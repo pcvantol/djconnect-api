@@ -15,6 +15,9 @@
 - Documented release cleanup as default behavior: after a new release is
   published and verified, old GitHub releases/tags are removed with
   `./cleanup_old_releases.sh --keep 1 --execute` unless intentionally retained.
+- Expanded Cloudflare operator documentation for required account permissions,
+  APNs `.p8` secret handling, remote D1 migration, Worker deploy,
+  `api.djconnect.dev` routing and `/health` smoke testing.
 
 ## 1.0.0 - 2026-06-20
 

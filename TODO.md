@@ -3,13 +3,18 @@
 ## Immediate Validation
 
 - Fix Cloudflare account/API token permissions for remote D1 migration and
-  Worker deploy.
+  Worker deploy. Required permissions include Workers Scripts deploy/edit and
+  D1 edit/query/migration access for database
+  `476a564f-08b2-4966-83b0-1221e2a4d063`.
 - Run `npx wrangler d1 migrations apply djconnect_api --remote`.
 - Run `npm run deploy`.
 - Configure `api.djconnect.dev` routing to the deployed Worker.
 - Set Cloudflare secrets outside the repository:
   - `APNS_PRIVATE_KEY`
   - `DJCONNECT_RELAY_SECRET`
+- For `APNS_PRIVATE_KEY`, paste the full Apple `.p8` file contents into
+  `npx wrangler secret put APNS_PRIVATE_KEY` when prompted. Do not print or
+  commit it.
 - Smoke test `GET https://api.djconnect.dev/health`.
 
 ## Security / Privacy

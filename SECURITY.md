@@ -14,6 +14,24 @@ Store production secrets with `wrangler secret put`.
 
 Secrets and production configuration must be set only through Cloudflare secrets/configuration. Do not place secrets in source files, tests, docs, fixtures, `.dev.vars`, `.env`, or migration files.
 
+Required Cloudflare secrets:
+
+- `APNS_PRIVATE_KEY`: full Apple `.p8` private key content. Paste it into
+  `npx wrangler secret put APNS_PRIVATE_KEY` when prompted. Never print, log,
+  commit or paste the key into issues.
+- `DJCONNECT_RELAY_SECRET`: long random relay shared secret for authenticated
+  HA -> API calls. Never commit the value.
+
+The APNs public metadata is allowed in source/config:
+
+- `APNS_TEAM_ID`
+- `APNS_KEY_ID`
+- APNs topics for iOS, macOS and watchOS
+- `APNS_ENVIRONMENT`
+
+Cloudflare API tokens are operator credentials. Do not commit them, put them in
+docs, or include them in command output shared publicly.
+
 ## Relay Auth
 
 All `/v1/push/*` calls require relay auth. The initial implementation supports a shared bearer secret and HMAC signatures. Per-install tokens can be added later without changing the APNs trust boundary.
@@ -39,6 +57,9 @@ Logs must only contain token hashes or redacted token snippets. Do not log reque
 ## Token Handling
 
 APNs tokens are hashed for lookup/audit. The current schema includes `apns_token` in plain form so development can relay pushes immediately; before production, replace this with encryption at rest or another protected token storage strategy.
+
+This is the main blocker before production APNs traffic. Do not treat the
+current `apns_token` column as production-hardened storage.
 
 ## Responsible Disclosure
 

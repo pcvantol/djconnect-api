@@ -8,11 +8,34 @@ Current release: `1.0.1`.
 
 ## Cloudflare Setup
 
+Cloudflare setup is intentionally manual for production credentials. Do not
+store APNs keys, relay secrets or Cloudflare tokens in this repository.
+
+### 1. Confirm Wrangler Account Permissions
+
+Wrangler currently uses the active Cloudflare login or `CLOUDFLARE_API_TOKEN`.
+The token/account must be authorized for:
+
+- Workers Scripts edit/deploy.
+- D1 database edit/query/migrations.
+- Account access for the account that owns D1 database
+  `476a564f-08b2-4966-83b0-1221e2a4d063`.
+
+Known blocked states from earlier validation:
+
+- Remote D1 migration failed with Cloudflare error `7403`.
+- Worker deploy failed with Wrangler/Cloudflare auth error `10000`.
+
+Fix the Cloudflare token/account permissions before running remote migration or
+deploy commands.
+
 The D1 database already exists:
 
 - `database_name`: `djconnect_api`
 - `database_id`: `476a564f-08b2-4966-83b0-1221e2a4d063`
 - binding: `DB`
+
+### 2. Validate D1 Locally
 
 Apply migrations locally:
 
@@ -20,20 +43,55 @@ Apply migrations locally:
 npx wrangler d1 migrations apply djconnect_api --local
 ```
 
-Apply migrations remotely:
+### 3. Set Secrets
 
-```sh
-npx wrangler d1 migrations apply djconnect_api --remote
-```
-
-Set required secrets:
+Set required secrets through Cloudflare only:
 
 ```sh
 npx wrangler secret put APNS_PRIVATE_KEY
 npx wrangler secret put DJCONNECT_RELAY_SECRET
 ```
 
-Do not print or commit the APNs private key. If setting from the local Apple key file, paste the contents into `wrangler secret put APNS_PRIVATE_KEY` when prompted.
+For `APNS_PRIVATE_KEY`, paste the full contents of the Apple `.p8` key into the
+Wrangler prompt. Do not document local key filenames or paths, print the key,
+pipe it into logs, commit it, add it to `.dev.vars`, or copy it into
+docs/issues/test fixtures.
+
+Use a long random value for `DJCONNECT_RELAY_SECRET`; never commit the value.
+
+### 4. Apply Remote D1 Migration
+
+Apply migrations remotely:
+
+```sh
+npx wrangler d1 migrations apply djconnect_api --remote
+```
+
+### 5. Deploy Worker
+
+```sh
+npm run deploy
+```
+
+### 6. Configure api.djconnect.dev
+
+In Cloudflare, route the deployed Worker to:
+
+```text
+https://api.djconnect.dev
+```
+
+Then smoke test:
+
+```sh
+curl https://api.djconnect.dev/health
+```
+
+Expected response:
+
+```json
+{"ok":true,"service":"djconnect-api"}
+```
 
 Non-secret APNs defaults are in `wrangler.jsonc`:
 
@@ -43,6 +101,10 @@ Non-secret APNs defaults are in `wrangler.jsonc`:
 - `APNS_TOPIC_MACOS=dev.djconnect.mac`
 - `APNS_TOPIC_WATCHOS=dev.djconnect.watch`
 - `APNS_ENVIRONMENT=sandbox`
+
+Keep `APNS_ENVIRONMENT=sandbox` for development/TestFlight sandbox testing.
+Switch to `production` only for production APNs release flows or use
+environment-specific Wrangler configuration when added.
 
 ## Development
 
@@ -59,7 +121,8 @@ Deploy:
 npm run deploy
 ```
 
-Route `api.djconnect.dev` to this Worker in Cloudflare after deploy.
+Route `api.djconnect.dev` to this Worker in Cloudflare after deploy, then run
+the `/health` smoke test above.
 
 ## Documentation
 
