@@ -8,7 +8,8 @@ Never commit or return:
 - Home Assistant tokens
 - Spotify tokens
 - Cloudflare API tokens
-- Relay shared secret
+- Relay/bootstrap shared secret
+- Per-install DJConnect relay tokens
 
 Store production secrets with `wrangler secret put`.
 
@@ -32,7 +33,8 @@ Required Cloudflare secrets:
   `npx wrangler secret put APNS_PRIVATE_KEY` when prompted. Never print, log,
   commit or paste the key into issues.
 - `DJCONNECT_RELAY_SECRET`: long random relay shared secret for authenticated
-  HA -> API calls. Never commit the value.
+  trusted bootstrap/operator calls that issue per-install tokens. Never commit
+  the value. Do not ship it in HACS or client code.
 
 The APNs public metadata is allowed in source/config:
 
@@ -46,7 +48,20 @@ docs, or include them in command output shared publicly.
 
 ## Relay Auth
 
-All `/v1/push/*` calls require relay auth. The initial implementation supports a shared bearer secret and HMAC signatures. Per-install tokens can be added later without changing the APNs trust boundary.
+Public HACS integrations must not contain a global DJConnect secret.
+
+The production auth model is:
+
+- `DJCONNECT_RELAY_SECRET` stays server/operator-side and is used only for
+  trusted bootstrap calls such as `POST /v1/install/token`.
+- Each Home Assistant installation receives its own `djci_...` install token.
+- `/v1/push/register`, `/v1/push/unregister`, `/v1/push/event` and
+  `/v1/install/rotate` require the per-install token for the exact
+  `ha_install_id` in the request body.
+- Install tokens are stored in D1 only as SHA-256 hashes. The raw token is
+  returned once and must be stored in Home Assistant config entry storage.
+- Rotate or disable a compromised install token without affecting other
+  installations.
 
 ## Data Minimization
 

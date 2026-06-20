@@ -30,3 +30,9 @@ export function sanitizeTokenForLog(token: string): string {
 export function cryptoRandomId(): string {
 	return crypto.randomUUID();
 }
+
+export function cryptoRandomToken(prefix: string): string {
+	const bytes = new Uint8Array(32);
+	crypto.getRandomValues(bytes);
+	return `${prefix}_${base64Url(bytes.buffer)}`;
+}

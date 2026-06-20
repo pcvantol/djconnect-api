@@ -14,6 +14,16 @@ export interface AppEnv {
 	DJCONNECT_RELAY_SECRET: string;
 }
 
+export interface InstallTokenRequest {
+	ha_install_id: string;
+	ha_user_hash?: string;
+	label?: string;
+}
+
+export interface RotateInstallTokenRequest {
+	ha_install_id: string;
+}
+
 export interface RegisterRequest {
 	ha_install_id: string;
 	ha_user_hash?: string;
@@ -71,4 +81,18 @@ export interface ApnsResult {
 	status: number;
 	reason?: string;
 	endpoint: string;
+}
+
+export interface InstallTokenRecord {
+	id: string;
+	ha_install_id: string;
+	ha_user_hash: string | null;
+	token_hash: string;
+	token_prefix: string;
+	label: string | null;
+	disabled: number;
+	created_at: string;
+	updated_at: string;
+	last_used_at: string | null;
+	rotated_at: string | null;
 }

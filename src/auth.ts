@@ -1,8 +1,9 @@
 import { timingSafeEqualString } from "./crypto";
 import { HttpError } from "./http";
+import { findInstallTokenByBearer, markInstallTokenUsed } from "./repository";
 import type { AppEnv } from "./types";
 
-export async function requireRelayAuth(request: Request, env: AppEnv): Promise<void> {
+export async function requireBootstrapAuth(request: Request, env: AppEnv): Promise<void> {
 	const authorization = request.headers.get("authorization") ?? "";
 	const expected = env.DJCONNECT_RELAY_SECRET;
 
@@ -28,6 +29,29 @@ export async function requireRelayAuth(request: Request, env: AppEnv): Promise<v
 	}
 
 	throw new HttpError(401, "auth_required");
+}
+
+export async function requireInstallAuth(request: Request, env: AppEnv, haInstallId: string): Promise<void> {
+	const authorization = request.headers.get("authorization") ?? "";
+	if (!authorization.startsWith("Bearer ")) {
+		throw new HttpError(401, "install_auth_required");
+	}
+
+	const token = authorization.slice("Bearer ".length).trim();
+	if (!token) {
+		throw new HttpError(401, "install_auth_required");
+	}
+
+	const record = await findInstallTokenByBearer(env.DB, token);
+	if (!record) {
+		throw new HttpError(401, "install_auth_required");
+	}
+
+	if (!(await timingSafeEqualString(record.ha_install_id, haInstallId))) {
+		throw new HttpError(403, "install_token_scope_mismatch");
+	}
+
+	await markInstallTokenUsed(env.DB, record.id);
 }
 
 async function verifyHmac(

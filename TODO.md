@@ -25,7 +25,8 @@
 ## Security / Privacy
 
 - Replace plain `apns_token` D1 storage with encrypted-at-rest storage.
-- Add per-install relay tokens with rotation/revocation support.
+- Add an operator-only disable/revoke endpoint for compromised per-install
+  tokens.
 - Add structured redacted logging helpers if more observability is needed.
 - Re-run the public repository secret scan before every release.
 - Confirm no request-body logging is enabled in Cloudflare observability/tail
@@ -39,7 +40,8 @@
   `/Users/pcvantol/Documents/GitHub/djconnect/API_CONTRACT.md`.
 - Add a compatibility note if HA integration versions require a specific API
   release line.
-- Add per-install token endpoints or provisioning flow when designed.
+- Design the user-facing pairing/provisioning flow that delivers a per-install
+  token to HACS without embedding global secrets.
 
 ## Testing
 

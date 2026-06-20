@@ -24,6 +24,13 @@
 - Hardened provisioning docs and script behavior with explicit `--dry-run`,
   Cloudflare API token verification before execute-mode changes and a note that
   custom-domain automation requires fixed Cloudflare auth/account permissions.
+- Added production-ready per-install relay tokens:
+  - `POST /v1/install/token` issues one-time-visible `djci_...` tokens through
+    trusted bootstrap auth.
+  - `POST /v1/install/rotate` rotates a single installation token.
+  - `/v1/push/register`, `/v1/push/unregister` and `/v1/push/event` now require
+    a per-install token scoped to the request `ha_install_id`.
+  - D1 stores install tokens only as SHA-256 hashes.
 
 ## 1.0.0 - 2026-06-20
 

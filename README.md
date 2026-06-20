@@ -92,6 +92,9 @@ pipe it into logs, commit it, add it to `.dev.vars`, or copy it into
 docs/issues/test fixtures.
 
 Use a long random value for `DJCONNECT_RELAY_SECRET`; never commit the value.
+This is a bootstrap/operator secret only. Do not ship it in HACS or client
+code. Public Home Assistant installations use per-install `djci_...` tokens
+issued by `POST /v1/install/token`.
 
 Automated equivalent:
 
@@ -219,7 +222,11 @@ by default:
 
 ## Notes
 
-- `POST /v1/push/register`, `/unregister`, and `/event` require relay auth.
+- `POST /v1/install/token` requires bootstrap auth with
+  `DJCONNECT_RELAY_SECRET`.
+- `POST /v1/push/register`, `/unregister`, `/event`, and
+  `/v1/install/rotate` require a per-install token scoped to the request
+  `ha_install_id`.
 - APNs endpoint selection uses each registration's `apns_environment`.
 - Invalid APNs tokens (`BadDeviceToken`, `Unregistered`, or HTTP 410) are marked disabled and invalid.
 - Audit rows intentionally avoid prompts, responses, tokens, chat history, and secrets.
