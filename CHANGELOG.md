@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Added production-level project documentation: contributing guide, code of
+  conduct, development environment, handoff, issue backlog, TODO backlog,
+  technical design decisions, third-party notices and MIT license.
+- Added `cleanup_old_releases.sh` for dry-run-first GitHub release/tag cleanup.
+- Expanded `AGENTS.md` and `README.md` with public repository and release
+  hygiene guidance.
+
 ## 1.0.0 - 2026-06-20
 
 Initial public DJConnect API backend release.

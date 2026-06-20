@@ -61,9 +61,26 @@ npm run deploy
 
 Route `api.djconnect.dev` to this Worker in Cloudflare after deploy.
 
+## Documentation
+
+- `API_CONTRACT.md` documents endpoint payloads.
+- `SECURITY.md` documents privacy, secret handling and responsible disclosure.
+- `DEVELOPMENT_ENVIRONMENT.md` documents local setup and validation commands.
+- `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` document community contribution standards.
+- `TECHNICAL_DESIGN_DECISIONS.md` records architecture and dependency decisions.
+- `THIRD_PARTY_NOTICES.md` summarizes third-party APIs, tools and trademarks.
+- `HANDOFF.md`, `TODO.md` and `ISSUES.md` track release state, next actions and known risks.
+- `CHAT_BOOTSTRAP.md` gives fresh-chat context for AI-assisted maintenance.
+
 ## Release
 
 Release hygiene follows the canonical cross-repo checklist in `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. Use `CHANGELOG.md` as the GitHub Release body.
+
+Use the cleanup helper as a dry-run before deleting old releases/tags:
+
+```sh
+./cleanup_old_releases.sh --keep 1
+```
 
 ## Notes
 
