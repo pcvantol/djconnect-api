@@ -2,17 +2,6 @@
 
 ## Open / Needs Validation
 
-### APNs token encryption at rest
-
-- Status: open before broader production rollout.
-- Area: D1 storage/security.
-- Symptom: `apns_token` is stored in plain form so the relay can send APNs
-  pushes.
-- Current mitigation: `apns_token_hash` is used for lookup/audit; docs call out
-  the plain token storage explicitly; request and audit logs must stay redacted.
-- Next action: Replace plain storage with encrypted-at-rest storage or another
-  protected token handling strategy.
-
 ### HACS pairing and install-token provisioning
 
 - Status: open.
@@ -47,6 +36,16 @@
   clients send live registrations.
 
 ## Resolved
+
+### APNs token encryption at rest
+
+- Status: implemented after `v1.0.2`.
+- Resolution: New APNs registrations store encrypted token material in D1 using
+  AES-GCM and the Cloudflare Worker secret `APNS_TOKEN_ENCRYPTION_KEY`.
+  `apns_token_hash` remains for lookup/audit. The nullable `apns_token` column
+  is retained only as a legacy migration fallback.
+- Follow-up: Validate the remote D1 migration and document any future
+  key-rotation/backfill procedure.
 
 ### Cloudflare remote authorization
 

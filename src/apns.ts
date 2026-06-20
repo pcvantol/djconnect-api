@@ -1,4 +1,4 @@
-import { base64Url } from "./crypto";
+import { base64Url, decryptSecret } from "./crypto";
 import type { ApnsEnvironment, ApnsResult, AppEnv, EventType, Registration } from "./types";
 
 export type Fetcher = typeof fetch;
@@ -54,7 +54,18 @@ export async function sendApns(
 	payload: Record<string, unknown>,
 	fetcher: Fetcher = fetch,
 ): Promise<ApnsResult> {
-	const endpoint = apnsEndpoint(registration.apns_environment, registration.apns_token);
+	let deviceToken: string | null;
+	try {
+		deviceToken = await registrationApnsToken(env, registration);
+	} catch {
+		return { ok: false, status: 0, reason: "TokenDecryptFailed", endpoint: "" };
+	}
+
+	if (!deviceToken) {
+		return { ok: false, status: 0, reason: "MissingDeviceToken", endpoint: "" };
+	}
+
+	const endpoint = apnsEndpoint(registration.apns_environment, deviceToken);
 	const token = await createProviderToken(env);
 	const response = await fetcher(endpoint, {
 		method: "POST",
@@ -74,6 +85,14 @@ export async function sendApns(
 	}
 
 	return { ok: response.ok, status: response.status, reason, endpoint };
+}
+
+async function registrationApnsToken(env: AppEnv, registration: Registration): Promise<string | null> {
+	if (registration.apns_token_ciphertext && registration.apns_token_nonce) {
+		return decryptSecret(registration.apns_token_ciphertext, registration.apns_token_nonce, env.APNS_TOKEN_ENCRYPTION_KEY);
+	}
+
+	return registration.apns_token;
 }
 
 async function createProviderToken(env: AppEnv): Promise<string> {

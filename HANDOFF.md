@@ -84,8 +84,9 @@ their own Home Assistant instance after opening, especially
 
 ## Current Decisions
 
-- D1 stores `apns_token_hash` for lookup/audit and `apns_token` as development
-  relay storage. Replace this with encryption at rest before production use.
+- D1 stores `apns_token_hash` for lookup/audit and encrypted APNs token
+  material for relay delivery. The nullable `apns_token` column remains only as
+  a legacy migration fallback for old rows.
 - APNs endpoint selection is per registration: sandbox or production.
 - `BadDeviceToken`, `Unregistered` and HTTP 410 mark a registration
   disabled/invalid.
@@ -119,6 +120,8 @@ Cloudflare production setup is active:
 
 - `APNS_PRIVATE_KEY` is installed as a Cloudflare Worker secret.
 - `DJCONNECT_RELAY_SECRET` is installed as a Cloudflare Worker secret.
+- `APNS_TOKEN_ENCRYPTION_KEY` must be installed as a Cloudflare Worker secret
+  before encrypted APNs registrations are accepted.
 - Remote D1 contains `install_tokens`, `registrations` and `relay_events`.
 - Worker deploy succeeded.
 - `https://api.djconnect.dev/health` returns `{"ok":true,"service":"djconnect-api"}`.
@@ -165,7 +168,9 @@ Before every release:
 
 ## Next Actions
 
-- Replace plain `apns_token` storage with encrypted-at-rest token storage.
+- Validate the encrypted APNs token migration in remote D1 after deployment.
+- Plan an operator-only key rotation/backfill procedure for
+  `APNS_TOKEN_ENCRYPTION_KEY`.
 - Build the HACS-side per-install token storage and event relay support.
 - Add an operator-only disable/revoke endpoint for compromised per-install
   tokens.

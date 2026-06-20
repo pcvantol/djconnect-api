@@ -13,7 +13,8 @@ Options:
   --dry-run                 Plan selected actions without making changes. Default.
   --execute                 Actually run selected actions. Default is dry-run.
   --all                     Run secrets, remote migration, deploy, domain setup and smoke test.
-  --set-secrets             Set APNS_PRIVATE_KEY and DJCONNECT_RELAY_SECRET with Wrangler.
+  --set-secrets             Set APNS_PRIVATE_KEY, DJCONNECT_RELAY_SECRET and
+                            APNS_TOKEN_ENCRYPTION_KEY with Wrangler.
   --migrate                 Apply D1 migrations to the remote djconnect_api database.
   --deploy                  Deploy the Worker with Wrangler.
   --custom-domain           Configure the Worker custom domain through Cloudflare API.
@@ -23,6 +24,9 @@ Options:
                             Required with --set-secrets.
   --relay-secret-env NAME   Environment variable containing the relay secret.
                             Default: DJCONNECT_RELAY_SECRET_VALUE.
+  --apns-token-key-env NAME Environment variable containing a base64 32-byte
+                            APNs token encryption key.
+                            Default: APNS_TOKEN_ENCRYPTION_KEY_VALUE.
   --account-id ID           Cloudflare account ID. Default: CLOUDFLARE_ACCOUNT_ID.
   --api-token-env NAME      Environment variable containing Cloudflare API token.
                             Default: CLOUDFLARE_API_TOKEN.
@@ -36,6 +40,7 @@ Examples:
   scripts/provision_cloudflare.sh --all
   scripts/provision_cloudflare.sh --execute --migrate --deploy --smoke-test
   DJCONNECT_RELAY_SECRET_VALUE='...' \
+  APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
     scripts/provision_cloudflare.sh --execute --set-secrets \
     --apns-private-key-file /secure/path/key.p8
 EOF
@@ -49,6 +54,7 @@ CUSTOM_DOMAIN=false
 SMOKE_TEST=false
 APNS_PRIVATE_KEY_FILE=""
 RELAY_SECRET_ENV="DJCONNECT_RELAY_SECRET_VALUE"
+APNS_TOKEN_KEY_ENV="APNS_TOKEN_ENCRYPTION_KEY_VALUE"
 ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-}"
 API_TOKEN_ENV="CLOUDFLARE_API_TOKEN"
 SERVICE_NAME="djconnect-api"
@@ -107,6 +113,14 @@ while [[ $# -gt 0 ]]; do
         exit 64
       fi
       RELAY_SECRET_ENV="$2"
+      shift 2
+      ;;
+    --apns-token-key-env)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        echo "--apns-token-key-env requires an environment variable name." >&2
+        exit 64
+      fi
+      APNS_TOKEN_KEY_ENV="$2"
       shift 2
       ;;
     --account-id)
@@ -287,6 +301,47 @@ set_worker_secret_from_env() {
   fi
 }
 
+set_apns_token_encryption_key() {
+ local env_name="$1"
+ local value="${!env_name:-}"
+  local decoded_size
+
+  if [[ -z "$value" ]]; then
+    if [[ "$EXECUTE" == true ]]; then
+      echo "Environment variable $env_name is required for APNS_TOKEN_ENCRYPTION_KEY." >&2
+      echo "Generate one with: openssl rand -base64 32" >&2
+      exit 64
+    fi
+    say_action "set Worker secret APNS_TOKEN_ENCRYPTION_KEY from environment variable $env_name (value required when executing)"
+    return
+  fi
+
+  if ! decode_base64 "$value" >/dev/null; then
+    echo "$env_name must be base64 encoded." >&2
+    exit 1
+  fi
+
+  decoded_size="$(decode_base64 "$value" | wc -c | tr -d ' ')"
+  if [[ "$decoded_size" != "32" ]]; then
+    echo "$env_name must decode to exactly 32 bytes for AES-256-GCM." >&2
+    exit 1
+  fi
+
+  say_action "set Worker secret APNS_TOKEN_ENCRYPTION_KEY from environment variable $env_name (value redacted)"
+  if [[ "$EXECUTE" == true ]]; then
+    printf '%s' "$value" | npx wrangler secret put "APNS_TOKEN_ENCRYPTION_KEY" >/dev/null
+  fi
+}
+
+decode_base64() {
+  local value="$1"
+  if printf '%s' "$value" | base64 --decode >/dev/null 2>&1; then
+    printf '%s' "$value" | base64 --decode
+    return
+  fi
+  printf '%s' "$value" | base64 -D
+}
+
 configure_custom_domain() {
   local api_token="${!API_TOKEN_ENV:-}"
   local response_file
@@ -331,6 +386,7 @@ verify_cloudflare_token
 if [[ "$SET_SECRETS" == true ]]; then
   set_worker_secret_from_file "APNS_PRIVATE_KEY" "$APNS_PRIVATE_KEY_FILE"
   set_worker_secret_from_env "DJCONNECT_RELAY_SECRET" "$RELAY_SECRET_ENV"
+  set_apns_token_encryption_key "$APNS_TOKEN_KEY_ENV"
 fi
 
 if [[ "$MIGRATE" == true ]]; then

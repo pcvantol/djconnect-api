@@ -105,10 +105,14 @@ Why:
 - D1 is a good fit for small relational registration lookup and audit.
 - The database schema can be public because it contains no credentials.
 
-Known production hardening:
+Security posture:
 
-- `apns_token` is plain development relay storage. Replace it with encrypted at
-  rest storage before production use.
+- New APNs registrations store encrypted token material in D1 using AES-GCM and
+  the Cloudflare Worker secret `APNS_TOKEN_ENCRYPTION_KEY`.
+- `apns_token_hash` remains available for lookup/audit without revealing the
+  raw token.
+- The nullable `apns_token` column is retained only as a legacy migration
+  fallback and should stay empty for new rows.
 
 ### APNs Provider Token Auth
 

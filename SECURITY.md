@@ -17,8 +17,9 @@ The repository also provides `scripts/provision_cloudflare.sh` for automated
 setup. It is dry-run by default, supports explicit `--dry-run`, refuses shell
 tracing and does not echo secret values. Provide APNs key material through
 `--apns-private-key-file` and the relay secret through an environment variable such as
-`DJCONNECT_RELAY_SECRET_VALUE`; never pass secret values directly in shell
-arguments.
+`DJCONNECT_RELAY_SECRET_VALUE`. Provide the APNs token encryption key through
+an environment variable such as `APNS_TOKEN_ENCRYPTION_KEY_VALUE`; never pass
+secret values directly in shell arguments.
 
 In execute mode, the script requires and verifies `CLOUDFLARE_API_TOKEN` before
 running Cloudflare-changing actions. A valid token alone is not enough for every
@@ -35,6 +36,9 @@ Required Cloudflare secrets:
 - `DJCONNECT_RELAY_SECRET`: long random relay shared secret for authenticated
   trusted bootstrap/operator calls that issue per-install tokens. Never commit
   the value. Do not ship it in HACS or client code.
+- `APNS_TOKEN_ENCRYPTION_KEY`: base64-encoded 32-byte key used to encrypt APNs
+  device tokens before D1 storage. Generate with `openssl rand -base64 32`.
+  Never commit, print, log, or copy it into GitHub Actions.
 
 The APNs public metadata is allowed in source/config:
 
@@ -83,10 +87,14 @@ Logs must only contain token hashes or redacted token snippets. Do not log reque
 
 ## Token Handling
 
-APNs tokens are hashed for lookup/audit. The current schema includes `apns_token` in plain form so development can relay pushes immediately; before production, replace this with encryption at rest or another protected token storage strategy.
+APNs tokens are hashed for lookup/audit and encrypted before D1 storage with
+AES-GCM using `APNS_TOKEN_ENCRYPTION_KEY`. New registrations write encrypted
+token material to `apns_token_ciphertext`, `apns_token_nonce` and
+`apns_token_key_version`; the raw nullable `apns_token` column is retained only
+as a legacy migration fallback for older rows.
 
-This is the main blocker before production APNs traffic. Do not treat the
-current `apns_token` column as production-hardened storage.
+Rotate the encryption key only with a deliberate re-encryption/backfill plan.
+Do not log decrypted APNs tokens; use hashes or redacted snippets only.
 
 ## Responsible Disclosure
 

@@ -5,6 +5,7 @@ import { apnsEndpoint, buildApnsPayload } from "../src/apns";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 const EXAMPLE_RELAY_SECRET = "example-relay-secret";
+const EXAMPLE_APNS_TOKEN_ENCRYPTION_KEY = btoa("0123456789abcdef0123456789abcdef");
 const AUTH = `Bearer ${EXAMPLE_RELAY_SECRET}`;
 
 const testEnv = {
@@ -16,6 +17,7 @@ const testEnv = {
 	APNS_TOPIC_MACOS: "dev.djconnect.mac",
 	APNS_TOPIC_WATCHOS: "dev.djconnect.watch",
 	APNS_ENVIRONMENT: "sandbox",
+	APNS_TOKEN_ENCRYPTION_KEY: EXAMPLE_APNS_TOKEN_ENCRYPTION_KEY,
 	DJCONNECT_RELAY_SECRET: EXAMPLE_RELAY_SECRET,
 };
 
@@ -111,8 +113,25 @@ describe("DJConnect API worker", () => {
 		expect(body.ok).toBe(true);
 		expect(body.apns_token_hash).toHaveLength(64);
 
-		const row = await env.DB.prepare("SELECT disabled, invalid FROM registrations WHERE device_id = ?").bind("example-device").first<{ disabled: number; invalid: number }>();
-		expect(row).toEqual({ disabled: 0, invalid: 0 });
+		const row = await env.DB.prepare(`
+			SELECT apns_token, apns_token_ciphertext, apns_token_nonce, apns_token_key_version, disabled, invalid
+			FROM registrations
+			WHERE device_id = ?
+		`).bind("example-device").first<{
+			apns_token: string | null;
+			apns_token_ciphertext: string | null;
+			apns_token_nonce: string | null;
+			apns_token_key_version: string | null;
+			disabled: number;
+			invalid: number;
+		}>();
+		expect(row?.disabled).toBe(0);
+		expect(row?.invalid).toBe(0);
+		expect(row?.apns_token).toBeNull();
+		expect(row?.apns_token_ciphertext).toEqual(expect.any(String));
+		expect(row?.apns_token_ciphertext).not.toContain("example-apns-token");
+		expect(row?.apns_token_nonce).toEqual(expect.any(String));
+		expect(row?.apns_token_key_version).toEqual(expect.any(String));
 
 		const unregister = await dispatch("/v1/push/unregister", {
 			ha_install_id: "example-ha-install",
@@ -138,6 +157,7 @@ describe("DJConnect API worker", () => {
 		}, installAuth);
 		expect(event.status).toBe(200);
 		expect(fetchMock).toHaveBeenCalledOnce();
+		expect(fetchMock.mock.calls[0]?.[0]).toBe("https://api.sandbox.push.apple.com/3/device/example-apns-token");
 
 		const row = await env.DB.prepare("SELECT disabled, invalid, last_error_code FROM registrations WHERE device_id = ?").bind("example-device").first<{ disabled: number; invalid: number; last_error_code: string }>();
 		expect(row).toEqual({ disabled: 1, invalid: 1, last_error_code: "BadDeviceToken" });
@@ -207,7 +227,10 @@ CREATE TABLE IF NOT EXISTS registrations (
 	device_id TEXT NOT NULL,
 	client_type TEXT NOT NULL CHECK (client_type IN ('ios', 'macos', 'watchos')),
 	apns_token_hash TEXT NOT NULL,
-	apns_token TEXT NOT NULL,
+	apns_token TEXT,
+	apns_token_ciphertext TEXT,
+	apns_token_nonce TEXT,
+	apns_token_key_version TEXT,
 	apns_environment TEXT NOT NULL CHECK (apns_environment IN ('sandbox', 'production')),
 	topic TEXT NOT NULL,
 	app_bundle_id TEXT,

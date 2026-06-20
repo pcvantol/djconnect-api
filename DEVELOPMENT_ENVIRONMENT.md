@@ -95,10 +95,20 @@ Required secrets must be set through Cloudflare secrets/configuration:
 ```sh
 npx wrangler secret put APNS_PRIVATE_KEY
 npx wrangler secret put DJCONNECT_RELAY_SECRET
+npx wrangler secret put APNS_TOKEN_ENCRYPTION_KEY
 ```
 
 When setting `APNS_PRIVATE_KEY`, paste the full Apple `.p8` file contents into
 the Wrangler prompt. Do not print the key or pipe it into shell history/logs.
+
+Generate `APNS_TOKEN_ENCRYPTION_KEY` with:
+
+```sh
+openssl rand -base64 32
+```
+
+The value must decode to exactly 32 bytes and must remain only in Cloudflare
+Worker secrets.
 
 Do not commit `.p8` files, `.dev.vars`, `.env`, API tokens or command output
 that contains secrets.
@@ -119,6 +129,7 @@ To set secrets safely:
 
 ```sh
 DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
   npm run provision:cloudflare -- --execute --set-secrets \
   --apns-private-key-file /secure/path/to/key.p8
 ```

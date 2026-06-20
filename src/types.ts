@@ -11,6 +11,7 @@ export interface AppEnv {
 	APNS_TOPIC_MACOS: string;
 	APNS_TOPIC_WATCHOS: string;
 	APNS_ENVIRONMENT: ApnsEnvironment;
+	APNS_TOKEN_ENCRYPTION_KEY: string;
 	DJCONNECT_RELAY_SECRET: string;
 }
 
@@ -61,7 +62,10 @@ export interface Registration {
 	device_id: string;
 	client_type: ClientType;
 	apns_token_hash: string;
-	apns_token: string;
+	apns_token: string | null;
+	apns_token_ciphertext: string | null;
+	apns_token_nonce: string | null;
+	apns_token_key_version: string | null;
 	apns_environment: ApnsEnvironment;
 	topic: string;
 	app_bundle_id: string | null;
