@@ -44,6 +44,9 @@ jobs:
       - name: Test
         run: npm test -- --run
 
+      - name: Postman contract smoke test
+        run: npm run postman:test
+
       - name: Secret pattern scan
         run: |
           set -euo pipefail
@@ -90,3 +93,6 @@ jobs:
 
       - name: Smoke test
         run: curl --fail --silent --show-error https://api.djconnect.dev/health
+
+      - name: Postman contract smoke test
+        run: npm run postman:test

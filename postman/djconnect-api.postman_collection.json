@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "4e3a4647-6f65-4d71-a6f0-14f82a43ec0c",
+		"name": "DJConnect API",
+		"description": "Privacy-safe DJConnect API contract smoke tests. This collection intentionally avoids real APNs tokens, Home Assistant tokens, prompts, responses, chat history and secrets.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('health returns 200', function () {",
+							"\tpm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('health body is stable', function () {",
+							"\tconst body = pm.response.json();",
+							"\tpm.expect(body).to.have.property('ok', true);",
+							"\tpm.expect(body).to.have.property('service', 'djconnect-api');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Install Token Requires Bootstrap Auth",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ha_install_id\": \"example-ha-install\",\n  \"ha_user_hash\": \"example-user-hash\",\n  \"label\": \"example-ha\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/install/token",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"install",
+						"token"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('install token endpoint rejects anonymous calls', function () {",
+							"\tpm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test('error body is auth_required', function () {",
+							"\tpm.expect(pm.response.json()).to.have.property('error', 'auth_required');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Push Register Requires Install Auth",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ha_install_id\": \"example-ha-install\",\n  \"ha_user_hash\": \"example-user-hash\",\n  \"device_id\": \"example-device\",\n  \"client_type\": \"ios\",\n  \"apns_token\": \"example-apns-token\",\n  \"apns_environment\": \"sandbox\",\n  \"app_bundle_id\": \"dev.djconnect.ios\",\n  \"app_version\": \"1.0.0\",\n  \"locale\": \"nl-NL\",\n  \"categories\": [\"ask_dj\"]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/push/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"push",
+						"register"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('register rejects anonymous calls', function () {",
+							"\tpm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test('error body is install_auth_required', function () {",
+							"\tpm.expect(pm.response.json()).to.have.property('error', 'install_auth_required');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Push Event Requires Install Auth And Stays Generic",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ha_install_id\": \"example-ha-install\",\n  \"ha_user_hash\": \"example-user-hash\",\n  \"event_type\": \"ask_dj_response\",\n  \"history_revision\": \"42\",\n  \"client_message_id\": \"example-client-message\",\n  \"open_target\": \"history\",\n  \"client_types\": [\"ios\", \"watchos\"]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/push/event",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"push",
+						"event"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('event rejects anonymous calls', function () {",
+							"\tpm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test('error body is install_auth_required', function () {",
+							"\tpm.expect(pm.response.json()).to.have.property('error', 'install_auth_required');",
+							"});",
+							"",
+							"pm.test('request body contains no raw prompt/response/secrets', function () {",
+							"\tconst raw = pm.request.body.raw;",
+							"\tpm.expect(raw).to.not.match(/prompt|response_text|assistant|spotify|token|secret|history_memory/i);",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://api.djconnect.dev",
+			"type": "string"
+		}
+	]
+}
