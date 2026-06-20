@@ -4,7 +4,7 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
-Current release: `1.0.1`.
+Current release: `1.0.2`.
 
 ## Cloudflare Setup
 
@@ -42,8 +42,8 @@ export CLOUDFLARE_API_TOKEN='replace-with-api-token'
 ```
 
 The script configures `api.djconnect.dev` for Worker service `djconnect-api` by
-default. Custom domain automation only works after Cloudflare auth/token
-permissions are fixed for the target account.
+default. The production Worker is currently deployed and routed to
+`https://api.djconnect.dev`.
 
 ### 1. Confirm Wrangler Account Permissions
 
@@ -58,13 +58,9 @@ The token/account must be authorized for:
 - Account access for the account that owns D1 database
   `476a564f-08b2-4966-83b0-1221e2a4d063`.
 
-Known blocked states from earlier validation:
-
-- Remote D1 migration failed with Cloudflare error `7403`.
-- Worker deploy failed with Wrangler/Cloudflare auth error `10000`.
-
-Fix the Cloudflare token/account permissions before running remote migration or
-deploy commands.
+The production GitHub Actions secret `CLOUDFLARE_API_TOKEN` has these
+permissions configured. If deploys fail with Cloudflare authentication errors,
+verify the same permission set before rotating the token.
 
 The D1 database already exists:
 
@@ -175,6 +171,15 @@ Keep `APNS_ENVIRONMENT=sandbox` for development/TestFlight sandbox testing.
 Switch to `production` only for production APNs release flows or use
 environment-specific Wrangler configuration when added.
 
+## Production Status
+
+- `https://api.djconnect.dev/health` is live.
+- Remote D1 migrations are applied.
+- Cloudflare Worker secrets are configured for `APNS_PRIVATE_KEY` and
+  `DJCONNECT_RELAY_SECRET`.
+- GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
+- The latest release is `v1.0.2`.
+
 ## Development
 
 ```sh
@@ -190,8 +195,8 @@ Deploy:
 npm run deploy
 ```
 
-Route `api.djconnect.dev` to this Worker in Cloudflare after deploy, then run
-the `/health` smoke test above.
+The deployed production route is `https://api.djconnect.dev`; run the
+`/health` smoke test above after deploys.
 
 ## CI/CD
 
