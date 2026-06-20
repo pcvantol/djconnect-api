@@ -9,6 +9,9 @@
 - Run `npx wrangler d1 migrations apply djconnect_api --remote`.
 - Run `npm run deploy`.
 - Configure `api.djconnect.dev` routing to the deployed Worker.
+- Use `scripts/provision_cloudflare.sh` to automate the secret, migration,
+  deploy, custom-domain and smoke-test steps once Cloudflare API permissions are
+  fixed.
 - Set Cloudflare secrets outside the repository:
   - `APNS_PRIVATE_KEY`
   - `DJCONNECT_RELAY_SECRET`

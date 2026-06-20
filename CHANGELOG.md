@@ -18,6 +18,9 @@
 - Expanded Cloudflare operator documentation for required account permissions,
   APNs `.p8` secret handling, remote D1 migration, Worker deploy,
   `api.djconnect.dev` routing and `/health` smoke testing.
+- Added `scripts/provision_cloudflare.sh`, a dry-run-first provisioning helper
+  for Cloudflare secrets, remote D1 migration, Worker deploy, custom domain
+  setup and `/health` smoke testing without printing secret values.
 
 ## 1.0.0 - 2026-06-20
 

@@ -98,6 +98,28 @@ the Wrangler prompt. Do not print the key or pipe it into shell history/logs.
 Do not commit `.p8` files, `.dev.vars`, `.env`, API tokens or command output
 that contains secrets.
 
+The repository includes a dry-run-first provisioning helper:
+
+```sh
+npm run provision:cloudflare -- --all
+```
+
+Run selected actions with `--execute` only after reviewing the dry-run:
+
+```sh
+npm run provision:cloudflare -- --execute --migrate --deploy --custom-domain --smoke-test
+```
+
+To set secrets safely:
+
+```sh
+DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+  npm run provision:cloudflare -- --execute --set-secrets \
+  --apns-private-key-file /secure/path/to/key.p8
+```
+
+The script refuses shell tracing and redacts secret values from its own output.
+
 After secrets, remote migration and deploy are configured, route the Worker to
 `https://api.djconnect.dev` and smoke test:
 

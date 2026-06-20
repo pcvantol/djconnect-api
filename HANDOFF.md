@@ -104,11 +104,27 @@ Blocked by external Cloudflare auth:
 
 ## Manual Cloudflare Work Still Required
 
+Most of this can be automated with:
+
+```sh
+npm run provision:cloudflare -- --all
+```
+
+After reviewing the dry-run, run selected steps with `--execute`.
+
 1. Fix Cloudflare account/API token permissions for the account that owns D1
    database `476a564f-08b2-4966-83b0-1221e2a4d063`.
 2. Set Cloudflare secrets:
    - `APNS_PRIVATE_KEY`
    - `DJCONNECT_RELAY_SECRET`
+
+   Automated form:
+
+   ```sh
+   DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+     scripts/provision_cloudflare.sh --execute --set-secrets \
+     --apns-private-key-file /secure/path/to/key.p8
+   ```
 3. Apply remote D1 migration:
 
    ```sh
@@ -121,11 +137,23 @@ Blocked by external Cloudflare auth:
    npm run deploy
    ```
 
+   Automated form:
+
+   ```sh
+   scripts/provision_cloudflare.sh --execute --migrate --deploy
+   ```
+
 5. Route `https://api.djconnect.dev` to the deployed Worker in Cloudflare.
 6. Smoke test:
 
    ```sh
    curl https://api.djconnect.dev/health
+   ```
+
+   Automated form:
+
+   ```sh
+   scripts/provision_cloudflare.sh --execute --custom-domain --smoke-test
    ```
 
 Expected response:

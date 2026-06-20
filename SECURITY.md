@@ -12,6 +12,13 @@ Never commit or return:
 
 Store production secrets with `wrangler secret put`.
 
+The repository also provides `scripts/provision_cloudflare.sh` for automated
+setup. It is dry-run by default, refuses shell tracing and does not echo secret
+values. Provide APNs key material through `--apns-private-key-file` and the
+relay secret through an environment variable such as
+`DJCONNECT_RELAY_SECRET_VALUE`; never pass secret values directly in shell
+arguments.
+
 Secrets and production configuration must be set only through Cloudflare secrets/configuration. Do not place secrets in source files, tests, docs, fixtures, `.dev.vars`, `.env`, or migration files.
 
 Required Cloudflare secrets:

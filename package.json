@@ -7,7 +7,8 @@
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "test": "vitest",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "provision:cloudflare": "scripts/provision_cloudflare.sh"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.12.4",

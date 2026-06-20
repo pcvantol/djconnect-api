@@ -11,6 +11,38 @@ Current release: `1.0.1`.
 Cloudflare setup is intentionally manual for production credentials. Do not
 store APNs keys, relay secrets or Cloudflare tokens in this repository.
 
+Most Cloudflare setup can also be automated with the safe provisioning script.
+It is dry-run by default and never prints secret values:
+
+```sh
+npm run provision:cloudflare -- --all
+```
+
+Run selected actions with `--execute` only after reviewing the dry-run:
+
+```sh
+npm run provision:cloudflare -- --execute --migrate --deploy --custom-domain --smoke-test
+```
+
+To set secrets through the script, pass the APNs `.p8` file path as an argument
+and the relay secret through an environment variable. The values are not echoed:
+
+```sh
+DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+  npm run provision:cloudflare -- --execute --set-secrets \
+  --apns-private-key-file /secure/path/to/key.p8
+```
+
+For custom domain setup through the Cloudflare API, set:
+
+```sh
+export CLOUDFLARE_ACCOUNT_ID='replace-with-account-id'
+export CLOUDFLARE_API_TOKEN='replace-with-api-token'
+```
+
+The script configures `api.djconnect.dev` for Worker service `djconnect-api` by
+default.
+
 ### 1. Confirm Wrangler Account Permissions
 
 Wrangler currently uses the active Cloudflare login or `CLOUDFLARE_API_TOKEN`.
@@ -59,6 +91,14 @@ docs/issues/test fixtures.
 
 Use a long random value for `DJCONNECT_RELAY_SECRET`; never commit the value.
 
+Automated equivalent:
+
+```sh
+DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+  scripts/provision_cloudflare.sh --execute --set-secrets \
+  --apns-private-key-file /secure/path/to/key.p8
+```
+
 ### 4. Apply Remote D1 Migration
 
 Apply migrations remotely:
@@ -67,10 +107,22 @@ Apply migrations remotely:
 npx wrangler d1 migrations apply djconnect_api --remote
 ```
 
+Automated equivalent:
+
+```sh
+scripts/provision_cloudflare.sh --execute --migrate
+```
+
 ### 5. Deploy Worker
 
 ```sh
 npm run deploy
+```
+
+Automated equivalent:
+
+```sh
+scripts/provision_cloudflare.sh --execute --deploy
 ```
 
 ### 6. Configure api.djconnect.dev
@@ -91,6 +143,12 @@ Expected response:
 
 ```json
 {"ok":true,"service":"djconnect-api"}
+```
+
+Automated equivalent:
+
+```sh
+scripts/provision_cloudflare.sh --execute --custom-domain --smoke-test
 ```
 
 Non-secret APNs defaults are in `wrangler.jsonc`:
@@ -134,6 +192,8 @@ the `/health` smoke test above.
 - `THIRD_PARTY_NOTICES.md` summarizes third-party APIs, tools and trademarks.
 - `HANDOFF.md`, `TODO.md` and `ISSUES.md` track release state, next actions and known risks.
 - `CHAT_BOOTSTRAP.md` gives fresh-chat context for AI-assisted maintenance.
+- `scripts/provision_cloudflare.sh` automates Cloudflare secrets, migration,
+  deploy, custom domain and smoke-test steps with dry-run-first safety.
 
 ## Release
 
