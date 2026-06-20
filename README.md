@@ -206,6 +206,7 @@ GitHub Actions runs `Validate` on pull requests and pushes to `main`:
 - `npx tsc --noEmit`
 - `npx wrangler deploy --dry-run`
 - `npm test -- --run`
+- `npm run postman:test`
 - public-repo secret pattern scan
 
 Pushes to `main` also run the `Deploy` job:
@@ -213,6 +214,7 @@ Pushes to `main` also run the `Deploy` job:
 - remote D1 migrations
 - Worker deploy
 - `https://api.djconnect.dev/health` smoke test
+- `npm run postman:test`
 
 Required GitHub Actions secret:
 
@@ -223,6 +225,22 @@ Required GitHub Actions secret:
 Worker runtime secrets such as `APNS_PRIVATE_KEY` and
 `DJCONNECT_RELAY_SECRET` stay in Cloudflare Worker secrets; do not copy them
 into GitHub Actions secrets unless a future workflow explicitly needs them.
+
+## Postman
+
+The Postman collection lives at
+`postman/djconnect-api.postman_collection.json`.
+
+Run the privacy-safe contract smoke tests with:
+
+```sh
+npm run postman:test
+```
+
+The collection checks `/health` and unauthenticated negative cases for the
+protected install/push endpoints. It intentionally uses only example values and
+does not require or contain APNs tokens, install tokens, relay secrets, prompts,
+assistant responses, Spotify tokens, Home Assistant tokens or chat history.
 
 ## Documentation
 

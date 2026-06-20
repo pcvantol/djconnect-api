@@ -2,6 +2,12 @@
 
 Base URL: `https://api.djconnect.dev`
 
+Postman collection:
+`postman/djconnect-api.postman_collection.json`
+
+The collection is intentionally privacy-safe: it tests `/health` and
+unauthenticated negative cases only, using example values and no secrets.
+
 Production auth uses per-install tokens. HACS integrations must never embed a
 global DJConnect secret.
 
