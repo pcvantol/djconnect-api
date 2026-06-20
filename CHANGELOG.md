@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.6 - 2026-06-20
+
+- Added `OPERATOR_RUNBOOK.md` with the production operator procedure for
+  `APNS_TOKEN_ENCRYPTION_KEY` rotation and encrypted APNs token backfill.
+- Documented preferred zero-downtime rotation with temporary dual-key/backfill
+  support, emergency rotation behavior and count-only D1 verification queries.
+- Clarified that the current Worker runtime uses one active APNs token
+  encryption key, so planned zero-downtime rotation requires temporary
+  dual-key/backfill tooling before replacing the Cloudflare secret.
+- Updated README, security, handoff, TODO and technical design documentation to
+  reference the operator runbook.
+- Hardened GitHub branch protection by requiring the `Validate` status check
+  before merging to `main`.
+
 ## 1.0.5 - 2026-06-20
 
 - Added `POST /v1/operator/install-token/revoke` for the DJConnect operator
