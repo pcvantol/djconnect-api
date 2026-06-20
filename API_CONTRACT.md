@@ -152,6 +152,39 @@ Response:
 }
 ```
 
+## POST /v1/operator/install-token/revoke
+
+Disables one compromised per-install token without issuing a replacement.
+This endpoint is for the DJConnect operator/admin website.
+
+Requires bootstrap/operator auth using `DJCONNECT_RELAY_SECRET` through bearer
+auth or HMAC signature. Per-install `djci_...` tokens are rejected and must not
+be used by admin tooling.
+
+Request:
+
+```json
+{
+  "ha_install_id": "example-ha-install",
+  "token_id": "install-token-id",
+  "reason": "operator-disabled-compromised-install"
+}
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "revoked": 1
+}
+```
+
+`revoked` is `1` when an active token was disabled and `0` when no active token
+matched that `ha_install_id`/`token_id` pair. The API stores `revoked_at` and
+an optional short `revoke_reason`; do not put raw tokens, user data, prompts or
+secrets in `reason`.
+
 ## POST /v1/push/register
 
 Registers or updates one Apple client device.

@@ -6,8 +6,6 @@
   preflight before manual `--execute` provisioning runs.
 - Add an operator key rotation/backfill procedure for encrypted APNs token
   storage.
-- Add an operator-only disable/revoke endpoint for compromised per-install
-  tokens.
 - Add structured redacted logging helpers if more observability is needed.
 - Re-run the public repository secret scan before every release.
 - Confirm no request-body logging is enabled in Cloudflare observability/tail

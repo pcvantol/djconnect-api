@@ -43,6 +43,12 @@ export interface RotateInstallTokenRequest {
 	ha_install_id: string;
 }
 
+export interface RevokeInstallTokenRequest {
+	ha_install_id: string;
+	token_id: string;
+	reason?: string;
+}
+
 export interface RegisterRequest {
 	ha_install_id: string;
 	ha_user_hash?: string;
@@ -148,4 +154,6 @@ export interface InstallTokenRecord {
 	updated_at: string;
 	last_used_at: string | null;
 	rotated_at: string | null;
+	revoked_at: string | null;
+	revoke_reason: string | null;
 }

@@ -1,7 +1,7 @@
 import { cryptoRandomId, cryptoRandomToken, encryptSecret, sha256Hex } from "./crypto";
 import { timingSafeEqualString } from "./crypto";
 import { HttpError } from "./http";
-import type { AdminRegistration, AdminRegistrationsQuery, ApnsEnvironment, BootstrapProofRequest, ClientType, EventType, InstallTokenRecord, InstallTokenRequest, PushEventRequest, RegisterRequest, Registration, UnregisterRequest } from "./types";
+import type { AdminRegistration, AdminRegistrationsQuery, ApnsEnvironment, BootstrapProofRequest, ClientType, EventType, InstallTokenRecord, InstallTokenRequest, PushEventRequest, RegisterRequest, Registration, RevokeInstallTokenRequest, UnregisterRequest } from "./types";
 
 export function topicForClientType(env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MACOS: string; APNS_TOPIC_WATCHOS: string }, clientType: ClientType): string {
 	switch (clientType) {
@@ -213,6 +213,19 @@ export async function rotateInstallToken(db: D1Database, input: InstallTokenRequ
 		WHERE ha_install_id = ? AND disabled = 0
 	`).bind(input.ha_install_id).run();
 	return issueInstallToken(db, input);
+}
+
+export async function revokeInstallToken(db: D1Database, input: RevokeInstallTokenRequest): Promise<{ revoked: number }> {
+	const reason = input.reason?.trim() || null;
+	const result = await db.prepare(`
+		UPDATE install_tokens
+		SET disabled = 1,
+			revoked_at = COALESCE(revoked_at, datetime('now')),
+			revoke_reason = ?,
+			updated_at = datetime('now')
+		WHERE id = ? AND ha_install_id = ? AND disabled = 0
+	`).bind(reason, input.token_id, input.ha_install_id).run();
+	return { revoked: result.meta.changes ?? 0 };
 }
 
 export async function findInstallTokenByBearer(db: D1Database, token: string): Promise<InstallTokenRecord | null> {

@@ -82,8 +82,11 @@ The production auth model is:
 - Install tokens are stored in D1 only as SHA-256 hashes. The raw token is
   returned once and is stored by the integration in Home Assistant config entry
   options.
-- Rotate or disable a compromised install token without affecting other
-  installations.
+- Rotate tokens with `/v1/install/rotate` using the current per-install token,
+  or disable a compromised token with the operator-only
+  `/v1/operator/install-token/revoke` endpoint. Revoke requests use
+  `ha_install_id` plus token ID, never raw `djci_...` token material, and do
+  not issue a replacement token.
 - Admin endpoints such as `GET /v1/admin/registrations` require the
   bootstrap/operator secret and explicitly reject per-install `djci_...` tokens.
 
