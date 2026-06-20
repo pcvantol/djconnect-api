@@ -4,7 +4,8 @@
 
 - Keep `scripts/provision_cloudflare.sh --dry-run --all` as the operator
   preflight before manual `--execute` provisioning runs.
-- Replace plain `apns_token` D1 storage with encrypted-at-rest storage.
+- Add an operator key rotation/backfill procedure for encrypted APNs token
+  storage.
 - Add an operator-only disable/revoke endpoint for compromised per-install
   tokens.
 - Add structured redacted logging helpers if more observability is needed.
@@ -17,6 +18,8 @@
 - Keep `DJCONNECT_RELAY_SECRET` as an operator/bootstrap secret only; never ship
   it in HACS/client code.
 - Keep per-install `djci_...` tokens scoped to one `ha_install_id`.
+- Keep `APNS_TOKEN_ENCRYPTION_KEY` only in Cloudflare Worker secrets and never
+  in GitHub Actions, local env files or fixtures.
 - Keep tests and fixtures on example values only.
 
 ## API / Contracts

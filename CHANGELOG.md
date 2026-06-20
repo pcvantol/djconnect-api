@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Added APNs token encryption at rest for D1 registrations:
+  - New registrations store encrypted token material instead of raw
+    `apns_token` values.
+  - Added `APNS_TOKEN_ENCRYPTION_KEY` as a Cloudflare Worker secret.
+  - Added a D1 migration that rebuilds `registrations` so `apns_token` is
+    nullable and encrypted columns are available.
+  - Kept legacy nullable `apns_token` fallback for old rows during migration.
+- Extended provisioning docs and script support for
+  `APNS_TOKEN_ENCRYPTION_KEY`.
+
 ## 1.0.2 - 2026-06-20
 
 - Added the `api.djconnect.dev` custom-domain route to `wrangler.jsonc`.
@@ -81,4 +93,6 @@ Known release notes:
 - Remote D1 migration was attempted during release validation but Cloudflare returned account authorization error `7403`.
 - Worker deploy was attempted during release validation but Wrangler returned authentication error `10000` for the configured API token.
 - Remote D1 migration and Cloudflare deploy require the correct Cloudflare account authorization and secrets to be configured outside the repository.
-- APNs token storage is intentionally documented as development-ready plain storage and must be replaced by encrypted-at-rest storage before production use.
+- APNs token storage in `v1.0.0` was intentionally documented as
+  development-ready plain storage and had to be replaced by encrypted-at-rest
+  storage before broader production use.

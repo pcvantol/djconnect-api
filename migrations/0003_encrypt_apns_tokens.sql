@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS registrations (
+CREATE TABLE registrations_encrypted (
 	id TEXT PRIMARY KEY,
 	ha_install_id TEXT NOT NULL,
 	ha_user_hash TEXT,
@@ -24,22 +24,25 @@ CREATE TABLE IF NOT EXISTS registrations (
 	UNIQUE (ha_install_id, device_id, client_type, apns_token_hash)
 );
 
+INSERT INTO registrations_encrypted (
+	id, ha_install_id, ha_user_hash, device_id, client_type, apns_token_hash,
+	apns_token, apns_environment, topic, app_bundle_id, app_version, locale,
+	categories_json, disabled, invalid, created_at, updated_at, last_success_at,
+	last_error_code
+)
+SELECT
+	id, ha_install_id, ha_user_hash, device_id, client_type, apns_token_hash,
+	apns_token, apns_environment, topic, app_bundle_id, app_version, locale,
+	categories_json, disabled, invalid, created_at, updated_at, last_success_at,
+	last_error_code
+FROM registrations;
+
+DROP TABLE registrations;
+
+ALTER TABLE registrations_encrypted RENAME TO registrations;
+
 CREATE INDEX IF NOT EXISTS idx_registrations_lookup
 	ON registrations (ha_install_id, ha_user_hash, client_type, disabled, invalid);
 
 CREATE INDEX IF NOT EXISTS idx_registrations_token_hash
 	ON registrations (apns_token_hash);
-
-CREATE TABLE IF NOT EXISTS relay_events (
-	id TEXT PRIMARY KEY,
-	ha_install_id TEXT NOT NULL,
-	event_type TEXT NOT NULL CHECK (event_type IN ('ask_dj_response', 'ask_dj_confirm', 'playback_change')),
-	client_type TEXT CHECK (client_type IS NULL OR client_type IN ('ios', 'macos', 'watchos')),
-	target_count INTEGER NOT NULL DEFAULT 0,
-	success_count INTEGER NOT NULL DEFAULT 0,
-	error_count INTEGER NOT NULL DEFAULT 0,
-	created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE INDEX IF NOT EXISTS idx_relay_events_install_created
-	ON relay_events (ha_install_id, created_at);

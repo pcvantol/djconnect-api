@@ -125,6 +125,10 @@ Response:
 }
 ```
 
+Storage note: the API hashes APNs tokens for lookup/audit and encrypts token
+material before D1 storage. Raw APNs tokens must not be logged or stored in
+docs, fixtures or client-visible audit data.
+
 ## POST /v1/push/unregister
 
 Disables a registration.

@@ -30,6 +30,7 @@ and the relay secret through an environment variable. The values are not echoed:
 
 ```sh
 DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
   npm run provision:cloudflare -- --execute --set-secrets \
   --apns-private-key-file /secure/path/to/key.p8
 ```
@@ -83,6 +84,7 @@ Set required secrets through Cloudflare only:
 ```sh
 npx wrangler secret put APNS_PRIVATE_KEY
 npx wrangler secret put DJCONNECT_RELAY_SECRET
+npx wrangler secret put APNS_TOKEN_ENCRYPTION_KEY
 ```
 
 For `APNS_PRIVATE_KEY`, paste the full contents of the Apple `.p8` key into the
@@ -95,10 +97,21 @@ This is a bootstrap/operator secret only. Do not ship it in HACS or client
 code. Public Home Assistant installations use per-install `djci_...` tokens
 issued by `POST /v1/install/token`.
 
+Generate `APNS_TOKEN_ENCRYPTION_KEY` as a base64-encoded 32-byte key and store
+it only as a Cloudflare Worker secret:
+
+```sh
+openssl rand -base64 32
+```
+
+This key protects APNs device tokens stored in D1. Do not commit it, copy it
+into GitHub Actions, or put it in `.dev.vars`/`.env`.
+
 Automated equivalent:
 
 ```sh
 DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
   scripts/provision_cloudflare.sh --execute --set-secrets \
   --apns-private-key-file /secure/path/to/key.p8
 ```
@@ -175,8 +188,8 @@ environment-specific Wrangler configuration when added.
 
 - `https://api.djconnect.dev/health` is live.
 - Remote D1 migrations are applied.
-- Cloudflare Worker secrets are configured for `APNS_PRIVATE_KEY` and
-  `DJCONNECT_RELAY_SECRET`.
+- Cloudflare Worker secrets are configured for `APNS_PRIVATE_KEY`,
+  `DJCONNECT_RELAY_SECRET` and `APNS_TOKEN_ENCRYPTION_KEY`.
 - GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
 - The latest release is `v1.0.2`.
 
@@ -222,9 +235,10 @@ Required GitHub Actions secret:
   deploy and Workers Routes edit permissions for the `djconnect_api` database,
   `djconnect-api` Worker and `djconnect.dev` zone.
 
-Worker runtime secrets such as `APNS_PRIVATE_KEY` and
-`DJCONNECT_RELAY_SECRET` stay in Cloudflare Worker secrets; do not copy them
-into GitHub Actions secrets unless a future workflow explicitly needs them.
+Worker runtime secrets such as `APNS_PRIVATE_KEY`,
+`DJCONNECT_RELAY_SECRET` and `APNS_TOKEN_ENCRYPTION_KEY` stay in Cloudflare
+Worker secrets; do not copy them into GitHub Actions secrets unless a future
+workflow explicitly needs them.
 
 ## Postman
 
@@ -285,4 +299,6 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 - APNs endpoint selection uses each registration's `apns_environment`.
 - Invalid APNs tokens (`BadDeviceToken`, `Unregistered`, or HTTP 410) are marked disabled and invalid.
 - Audit rows intentionally avoid prompts, responses, tokens, chat history, and secrets.
-- The `apns_token` column is plain storage for development relay support; replace it with encrypted-at-rest storage before production.
+- New APNs registrations store device tokens encrypted at rest in D1 with
+  `APNS_TOKEN_ENCRYPTION_KEY`. The legacy nullable `apns_token` column remains
+  only as a migration fallback for old rows and should stay empty for new rows.

@@ -1,4 +1,4 @@
-import { cryptoRandomId, cryptoRandomToken, sha256Hex } from "./crypto";
+import { cryptoRandomId, cryptoRandomToken, encryptSecret, sha256Hex } from "./crypto";
 import type { ApnsEnvironment, ClientType, EventType, InstallTokenRecord, InstallTokenRequest, PushEventRequest, RegisterRequest, Registration, UnregisterRequest } from "./types";
 
 export function topicForClientType(env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MACOS: string; APNS_TOPIC_WATCHOS: string }, clientType: ClientType): string {
@@ -12,8 +12,9 @@ export function topicForClientType(env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MAC
 	}
 }
 
-export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MACOS: string; APNS_TOPIC_WATCHOS: string; APNS_ENVIRONMENT: ApnsEnvironment }, input: RegisterRequest): Promise<{ id: string; tokenHash: string }> {
+export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MACOS: string; APNS_TOPIC_WATCHOS: string; APNS_ENVIRONMENT: ApnsEnvironment; APNS_TOKEN_ENCRYPTION_KEY: string }, input: RegisterRequest): Promise<{ id: string; tokenHash: string }> {
 	const tokenHash = await sha256Hex(input.apns_token);
+	const encryptedToken = await encryptSecret(input.apns_token, env.APNS_TOKEN_ENCRYPTION_KEY);
 	const id = cryptoRandomId();
 	const apnsEnvironment = input.apns_environment ?? env.APNS_ENVIRONMENT;
 	const topic = topicForClientType(env, input.client_type);
@@ -22,13 +23,17 @@ export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: 
 	await db.prepare(`
 		INSERT INTO registrations (
 			id, ha_install_id, ha_user_hash, device_id, client_type, apns_token_hash,
-			apns_token, apns_environment, topic, app_bundle_id,
+			apns_token, apns_token_ciphertext, apns_token_nonce, apns_token_key_version,
+			apns_environment, topic, app_bundle_id,
 			app_version, locale, categories_json, disabled, invalid, created_at, updated_at
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, datetime('now'), datetime('now'))
+		VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, datetime('now'), datetime('now'))
 		ON CONFLICT(ha_install_id, device_id, client_type, apns_token_hash) DO UPDATE SET
 			ha_user_hash = excluded.ha_user_hash,
 			apns_token = excluded.apns_token,
+			apns_token_ciphertext = excluded.apns_token_ciphertext,
+			apns_token_nonce = excluded.apns_token_nonce,
+			apns_token_key_version = excluded.apns_token_key_version,
 			apns_environment = excluded.apns_environment,
 			topic = excluded.topic,
 			app_bundle_id = excluded.app_bundle_id,
@@ -46,7 +51,9 @@ export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: 
 		input.device_id,
 		input.client_type,
 		tokenHash,
-		input.apns_token,
+		encryptedToken.ciphertext,
+		encryptedToken.nonce,
+		encryptedToken.keyVersion,
 		apnsEnvironment,
 		topic,
 		input.app_bundle_id ?? null,
