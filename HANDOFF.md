@@ -4,7 +4,7 @@
 
 - Repository: `pcvantol/djconnect-api`.
 - Runtime: Cloudflare Worker.
-- Current release: `1.0.3`.
+- Current release: `1.0.4`.
 - Purpose: central APNs push relay for DJConnect Apple clients.
 - Public API target: `https://api.djconnect.dev`.
 - D1 database: `djconnect_api`.

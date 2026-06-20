@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.3 - 2026-06-20
+## 1.0.4 - 2026-06-20
 
 - Documented that HACS-side per-install token provisioning is now automatic:
   the integration persists `ha_install_id`, obtains/stores a `djci_...` token
@@ -12,6 +12,9 @@
     operator auth as a fallback.
   - Proofs are stored hashed, bound to install/client/device context and
     consumed behind D1 rate limits.
+- Tightened Postman contract coverage now that proof-only
+  `/v1/install/token` is deployed: calls without a proof must return
+  `missing_bootstrap_proof`.
 - Added APNs token encryption at rest for D1 registrations:
   - New registrations store encrypted token material instead of raw
     `apns_token` values.
@@ -28,6 +31,11 @@
   - Returns hashed install/device identifiers and operational registration
     metadata only.
   - Never returns raw APNs tokens, encrypted token material, nonces or secrets.
+
+## 1.0.3 - 2026-06-20
+
+- Released APNs token encryption at rest and the first admin registration
+  metadata endpoint.
 
 ## 1.0.2 - 2026-06-20
 
