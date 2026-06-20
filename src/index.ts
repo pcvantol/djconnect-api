@@ -2,8 +2,8 @@ import { requireAdminAuth, requireBootstrapAuth, requireInstallAuth } from "./au
 import { buildApnsPayload, isInvalidTokenReason, sendApns } from "./apns";
 import { sha256Hex } from "./crypto";
 import { HttpError, json, readJson } from "./http";
-import { auditEvent, consumeBootstrapProof, enforceBootstrapRateLimit, findActiveRegistrations, issueBootstrapProof, issueInstallToken, listAdminRegistrations, markRegistrationError, markRegistrationSuccess, rotateInstallToken, unregister, upsertRegistration } from "./repository";
-import type { AdminRegistrationsQuery, AppEnv, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
+import { auditEvent, consumeBootstrapProof, enforceBootstrapRateLimit, findActiveRegistrations, issueBootstrapProof, issueInstallToken, listAdminRegistrations, markRegistrationError, markRegistrationSuccess, revokeInstallToken, rotateInstallToken, unregister, upsertRegistration } from "./repository";
+import type { AdminRegistrationsQuery, AppEnv, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
 const VALID_BOOTSTRAP_CLIENT_TYPES = new Set(["ios", "macos", "watchos", "raspberry_pi", "esp32", "conversation_agent"]);
@@ -50,6 +50,14 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 		await requireAdminAuth(request, env);
 		const result = await listAdminRegistrations(env.DB, validateAdminRegistrationsQuery(url));
 		return json({ ok: true, ...result });
+	}
+
+	if (request.method === "POST" && url.pathname === "/v1/operator/install-token/revoke") {
+		await requireAdminAuth(request, env);
+		const input = await readJson<RevokeInstallTokenRequest>(request);
+		validateRevokeInstallToken(input);
+		const result = await revokeInstallToken(env.DB, input);
+		return json({ ok: true, revoked: result.revoked });
 	}
 
 	if (request.method === "POST" && url.pathname === "/v1/install/bootstrap-proof") {
@@ -189,6 +197,23 @@ function validateBootstrapProofRequest(input: BootstrapProofRequest): void {
 
 function validateRotateInstallToken(input: RotateInstallTokenRequest): void {
 	requireString(input.ha_install_id, "ha_install_id");
+}
+
+function validateRevokeInstallToken(input: RevokeInstallTokenRequest): void {
+	requireString(input.ha_install_id, "ha_install_id");
+	requireString(input.token_id, "token_id");
+	if (input.reason !== undefined) {
+		if (typeof input.reason !== "string") {
+			throw new HttpError(400, "invalid_reason");
+		}
+		if (input.reason.length > 200) {
+			throw new HttpError(400, "invalid_reason");
+		}
+		if (/\bdjci_[A-Za-z0-9_-]+/.test(input.reason)) {
+			throw new HttpError(400, "unsafe_payload");
+		}
+		rejectForbiddenPayloadKeys({ reason: input.reason });
+	}
 }
 
 function validateRegister(input: RegisterRequest): void {

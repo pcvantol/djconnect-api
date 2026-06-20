@@ -192,6 +192,71 @@ describe("DJConnect API worker", () => {
 		expect(newRegister.status).toBe(200);
 	});
 
+	it("lets an operator revoke a compromised install token without issuing a replacement", async () => {
+		const proof = await issueBootstrapProof();
+		const tokenResponse = await dispatch("/v1/install/token", installTokenPayload({ bootstrap_proof: proof }));
+		expect(tokenResponse.status).toBe(200);
+		const tokenBody = await tokenResponse.json() as { id: string; install_token: string };
+		const installAuth = `Bearer ${tokenBody.install_token}`;
+
+		const revoke = await dispatch("/v1/operator/install-token/revoke", {
+			ha_install_id: "example-ha-install",
+			token_id: tokenBody.id,
+			reason: "operator-disabled-compromised-install",
+		}, AUTH);
+		expect(revoke.status).toBe(200);
+		expect(await revoke.json()).toEqual({ ok: true, revoked: 1 });
+
+		const row = await env.DB.prepare(`
+			SELECT disabled, revoked_at, revoke_reason, rotated_at
+			FROM install_tokens
+			WHERE id = ?
+		`).bind(tokenBody.id).first<{
+			disabled: number;
+			revoked_at: string | null;
+			revoke_reason: string | null;
+			rotated_at: string | null;
+		}>();
+		expect(row?.disabled).toBe(1);
+		expect(row?.revoked_at).toEqual(expect.any(String));
+		expect(row?.revoke_reason).toBe("operator-disabled-compromised-install");
+		expect(row?.rotated_at).toBeNull();
+
+		const blocked = await dispatch("/v1/push/register", registerPayload(), installAuth);
+		expect(blocked.status).toBe(401);
+
+		const tokenCount = await env.DB.prepare("SELECT COUNT(*) AS count FROM install_tokens WHERE ha_install_id = ?").bind("example-ha-install").first<{ count: number }>();
+		expect(tokenCount?.count).toBe(1);
+	});
+
+	it("protects operator token revoke from anonymous and per-install auth", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		const anonymous = await dispatch("/v1/operator/install-token/revoke", {
+			ha_install_id: "example-ha-install",
+			token_id: "example-token-id",
+		});
+		expect(anonymous.status).toBe(401);
+		expect(await anonymous.json()).toEqual({ error: "auth_required" });
+
+		const perInstall = await dispatch("/v1/operator/install-token/revoke", {
+			ha_install_id: "example-ha-install",
+			token_id: "example-token-id",
+		}, installAuth);
+		expect(perInstall.status).toBe(403);
+		expect(await perInstall.json()).toEqual({ error: "admin_auth_required" });
+	});
+
+	it("rejects raw install tokens in operator revoke reasons", async () => {
+		const response = await dispatch("/v1/operator/install-token/revoke", {
+			ha_install_id: "example-ha-install",
+			token_id: "example-token-id",
+			reason: "contains djci_example-install-token",
+		}, AUTH);
+
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({ error: "unsafe_payload" });
+	});
+
 	it("builds an APNs payload without prompts, responses, or secrets", () => {
 		const payload = buildApnsPayload({
 			event_type: "ask_dj_response",
@@ -765,7 +830,9 @@ CREATE TABLE IF NOT EXISTS install_tokens (
 	created_at TEXT NOT NULL DEFAULT (datetime('now')),
 	updated_at TEXT NOT NULL DEFAULT (datetime('now')),
 	last_used_at TEXT,
-	rotated_at TEXT
+	rotated_at TEXT,
+	revoked_at TEXT,
+	revoke_reason TEXT
 );
 
 CREATE TABLE IF NOT EXISTS bootstrap_proofs (

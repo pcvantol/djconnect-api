@@ -310,6 +310,10 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 - `GET /v1/admin/registrations` requires the same bootstrap/operator auth,
   rejects per-install `djci_...` tokens and returns only privacy-safe
   registration metadata for the admin website.
+- `POST /v1/operator/install-token/revoke` requires bootstrap/operator auth
+  and disables one compromised per-install token by `ha_install_id` plus token
+  ID. It never accepts or returns raw `djci_...` token material and never
+  issues a replacement token.
 - `POST /v1/push/register`, `/unregister`, `/event`, and
   `/v1/install/rotate` require a per-install token scoped to the request
   `ha_install_id`.
