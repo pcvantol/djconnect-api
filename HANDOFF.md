@@ -4,7 +4,7 @@
 
 - Repository: `pcvantol/djconnect-api`.
 - Runtime: Cloudflare Worker.
-- Current release: `1.0.1`.
+- Current release: `1.0.2`.
 - Purpose: central APNs push relay for DJConnect Apple clients.
 - Public API target: `https://api.djconnect.dev`.
 - D1 database: `djconnect_api`.
@@ -51,12 +51,18 @@ Public health:
 
 Relay endpoints:
 
+- `POST /v1/install/token`
+- `POST /v1/install/rotate`
 - `POST /v1/push/register`
 - `POST /v1/push/unregister`
 - `POST /v1/push/event`
 
-All `/v1/push/*` endpoints require relay auth using `DJCONNECT_RELAY_SECRET`
-through bearer auth or HMAC signature.
+`POST /v1/install/token` requires bootstrap auth using
+`DJCONNECT_RELAY_SECRET` through bearer auth or HMAC signature. Public
+Home Assistant/HACS installations must not receive that bootstrap secret.
+
+`/v1/push/*` and `/v1/install/rotate` require a per-install `djci_...` token
+scoped to the request `ha_install_id`.
 
 ## Privacy Boundaries
 
@@ -85,11 +91,12 @@ their own Home Assistant instance after opening, especially
   disabled/invalid.
 - Audit rows are intentionally minimal and do not contain prompts, responses,
   secrets or full history.
+- Per-install relay tokens are stored only as SHA-256 hashes in D1.
 - Tests use example fixture values only.
 
-## Historical Validation Status For 1.0.0
+## Historical Validation Notes
 
-Passed:
+Initial `v1.0.0` validation passed:
 
 - `npx wrangler types`
 - `npx tsc --noEmit`
@@ -97,10 +104,14 @@ Passed:
 - `npx wrangler d1 migrations apply djconnect_api --local`
 - Public repository secret scan
 
-Previously blocked by external Cloudflare auth:
+Initial `v1.0.0` release validation was previously blocked by external
+Cloudflare auth:
 
 - Remote D1 migration returned account authorization error `7403`.
 - Worker deploy returned Wrangler authentication error `10000`.
+
+These blockers are resolved as of `v1.0.2`; CI/CD now deploys `main`
+successfully.
 
 ## Cloudflare And CI/CD Status
 
@@ -116,10 +127,9 @@ GitHub Actions CI/CD is configured in `.github/workflows/ci-cd.yml`:
 
 - `Validate` runs on pull requests and pushes to `main`.
 - `Deploy` runs on pushes to `main` after validation.
-- Add GitHub secret `CLOUDFLARE_API_TOKEN` with Workers deploy, D1 migration
-  and Workers Routes edit permissions for `djconnect.dev`.
-- After the first successful Actions run, add `Validate` as a required status
-  check in branch protection.
+- GitHub secret `CLOUDFLARE_API_TOKEN` is configured with Workers deploy, D1
+  migration and Workers Routes edit permissions for `djconnect.dev`.
+- The latest `main` CI/CD run is green.
 
 Manual/operator provisioning remains available with:
 
@@ -155,10 +165,7 @@ Before every release:
 
 ## Next Actions
 
-- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN` with Workers Routes edit
-  permissions for `djconnect.dev`.
-- Merge the CI/CD and custom-domain route PR.
-- After the first successful Actions run, configure `Validate` as a required
-  status check on `main`.
 - Replace plain `apns_token` storage with encrypted-at-rest token storage.
 - Build the HACS-side per-install token storage and event relay support.
+- Add an operator-only disable/revoke endpoint for compromised per-install
+  tokens.

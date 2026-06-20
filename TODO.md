@@ -1,16 +1,9 @@
 # DJConnect API TODO Backlog
 
-## Immediate Validation
+## Production Hardening
 
-- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN` with Workers deploy, D1
-  migration and Workers Routes edit permissions for `djconnect.dev`.
-- After the first successful GitHub Actions run, make `Validate` a required
-  status check in `main` branch protection.
 - Keep `scripts/provision_cloudflare.sh --dry-run --all` as the operator
   preflight before manual `--execute` provisioning runs.
-
-## Security / Privacy
-
 - Replace plain `apns_token` D1 storage with encrypted-at-rest storage.
 - Add an operator-only disable/revoke endpoint for compromised per-install
   tokens.
@@ -18,6 +11,13 @@
 - Re-run the public repository secret scan before every release.
 - Confirm no request-body logging is enabled in Cloudflare observability/tail
   workflows.
+
+## Security / Privacy
+
+- Keep `DJCONNECT_RELAY_SECRET` as an operator/bootstrap secret only; never ship
+  it in HACS/client code.
+- Keep per-install `djci_...` tokens scoped to one `ha_install_id`.
+- Keep tests and fixtures on example values only.
 
 ## API / Contracts
 
@@ -36,7 +36,8 @@
 - Add tests for multiple client types and per-client topic selection.
 - Add tests for optional `ha_user_hash` filtering.
 - Add tests for audit row counts after mixed APNs success/failure.
-- Add integration smoke tests after a deployed Worker URL exists.
+- Add integration smoke tests beyond `/health` once a staging install-token
+  provisioning flow exists.
 
 ## Documentation
 

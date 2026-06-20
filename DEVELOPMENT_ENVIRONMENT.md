@@ -81,10 +81,14 @@ Before remote operations, confirm the active Wrangler account or
 account that owns database `476a564f-08b2-4966-83b0-1221e2a4d063`, and can
 edit Workers Routes/read Zone metadata for the `djconnect.dev` zone.
 
-Previously observed blocked states:
+Previously observed blocked states before the production token permissions were
+fixed:
 
 - Remote D1 migration: Cloudflare error `7403`.
 - Worker deploy: Wrangler/Cloudflare auth error `10000`.
+
+Current production CI/CD deploys successfully with the GitHub Actions
+`CLOUDFLARE_API_TOKEN` secret.
 
 Required secrets must be set through Cloudflare secrets/configuration:
 
