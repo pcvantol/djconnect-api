@@ -57,4 +57,5 @@
 - Use `CHANGELOG.md` for GitHub Release notes.
 - Run `./cleanup_old_releases.sh --keep 1` as a dry-run before publishing.
 - Run `./cleanup_old_releases.sh --keep 1 --execute` by default after the new
-  GitHub Release is published and verified.
+  GitHub Release is published and verified; this also removes old completed
+  GitHub Actions workflow runs.

@@ -239,12 +239,15 @@ Use the cleanup helper during every release cycle. First inspect the dry-run:
 ./cleanup_old_releases.sh --keep 1
 ```
 
-After the new GitHub Release is published and verified, delete old releases/tags
-by default:
+After the new GitHub Release is published and verified, delete old
+releases/tags and old completed GitHub Actions workflow runs by default:
 
 ```sh
 ./cleanup_old_releases.sh --keep 1 --execute
 ```
+
+Use `--keep-workflow-runs N` to keep more completed Actions runs, or
+`--skip-workflow-runs` when preserving Actions history for an investigation.
 
 ## Notes
 

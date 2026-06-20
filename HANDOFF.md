@@ -150,7 +150,8 @@ Before every release:
 - Use `CHANGELOG.md` as GitHub Release body.
 - Run `./cleanup_old_releases.sh --keep 1` dry-run before publishing, then
   `./cleanup_old_releases.sh --keep 1 --execute` by default after the new
-  GitHub Release is published and verified.
+  GitHub Release is published and verified. This also removes old completed
+  GitHub Actions workflow runs unless `--skip-workflow-runs` is passed.
 
 ## Next Actions
 

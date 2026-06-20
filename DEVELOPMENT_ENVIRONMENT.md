@@ -187,4 +187,5 @@ Not allowed:
 - Release cleanup is part of the normal release cycle: run
   `./cleanup_old_releases.sh --keep 1` as a dry-run first, then
   `./cleanup_old_releases.sh --keep 1 --execute` after the new GitHub Release
-  is published and verified.
+  is published and verified. The cleanup removes old releases/tags and old
+  completed GitHub Actions workflow runs by default.
