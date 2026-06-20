@@ -4,6 +4,8 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
+Current release: `1.0.0`.
+
 ## Cloudflare Setup
 
 The D1 database already exists:
@@ -58,6 +60,10 @@ npm run deploy
 ```
 
 Route `api.djconnect.dev` to this Worker in Cloudflare after deploy.
+
+## Release
+
+Release hygiene follows the canonical cross-repo checklist in `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. Use `CHANGELOG.md` as the GitHub Release body.
 
 ## Notes
 
