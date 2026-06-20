@@ -62,6 +62,28 @@ describe("DJConnect API worker", () => {
 		expect(row?.token_hash).not.toBe(body.token);
 	});
 
+	it("accepts valid HMAC bootstrap auth and rejects stale HMAC timestamps", async () => {
+		const body = {
+			ha_install_id: "example-ha-install",
+			ha_user_hash: "example-user-hash",
+			label: "example-ha-hmac",
+		};
+		const validResponse = await dispatchWithHeaders(
+			"/v1/install/token",
+			body,
+			await hmacHeaders(body, Math.floor(Date.now() / 1000)),
+		);
+		expect(validResponse.status).toBe(200);
+
+		const staleResponse = await dispatchWithHeaders(
+			"/v1/install/token",
+			body,
+			await hmacHeaders(body, Math.floor(Date.now() / 1000) - 10 * 60),
+		);
+		expect(staleResponse.status).toBe(401);
+		expect(await staleResponse.json()).toEqual({ error: "auth_required" });
+	});
+
 	it("does not allow the bootstrap secret for push calls", async () => {
 		const response = await dispatch("/v1/push/register", registerPayload(), AUTH);
 		expect(response.status).toBe(401);
@@ -163,6 +185,128 @@ describe("DJConnect API worker", () => {
 		expect(row).toEqual({ disabled: 1, invalid: 1, last_error_code: "BadDeviceToken" });
 	});
 
+	it("filters push delivery by ha_user_hash", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth, {
+			device_id: "example-device-user-a",
+			ha_user_hash: "example-user-hash-a",
+			apns_token: "example-apns-token-user-a",
+		});
+		await registerDevice(installAuth, {
+			device_id: "example-device-user-b",
+			ha_user_hash: "example-user-hash-b",
+			apns_token: "example-apns-token-user-b",
+		});
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const event = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			ha_user_hash: "example-user-hash-b",
+			event_type: "ask_dj_response",
+		}, installAuth);
+		const body = await event.json() as { matched: number; delivered: number; failed: number };
+
+		expect(event.status).toBe(200);
+		expect(body).toMatchObject({ matched: 1, delivered: 1, failed: 0 });
+		expect(fetchMock).toHaveBeenCalledOnce();
+		expect(fetchMock.mock.calls[0]?.[0]).toBe("https://api.sandbox.push.apple.com/3/device/example-apns-token-user-b");
+	});
+
+	it("selects topics for multiple client types", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth, {
+			device_id: "example-ios-device",
+			client_type: "ios",
+			apns_token: "example-ios-apns-token",
+			apns_environment: "production",
+		});
+		await registerDevice(installAuth, {
+			device_id: "example-macos-device",
+			client_type: "macos",
+			apns_token: "example-macos-apns-token",
+			apns_environment: "production",
+		});
+		await registerDevice(installAuth, {
+			device_id: "example-watchos-device",
+			client_type: "watchos",
+			apns_token: "example-watchos-apns-token",
+			apns_environment: "production",
+		});
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const event = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "playback_change",
+			client_types: ["ios", "watchos"],
+		}, installAuth);
+		const body = await event.json() as { matched: number; delivered: number; failed: number };
+
+		expect(event.status).toBe(200);
+		expect(body).toMatchObject({ matched: 2, delivered: 2, failed: 0 });
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+		expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
+			"https://api.push.apple.com/3/device/example-ios-apns-token",
+			"https://api.push.apple.com/3/device/example-watchos-apns-token",
+		]);
+		expect(fetchMock.mock.calls.map((call) => (call[1]?.headers as Record<string, string>)["apns-topic"])).toEqual([
+			"dev.djconnect.ios",
+			"dev.djconnect.watch",
+		]);
+	});
+
+	it("audits mixed APNs success and failure counts", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth, {
+			device_id: "example-success-device",
+			apns_token: "example-success-apns-token",
+		});
+		await registerDevice(installAuth, {
+			device_id: "example-server-error-device",
+			apns_token: "example-server-error-apns-token",
+		});
+		await registerDevice(installAuth, {
+			device_id: "example-invalid-device",
+			apns_token: "example-invalid-apns-token",
+		});
+		vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => {
+			const endpoint = String(url);
+			if (endpoint.endsWith("/example-success-apns-token")) {
+				return new Response("{}", { status: 200 });
+			}
+			if (endpoint.endsWith("/example-invalid-apns-token")) {
+				return new Response(JSON.stringify({ reason: "Unregistered" }), { status: 410 });
+			}
+			return new Response(JSON.stringify({ reason: "InternalServerError" }), { status: 500 });
+		});
+
+		const event = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+		}, installAuth);
+		const body = await event.json() as { matched: number; delivered: number; failed: number };
+
+		expect(event.status).toBe(200);
+		expect(body).toMatchObject({ matched: 3, delivered: 1, failed: 2 });
+		const audit = await env.DB.prepare(`
+			SELECT target_count, success_count, error_count, client_type
+			FROM relay_events
+			WHERE ha_install_id = ?
+		`).bind("example-ha-install").first<{
+			target_count: number;
+			success_count: number;
+			error_count: number;
+			client_type: string | null;
+		}>();
+		expect(audit).toEqual({ target_count: 3, success_count: 1, error_count: 2, client_type: null });
+
+		const invalid = await env.DB.prepare(`
+			SELECT disabled, invalid, last_error_code
+			FROM registrations
+			WHERE device_id = ?
+		`).bind("example-invalid-device").first<{ disabled: number; invalid: number; last_error_code: string }>();
+		expect(invalid).toEqual({ disabled: 1, invalid: 1, last_error_code: "Unregistered" });
+	});
+
 	it("selects sandbox and production APNs endpoints", () => {
 		expect(apnsEndpoint("sandbox", "abc")).toBe("https://api.sandbox.push.apple.com/3/device/abc");
 		expect(apnsEndpoint("production", "abc")).toBe("https://api.push.apple.com/3/device/abc");
@@ -170,18 +314,43 @@ describe("DJConnect API worker", () => {
 });
 
 async function dispatch(path: string, body: unknown, authorization?: string): Promise<Response> {
+	return dispatchWithHeaders(path, body, {
+		...(authorization ? { authorization } : {}),
+	});
+}
+
+async function dispatchWithHeaders(path: string, body: unknown, headers: Record<string, string>): Promise<Response> {
+	const serializedBody = JSON.stringify(body);
 	const request = new IncomingRequest(`https://api.djconnect.dev${path}`, {
 		method: "POST",
 		headers: {
 			"content-type": "application/json",
-			...(authorization ? { authorization } : {}),
+			...headers,
 		},
-		body: JSON.stringify(body),
+		body: serializedBody,
 	});
 	const ctx = createExecutionContext();
 	const response = await worker.fetch(request, testEnv, ctx);
 	await waitOnExecutionContext(ctx);
 	return response;
+}
+
+async function hmacHeaders(body: unknown, timestamp: number): Promise<Record<string, string>> {
+	const serializedBody = JSON.stringify(body);
+	const payload = `${timestamp}.${serializedBody}`;
+	const key = await crypto.subtle.importKey(
+		"raw",
+		new TextEncoder().encode(EXAMPLE_RELAY_SECRET),
+		{ name: "HMAC", hash: "SHA-256" },
+		false,
+		["sign"],
+	);
+	const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+	const signatureHex = [...new Uint8Array(signature)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+	return {
+		"x-djconnect-timestamp": String(timestamp),
+		"x-djconnect-signature": `sha256=${signatureHex}`,
+	};
 }
 
 async function issueInstallAuth(haInstallId: string): Promise<string> {
@@ -191,7 +360,23 @@ async function issueInstallAuth(haInstallId: string): Promise<string> {
 	return `Bearer ${body.token}`;
 }
 
-function registerPayload() {
+async function registerDevice(installAuth: string, overrides: Partial<ReturnType<typeof registerPayload>> = {}): Promise<void> {
+	const response = await dispatch("/v1/push/register", registerPayload(overrides), installAuth);
+	expect(response.status).toBe(200);
+}
+
+function registerPayload(overrides: Partial<{
+	ha_install_id: string;
+	ha_user_hash: string;
+	device_id: string;
+	client_type: "ios" | "macos" | "watchos";
+	apns_token: string;
+	apns_environment: "sandbox" | "production";
+	app_bundle_id: string;
+	app_version: string;
+	locale: string;
+	categories: string[];
+}> = {}) {
 	return {
 		ha_install_id: "example-ha-install",
 		ha_user_hash: "example-user-hash",
@@ -203,6 +388,7 @@ function registerPayload() {
 		app_version: "1.0.0",
 		locale: "nl-NL",
 		categories: ["ask_dj"],
+		...overrides,
 	};
 }
 
