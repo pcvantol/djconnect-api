@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.0.2 - 2026-06-20
+
+- Added the `api.djconnect.dev` custom-domain route to `wrangler.jsonc`.
+- Added GitHub Actions CI/CD:
+  - `Validate` runs install, typecheck, Wrangler deploy dry-run, tests and a
+    public-repo secret-pattern scan.
+  - `Deploy` runs remote D1 migrations, Worker deploy and `/health` smoke test
+    on pushes to `main`.
+- Updated CI actions to `actions/checkout@v5` and `actions/setup-node@v5`.
+- Updated test dependencies for the Dependabot security batch:
+  `@cloudflare/vitest-pool-workers` to `0.16.18`, `vitest` to `4.1.9` and
+  transitive `esbuild` to `0.28.1`.
+- Updated `vitest.config.mts` to the Vitest 4 Cloudflare Workers plugin API.
+- Extended release cleanup so `cleanup_old_releases.sh` removes old completed
+  GitHub Actions workflow runs in addition to old releases/tags.
+- Documented Cloudflare API token permissions for D1, Workers deploy and
+  Workers Routes on `djconnect.dev`.
+- Validated production Cloudflare setup:
+  - Remote D1 contains `install_tokens`, `registrations` and `relay_events`.
+  - Worker deploy succeeds through CI/CD.
+  - `https://api.djconnect.dev/health` returns
+    `{"ok":true,"service":"djconnect-api"}`.
+
 ## 1.0.1 - 2026-06-20
 
 - Added production-level project documentation: contributing guide, code of
