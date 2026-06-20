@@ -1,6 +1,8 @@
 # Logs
 
 logs
+.DS_Store
+*.p8
 _.log
 npm-debug.log_
 yarn-debug.log*

@@ -8,11 +8,28 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2026-06-20",
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"head_sampling_rate": 1
 	},
 	"upload_source_maps": true,
 	"compatibility_flags": [
 		"nodejs_compat"
+	],
+	"vars": {
+		"APNS_TEAM_ID": "ZEML4LPXH4",
+		"APNS_KEY_ID": "929NDF6UYK",
+		"APNS_TOPIC_IOS": "dev.djconnect.ios",
+		"APNS_TOPIC_MACOS": "dev.djconnect.mac",
+		"APNS_TOPIC_WATCHOS": "dev.djconnect.watch",
+		"APNS_ENVIRONMENT": "sandbox"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "djconnect_api",
+			"database_id": "476a564f-08b2-4966-83b0-1221e2a4d063",
+			"migrations_dir": "migrations"
+		}
 	]
 	/**
 	 * Smart Placement
