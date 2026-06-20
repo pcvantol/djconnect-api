@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.5 - 2026-06-20
+
+- Added `POST /v1/operator/install-token/revoke` for the DJConnect operator
+  website.
+- The revoke endpoint requires bootstrap/operator auth, rejects per-install
+  `djci_...` tokens, disables a matching install token by `ha_install_id` plus
+  token ID and never issues a replacement token.
+- Added D1 revoke metadata columns on `install_tokens`: `revoked_at` and
+  `revoke_reason`.
+- Added tests for operator revoke success, auth boundaries, no replacement
+  token issuance and unsafe reason rejection.
+- Updated API, README, security and TODO documentation now that backend support
+  exists for the website revoke flow.
+
 ## 1.0.4 - 2026-06-20
 
 - Documented that HACS-side per-install token provisioning is now automatic:
