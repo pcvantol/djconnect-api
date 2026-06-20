@@ -33,6 +33,8 @@ describe("DJConnect API worker", () => {
 		await env.DB.exec("DELETE FROM relay_events");
 		await env.DB.exec("DELETE FROM registrations");
 		await env.DB.exec("DELETE FROM install_tokens");
+		await env.DB.exec("DELETE FROM bootstrap_proofs");
+		await env.DB.exec("DELETE FROM bootstrap_rate_limits");
 		vi.restoreAllMocks();
 	});
 
@@ -44,44 +46,117 @@ describe("DJConnect API worker", () => {
 		expect(event.status).toBe(401);
 	});
 
-	it("issues per-install tokens with bootstrap auth", async () => {
+	it("does not issue per-install tokens with only the operator secret", async () => {
 		const response = await dispatch("/v1/install/token", {
 			ha_install_id: "example-ha-install",
 			ha_user_hash: "example-user-hash",
 			label: "example-ha",
 		}, AUTH);
 
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({ error: "missing_bootstrap_proof" });
+	});
+
+	it("issues per-install tokens with a valid bootstrap proof", async () => {
+		const proof = await issueBootstrapProof();
+		const response = await dispatch("/v1/install/token", installTokenPayload({ bootstrap_proof: proof }));
+
 		expect(response.status).toBe(200);
-		const body = await response.json() as { ok: boolean; token: string; token_hash: string };
+		const body = await response.json() as { ok: boolean; success: boolean; install_token: string; token: string; token_hash: string; expires_at: null };
 		expect(body.ok).toBe(true);
-		expect(body.token).toMatch(/^djci_/);
+		expect(body.success).toBe(true);
+		expect(body.install_token).toMatch(/^djci_/);
+		expect(body.token).toBe(body.install_token);
 		expect(body.token_hash).toHaveLength(64);
+		expect(body.expires_at).toBeNull();
 
 		const row = await env.DB.prepare("SELECT token_hash, disabled FROM install_tokens WHERE ha_install_id = ?").bind("example-ha-install").first<{ token_hash: string; disabled: number }>();
 		expect(row).toEqual({ token_hash: body.token_hash, disabled: 0 });
-		expect(row?.token_hash).not.toBe(body.token);
+		expect(row?.token_hash).not.toBe(body.install_token);
+		const proofRow = await env.DB.prepare("SELECT proof_hash, used_at FROM bootstrap_proofs WHERE ha_install_id = ?").bind("example-ha-install").first<{ proof_hash: string; used_at: string | null }>();
+		expect(proofRow?.proof_hash).toHaveLength(64);
+		expect(proofRow?.proof_hash).not.toBe(proof);
+		expect(proofRow?.used_at).toEqual(expect.any(String));
 	});
 
-	it("accepts valid HMAC bootstrap auth and rejects stale HMAC timestamps", async () => {
+	it("accepts valid HMAC bootstrap auth for proof issuing and rejects stale HMAC timestamps", async () => {
 		const body = {
 			ha_install_id: "example-ha-install",
-			ha_user_hash: "example-user-hash",
-			label: "example-ha-hmac",
+			client_type: "ios",
+			device_id: "example-device",
 		};
 		const validResponse = await dispatchWithHeaders(
-			"/v1/install/token",
+			"/v1/install/bootstrap-proof",
 			body,
 			await hmacHeaders(body, Math.floor(Date.now() / 1000)),
 		);
 		expect(validResponse.status).toBe(200);
+		const validBody = await validResponse.json() as { bootstrap_proof: string };
+		expect(validBody.bootstrap_proof).toMatch(/^djcboot_/);
 
 		const staleResponse = await dispatchWithHeaders(
-			"/v1/install/token",
+			"/v1/install/bootstrap-proof",
 			body,
 			await hmacHeaders(body, Math.floor(Date.now() / 1000) - 10 * 60),
 		);
 		expect(staleResponse.status).toBe(401);
 		expect(await staleResponse.json()).toEqual({ error: "auth_required" });
+	});
+
+	it("rejects expired, reused and mismatched bootstrap proofs", async () => {
+		const expiredProof = await insertBootstrapProof({
+			ha_install_id: "example-ha-install",
+			client_type: "ios",
+			device_id: "example-device",
+			expires_at: new Date(Date.now() - 1000).toISOString(),
+		});
+		const expired = await dispatch("/v1/install/token", installTokenPayload({ bootstrap_proof: expiredProof }));
+		expect(expired.status).toBe(401);
+		expect(await expired.json()).toEqual({ error: "bootstrap_proof_expired" });
+
+		const proof = await issueBootstrapProof();
+		const first = await dispatch("/v1/install/token", installTokenPayload({ bootstrap_proof: proof }));
+		expect(first.status).toBe(200);
+		const reused = await dispatch("/v1/install/token", installTokenPayload({ bootstrap_proof: proof }));
+		expect(reused.status).toBe(409);
+		expect(await reused.json()).toEqual({ error: "bootstrap_proof_used" });
+
+		const wrongInstallProof = await issueBootstrapProof();
+		const wrongInstall = await dispatch("/v1/install/token", installTokenPayload({
+			bootstrap_proof: wrongInstallProof,
+			ha_install_id: "other-ha-install",
+		}));
+		expect(wrongInstall.status).toBe(403);
+		expect(await wrongInstall.json()).toEqual({ error: "install_id_mismatch" });
+
+		const wrongDeviceProof = await issueBootstrapProof();
+		const wrongDevice = await dispatch("/v1/install/token", installTokenPayload({
+			bootstrap_proof: wrongDeviceProof,
+			device_id: "other-device",
+		}));
+		expect(wrongDevice.status).toBe(401);
+		expect(await wrongDevice.json()).toEqual({ error: "invalid_bootstrap_proof" });
+
+		const wrongClientProof = await issueBootstrapProof();
+		const wrongClient = await dispatch("/v1/install/token", installTokenPayload({
+			bootstrap_proof: wrongClientProof,
+			client_type: "macos",
+		}));
+		expect(wrongClient.status).toBe(401);
+		expect(await wrongClient.json()).toEqual({ error: "invalid_bootstrap_proof" });
+	});
+
+	it("does not log bootstrap proofs or tokens on bootstrap failures", async () => {
+		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const response = await dispatch("/v1/install/token", installTokenPayload({
+			bootstrap_proof: "djcboot_example-invalid-proof",
+		}));
+		const serialized = await response.text();
+
+		expect(response.status).toBe(401);
+		expect(serialized).not.toContain("djcboot_example-invalid-proof");
+		expect(serialized).not.toContain("djci_");
+		expect(consoleSpy).not.toHaveBeenCalled();
 	});
 
 	it("does not allow the bootstrap secret for push calls", async () => {
@@ -125,6 +200,25 @@ describe("DJConnect API worker", () => {
 		const serialized = JSON.stringify(payload);
 		expect(serialized).toContain("Ask DJ heeft geantwoord.");
 		expect(serialized).not.toMatch(/prompt|response_text|assistant|spotify|token|secret|history_memory/i);
+	});
+
+	it("rejects push event payloads with raw prompt, response, history, memory or token fields", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		for (const unsafe of [
+			{ prompt: "play something" },
+			{ assistant_response: "raw answer" },
+			{ history: ["full chat"] },
+			{ memory: "private memory" },
+			{ token: "example-token" },
+		]) {
+			const response = await dispatch("/v1/push/event", {
+				ha_install_id: "example-ha-install",
+				event_type: "ask_dj_response",
+				...unsafe,
+			}, installAuth);
+			expect(response.status).toBe(400);
+			expect(await response.json()).toEqual({ error: "unsafe_payload" });
+		}
 	});
 
 	it("registers and unregisters a device in D1", async () => {
@@ -480,10 +574,84 @@ async function hmacHeaders(body: unknown, timestamp: number): Promise<Record<str
 }
 
 async function issueInstallAuth(haInstallId: string): Promise<string> {
-	const response = await dispatch("/v1/install/token", { ha_install_id: haInstallId }, AUTH);
+	const proof = await issueBootstrapProof({ ha_install_id: haInstallId });
+	const response = await dispatch("/v1/install/token", installTokenPayload({ ha_install_id: haInstallId, bootstrap_proof: proof }));
 	expect(response.status).toBe(200);
-	const body = await response.json() as { token: string };
-	return `Bearer ${body.token}`;
+	const body = await response.json() as { install_token: string };
+	return `Bearer ${body.install_token}`;
+}
+
+async function issueBootstrapProof(overrides: Partial<ReturnType<typeof bootstrapProofPayload>> = {}): Promise<string> {
+	const response = await dispatch("/v1/install/bootstrap-proof", bootstrapProofPayload(overrides), AUTH);
+	expect(response.status).toBe(200);
+	const body = await response.json() as { bootstrap_proof: string };
+	return body.bootstrap_proof;
+}
+
+async function insertBootstrapProof(input: {
+	ha_install_id: string;
+	client_type: string;
+	device_id: string;
+	expires_at: string;
+}): Promise<string> {
+	const proof = `djcboot_${crypto.randomUUID()}`;
+	const proofHash = await sha256HexForTest(proof);
+	await env.DB.prepare(`
+		INSERT INTO bootstrap_proofs (
+			id, proof_hash, ha_install_id, client_type, device_id, expires_at, created_at
+		)
+		VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+	`).bind(
+		crypto.randomUUID(),
+		proofHash,
+		input.ha_install_id,
+		input.client_type,
+		input.device_id,
+		input.expires_at,
+	).run();
+	return proof;
+}
+
+function bootstrapProofPayload(overrides: Partial<{
+	ha_install_id: string;
+	integration: string;
+	integration_version: string;
+	client_type: "ios" | "macos" | "watchos" | "raspberry_pi" | "esp32" | "conversation_agent";
+	device_id: string;
+	pairing_session_id: string;
+	ttl_seconds: number;
+}> = {}) {
+	return {
+		ha_install_id: "example-ha-install",
+		integration: "djconnect_hacs",
+		integration_version: "3.1.0",
+		client_type: "ios",
+		device_id: "example-device",
+		pairing_session_id: "example-pairing-session",
+		...overrides,
+	};
+}
+
+function installTokenPayload(overrides: Partial<{
+	ha_install_id: string;
+	ha_user_hash: string;
+	label: string;
+	integration: string;
+	integration_version: string;
+	client_type: "ios" | "macos" | "watchos" | "raspberry_pi" | "esp32" | "conversation_agent";
+	device_id: string;
+	bootstrap_proof: string;
+}> = {}) {
+	return {
+		ha_install_id: "example-ha-install",
+		ha_user_hash: "example-user-hash",
+		label: "example-ha",
+		integration: "djconnect_hacs",
+		integration_version: "3.1.0",
+		client_type: "ios",
+		device_id: "example-device",
+		...overrides,
+	};
 }
 
 async function registerDevice(installAuth: string, overrides: Partial<ReturnType<typeof registerPayload>> = {}): Promise<void> {
@@ -531,6 +699,11 @@ async function makePrivateKeyPem(): Promise<string> {
 	return `${begin}\n${base64.match(/.{1,64}/g)?.join("\n")}\n${end}`;
 }
 
+async function sha256HexForTest(value: string): Promise<string> {
+	const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+	return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
 const TEST_SCHEMA = `
 CREATE TABLE IF NOT EXISTS registrations (
 	id TEXT PRIMARY KEY,
@@ -570,6 +743,27 @@ CREATE TABLE IF NOT EXISTS install_tokens (
 	updated_at TEXT NOT NULL DEFAULT (datetime('now')),
 	last_used_at TEXT,
 	rotated_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS bootstrap_proofs (
+	id TEXT PRIMARY KEY,
+	proof_hash TEXT NOT NULL UNIQUE,
+	ha_install_id TEXT NOT NULL,
+	integration TEXT,
+	integration_version TEXT,
+	client_type TEXT NOT NULL CHECK (client_type IN ('ios', 'macos', 'watchos', 'raspberry_pi', 'esp32', 'conversation_agent')),
+	device_id TEXT NOT NULL,
+	pairing_session_id TEXT,
+	expires_at TEXT NOT NULL,
+	used_at TEXT,
+	created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS bootstrap_rate_limits (
+	key TEXT PRIMARY KEY,
+	window_start INTEGER NOT NULL,
+	count INTEGER NOT NULL,
+	updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS relay_events (

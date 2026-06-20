@@ -291,8 +291,14 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 
 ## Notes
 
-- `POST /v1/install/token` requires bootstrap auth with
-  `DJCONNECT_RELAY_SECRET`.
+- `POST /v1/install/bootstrap-proof` is the operator/admin pairing endpoint
+  that issues short-lived one-time `djcboot_...` proofs.
+- `POST /v1/install/token` is proof-only: it consumes a valid `djcboot_...`
+  proof and does not accept `DJCONNECT_RELAY_SECRET` as a fallback.
+- The Home Assistant/HACS integration provisions its per-install `djci_...`
+  token automatically during setup and stores it in Home Assistant config entry
+  options. Manual API URL/token controls are support-only override/rotation
+  tools, not the normal user flow.
 - `GET /v1/admin/registrations` requires the same bootstrap/operator auth,
   rejects per-install `djci_...` tokens and returns only privacy-safe
   registration metadata for the admin website.

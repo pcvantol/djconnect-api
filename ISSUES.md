@@ -2,17 +2,6 @@
 
 ## Open / Needs Validation
 
-### HACS pairing and install-token provisioning
-
-- Status: open.
-- Area: Home Assistant integration onboarding.
-- Symptom: The central API has per-install `djci_...` tokens, but the
-  user-facing pairing/provisioning flow for HACS still needs to be implemented.
-- Current mitigation: `DJCONNECT_RELAY_SECRET` is kept as an operator/bootstrap
-  secret only; HACS/client code must never contain it.
-- Next action: Build the HACS-side token storage, rotation and privacy-safe
-  event relay flow.
-
 ### Operator token revocation
 
 - Status: open.
@@ -36,6 +25,18 @@
   clients send live registrations.
 
 ## Resolved
+
+### HACS pairing and install-token provisioning
+
+- Status: implemented in the Home Assistant/HACS integration.
+- Resolution: The integration provisions itself automatically during setup:
+  it creates/persists a stable `ha_install_id`, obtains a per-install
+  `djci_...` token, stores that token in Home Assistant config entry options
+  and uses it as `Authorization: Bearer <djci_token>` for central API calls.
+- The normal user flow does not require manually pasting a token. API URL/token
+  controls are support/override tools for inspection, replacement and rotation.
+- Security boundary: HACS/client code must not contain `DJCONNECT_RELAY_SECRET`,
+  APNs private key material, Cloudflare tokens or any global project secret.
 
 ### APNs token encryption at rest
 

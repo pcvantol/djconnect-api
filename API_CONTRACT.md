@@ -8,11 +8,12 @@ Postman collection:
 The collection is intentionally privacy-safe: it tests `/health` and
 unauthenticated negative cases only, using example values and no secrets.
 
-Production auth uses per-install tokens. HACS integrations must never embed a
+Production auth uses per-install tokens. HACS integrations provision and store
+their own per-install `djci_...` token automatically; they must never embed a
 global DJConnect secret.
 
-Bootstrap auth is only for trusted operator/admin flows that issue install
-tokens:
+Bootstrap/operator auth is only for trusted admin/pairing flows that issue
+short-lived bootstrap proofs:
 
 ```http
 Authorization: Bearer <DJCONNECT_RELAY_SECRET>
@@ -39,18 +40,23 @@ Response:
 { "ok": true, "service": "djconnect-api" }
 ```
 
-## POST /v1/install/token
+## POST /v1/install/bootstrap-proof
 
-Issues a per-install token. This endpoint is protected by bootstrap auth and is
-not called by public HACS code with a bundled secret.
+Issues a short-lived, one-time bootstrap proof for an existing
+pairing/provisioning context. This is an operator/admin pairing endpoint and is
+not called by public HACS code with a bundled global secret.
 
 Request:
 
 ```json
 {
   "ha_install_id": "example-ha-install",
-  "ha_user_hash": "example-user-hash",
-  "label": "example-ha"
+  "integration": "djconnect_hacs",
+  "integration_version": "3.1.0",
+  "client_type": "ios",
+  "device_id": "example-device",
+  "pairing_session_id": "example-pairing-session",
+  "ttl_seconds": 600
 }
 ```
 
@@ -59,14 +65,68 @@ Response:
 ```json
 {
   "ok": true,
-  "id": "install-token-id",
-  "token": "djci_example-install-token-returned-once",
-  "token_hash": "sha256-hex"
+  "id": "bootstrap-proof-id",
+  "bootstrap_proof": "djcboot_example-bootstrap-proof-returned-once",
+  "proof_hash": "sha256-hex",
+  "expires_at": "2026-06-20T12:00:00.000Z"
 }
 ```
 
-Store the returned token in the Home Assistant config entry storage. The raw
-token is returned once and is stored by the API only as a SHA-256 hash.
+The API stores only the proof hash. The raw proof is returned once, must not be
+logged, and expires after a short TTL. Proofs are bound to `ha_install_id`,
+`client_type` and `device_id`.
+
+## POST /v1/install/token
+
+Issues a per-install token. This endpoint is proof-only: it does not accept
+`DJCONNECT_RELAY_SECRET`/operator auth as a fallback. Public HACS code must
+never contain a bundled global secret.
+
+The Home Assistant integration's normal user flow is automatic provisioning:
+it creates/persists `ha_install_id`, obtains a per-install token during setup,
+stores it in Home Assistant config entry options and uses that token for
+central API calls. Manual API URL/token controls are support/override tools,
+not a required onboarding step.
+
+Request:
+
+```json
+{
+  "ha_install_id": "example-ha-install",
+  "ha_user_hash": "example-user-hash",
+  "label": "example-ha",
+  "integration": "djconnect_hacs",
+  "integration_version": "3.1.0",
+  "client_type": "ios",
+  "device_id": "example-device",
+  "bootstrap_proof": "djcboot_example-bootstrap-proof-returned-once"
+}
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "success": true,
+  "id": "install-token-id",
+  "token": "djci_example-install-token-returned-once",
+  "install_token": "djci_example-install-token-returned-once",
+  "token_hash": "sha256-hex",
+  "expires_at": null
+}
+```
+
+Store the returned token in Home Assistant config entry storage. The raw token
+is returned once and is stored by the API only as a SHA-256 hash.
+
+Failure codes:
+
+- `invalid_bootstrap_proof`
+- `bootstrap_proof_expired`
+- `bootstrap_proof_used`
+- `install_id_mismatch`
+- `bootstrap_rate_limited`
 
 ## POST /v1/install/rotate
 

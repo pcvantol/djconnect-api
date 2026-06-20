@@ -61,15 +61,28 @@ Admin endpoints:
 
 - `GET /v1/admin/registrations`
 
-`POST /v1/install/token` requires bootstrap auth using
-`DJCONNECT_RELAY_SECRET` through bearer auth or HMAC signature. Public
-Home Assistant/HACS installations must not receive that bootstrap secret.
+`POST /v1/install/bootstrap-proof` requires bootstrap/operator auth using
+`DJCONNECT_RELAY_SECRET` through bearer auth or HMAC signature and returns a
+short-lived one-time `djcboot_...` proof for an existing pairing context.
+Public Home Assistant/HACS installations must not receive that bootstrap
+secret.
+
+`POST /v1/install/token` is proof-only. It consumes a valid `djcboot_...` proof
+bound to `ha_install_id`, `client_type` and `device_id`, then returns a
+per-install `djci_...` token. Proofs are stored hashed and consumption is
+rate-limited by hashed IP/install/device keys in D1.
 
 `/v1/push/*` and `/v1/install/rotate` require a per-install `djci_...` token
 scoped to the request `ha_install_id`.
 
 `GET /v1/admin/registrations` requires bootstrap/operator auth, rejects
 per-install tokens and returns only privacy-safe metadata for the admin website.
+
+The Home Assistant/HACS side now handles per-install token provisioning
+automatically during setup. It creates/persists `ha_install_id`, obtains a
+`djci_...` token, stores it in Home Assistant config entry options and uses it
+as bearer auth for central calls. Manual token/API URL controls are support-only
+override/rotation tools, not the normal user flow.
 The admin website must use this endpoint rather than reading D1 directly.
 
 ## Privacy Boundaries
@@ -180,6 +193,5 @@ Before every release:
 - Validate the encrypted APNs token migration in remote D1 after deployment.
 - Plan an operator-only key rotation/backfill procedure for
   `APNS_TOKEN_ENCRYPTION_KEY`.
-- Build the HACS-side per-install token storage and event relay support.
 - Add an operator-only disable/revoke endpoint for compromised per-install
   tokens.

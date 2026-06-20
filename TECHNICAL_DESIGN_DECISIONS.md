@@ -63,13 +63,20 @@ Why:
 Pattern:
 
 - `DJCONNECT_RELAY_SECRET` is a bootstrap/operator secret for trusted
-  `POST /v1/install/token` calls only.
+  `POST /v1/install/bootstrap-proof` calls only.
 - HMAC bootstrap auth signs `timestamp + "." + raw_body`; timestamp skew is
   limited to five minutes.
-- Public HACS installs receive a per-install `djci_...` bearer token.
+- Bootstrap proofs use `djcboot_...`, are stored only as SHA-256 hashes, are
+  one-time use, expire quickly and are bound to install/client/device context.
+- Public HACS installs receive a per-install `djci_...` bearer token through
+  automatic setup/provisioning. The normal `/v1/install/token` path consumes a
+  short-lived one-time `djcboot_...` proof and does not accept the operator
+  secret as a fallback. Users should not have to paste this token in the normal
+  onboarding path.
 - Push/register/event calls require a per-install token scoped to the same
   `ha_install_id`.
 - Install tokens are stored only as SHA-256 hashes in D1.
+- Proof consumption is D1 rate-limited using hashed IP/install/device keys.
 - Comparisons use hashed timing-safe equality.
 
 Primary source files:
@@ -80,6 +87,8 @@ Primary source files:
 Why:
 
 - Avoids shipping a global shared secret in open-source HACS code.
+- Keeps the user-facing flow quiet: setup provisions the token under the hood,
+  while options/support UI can inspect, replace or rotate it when needed.
 - Allows per-install rotation/revocation without affecting other installs.
 - Keeps APNs provider credentials server-side while still allowing privacy-safe
   HA wake/sync events.

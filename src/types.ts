@@ -1,4 +1,5 @@
 export type ClientType = "ios" | "macos" | "watchos";
+export type BootstrapClientType = ClientType | "raspberry_pi" | "esp32" | "conversation_agent";
 export type ApnsEnvironment = "sandbox" | "production";
 export type EventType = "ask_dj_response" | "ask_dj_confirm" | "playback_change";
 
@@ -19,6 +20,22 @@ export interface InstallTokenRequest {
 	ha_install_id: string;
 	ha_user_hash?: string;
 	label?: string;
+	integration?: string;
+	integration_version?: string;
+	client_type?: BootstrapClientType;
+	device_id?: string;
+	bootstrap_proof?: string;
+	pairing_session_id?: string;
+}
+
+export interface BootstrapProofRequest {
+	ha_install_id: string;
+	integration?: string;
+	integration_version?: string;
+	client_type: BootstrapClientType;
+	device_id: string;
+	pairing_session_id?: string;
+	ttl_seconds?: number;
 }
 
 export interface RotateInstallTokenRequest {
