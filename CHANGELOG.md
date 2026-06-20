@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.3 - 2026-06-20
 
 - Added APNs token encryption at rest for D1 registrations:
   - New registrations store encrypted token material instead of raw
@@ -11,6 +11,13 @@
   - Kept legacy nullable `apns_token` fallback for old rows during migration.
 - Extended provisioning docs and script support for
   `APNS_TOKEN_ENCRYPTION_KEY`.
+- Added `GET /v1/admin/registrations` for the DJConnect admin website:
+  - Requires bootstrap/operator auth and rejects per-install `djci_...` tokens.
+  - Supports pagination and privacy-safe filters for client type, APNs
+    environment, disabled/invalid status and install ID.
+  - Returns hashed install/device identifiers and operational registration
+    metadata only.
+  - Never returns raw APNs tokens, encrypted token material, nonces or secrets.
 
 ## 1.0.2 - 2026-06-20
 

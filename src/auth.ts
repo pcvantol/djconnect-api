@@ -31,6 +31,17 @@ export async function requireBootstrapAuth(request: Request, env: AppEnv): Promi
 	throw new HttpError(401, "auth_required");
 }
 
+export async function requireAdminAuth(request: Request, env: AppEnv): Promise<void> {
+	const authorization = request.headers.get("authorization") ?? "";
+	if (authorization.startsWith("Bearer ")) {
+		const token = authorization.slice("Bearer ".length).trim();
+		if (token && token.startsWith("djci_")) {
+			throw new HttpError(403, "admin_auth_required");
+		}
+	}
+	await requireBootstrapAuth(request, env);
+}
+
 export async function requireInstallAuth(request: Request, env: AppEnv, haInstallId: string): Promise<void> {
 	const authorization = request.headers.get("authorization") ?? "";
 	if (!authorization.startsWith("Bearer ")) {
