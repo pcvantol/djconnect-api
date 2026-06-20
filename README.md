@@ -221,6 +221,8 @@ GitHub Actions runs `Validate` on pull requests and pushes to `main`:
 - `npm test -- --run`
 - `npm run postman:test`
 - public-repo secret pattern scan
+- staging-safe E2E smoke test when `DJCONNECT_RELAY_SECRET` is configured as a
+  GitHub Actions secret
 
 Pushes to `main` also run the `Deploy` job:
 
@@ -234,11 +236,17 @@ Required GitHub Actions secret:
 - `CLOUDFLARE_API_TOKEN`: Cloudflare API token with D1 migration, Workers
   deploy and Workers Routes edit permissions for the `djconnect_api` database,
   `djconnect-api` Worker and `djconnect.dev` zone.
+- `DJCONNECT_RELAY_SECRET`: optional for CI, but required to enable the
+  staging-safe E2E smoke test. It must match the Cloudflare Worker secret of the
+  same name. The test uses only `example-...` install/device/APNs values and
+  requires Cloudflare Worker secret `DJCONNECT_SMOKE_TEST_MODE=enabled` so APNs
+  is not called.
 
 Worker runtime secrets such as `APNS_PRIVATE_KEY`,
-`DJCONNECT_RELAY_SECRET` and `APNS_TOKEN_ENCRYPTION_KEY` stay in Cloudflare
-Worker secrets; do not copy them into GitHub Actions secrets unless a future
-workflow explicitly needs them.
+`DJCONNECT_RELAY_SECRET`, `APNS_TOKEN_ENCRYPTION_KEY` and
+`DJCONNECT_SMOKE_TEST_MODE` stay in Cloudflare Worker secrets. Only
+`DJCONNECT_RELAY_SECRET` is duplicated into GitHub Actions, and only to run the
+operator-authenticated staging-safe E2E smoke test.
 
 ## Postman
 

@@ -66,6 +66,10 @@ export async function sendApns(
 	}
 
 	const endpoint = apnsEndpoint(registration.apns_environment, deviceToken);
+	if (env.DJCONNECT_SMOKE_TEST_MODE === "enabled" && deviceToken.startsWith("example-")) {
+		return { ok: true, status: 200, endpoint };
+	}
+
 	const token = await createProviderToken(env);
 	const response = await fetcher(endpoint, {
 		method: "POST",

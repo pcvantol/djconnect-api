@@ -39,6 +39,10 @@ Required Cloudflare secrets:
 - `APNS_TOKEN_ENCRYPTION_KEY`: base64-encoded 32-byte key used to encrypt APNs
   device tokens before D1 storage. Generate with `openssl rand -base64 32`.
   Never commit, print, log, or copy it into GitHub Actions.
+- `DJCONNECT_SMOKE_TEST_MODE`: optional Worker secret. Set to `enabled` only to
+  allow CI to run the staging-safe E2E path with `example-...` APNs tokens
+  without contacting APNs. The Worker still uses real APNs for all non-example
+  tokens.
 
 The APNs public metadata is allowed in source/config:
 
@@ -49,6 +53,10 @@ The APNs public metadata is allowed in source/config:
 
 Cloudflare API tokens are operator credentials. Do not commit them, put them in
 docs, or include them in command output shared publicly.
+
+GitHub Actions may contain `DJCONNECT_RELAY_SECRET` only for the staging-safe
+E2E smoke test. Do not expose it to pull requests from untrusted forks, logs, or
+non-CI tooling.
 
 ## Relay Auth
 

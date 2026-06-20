@@ -144,6 +144,9 @@ Cloudflare production setup is active:
 - `DJCONNECT_RELAY_SECRET` is installed as a Cloudflare Worker secret.
 - `APNS_TOKEN_ENCRYPTION_KEY` must be installed as a Cloudflare Worker secret
   before encrypted APNs registrations are accepted.
+- `DJCONNECT_SMOKE_TEST_MODE=enabled` is installed as a Cloudflare Worker
+  secret so CI can run proof -> token -> register -> event smoke coverage using
+  only `example-...` APNs tokens without contacting APNs.
 - Remote D1 contains `install_tokens`, `registrations` and `relay_events`.
 - Worker deploy succeeded.
 - `https://api.djconnect.dev/health` returns `{"ok":true,"service":"djconnect-api"}`.
@@ -195,3 +198,5 @@ Before every release:
   `APNS_TOKEN_ENCRYPTION_KEY`.
 - Add an operator-only disable/revoke endpoint for compromised per-install
   tokens.
+- Add GitHub Actions secret `DJCONNECT_RELAY_SECRET` to enable the staging-safe
+  E2E smoke test in CI.
