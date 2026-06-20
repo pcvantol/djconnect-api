@@ -87,7 +87,7 @@ their own Home Assistant instance after opening, especially
   secrets or full history.
 - Tests use example fixture values only.
 
-## Validation Status For 1.0.0
+## Historical Validation Status For 1.0.0
 
 Passed:
 
@@ -97,67 +97,35 @@ Passed:
 - `npx wrangler d1 migrations apply djconnect_api --local`
 - Public repository secret scan
 
-Blocked by external Cloudflare auth:
+Previously blocked by external Cloudflare auth:
 
 - Remote D1 migration returned account authorization error `7403`.
 - Worker deploy returned Wrangler authentication error `10000`.
 
-## Manual Cloudflare Work Still Required
+## Cloudflare And CI/CD Status
 
-Most of this can be automated with:
+Cloudflare production setup is active:
+
+- `APNS_PRIVATE_KEY` is installed as a Cloudflare Worker secret.
+- `DJCONNECT_RELAY_SECRET` is installed as a Cloudflare Worker secret.
+- Remote D1 contains `install_tokens`, `registrations` and `relay_events`.
+- Worker deploy succeeded.
+- `https://api.djconnect.dev/health` returns `{"ok":true,"service":"djconnect-api"}`.
+
+GitHub Actions CI/CD is configured in `.github/workflows/ci-cd.yml`:
+
+- `Validate` runs on pull requests and pushes to `main`.
+- `Deploy` runs on pushes to `main` after validation.
+- Add GitHub secret `CLOUDFLARE_API_TOKEN` with Workers deploy and D1 migration
+  permissions.
+- After the first successful Actions run, add `Validate` as a required status
+  check in branch protection.
+
+Manual/operator provisioning remains available with:
 
 ```sh
 npm run provision:cloudflare -- --dry-run --all
 ```
-
-After reviewing the dry-run, run selected steps with `--execute`.
-Custom-domain automation works only after Cloudflare auth is fixed and
-`CLOUDFLARE_ACCOUNT_ID` plus `CLOUDFLARE_API_TOKEN` are valid for the target
-account.
-
-1. Fix Cloudflare account/API token permissions for the account that owns D1
-   database `476a564f-08b2-4966-83b0-1221e2a4d063`.
-2. Set Cloudflare secrets:
-   - `APNS_PRIVATE_KEY`
-   - `DJCONNECT_RELAY_SECRET`
-
-   Automated form:
-
-   ```sh
-   DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
-     scripts/provision_cloudflare.sh --execute --set-secrets \
-     --apns-private-key-file /secure/path/to/key.p8
-   ```
-3. Apply remote D1 migration:
-
-   ```sh
-   npx wrangler d1 migrations apply djconnect_api --remote
-   ```
-
-4. Deploy the Worker:
-
-   ```sh
-   npm run deploy
-   ```
-
-   Automated form:
-
-   ```sh
-   scripts/provision_cloudflare.sh --execute --migrate --deploy
-   ```
-
-5. Route `https://api.djconnect.dev` to the deployed Worker in Cloudflare.
-6. Smoke test:
-
-   ```sh
-   curl https://api.djconnect.dev/health
-   ```
-
-   Automated form:
-
-   ```sh
-   scripts/provision_cloudflare.sh --execute --custom-domain --smoke-test
-   ```
 
 Expected response:
 
@@ -166,7 +134,7 @@ Expected response:
 ```
 
 Do not print or commit the APNs `.p8` key, relay secret, Cloudflare token or
-any real APNs device token while completing these steps.
+any real APNs device token while operating or debugging the deployment.
 
 ## Release Checklist
 
@@ -186,10 +154,9 @@ Before every release:
 
 ## Next Actions
 
-- Fix Cloudflare token/account permissions for remote D1 migrations and Worker
-  deploy.
-- Configure required Cloudflare secrets outside the repository.
-- Route and smoke test `https://api.djconnect.dev`.
+- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN`.
+- Merge the CI/CD and custom-domain route PR.
+- After the first successful Actions run, configure `Validate` as a required
+  status check on `main`.
 - Replace plain `apns_token` storage with encrypted-at-rest token storage.
-- Add per-install relay tokens when HA integration support is ready.
-- Add deployment smoke checks for `https://api.djconnect.dev/health`.
+- Build the HACS-side per-install token storage and event relay support.

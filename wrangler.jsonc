@@ -30,6 +30,12 @@
 			"database_id": "476a564f-08b2-4966-83b0-1221e2a4d063",
 			"migrations_dir": "migrations"
 		}
+	],
+	"routes": [
+		{
+			"pattern": "api.djconnect.dev",
+			"custom_domain": true
+		}
 	]
 	/**
 	 * Smart Placement
