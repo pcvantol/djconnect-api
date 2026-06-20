@@ -109,6 +109,10 @@ their own Home Assistant instance after opening, especially
 - D1 stores `apns_token_hash` for lookup/audit and encrypted APNs token
   material for relay delivery. The nullable `apns_token` column remains only as
   a legacy migration fallback for old rows.
+- `OPERATOR_RUNBOOK.md` documents the APNs token encryption key rotation and
+  backfill procedure. The current Worker runtime still uses one active
+  `APNS_TOKEN_ENCRYPTION_KEY`; planned zero-downtime rotation requires a
+  temporary dual-key/backfill implementation before replacing the secret.
 - APNs endpoint selection is per registration: sandbox or production.
 - `BadDeviceToken`, `Unregistered` and HTTP 410 mark a registration
   disabled/invalid.
@@ -194,9 +198,7 @@ Before every release:
 ## Next Actions
 
 - Validate the encrypted APNs token migration in remote D1 after deployment.
-- Plan an operator-only key rotation/backfill procedure for
-  `APNS_TOKEN_ENCRYPTION_KEY`.
-- Add an operator-only disable/revoke endpoint for compromised per-install
-  tokens.
-- Add GitHub Actions secret `DJCONNECT_RELAY_SECRET` to enable the staging-safe
-  E2E smoke test in CI.
+- Build a temporary dual-key/backfill implementation before the first planned
+  `APNS_TOKEN_ENCRYPTION_KEY` rotation.
+- Keep GitHub Actions `DJCONNECT_RELAY_SECRET` configured so the staging-safe
+  E2E smoke test continues to run.

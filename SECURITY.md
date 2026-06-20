@@ -135,6 +135,7 @@ as a legacy migration fallback for older rows.
 
 Rotate the encryption key only with a deliberate re-encryption/backfill plan.
 Do not log decrypted APNs tokens; use hashes or redacted snippets only.
+The operator procedure lives in `OPERATOR_RUNBOOK.md`.
 
 ## Responsible Disclosure
 

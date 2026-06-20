@@ -4,8 +4,8 @@
 
 - Keep `scripts/provision_cloudflare.sh --dry-run --all` as the operator
   preflight before manual `--execute` provisioning runs.
-- Add an operator key rotation/backfill procedure for encrypted APNs token
-  storage.
+- Build temporary dual-key/backfill tooling before the first planned
+  `APNS_TOKEN_ENCRYPTION_KEY` rotation.
 - Add structured redacted logging helpers if more observability is needed.
 - Re-run the public repository secret scan before every release.
 - Confirm no request-body logging is enabled in Cloudflare observability/tail

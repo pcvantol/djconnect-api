@@ -122,6 +122,9 @@ Security posture:
   raw token.
 - The nullable `apns_token` column is retained only as a legacy migration
   fallback and should stay empty for new rows.
+- The current runtime intentionally has one active encryption key. Planned
+  zero-downtime key rotation requires a temporary dual-key/backfill change as
+  documented in `OPERATOR_RUNBOOK.md`.
 
 ### APNs Provider Token Auth
 

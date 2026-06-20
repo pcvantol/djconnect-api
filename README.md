@@ -106,6 +106,8 @@ openssl rand -base64 32
 
 This key protects APNs device tokens stored in D1. Do not commit it, copy it
 into GitHub Actions, or put it in `.dev.vars`/`.env`.
+For planned rotation and encrypted-row backfill, follow
+`OPERATOR_RUNBOOK.md`.
 
 Automated equivalent:
 
@@ -273,6 +275,8 @@ assistant responses, Spotify tokens, Home Assistant tokens or chat history.
 - `TECHNICAL_DESIGN_DECISIONS.md` records architecture and dependency decisions.
 - `THIRD_PARTY_NOTICES.md` summarizes third-party APIs, tools and trademarks.
 - `HANDOFF.md`, `TODO.md` and `ISSUES.md` track release state, next actions and known risks.
+- `OPERATOR_RUNBOOK.md` contains production operator procedures such as APNs
+  token encryption key rotation and backfill.
 - `CHAT_BOOTSTRAP.md` gives fresh-chat context for AI-assisted maintenance.
 - `scripts/provision_cloudflare.sh` automates Cloudflare secrets, migration,
   deploy, custom domain and smoke-test steps with dry-run-first safety.
