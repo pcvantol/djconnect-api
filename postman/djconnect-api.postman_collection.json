@@ -74,11 +74,11 @@
 						"type": "text/javascript",
 						"exec": [
 							"pm.test('install token endpoint rejects calls without proof', function () {",
-							"\tpm.expect([400, 401]).to.include(pm.response.code);",
+							"\tpm.response.to.have.status(400);",
 							"});",
 							"",
-							"pm.test('error body is proof or auth rejection during rollout', function () {",
-							"\tpm.expect(['missing_bootstrap_proof', 'auth_required']).to.include(pm.response.json().error);",
+							"pm.test('error body is missing_bootstrap_proof', function () {",
+							"\tpm.expect(pm.response.json()).to.have.property('error', 'missing_bootstrap_proof');",
 							"});"
 						]
 					}

@@ -1,16 +1,16 @@
 {
   "name": "djconnect-api",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
-	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
-		"test": "vitest",
-		"cf-typegen": "wrangler types",
-		"postman:test": "npx --yes newman run postman/djconnect-api.postman_collection.json --env-var baseUrl=https://api.djconnect.dev --bail",
-		"provision:cloudflare": "scripts/provision_cloudflare.sh"
-	},
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types",
+    "postman:test": "npx --yes newman run postman/djconnect-api.postman_collection.json --env-var baseUrl=https://api.djconnect.dev --bail",
+    "provision:cloudflare": "scripts/provision_cloudflare.sh"
+  },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.16.18",
     "@types/node": "^26.0.0",
