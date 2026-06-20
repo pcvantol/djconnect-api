@@ -2,8 +2,8 @@
 
 ## Immediate Validation
 
-- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN` with Workers deploy and D1
-  migration permissions.
+- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN` with Workers deploy, D1
+  migration and Workers Routes edit permissions for `djconnect.dev`.
 - After the first successful GitHub Actions run, make `Validate` a required
   status check in `main` branch protection.
 - Keep `scripts/provision_cloudflare.sh --dry-run --all` as the operator

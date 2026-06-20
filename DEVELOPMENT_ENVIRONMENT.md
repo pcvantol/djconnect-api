@@ -78,7 +78,8 @@ The D1 binding is configured in `wrangler.jsonc`:
 
 Before remote operations, confirm the active Wrangler account or
 `CLOUDFLARE_API_TOKEN` can edit Workers and D1 resources for the Cloudflare
-account that owns database `476a564f-08b2-4966-83b0-1221e2a4d063`.
+account that owns database `476a564f-08b2-4966-83b0-1221e2a4d063`, and can
+edit Workers Routes/read Zone metadata for the `djconnect.dev` zone.
 
 Previously observed blocked states:
 
