@@ -101,7 +101,7 @@ that contains secrets.
 The repository includes a dry-run-first provisioning helper:
 
 ```sh
-npm run provision:cloudflare -- --all
+npm run provision:cloudflare -- --dry-run --all
 ```
 
 Run selected actions with `--execute` only after reviewing the dry-run:
@@ -119,6 +119,10 @@ DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
 ```
 
 The script refuses shell tracing and redacts secret values from its own output.
+When `--execute` is used for Cloudflare changes, it verifies
+`CLOUDFLARE_API_TOKEN` with Cloudflare before running Wrangler or custom-domain
+actions. Custom-domain automation also requires `CLOUDFLARE_ACCOUNT_ID` and
+only works after the token has permissions for the target account.
 
 After secrets, remote migration and deploy are configured, route the Worker to
 `https://api.djconnect.dev` and smoke test:

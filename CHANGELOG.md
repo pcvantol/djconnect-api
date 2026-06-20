@@ -21,6 +21,9 @@
 - Added `scripts/provision_cloudflare.sh`, a dry-run-first provisioning helper
   for Cloudflare secrets, remote D1 migration, Worker deploy, custom domain
   setup and `/health` smoke testing without printing secret values.
+- Hardened provisioning docs and script behavior with explicit `--dry-run`,
+  Cloudflare API token verification before execute-mode changes and a note that
+  custom-domain automation requires fixed Cloudflare auth/account permissions.
 
 ## 1.0.0 - 2026-06-20
 

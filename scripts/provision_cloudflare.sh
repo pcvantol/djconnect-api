@@ -10,6 +10,7 @@ Safe by default: this script runs in dry-run mode unless --execute is passed.
 It never prints secret values. Do not run with shell tracing (set -x).
 
 Options:
+  --dry-run                 Plan selected actions without making changes. Default.
   --execute                 Actually run selected actions. Default is dry-run.
   --all                     Run secrets, remote migration, deploy, domain setup and smoke test.
   --set-secrets             Set APNS_PRIVATE_KEY and DJCONNECT_RELAY_SECRET with Wrangler.
@@ -31,6 +32,7 @@ Options:
   -h, --help                Show this help.
 
 Examples:
+  scripts/provision_cloudflare.sh --dry-run --all
   scripts/provision_cloudflare.sh --all
   scripts/provision_cloudflare.sh --execute --migrate --deploy --smoke-test
   DJCONNECT_RELAY_SECRET_VALUE='...' \
@@ -57,6 +59,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --execute)
       EXECUTE=true
+      shift
+      ;;
+    --dry-run)
+      EXECUTE=false
       shift
       ;;
     --all)
@@ -186,13 +192,49 @@ require_command() {
 
 require_command npx
 
-if [[ "$CUSTOM_DOMAIN" == true ]]; then
+if [[ "$CUSTOM_DOMAIN" == true || "$SMOKE_TEST" == true || "$EXECUTE" == true ]]; then
   require_command curl
 fi
 
-if [[ "$SMOKE_TEST" == true ]]; then
-  require_command curl
-fi
+verify_cloudflare_token() {
+  local api_token="${!API_TOKEN_ENV:-}"
+  local response_file
+  local status_code
+
+  if [[ "$EXECUTE" != true ]]; then
+    return
+  fi
+
+  if [[ "$SET_SECRETS" == false && "$MIGRATE" == false && "$DEPLOY" == false && "$CUSTOM_DOMAIN" == false ]]; then
+    return
+  fi
+
+  if [[ -z "$api_token" ]]; then
+    echo "$API_TOKEN_ENV is required for --execute Cloudflare changes." >&2
+    exit 64
+  fi
+
+  response_file="$(mktemp)"
+  status_code="$(
+    curl -sS -o "$response_file" -w '%{http_code}' \
+      -H "Authorization: Bearer ${api_token}" \
+      "https://api.cloudflare.com/client/v4/user/tokens/verify"
+  )"
+
+  if [[ "$status_code" -lt 200 || "$status_code" -ge 300 ]]; then
+    echo "Cloudflare API token verification failed with HTTP $status_code." >&2
+    echo "Fix $API_TOKEN_ENV before running provisioning. Response body is in $response_file; do not paste it publicly." >&2
+    exit 1
+  fi
+
+  if ! grep -q '"success":true' "$response_file"; then
+    echo "Cloudflare API token verification did not return success=true." >&2
+    echo "Fix $API_TOKEN_ENV permissions before running provisioning. Response body is in $response_file; do not paste it publicly." >&2
+    exit 1
+  fi
+
+  rm -f "$response_file"
+}
 
 set_worker_secret_from_file() {
   local name="$1"
@@ -283,6 +325,8 @@ configure_custom_domain() {
 
   rm -f "$response_file"
 }
+
+verify_cloudflare_token
 
 if [[ "$SET_SECRETS" == true ]]; then
   set_worker_secret_from_file "APNS_PRIVATE_KEY" "$APNS_PRIVATE_KEY_FILE"

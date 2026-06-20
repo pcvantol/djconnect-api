@@ -12,6 +12,8 @@
 - Use `scripts/provision_cloudflare.sh` to automate the secret, migration,
   deploy, custom-domain and smoke-test steps once Cloudflare API permissions are
   fixed.
+- Confirm `scripts/provision_cloudflare.sh --dry-run --all` before any
+  `--execute` provisioning run.
 - Set Cloudflare secrets outside the repository:
   - `APNS_PRIVATE_KEY`
   - `DJCONNECT_RELAY_SECRET`

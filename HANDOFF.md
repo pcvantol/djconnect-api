@@ -107,10 +107,13 @@ Blocked by external Cloudflare auth:
 Most of this can be automated with:
 
 ```sh
-npm run provision:cloudflare -- --all
+npm run provision:cloudflare -- --dry-run --all
 ```
 
 After reviewing the dry-run, run selected steps with `--execute`.
+Custom-domain automation works only after Cloudflare auth is fixed and
+`CLOUDFLARE_ACCOUNT_ID` plus `CLOUDFLARE_API_TOKEN` are valid for the target
+account.
 
 1. Fix Cloudflare account/API token permissions for the account that owns D1
    database `476a564f-08b2-4966-83b0-1221e2a4d063`.

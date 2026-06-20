@@ -12,10 +12,11 @@ Cloudflare setup is intentionally manual for production credentials. Do not
 store APNs keys, relay secrets or Cloudflare tokens in this repository.
 
 Most Cloudflare setup can also be automated with the safe provisioning script.
-It is dry-run by default and never prints secret values:
+It is dry-run by default, also accepts explicit `--dry-run`, and never prints
+secret values:
 
 ```sh
-npm run provision:cloudflare -- --all
+npm run provision:cloudflare -- --dry-run --all
 ```
 
 Run selected actions with `--execute` only after reviewing the dry-run:
@@ -41,7 +42,8 @@ export CLOUDFLARE_API_TOKEN='replace-with-api-token'
 ```
 
 The script configures `api.djconnect.dev` for Worker service `djconnect-api` by
-default.
+default. Custom domain automation only works after Cloudflare auth/token
+permissions are fixed for the target account.
 
 ### 1. Confirm Wrangler Account Permissions
 
@@ -150,6 +152,9 @@ Automated equivalent:
 ```sh
 scripts/provision_cloudflare.sh --execute --custom-domain --smoke-test
 ```
+
+The custom-domain step uses the Cloudflare API and requires a valid
+`CLOUDFLARE_API_TOKEN` plus `CLOUDFLARE_ACCOUNT_ID`.
 
 Non-secret APNs defaults are in `wrangler.jsonc`:
 
