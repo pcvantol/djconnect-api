@@ -114,8 +114,9 @@ Before every release:
 - Attempt remote D1 migration and Worker deploy when Cloudflare credentials are
   available.
 - Use `CHANGELOG.md` as GitHub Release body.
-- Run `./cleanup_old_releases.sh --keep 1` dry-run, then `--execute` only when
-  old releases/tags should be removed.
+- Run `./cleanup_old_releases.sh --keep 1` dry-run before publishing, then
+  `./cleanup_old_releases.sh --keep 1 --execute` by default after the new
+  GitHub Release is published and verified.
 
 ## Next Actions
 

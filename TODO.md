@@ -56,6 +56,6 @@
 - Run `npx wrangler d1 migrations apply djconnect_api --local`.
 - Attempt remote migration/deploy when credentials are available.
 - Use `CHANGELOG.md` for GitHub Release notes.
-- Run `./cleanup_old_releases.sh --keep 1` as a dry-run.
-- Run `./cleanup_old_releases.sh --keep 1 --execute` only after confirming old
-  releases/tags should be removed.
+- Run `./cleanup_old_releases.sh --keep 1` as a dry-run before publishing.
+- Run `./cleanup_old_releases.sh --keep 1 --execute` by default after the new
+  GitHub Release is published and verified.

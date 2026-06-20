@@ -139,3 +139,7 @@ Not allowed:
   `/Users/pcvantol/Documents/GitHub/djconnect`.
 - Do not include secrets, private data or proprietary third-party material in
   prompts, agent logs, screenshots, issues or test fixtures.
+- Release cleanup is part of the normal release cycle: run
+  `./cleanup_old_releases.sh --keep 1` as a dry-run first, then
+  `./cleanup_old_releases.sh --keep 1 --execute` after the new GitHub Release
+  is published and verified.
