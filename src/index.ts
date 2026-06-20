@@ -1,9 +1,9 @@
-import { requireBootstrapAuth, requireInstallAuth } from "./auth";
+import { requireAdminAuth, requireBootstrapAuth, requireInstallAuth } from "./auth";
 import { buildApnsPayload, isInvalidTokenReason, sendApns } from "./apns";
 import { sha256Hex } from "./crypto";
 import { HttpError, json, readJson } from "./http";
-import { auditEvent, findActiveRegistrations, issueInstallToken, markRegistrationError, markRegistrationSuccess, rotateInstallToken, unregister, upsertRegistration } from "./repository";
-import type { AppEnv, InstallTokenRequest, PushEventRequest, RegisterRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
+import { auditEvent, findActiveRegistrations, issueInstallToken, listAdminRegistrations, markRegistrationError, markRegistrationSuccess, rotateInstallToken, unregister, upsertRegistration } from "./repository";
+import type { AdminRegistrationsQuery, AppEnv, InstallTokenRequest, PushEventRequest, RegisterRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
 const VALID_ENVIRONMENTS = new Set(["sandbox", "production"]);
@@ -27,6 +27,12 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 	const url = new URL(request.url);
 	if (request.method === "GET" && url.pathname === "/health") {
 		return json({ ok: true, service: "djconnect-api" });
+	}
+
+	if (request.method === "GET" && url.pathname === "/v1/admin/registrations") {
+		await requireAdminAuth(request, env);
+		const result = await listAdminRegistrations(env.DB, validateAdminRegistrationsQuery(url));
+		return json({ ok: true, ...result });
 	}
 
 	if (request.method === "POST" && url.pathname === "/v1/install/token") {
@@ -155,6 +161,50 @@ function validatePushEvent(input: PushEventRequest): void {
 			throw new HttpError(400, "invalid_client_type");
 		}
 	}
+}
+
+function validateAdminRegistrationsQuery(url: URL): AdminRegistrationsQuery {
+	const params = url.searchParams;
+	const limit = clampNumber(params.get("limit"), 50, 1, 100);
+	const offset = clampNumber(params.get("offset") ?? params.get("cursor"), 0, 0, 100000);
+	const clientType = optionalEnum(params.get("client_type"), VALID_CLIENT_TYPES, "invalid_client_type");
+	const apnsEnvironment = optionalEnum(params.get("apns_environment"), VALID_ENVIRONMENTS, "invalid_apns_environment");
+	const disabled = optionalBoolean(params.get("disabled"), "invalid_disabled");
+	const invalid = optionalBoolean(params.get("invalid"), "invalid_invalid");
+	const haInstallId = params.get("ha_install_id")?.trim() || undefined;
+	return {
+		limit,
+		offset,
+		...(clientType ? { client_type: clientType as AdminRegistrationsQuery["client_type"] } : {}),
+		...(apnsEnvironment ? { apns_environment: apnsEnvironment as AdminRegistrationsQuery["apns_environment"] } : {}),
+		...(disabled !== undefined ? { disabled } : {}),
+		...(invalid !== undefined ? { invalid } : {}),
+		...(haInstallId ? { ha_install_id: haInstallId } : {}),
+	};
+}
+
+function clampNumber(value: string | null, fallback: number, min: number, max: number): number {
+	if (value === null || value.trim() === "") return fallback;
+	const parsed = Number(value);
+	if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
+		throw new HttpError(400, "invalid_pagination");
+	}
+	return parsed;
+}
+
+function optionalEnum(value: string | null, allowed: Set<string>, errorCode: string): string | undefined {
+	if (value === null || value.trim() === "") return undefined;
+	if (!allowed.has(value)) {
+		throw new HttpError(400, errorCode);
+	}
+	return value;
+}
+
+function optionalBoolean(value: string | null, errorCode: string): boolean | undefined {
+	if (value === null || value.trim() === "") return undefined;
+	if (value === "true" || value === "1") return true;
+	if (value === "false" || value === "0") return false;
+	throw new HttpError(400, errorCode);
 }
 
 function requireString(value: unknown, field: string): void {

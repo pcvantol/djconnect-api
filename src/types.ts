@@ -55,6 +55,37 @@ export interface PushEventRequest {
 	client_types?: ClientType[];
 }
 
+export interface AdminRegistrationsQuery {
+	limit: number;
+	offset: number;
+	client_type?: ClientType;
+	apns_environment?: ApnsEnvironment;
+	disabled?: boolean;
+	invalid?: boolean;
+	ha_install_id?: string;
+}
+
+export interface AdminRegistration {
+	id: string;
+	ha_install_id_hash: string;
+	ha_user_hash: string | null;
+	device_id_hash: string;
+	client_type: ClientType;
+	apns_environment: ApnsEnvironment;
+	topic: string;
+	app_bundle_id: string | null;
+	app_version: string | null;
+	locale: string | null;
+	categories: string[];
+	disabled: boolean;
+	invalid: boolean;
+	created_at: string;
+	updated_at: string;
+	last_success_at: string | null;
+	last_error_code: string | null;
+	apns_token_hash_prefix: string | null;
+}
+
 export interface Registration {
 	id: string;
 	ha_install_id: string;

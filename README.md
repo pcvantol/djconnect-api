@@ -4,7 +4,7 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
-Current release: `1.0.2`.
+Current release: `1.0.3`.
 
 ## Cloudflare Setup
 
@@ -191,7 +191,7 @@ environment-specific Wrangler configuration when added.
 - Cloudflare Worker secrets are configured for `APNS_PRIVATE_KEY`,
   `DJCONNECT_RELAY_SECRET` and `APNS_TOKEN_ENCRYPTION_KEY`.
 - GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
-- The latest release is `v1.0.2`.
+- The latest release is `v1.0.3`.
 
 ## Development
 
@@ -293,6 +293,9 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 
 - `POST /v1/install/token` requires bootstrap auth with
   `DJCONNECT_RELAY_SECRET`.
+- `GET /v1/admin/registrations` requires the same bootstrap/operator auth,
+  rejects per-install `djci_...` tokens and returns only privacy-safe
+  registration metadata for the admin website.
 - `POST /v1/push/register`, `/unregister`, `/event`, and
   `/v1/install/rotate` require a per-install token scoped to the request
   `ha_install_id`.
@@ -302,3 +305,7 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 - New APNs registrations store device tokens encrypted at rest in D1 with
   `APNS_TOKEN_ENCRYPTION_KEY`. The legacy nullable `apns_token` column remains
   only as a migration fallback for old rows and should stay empty for new rows.
+- The DJConnect admin website must read registered Apple device summaries
+  through `GET /v1/admin/registrations`, never by querying D1 directly. That
+  endpoint returns hashed/prefixed install and device identifiers and never
+  returns APNs token material.

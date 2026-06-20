@@ -66,6 +66,8 @@ The production auth model is:
   returned once and must be stored in Home Assistant config entry storage.
 - Rotate or disable a compromised install token without affecting other
   installations.
+- Admin endpoints such as `GET /v1/admin/registrations` require the
+  bootstrap/operator secret and explicitly reject per-install `djci_...` tokens.
 
 ## Data Minimization
 
@@ -80,6 +82,19 @@ This API stores only push routing metadata and minimal audit rows. It must not s
 - APNs provider key material
 
 Apple push payloads are generic wake/sync signals. Clients fetch current data from their own Home Assistant instance after opening.
+
+## Admin Data Exposure
+
+Admin views must be privacy-safe summaries. `GET /v1/admin/registrations`
+returns only operational metadata needed by the DJConnect admin website:
+registration ID, hashed install/device identifiers, Home Assistant user hash,
+client type, APNs environment, APNs topic, app metadata, locale, categories,
+disabled/invalid flags and timestamps.
+
+Admin responses must never include raw APNs tokens, APNs token ciphertext,
+nonces, encryption key versions, provider keys, relay secrets, Home Assistant
+tokens, Spotify tokens, raw prompts, assistant responses or chat history. The
+admin website must read through the admin API and must not query D1 directly.
 
 ## Logging
 

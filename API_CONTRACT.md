@@ -192,3 +192,67 @@ Response:
 The event body must not include raw prompts, raw assistant responses, Spotify tokens, HA tokens, or chat history.
 
 Clients should open and sync directly with their own Home Assistant instance, especially `/api/djconnect/ask_dj/history`.
+
+## GET /v1/admin/registrations
+
+Returns a privacy-safe operator overview of registered Apple client devices for
+the DJConnect admin website.
+
+Requires bootstrap/operator auth using `DJCONNECT_RELAY_SECRET` through bearer
+auth or HMAC signature. Per-install `djci_...` tokens are rejected and must not
+be used by admin tooling.
+
+Query parameters:
+
+- `limit`: page size from 1 to 100. Default: 50.
+- `offset`: zero-based row offset. Default: 0.
+- `cursor`: alias for `offset`.
+- `client_type`: optional `ios`, `macos` or `watchos`.
+- `apns_environment`: optional `sandbox` or `production`.
+- `disabled`: optional `true`, `false`, `1` or `0`.
+- `invalid`: optional `true`, `false`, `1` or `0`.
+- `ha_install_id`: optional exact install filter. The raw value is accepted
+  only as an operator filter and is not returned.
+
+Example:
+
+```http
+GET /v1/admin/registrations?client_type=ios&disabled=false&limit=25
+Authorization: Bearer <DJCONNECT_RELAY_SECRET>
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "registrations": [
+    {
+      "id": "registration-id",
+      "ha_install_id_hash": "0123456789abcdef",
+      "ha_user_hash": "example-user-hash",
+      "device_id_hash": "abcdef0123456789",
+      "client_type": "ios",
+      "apns_environment": "sandbox",
+      "topic": "dev.djconnect.ios",
+      "app_bundle_id": "dev.djconnect.ios",
+      "app_version": "1.0.0",
+      "locale": "nl-NL",
+      "categories": ["ask_dj"],
+      "disabled": false,
+      "invalid": false,
+      "created_at": "2026-06-20 12:00:00",
+      "updated_at": "2026-06-20 12:10:00",
+      "last_success_at": "2026-06-20 12:10:00",
+      "last_error_code": null,
+      "apns_token_hash_prefix": "0123456789ab"
+    }
+  ],
+  "next_offset": null
+}
+```
+
+The response never includes raw APNs tokens, APNs token ciphertext, nonces,
+encryption key versions, relay secrets, Home Assistant tokens, Spotify tokens,
+prompts, responses or chat history. Install and device identifiers are returned
+only as stable SHA-256 prefixes.

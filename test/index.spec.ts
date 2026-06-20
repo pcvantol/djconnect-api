@@ -307,6 +307,119 @@ describe("DJConnect API worker", () => {
 		expect(invalid).toEqual({ disabled: 1, invalid: 1, last_error_code: "Unregistered" });
 	});
 
+	it("lists admin registrations with operator auth and privacy-safe fields", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		const register = await dispatch("/v1/push/register", registerPayload(), installAuth);
+		expect(register.status).toBe(200);
+		await env.DB.prepare("UPDATE registrations SET last_success_at = datetime('now') WHERE device_id = ?").bind("example-device").run();
+
+		const response = await dispatchGet("/v1/admin/registrations?limit=10", AUTH);
+		expect(response.status).toBe(200);
+		const body = await response.json() as {
+			ok: boolean;
+			registrations: Array<Record<string, unknown>>;
+			next_offset: number | null;
+		};
+		expect(body.ok).toBe(true);
+		expect(body.next_offset).toBeNull();
+		expect(body.registrations).toHaveLength(1);
+
+		const row = body.registrations[0]!;
+		expect(row.id).toEqual(expect.any(String));
+		expect(row.ha_install_id_hash).toMatch(/^[a-f0-9]{16}$/);
+		expect(row.ha_install_id_hash).not.toBe("example-ha-install");
+		expect(row.device_id_hash).toMatch(/^[a-f0-9]{16}$/);
+		expect(row.device_id_hash).not.toBe("example-device");
+		expect(row.ha_user_hash).toBe("example-user-hash");
+		expect(row.client_type).toBe("ios");
+		expect(row.apns_environment).toBe("sandbox");
+		expect(row.topic).toBe("dev.djconnect.ios");
+		expect(row.app_bundle_id).toBe("dev.djconnect.ios");
+		expect(row.app_version).toBe("1.0.0");
+		expect(row.locale).toBe("nl-NL");
+		expect(row.categories).toEqual(["ask_dj"]);
+		expect(row.disabled).toBe(false);
+		expect(row.invalid).toBe(false);
+		expect(row.apns_token_hash_prefix).toMatch(/^[a-f0-9]{12}$/);
+		expect(row.created_at).toEqual(expect.any(String));
+		expect(row.updated_at).toEqual(expect.any(String));
+		expect(row.last_success_at).toEqual(expect.any(String));
+		expect(row.last_error_code).toBeNull();
+
+		const serialized = JSON.stringify(body);
+		expect(serialized).not.toContain("example-apns-token");
+		expect(serialized).not.toContain("apns_token_ciphertext");
+		expect(serialized).not.toContain("apns_token_nonce");
+		expect(serialized).not.toContain("apns_token_key_version");
+		expect(serialized).not.toContain("APNS_PRIVATE_KEY");
+		expect(serialized).not.toContain("APNS_TOKEN_ENCRYPTION_KEY");
+		expect(serialized).not.toContain("DJCONNECT_RELAY_SECRET");
+		expect(serialized).not.toContain(EXAMPLE_RELAY_SECRET);
+	});
+
+	it("protects admin registrations from anonymous and per-install auth", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+
+		const anonymous = await dispatchGet("/v1/admin/registrations");
+		expect(anonymous.status).toBe(401);
+
+		const perInstall = await dispatchGet("/v1/admin/registrations", installAuth);
+		expect(perInstall.status).toBe(403);
+	});
+
+	it("filters and paginates admin registrations", async () => {
+		const firstAuth = await issueInstallAuth("example-ha-install");
+		const secondAuth = await issueInstallAuth("example-second-install");
+		const thirdAuth = await issueInstallAuth("example-third-install");
+		await dispatch("/v1/push/register", registerPayload(), firstAuth);
+		await dispatch("/v1/push/register", {
+			...registerPayload(),
+			ha_install_id: "example-second-install",
+			device_id: "example-mac-device",
+			client_type: "macos",
+			apns_environment: "production",
+			app_bundle_id: "dev.djconnect.mac",
+		}, secondAuth);
+		await dispatch("/v1/push/register", {
+			...registerPayload(),
+			ha_install_id: "example-third-install",
+			device_id: "example-watch-device",
+			client_type: "watchos",
+		}, thirdAuth);
+		await env.DB.prepare("UPDATE registrations SET disabled = 1, invalid = 1, last_error_code = 'Unregistered' WHERE device_id = ?").bind("example-watch-device").run();
+
+		const macos = await dispatchGet("/v1/admin/registrations?client_type=macos&apns_environment=production", AUTH);
+		expect(macos.status).toBe(200);
+		const macosBody = await macos.json() as { registrations: Array<{ client_type: string; apns_environment: string }> };
+		expect(macosBody.registrations).toHaveLength(1);
+		expect(macosBody.registrations[0]).toMatchObject({ client_type: "macos", apns_environment: "production" });
+
+		const disabled = await dispatchGet("/v1/admin/registrations?disabled=true&invalid=1", AUTH);
+		expect(disabled.status).toBe(200);
+		const disabledBody = await disabled.json() as { registrations: Array<{ disabled: boolean; invalid: boolean; last_error_code: string }> };
+		expect(disabledBody.registrations).toHaveLength(1);
+		expect(disabledBody.registrations[0]).toMatchObject({ disabled: true, invalid: true, last_error_code: "Unregistered" });
+
+		const filteredInstall = await dispatchGet("/v1/admin/registrations?ha_install_id=example-ha-install", AUTH);
+		expect(filteredInstall.status).toBe(200);
+		const filteredInstallBody = await filteredInstall.json() as { registrations: Array<{ ha_install_id_hash: string; device_id_hash: string }> };
+		expect(filteredInstallBody.registrations).toHaveLength(1);
+		expect(JSON.stringify(filteredInstallBody)).not.toContain("example-ha-install");
+		expect(JSON.stringify(filteredInstallBody)).not.toContain("example-device");
+
+		const firstPage = await dispatchGet("/v1/admin/registrations?limit=2&offset=0", AUTH);
+		expect(firstPage.status).toBe(200);
+		const firstPageBody = await firstPage.json() as { registrations: unknown[]; next_offset: number | null };
+		expect(firstPageBody.registrations).toHaveLength(2);
+		expect(firstPageBody.next_offset).toBe(2);
+
+		const secondPage = await dispatchGet("/v1/admin/registrations?limit=2&offset=2", AUTH);
+		expect(secondPage.status).toBe(200);
+		const secondPageBody = await secondPage.json() as { registrations: unknown[]; next_offset: number | null };
+		expect(secondPageBody.registrations).toHaveLength(1);
+		expect(secondPageBody.next_offset).toBeNull();
+	});
+
 	it("selects sandbox and production APNs endpoints", () => {
 		expect(apnsEndpoint("sandbox", "abc")).toBe("https://api.sandbox.push.apple.com/3/device/abc");
 		expect(apnsEndpoint("production", "abc")).toBe("https://api.push.apple.com/3/device/abc");
@@ -317,6 +430,19 @@ async function dispatch(path: string, body: unknown, authorization?: string): Pr
 	return dispatchWithHeaders(path, body, {
 		...(authorization ? { authorization } : {}),
 	});
+}
+
+async function dispatchGet(path: string, authorization?: string): Promise<Response> {
+	const request = new IncomingRequest(`https://api.djconnect.dev${path}`, {
+		method: "GET",
+		headers: {
+			...(authorization ? { authorization } : {}),
+		},
+	});
+	const ctx = createExecutionContext();
+	const response = await worker.fetch(request, testEnv, ctx);
+	await waitOnExecutionContext(ctx);
+	return response;
 }
 
 async function dispatchWithHeaders(path: string, body: unknown, headers: Record<string, string>): Promise<Response> {

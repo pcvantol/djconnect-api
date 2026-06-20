@@ -4,7 +4,7 @@
 
 - Repository: `pcvantol/djconnect-api`.
 - Runtime: Cloudflare Worker.
-- Current release: `1.0.2`.
+- Current release: `1.0.3`.
 - Purpose: central APNs push relay for DJConnect Apple clients.
 - Public API target: `https://api.djconnect.dev`.
 - D1 database: `djconnect_api`.
@@ -57,12 +57,20 @@ Relay endpoints:
 - `POST /v1/push/unregister`
 - `POST /v1/push/event`
 
+Admin endpoints:
+
+- `GET /v1/admin/registrations`
+
 `POST /v1/install/token` requires bootstrap auth using
 `DJCONNECT_RELAY_SECRET` through bearer auth or HMAC signature. Public
 Home Assistant/HACS installations must not receive that bootstrap secret.
 
 `/v1/push/*` and `/v1/install/rotate` require a per-install `djci_...` token
 scoped to the request `ha_install_id`.
+
+`GET /v1/admin/registrations` requires bootstrap/operator auth, rejects
+per-install tokens and returns only privacy-safe metadata for the admin website.
+The admin website must use this endpoint rather than reading D1 directly.
 
 ## Privacy Boundaries
 
@@ -77,6 +85,7 @@ The Worker must not log, store or relay:
 - APNs provider private key.
 - Relay secret.
 - Production user, device or install identifiers in tests/fixtures.
+- Raw production install IDs or device IDs in admin responses.
 
 APNs payloads are generic wake/sync hints. Clients must always sync through
 their own Home Assistant instance after opening, especially
