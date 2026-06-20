@@ -57,17 +57,31 @@ Public HACS integrations must not contain a global DJConnect secret.
 The production auth model is:
 
 - `DJCONNECT_RELAY_SECRET` stays server/operator-side and is used only for
-  trusted bootstrap calls such as `POST /v1/install/token`.
+  trusted admin/pairing calls such as `POST /v1/install/bootstrap-proof`.
 - Each Home Assistant installation receives its own `djci_...` install token.
+  The HACS integration provisions this automatically during setup; users do not
+  normally paste tokens manually. `POST /v1/install/token` requires a
+  short-lived one-time `djcboot_...` proof and does not accept
+  `DJCONNECT_RELAY_SECRET` as a fallback.
+- Bootstrap proofs are stored hashed, bound to `ha_install_id`, `client_type`
+  and `device_id`, expire quickly and are marked used after successful token
+  issuance.
+- Bootstrap proof consumption is D1 rate-limited by hashed IP, install ID and
+  device ID keys. Rate-limit rows must not store raw proofs or tokens.
 - `/v1/push/register`, `/v1/push/unregister`, `/v1/push/event` and
   `/v1/install/rotate` require the per-install token for the exact
   `ha_install_id` in the request body.
 - Install tokens are stored in D1 only as SHA-256 hashes. The raw token is
-  returned once and must be stored in Home Assistant config entry storage.
+  returned once and is stored by the integration in Home Assistant config entry
+  options.
 - Rotate or disable a compromised install token without affecting other
   installations.
 - Admin endpoints such as `GET /v1/admin/registrations` require the
   bootstrap/operator secret and explicitly reject per-install `djci_...` tokens.
+
+Support/options UI may expose API URL/token inspection, replacement or
+rotation controls, but those are operator support paths. They are not the
+standard user onboarding path and must not reveal global secrets.
 
 ## Data Minimization
 

@@ -2,12 +2,29 @@ import { requireAdminAuth, requireBootstrapAuth, requireInstallAuth } from "./au
 import { buildApnsPayload, isInvalidTokenReason, sendApns } from "./apns";
 import { sha256Hex } from "./crypto";
 import { HttpError, json, readJson } from "./http";
-import { auditEvent, findActiveRegistrations, issueInstallToken, listAdminRegistrations, markRegistrationError, markRegistrationSuccess, rotateInstallToken, unregister, upsertRegistration } from "./repository";
-import type { AdminRegistrationsQuery, AppEnv, InstallTokenRequest, PushEventRequest, RegisterRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
+import { auditEvent, consumeBootstrapProof, enforceBootstrapRateLimit, findActiveRegistrations, issueBootstrapProof, issueInstallToken, listAdminRegistrations, markRegistrationError, markRegistrationSuccess, rotateInstallToken, unregister, upsertRegistration } from "./repository";
+import type { AdminRegistrationsQuery, AppEnv, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
+const VALID_BOOTSTRAP_CLIENT_TYPES = new Set(["ios", "macos", "watchos", "raspberry_pi", "esp32", "conversation_agent"]);
 const VALID_ENVIRONMENTS = new Set(["sandbox", "production"]);
 const VALID_EVENTS = new Set(["ask_dj_response", "ask_dj_confirm", "playback_change"]);
+const FORBIDDEN_PAYLOAD_KEYS = new Set([
+	"prompt",
+	"raw_prompt",
+	"assistant_response",
+	"response",
+	"response_text",
+	"history",
+	"chat_history",
+	"memory",
+	"apns_token",
+	"ha_token",
+	"spotify_token",
+	"token",
+	"secret",
+	"authorization",
+]);
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
@@ -35,12 +52,33 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 		return json({ ok: true, ...result });
 	}
 
+	if (request.method === "POST" && url.pathname === "/v1/install/bootstrap-proof") {
+		await requireAdminAuth(request, env);
+		const input = await readJson<BootstrapProofRequest>(request);
+		validateBootstrapProofRequest(input);
+		const result = await issueBootstrapProof(env.DB, input);
+		return json({ ok: true, id: result.id, bootstrap_proof: result.proof, proof_hash: result.proofHash, expires_at: result.expiresAt });
+	}
+
 	if (request.method === "POST" && url.pathname === "/v1/install/token") {
-		await requireBootstrapAuth(request, env);
 		const input = await readJson<InstallTokenRequest>(request);
 		validateInstallTokenRequest(input);
+		await enforceBootstrapRateLimit(env.DB, {
+			ip: clientIp(request),
+			ha_install_id: input.ha_install_id,
+			device_id: input.device_id!,
+		});
+		await consumeBootstrapProof(env.DB, input);
 		const result = await issueInstallToken(env.DB, input);
-		return json({ ok: true, id: result.id, token: result.token, token_hash: result.tokenHash });
+		return json({
+			ok: true,
+			success: true,
+			id: result.id,
+			token: result.token,
+			install_token: result.token,
+			token_hash: result.tokenHash,
+			expires_at: null,
+		});
 	}
 
 	if (request.method === "POST" && url.pathname === "/v1/install/rotate") {
@@ -110,6 +148,12 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 	return json({ error: "not_found" }, { status: 404 });
 }
 
+function clientIp(request: Request): string {
+	return request.headers.get("cf-connecting-ip")
+		?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+		?? "unknown";
+}
+
 function requireBearerHeader(request: Request): void {
 	const authorization = request.headers.get("authorization") ?? "";
 	if (!authorization.startsWith("Bearer ") || authorization.slice("Bearer ".length).trim() === "") {
@@ -119,11 +163,27 @@ function requireBearerHeader(request: Request): void {
 
 function validateInstallTokenRequest(input: InstallTokenRequest): void {
 	requireString(input.ha_install_id, "ha_install_id");
+	requireString(input.bootstrap_proof, "bootstrap_proof");
+	requireString(input.device_id, "device_id");
+	if (!VALID_BOOTSTRAP_CLIENT_TYPES.has(input.client_type ?? "")) {
+		throw new HttpError(400, "invalid_client_type");
+	}
 	if (input.ha_user_hash !== undefined && typeof input.ha_user_hash !== "string") {
 		throw new HttpError(400, "invalid_ha_user_hash");
 	}
 	if (input.label !== undefined && typeof input.label !== "string") {
 		throw new HttpError(400, "invalid_label");
+	}
+}
+
+function validateBootstrapProofRequest(input: BootstrapProofRequest): void {
+	requireString(input.ha_install_id, "ha_install_id");
+	requireString(input.device_id, "device_id");
+	if (!VALID_BOOTSTRAP_CLIENT_TYPES.has(input.client_type)) {
+		throw new HttpError(400, "invalid_client_type");
+	}
+	if (input.ttl_seconds !== undefined && (!Number.isInteger(input.ttl_seconds) || input.ttl_seconds < 60 || input.ttl_seconds > 600)) {
+		throw new HttpError(400, "invalid_ttl_seconds");
 	}
 }
 
@@ -153,12 +213,28 @@ function validateUnregister(input: UnregisterRequest): void {
 
 function validatePushEvent(input: PushEventRequest): void {
 	requireString(input.ha_install_id, "ha_install_id");
+	rejectForbiddenPayloadKeys(input);
 	if (!VALID_EVENTS.has(input.event_type)) {
 		throw new HttpError(400, "invalid_event_type");
 	}
 	for (const clientType of input.client_types ?? []) {
 		if (!VALID_CLIENT_TYPES.has(clientType)) {
 			throw new HttpError(400, "invalid_client_type");
+		}
+	}
+}
+
+function rejectForbiddenPayloadKeys(value: unknown): void {
+	if (value === null || typeof value !== "object") return;
+	for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+		const normalized = key.toLowerCase();
+		if (FORBIDDEN_PAYLOAD_KEYS.has(normalized)) {
+			throw new HttpError(400, "unsafe_payload");
+		}
+		if (Array.isArray(child)) {
+			for (const item of child) rejectForbiddenPayloadKeys(item);
+		} else {
+			rejectForbiddenPayloadKeys(child);
 		}
 	}
 }

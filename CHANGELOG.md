@@ -2,6 +2,16 @@
 
 ## 1.0.3 - 2026-06-20
 
+- Documented that HACS-side per-install token provisioning is now automatic:
+  the integration persists `ha_install_id`, obtains/stores a `djci_...` token
+  during setup and uses support/options UI only for override or rotation.
+- Added proof-based HACS bootstrap:
+  - `POST /v1/install/bootstrap-proof` issues short-lived one-time
+    `djcboot_...` proofs through operator/admin auth.
+  - `POST /v1/install/token` consumes valid proofs and no longer accepts
+    operator auth as a fallback.
+  - Proofs are stored hashed, bound to install/client/device context and
+    consumed behind D1 rate limits.
 - Added APNs token encryption at rest for D1 registrations:
   - New registrations store encrypted token material instead of raw
     `apns_token` values.

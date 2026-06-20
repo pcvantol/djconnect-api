@@ -25,22 +25,19 @@
 ## API / Contracts
 
 - Keep `/v1/push/*` aligned with the Home Assistant integration relay contract
-  when that integration starts calling this central API.
+  as the integration uses this central API.
 - Keep `API_CONTRACT.md` aligned with
   `/Users/pcvantol/Documents/GitHub/djconnect/API_CONTRACT.md`.
 - Add a compatibility note if HA integration versions require a specific API
   release line.
-- Design the user-facing pairing/provisioning flow that delivers a per-install
-  token to HACS without embedding global secrets.
+- Keep the HACS token provisioning docs aligned with the implemented automatic
+  setup flow. Manual token/API URL controls are support-only, not the normal
+  onboarding path.
 
 ## Testing
 
-- Add tests for HMAC-auth success and timestamp rejection.
-- Add tests for multiple client types and per-client topic selection.
-- Add tests for optional `ha_user_hash` filtering.
-- Add tests for audit row counts after mixed APNs success/failure.
-- Add integration smoke tests beyond `/health` once a staging install-token
-  provisioning flow exists.
+- Add integration smoke tests beyond `/health` once a staging-safe end-to-end
+  HACS pairing/provisioning path is available for CI.
 
 ## Documentation
 

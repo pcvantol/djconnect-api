@@ -42,7 +42,7 @@
 			]
 		},
 		{
-			"name": "Install Token Requires Bootstrap Auth",
+			"name": "Install Token Requires Bootstrap Proof",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -73,12 +73,12 @@
 					"script": {
 						"type": "text/javascript",
 						"exec": [
-							"pm.test('install token endpoint rejects anonymous calls', function () {",
-							"\tpm.response.to.have.status(401);",
+							"pm.test('install token endpoint rejects calls without proof', function () {",
+							"\tpm.expect([400, 401]).to.include(pm.response.code);",
 							"});",
 							"",
-							"pm.test('error body is auth_required', function () {",
-							"\tpm.expect(pm.response.json()).to.have.property('error', 'auth_required');",
+							"pm.test('error body is proof or auth rejection during rollout', function () {",
+							"\tpm.expect(['missing_bootstrap_proof', 'auth_required']).to.include(pm.response.json().error);",
 							"});"
 						]
 					}
