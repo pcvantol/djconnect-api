@@ -116,8 +116,8 @@ GitHub Actions CI/CD is configured in `.github/workflows/ci-cd.yml`:
 
 - `Validate` runs on pull requests and pushes to `main`.
 - `Deploy` runs on pushes to `main` after validation.
-- Add GitHub secret `CLOUDFLARE_API_TOKEN` with Workers deploy and D1 migration
-  permissions.
+- Add GitHub secret `CLOUDFLARE_API_TOKEN` with Workers deploy, D1 migration
+  and Workers Routes edit permissions for `djconnect.dev`.
 - After the first successful Actions run, add `Validate` as a required status
   check in branch protection.
 
@@ -150,11 +150,13 @@ Before every release:
 - Use `CHANGELOG.md` as GitHub Release body.
 - Run `./cleanup_old_releases.sh --keep 1` dry-run before publishing, then
   `./cleanup_old_releases.sh --keep 1 --execute` by default after the new
-  GitHub Release is published and verified.
+  GitHub Release is published and verified. This also removes old completed
+  GitHub Actions workflow runs unless `--skip-workflow-runs` is passed.
 
 ## Next Actions
 
-- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN`.
+- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN` with Workers Routes edit
+  permissions for `djconnect.dev`.
 - Merge the CI/CD and custom-domain route PR.
 - After the first successful Actions run, configure `Validate` as a required
   status check on `main`.

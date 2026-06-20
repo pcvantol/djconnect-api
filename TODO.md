@@ -2,8 +2,8 @@
 
 ## Immediate Validation
 
-- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN` with Workers deploy and D1
-  migration permissions.
+- Add GitHub Actions secret `CLOUDFLARE_API_TOKEN` with Workers deploy, D1
+  migration and Workers Routes edit permissions for `djconnect.dev`.
 - After the first successful GitHub Actions run, make `Validate` a required
   status check in `main` branch protection.
 - Keep `scripts/provision_cloudflare.sh --dry-run --all` as the operator
@@ -57,4 +57,5 @@
 - Use `CHANGELOG.md` for GitHub Release notes.
 - Run `./cleanup_old_releases.sh --keep 1` as a dry-run before publishing.
 - Run `./cleanup_old_releases.sh --keep 1 --execute` by default after the new
-  GitHub Release is published and verified.
+  GitHub Release is published and verified; this also removes old completed
+  GitHub Actions workflow runs.

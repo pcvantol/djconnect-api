@@ -78,7 +78,8 @@ The D1 binding is configured in `wrangler.jsonc`:
 
 Before remote operations, confirm the active Wrangler account or
 `CLOUDFLARE_API_TOKEN` can edit Workers and D1 resources for the Cloudflare
-account that owns database `476a564f-08b2-4966-83b0-1221e2a4d063`.
+account that owns database `476a564f-08b2-4966-83b0-1221e2a4d063`, and can
+edit Workers Routes/read Zone metadata for the `djconnect.dev` zone.
 
 Previously observed blocked states:
 
@@ -187,4 +188,5 @@ Not allowed:
 - Release cleanup is part of the normal release cycle: run
   `./cleanup_old_releases.sh --keep 1` as a dry-run first, then
   `./cleanup_old_releases.sh --keep 1 --execute` after the new GitHub Release
-  is published and verified.
+  is published and verified. The cleanup removes old releases/tags and old
+  completed GitHub Actions workflow runs by default.
