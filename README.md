@@ -190,6 +190,32 @@ npm run deploy
 Route `api.djconnect.dev` to this Worker in Cloudflare after deploy, then run
 the `/health` smoke test above.
 
+## CI/CD
+
+GitHub Actions runs `Validate` on pull requests and pushes to `main`:
+
+- `npm ci`
+- `npx tsc --noEmit`
+- `npx wrangler deploy --dry-run`
+- `npm test -- --run`
+- public-repo secret pattern scan
+
+Pushes to `main` also run the `Deploy` job:
+
+- remote D1 migrations
+- Worker deploy
+- `https://api.djconnect.dev/health` smoke test
+
+Required GitHub Actions secret:
+
+- `CLOUDFLARE_API_TOKEN`: Cloudflare API token with D1 migration and Workers
+  deploy permissions for the `djconnect_api` database and `djconnect-api`
+  Worker.
+
+Worker runtime secrets such as `APNS_PRIVATE_KEY` and
+`DJCONNECT_RELAY_SECRET` stay in Cloudflare Worker secrets; do not copy them
+into GitHub Actions secrets unless a future workflow explicitly needs them.
+
 ## Documentation
 
 - `API_CONTRACT.md` documents endpoint payloads.
