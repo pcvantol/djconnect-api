@@ -1,9 +1,9 @@
-import { requireRelayAuth } from "./auth";
+import { requireBootstrapAuth, requireInstallAuth } from "./auth";
 import { buildApnsPayload, isInvalidTokenReason, sendApns } from "./apns";
 import { sha256Hex } from "./crypto";
 import { HttpError, json, readJson } from "./http";
-import { auditEvent, findActiveRegistrations, markRegistrationError, markRegistrationSuccess, unregister, upsertRegistration } from "./repository";
-import type { AppEnv, PushEventRequest, RegisterRequest, UnregisterRequest } from "./types";
+import { auditEvent, findActiveRegistrations, issueInstallToken, markRegistrationError, markRegistrationSuccess, rotateInstallToken, unregister, upsertRegistration } from "./repository";
+import type { AppEnv, InstallTokenRequest, PushEventRequest, RegisterRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
 const VALID_ENVIRONMENTS = new Set(["sandbox", "production"]);
@@ -29,26 +29,46 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 		return json({ ok: true, service: "djconnect-api" });
 	}
 
+	if (request.method === "POST" && url.pathname === "/v1/install/token") {
+		await requireBootstrapAuth(request, env);
+		const input = await readJson<InstallTokenRequest>(request);
+		validateInstallTokenRequest(input);
+		const result = await issueInstallToken(env.DB, input);
+		return json({ ok: true, id: result.id, token: result.token, token_hash: result.tokenHash });
+	}
+
+	if (request.method === "POST" && url.pathname === "/v1/install/rotate") {
+		const input = await readJson<RotateInstallTokenRequest>(request);
+		requireBearerHeader(request);
+		validateRotateInstallToken(input);
+		await requireInstallAuth(request, env, input.ha_install_id);
+		const result = await rotateInstallToken(env.DB, input);
+		return json({ ok: true, id: result.id, token: result.token, token_hash: result.tokenHash });
+	}
+
 	if (request.method === "POST" && url.pathname === "/v1/push/register") {
-		await requireRelayAuth(request, env);
 		const input = await readJson<RegisterRequest>(request);
+		requireBearerHeader(request);
 		validateRegister(input);
+		await requireInstallAuth(request, env, input.ha_install_id);
 		const result = await upsertRegistration(env.DB, env, input);
 		return json({ ok: true, id: result.id, apns_token_hash: result.tokenHash });
 	}
 
 	if (request.method === "POST" && url.pathname === "/v1/push/unregister") {
-		await requireRelayAuth(request, env);
 		const input = await readJson<UnregisterRequest>(request);
+		requireBearerHeader(request);
 		validateUnregister(input);
+		await requireInstallAuth(request, env, input.ha_install_id);
 		const changes = await unregister(env.DB, input);
 		return json({ ok: true, disabled: changes });
 	}
 
 	if (request.method === "POST" && url.pathname === "/v1/push/event") {
-		await requireRelayAuth(request, env);
 		const input = await readJson<PushEventRequest>(request);
+		requireBearerHeader(request);
 		validatePushEvent(input);
+		await requireInstallAuth(request, env, input.ha_install_id);
 		const registrations = await findActiveRegistrations(env.DB, input);
 		const payload = buildApnsPayload(input);
 		let delivered = 0;
@@ -82,6 +102,27 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 	}
 
 	return json({ error: "not_found" }, { status: 404 });
+}
+
+function requireBearerHeader(request: Request): void {
+	const authorization = request.headers.get("authorization") ?? "";
+	if (!authorization.startsWith("Bearer ") || authorization.slice("Bearer ".length).trim() === "") {
+		throw new HttpError(401, "install_auth_required");
+	}
+}
+
+function validateInstallTokenRequest(input: InstallTokenRequest): void {
+	requireString(input.ha_install_id, "ha_install_id");
+	if (input.ha_user_hash !== undefined && typeof input.ha_user_hash !== "string") {
+		throw new HttpError(400, "invalid_ha_user_hash");
+	}
+	if (input.label !== undefined && typeof input.label !== "string") {
+		throw new HttpError(400, "invalid_label");
+	}
+}
+
+function validateRotateInstallToken(input: RotateInstallTokenRequest): void {
+	requireString(input.ha_install_id, "ha_install_id");
 }
 
 function validateRegister(input: RegisterRequest): void {

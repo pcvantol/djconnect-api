@@ -76,6 +76,15 @@ The D1 binding is configured in `wrangler.jsonc`:
 - database name: `djconnect_api`
 - migrations directory: `migrations`
 
+Before remote operations, confirm the active Wrangler account or
+`CLOUDFLARE_API_TOKEN` can edit Workers and D1 resources for the Cloudflare
+account that owns database `476a564f-08b2-4966-83b0-1221e2a4d063`.
+
+Previously observed blocked states:
+
+- Remote D1 migration: Cloudflare error `7403`.
+- Worker deploy: Wrangler/Cloudflare auth error `10000`.
+
 Required secrets must be set through Cloudflare secrets/configuration:
 
 ```sh
@@ -83,8 +92,44 @@ npx wrangler secret put APNS_PRIVATE_KEY
 npx wrangler secret put DJCONNECT_RELAY_SECRET
 ```
 
+When setting `APNS_PRIVATE_KEY`, paste the full Apple `.p8` file contents into
+the Wrangler prompt. Do not print the key or pipe it into shell history/logs.
+
 Do not commit `.p8` files, `.dev.vars`, `.env`, API tokens or command output
 that contains secrets.
+
+The repository includes a dry-run-first provisioning helper:
+
+```sh
+npm run provision:cloudflare -- --dry-run --all
+```
+
+Run selected actions with `--execute` only after reviewing the dry-run:
+
+```sh
+npm run provision:cloudflare -- --execute --migrate --deploy --custom-domain --smoke-test
+```
+
+To set secrets safely:
+
+```sh
+DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+  npm run provision:cloudflare -- --execute --set-secrets \
+  --apns-private-key-file /secure/path/to/key.p8
+```
+
+The script refuses shell tracing and redacts secret values from its own output.
+When `--execute` is used for Cloudflare changes, it verifies
+`CLOUDFLARE_API_TOKEN` with Cloudflare before running Wrangler or custom-domain
+actions. Custom-domain automation also requires `CLOUDFLARE_ACCOUNT_ID` and
+only works after the token has permissions for the target account.
+
+After secrets, remote migration and deploy are configured, route the Worker to
+`https://api.djconnect.dev` and smoke test:
+
+```sh
+curl https://api.djconnect.dev/health
+```
 
 ## Migration Validation
 

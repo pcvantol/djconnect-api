@@ -30,6 +30,7 @@ describe("DJConnect API worker", () => {
 		testEnv.APNS_PRIVATE_KEY = await makePrivateKeyPem();
 		await env.DB.exec("DELETE FROM relay_events");
 		await env.DB.exec("DELETE FROM registrations");
+		await env.DB.exec("DELETE FROM install_tokens");
 		vi.restoreAllMocks();
 	});
 
@@ -39,6 +40,55 @@ describe("DJConnect API worker", () => {
 
 		const event = await dispatch("/v1/push/event", {});
 		expect(event.status).toBe(401);
+	});
+
+	it("issues per-install tokens with bootstrap auth", async () => {
+		const response = await dispatch("/v1/install/token", {
+			ha_install_id: "example-ha-install",
+			ha_user_hash: "example-user-hash",
+			label: "example-ha",
+		}, AUTH);
+
+		expect(response.status).toBe(200);
+		const body = await response.json() as { ok: boolean; token: string; token_hash: string };
+		expect(body.ok).toBe(true);
+		expect(body.token).toMatch(/^djci_/);
+		expect(body.token_hash).toHaveLength(64);
+
+		const row = await env.DB.prepare("SELECT token_hash, disabled FROM install_tokens WHERE ha_install_id = ?").bind("example-ha-install").first<{ token_hash: string; disabled: number }>();
+		expect(row).toEqual({ token_hash: body.token_hash, disabled: 0 });
+		expect(row?.token_hash).not.toBe(body.token);
+	});
+
+	it("does not allow the bootstrap secret for push calls", async () => {
+		const response = await dispatch("/v1/push/register", registerPayload(), AUTH);
+		expect(response.status).toBe(401);
+	});
+
+	it("rejects install tokens for a different HA install", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		const response = await dispatch("/v1/push/register", {
+			...registerPayload(),
+			ha_install_id: "other-ha-install",
+		}, installAuth);
+
+		expect(response.status).toBe(403);
+	});
+
+	it("rotates per-install tokens and disables the previous token", async () => {
+		const oldAuth = await issueInstallAuth("example-ha-install");
+		const rotate = await dispatch("/v1/install/rotate", {
+			ha_install_id: "example-ha-install",
+		}, oldAuth);
+		expect(rotate.status).toBe(200);
+		const body = await rotate.json() as { token: string };
+		const newAuth = `Bearer ${body.token}`;
+
+		const oldRegister = await dispatch("/v1/push/register", registerPayload(), oldAuth);
+		expect(oldRegister.status).toBe(401);
+
+		const newRegister = await dispatch("/v1/push/register", registerPayload(), newAuth);
+		expect(newRegister.status).toBe(200);
 	});
 
 	it("builds an APNs payload without prompts, responses, or secrets", () => {
@@ -54,7 +104,8 @@ describe("DJConnect API worker", () => {
 	});
 
 	it("registers and unregisters a device in D1", async () => {
-		const register = await dispatch("/v1/push/register", registerPayload(), AUTH);
+		const installAuth = await issueInstallAuth("example-ha-install");
+		const register = await dispatch("/v1/push/register", registerPayload(), installAuth);
 		expect(register.status).toBe(200);
 		const body = await register.json() as { ok: boolean; apns_token_hash: string };
 		expect(body.ok).toBe(true);
@@ -66,7 +117,7 @@ describe("DJConnect API worker", () => {
 		const unregister = await dispatch("/v1/push/unregister", {
 			ha_install_id: "example-ha-install",
 			device_id: "example-device",
-		}, AUTH);
+		}, installAuth);
 		expect(unregister.status).toBe(200);
 
 		const updated = await env.DB.prepare("SELECT disabled FROM registrations WHERE device_id = ?").bind("example-device").first<{ disabled: number }>();
@@ -74,7 +125,8 @@ describe("DJConnect API worker", () => {
 	});
 
 	it("disables a registration when APNs reports an invalid token", async () => {
-		await dispatch("/v1/push/register", registerPayload(), AUTH);
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await dispatch("/v1/push/register", registerPayload(), installAuth);
 		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
 			new Response(JSON.stringify({ reason: "BadDeviceToken" }), { status: 400 }),
 		);
@@ -83,7 +135,7 @@ describe("DJConnect API worker", () => {
 			ha_install_id: "example-ha-install",
 			event_type: "ask_dj_response",
 			history_revision: 7,
-		}, AUTH);
+		}, installAuth);
 		expect(event.status).toBe(200);
 		expect(fetchMock).toHaveBeenCalledOnce();
 
@@ -110,6 +162,13 @@ async function dispatch(path: string, body: unknown, authorization?: string): Pr
 	const response = await worker.fetch(request, testEnv, ctx);
 	await waitOnExecutionContext(ctx);
 	return response;
+}
+
+async function issueInstallAuth(haInstallId: string): Promise<string> {
+	const response = await dispatch("/v1/install/token", { ha_install_id: haInstallId }, AUTH);
+	expect(response.status).toBe(200);
+	const body = await response.json() as { token: string };
+	return `Bearer ${body.token}`;
 }
 
 function registerPayload() {
@@ -162,6 +221,20 @@ CREATE TABLE IF NOT EXISTS registrations (
 	last_success_at TEXT,
 	last_error_code TEXT,
 	UNIQUE (ha_install_id, device_id, client_type, apns_token_hash)
+);
+
+CREATE TABLE IF NOT EXISTS install_tokens (
+	id TEXT PRIMARY KEY,
+	ha_install_id TEXT NOT NULL,
+	ha_user_hash TEXT,
+	token_hash TEXT NOT NULL UNIQUE,
+	token_prefix TEXT NOT NULL,
+	label TEXT,
+	disabled INTEGER NOT NULL DEFAULT 0 CHECK (disabled IN (0, 1)),
+	created_at TEXT NOT NULL DEFAULT (datetime('now')),
+	updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+	last_used_at TEXT,
+	rotated_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS relay_events (

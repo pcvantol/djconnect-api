@@ -1,5 +1,5 @@
-import { cryptoRandomId, sha256Hex } from "./crypto";
-import type { ApnsEnvironment, ClientType, EventType, PushEventRequest, RegisterRequest, Registration, UnregisterRequest } from "./types";
+import { cryptoRandomId, cryptoRandomToken, sha256Hex } from "./crypto";
+import type { ApnsEnvironment, ClientType, EventType, InstallTokenRecord, InstallTokenRequest, PushEventRequest, RegisterRequest, Registration, UnregisterRequest } from "./types";
 
 export function topicForClientType(env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MACOS: string; APNS_TOPIC_WATCHOS: string }, clientType: ClientType): string {
 	switch (clientType) {
@@ -56,6 +56,53 @@ export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: 
 	).run();
 
 	return { id, tokenHash };
+}
+
+export async function issueInstallToken(db: D1Database, input: InstallTokenRequest): Promise<{ id: string; token: string; tokenHash: string }> {
+	const id = cryptoRandomId();
+	const token = cryptoRandomToken("djci");
+	const tokenHash = await sha256Hex(token);
+	const tokenPrefix = token.slice(0, 12);
+
+	await db.prepare(`
+		INSERT INTO install_tokens (
+			id, ha_install_id, ha_user_hash, token_hash, token_prefix,
+			label, disabled, created_at, updated_at
+		)
+		VALUES (?, ?, ?, ?, ?, ?, 0, datetime('now'), datetime('now'))
+	`).bind(
+		id,
+		input.ha_install_id,
+		input.ha_user_hash ?? null,
+		tokenHash,
+		tokenPrefix,
+		input.label ?? null,
+	).run();
+
+	return { id, token, tokenHash };
+}
+
+export async function rotateInstallToken(db: D1Database, input: InstallTokenRequest): Promise<{ id: string; token: string; tokenHash: string }> {
+	await db.prepare(`
+		UPDATE install_tokens
+		SET disabled = 1, rotated_at = datetime('now'), updated_at = datetime('now')
+		WHERE ha_install_id = ? AND disabled = 0
+	`).bind(input.ha_install_id).run();
+	return issueInstallToken(db, input);
+}
+
+export async function findInstallTokenByBearer(db: D1Database, token: string): Promise<InstallTokenRecord | null> {
+	const tokenHash = await sha256Hex(token);
+	const row = await db.prepare(`
+		SELECT * FROM install_tokens
+		WHERE token_hash = ? AND disabled = 0
+		LIMIT 1
+	`).bind(tokenHash).first<InstallTokenRecord>();
+	return row ?? null;
+}
+
+export async function markInstallTokenUsed(db: D1Database, id: string): Promise<void> {
+	await db.prepare("UPDATE install_tokens SET last_used_at = datetime('now'), updated_at = datetime('now') WHERE id = ?").bind(id).run();
 }
 
 export async function unregister(db: D1Database, input: UnregisterRequest): Promise<number> {

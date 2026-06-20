@@ -58,13 +58,18 @@ Why:
 - Avoids unnecessary framework dependencies in an edge Worker.
 - Keeps tests focused on the actual Cloudflare runtime behavior.
 
-### Relay Auth With Shared Secret And HMAC Support
+### Per-Install Relay Auth With Bootstrap Secret
 
 Pattern:
 
-- Bearer auth compares the presented token with `DJCONNECT_RELAY_SECRET`.
-- HMAC auth signs `timestamp + "." + raw_body`.
-- Timestamp skew is limited to five minutes.
+- `DJCONNECT_RELAY_SECRET` is a bootstrap/operator secret for trusted
+  `POST /v1/install/token` calls only.
+- HMAC bootstrap auth signs `timestamp + "." + raw_body`; timestamp skew is
+  limited to five minutes.
+- Public HACS installs receive a per-install `djci_...` bearer token.
+- Push/register/event calls require a per-install token scoped to the same
+  `ha_install_id`.
+- Install tokens are stored only as SHA-256 hashes in D1.
 - Comparisons use hashed timing-safe equality.
 
 Primary source files:
@@ -74,10 +79,10 @@ Primary source files:
 
 Why:
 
-- Shared secret is enough for initial HA -> API relay calls.
-- HMAC support gives a path toward request-body integrity.
-- Per-install tokens can be added later without changing the APNs trust
-  boundary.
+- Avoids shipping a global shared secret in open-source HACS code.
+- Allows per-install rotation/revocation without affecting other installs.
+- Keeps APNs provider credentials server-side while still allowing privacy-safe
+  HA wake/sync events.
 
 ### D1 As Registration And Audit Store
 
@@ -85,6 +90,7 @@ Pattern:
 
 - `registrations` stores install/user/device/client metadata plus APNs token
   routing fields.
+- `install_tokens` stores per-install token hashes and rotation metadata.
 - `relay_events` stores minimal counts only.
 - Audit rows intentionally exclude prompts, responses, history, memory and
   secrets.
