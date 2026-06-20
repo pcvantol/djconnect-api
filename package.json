@@ -9,6 +9,7 @@
     "test": "vitest",
     "cf-typegen": "wrangler types",
     "postman:test": "npx --yes newman run postman/djconnect-api.postman_collection.json --env-var baseUrl=https://api.djconnect.dev --bail",
+    "smoke:e2e": "scripts/smoke_e2e.sh",
     "provision:cloudflare": "scripts/provision_cloudflare.sh"
   },
   "devDependencies": {

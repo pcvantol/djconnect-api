@@ -47,6 +47,17 @@ jobs:
       - name: Postman contract smoke test
         run: npm run postman:test
 
+      - name: Staging-safe E2E smoke test
+        run: |
+          if [ -z "${DJCONNECT_RELAY_SECRET_VALUE:-}" ]; then
+            echo "Skipping staging-safe E2E smoke test because DJCONNECT_RELAY_SECRET is not configured as a GitHub Actions secret."
+            echo "Set it to the same value as the Cloudflare Worker DJCONNECT_RELAY_SECRET to enable proof -> token -> register -> event CI coverage."
+            exit 0
+          fi
+          npm run smoke:e2e
+        env:
+          DJCONNECT_RELAY_SECRET_VALUE: ${{ secrets.DJCONNECT_RELAY_SECRET }}
+
       - name: Secret pattern scan
         run: |
           set -euo pipefail

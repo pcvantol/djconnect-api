@@ -19,6 +19,7 @@ const testEnv = {
 	APNS_ENVIRONMENT: "sandbox",
 	APNS_TOKEN_ENCRYPTION_KEY: EXAMPLE_APNS_TOKEN_ENCRYPTION_KEY,
 	DJCONNECT_RELAY_SECRET: EXAMPLE_RELAY_SECRET,
+	DJCONNECT_SMOKE_TEST_MODE: "disabled",
 };
 
 describe("DJConnect API worker", () => {
@@ -30,6 +31,7 @@ describe("DJConnect API worker", () => {
 
 	beforeEach(async () => {
 		testEnv.APNS_PRIVATE_KEY = await makePrivateKeyPem();
+		testEnv.DJCONNECT_SMOKE_TEST_MODE = "disabled";
 		await env.DB.exec("DELETE FROM relay_events");
 		await env.DB.exec("DELETE FROM registrations");
 		await env.DB.exec("DELETE FROM install_tokens");
@@ -399,6 +401,27 @@ describe("DJConnect API worker", () => {
 			WHERE device_id = ?
 		`).bind("example-invalid-device").first<{ disabled: number; invalid: number; last_error_code: string }>();
 		expect(invalid).toEqual({ disabled: 1, invalid: 1, last_error_code: "Unregistered" });
+	});
+
+	it("supports smoke-test mode without calling APNs for example tokens", async () => {
+		testEnv.DJCONNECT_SMOKE_TEST_MODE = "enabled";
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth, {
+			device_id: "example-smoke-device",
+			apns_token: "example-smoke-apns-token",
+		});
+		const fetchMock = vi.spyOn(globalThis, "fetch");
+
+		const event = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+			history_revision: "smoke-1",
+		}, installAuth);
+		const body = await event.json() as { matched: number; delivered: number; failed: number };
+
+		expect(event.status).toBe(200);
+		expect(body).toMatchObject({ matched: 1, delivered: 1, failed: 0 });
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
 	it("lists admin registrations with operator auth and privacy-safe fields", async () => {

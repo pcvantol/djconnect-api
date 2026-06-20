@@ -96,6 +96,7 @@ Required secrets must be set through Cloudflare secrets/configuration:
 npx wrangler secret put APNS_PRIVATE_KEY
 npx wrangler secret put DJCONNECT_RELAY_SECRET
 npx wrangler secret put APNS_TOKEN_ENCRYPTION_KEY
+npx wrangler secret put DJCONNECT_SMOKE_TEST_MODE
 ```
 
 When setting `APNS_PRIVATE_KEY`, paste the full Apple `.p8` file contents into
@@ -109,6 +110,11 @@ openssl rand -base64 32
 
 The value must decode to exactly 32 bytes and must remain only in Cloudflare
 Worker secrets.
+
+Set `DJCONNECT_SMOKE_TEST_MODE` to `enabled` only for the production Worker when
+the CI staging-safe E2E smoke test is allowed to bypass real APNs delivery for
+`example-...` APNs tokens. This mode must never bypass APNs for non-example
+tokens.
 
 Do not commit `.p8` files, `.dev.vars`, `.env`, API tokens or command output
 that contains secrets.
