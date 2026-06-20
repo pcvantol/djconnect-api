@@ -4,7 +4,7 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
-Current release: `1.0.0`.
+Current release: `1.0.1`.
 
 ## Cloudflare Setup
 
@@ -76,10 +76,17 @@ Route `api.djconnect.dev` to this Worker in Cloudflare after deploy.
 
 Release hygiene follows the canonical cross-repo checklist in `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. Use `CHANGELOG.md` as the GitHub Release body.
 
-Use the cleanup helper as a dry-run before deleting old releases/tags:
+Use the cleanup helper during every release cycle. First inspect the dry-run:
 
 ```sh
 ./cleanup_old_releases.sh --keep 1
+```
+
+After the new GitHub Release is published and verified, delete old releases/tags
+by default:
+
+```sh
+./cleanup_old_releases.sh --keep 1 --execute
 ```
 
 ## Notes

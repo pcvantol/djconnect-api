@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.1 - 2026-06-20
 
 - Added production-level project documentation: contributing guide, code of
   conduct, development environment, handoff, issue backlog, TODO backlog,
@@ -8,6 +8,13 @@
 - Added `cleanup_old_releases.sh` for dry-run-first GitHub release/tag cleanup.
 - Expanded `AGENTS.md` and `README.md` with public repository and release
   hygiene guidance.
+- Configured GitHub repository hygiene outside the codebase: public metadata,
+  squash-only merge strategy, automatic head-branch deletion, security scanning,
+  push protection, Dependabot security updates, private vulnerability reporting
+  and protected `main` with pull-request review requirements.
+- Documented release cleanup as default behavior: after a new release is
+  published and verified, old GitHub releases/tags are removed with
+  `./cleanup_old_releases.sh --keep 1 --execute` unless intentionally retained.
 
 ## 1.0.0 - 2026-06-20
 

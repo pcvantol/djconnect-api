@@ -37,6 +37,7 @@ For all limits and quotas, retrieve from the product's `/platform/limits/` page.
 | `npm test` | Run Worker tests |
 | `npx wrangler d1 migrations apply djconnect_api --local` | Validate D1 migrations locally |
 | `./cleanup_old_releases.sh --keep 1` | Dry-run release/tag cleanup |
+| `./cleanup_old_releases.sh --keep 1 --execute` | Delete old releases/tags after a verified release |
 
 Run `wrangler types` after changing bindings in wrangler.jsonc.
 

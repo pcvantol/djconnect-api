@@ -102,8 +102,10 @@ For this repo, release validation includes:
   available.
 - Create/push a semver tag such as `v1.0.0`.
 - Publish a GitHub Release using the matching `CHANGELOG.md` section.
-- Run `./cleanup_old_releases.sh --keep 1` as a dry-run and use `--execute`
-  only when old releases should actually be deleted.
+- Run `./cleanup_old_releases.sh --keep 1` as a dry-run before publishing.
+- After the new GitHub Release is published and verified, run
+  `./cleanup_old_releases.sh --keep 1 --execute` by default unless multiple old
+  releases/tags are intentionally retained.
 
 ## Licensing
 
