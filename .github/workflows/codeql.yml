@@ -1,0 +1,22 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "24 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  codeql:
+    uses: pcvantol/djconnect/.github/workflows/djconnect-codeql-ci.yml@main
+    with:
+      languages: javascript-typescript
