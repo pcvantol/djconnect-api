@@ -50,7 +50,9 @@ Pattern:
 
 - `src/index.ts` routes `GET /health` and `POST /v1/push/*` directly.
 - Request validation is kept close to each endpoint.
-- `HttpError` maps controlled failures to JSON error responses.
+- `HttpError` maps controlled failures to JSON error responses. Error codes are
+  stable and language-neutral; optional localized message text is sourced from
+  `src/messages.ts`.
 
 Why:
 

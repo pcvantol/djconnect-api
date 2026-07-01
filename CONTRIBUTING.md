@@ -53,6 +53,11 @@ source code that parses PEM headers are expected. Real secrets are not.
 - Keep APNs payloads generic wake/sync hints. Do not include raw prompts, raw
   assistant responses, full history, memory, Home Assistant tokens or Spotify
   tokens.
+- Add user-facing API error messages and APNs notification text through
+  `src/messages.ts`, using stable language-neutral error codes and translations
+  for every supported language: `en`, `nl`, `de`, `fr` and `es`. Do not localize
+  JSON keys, endpoint paths, token prefixes, `client_type` values or APNs
+  payload keys.
 - Use example fixture values such as `example-ha-install`,
   `example-user-hash`, `example-apns-token` and `dev.djconnect.ios`.
 - Update tests when endpoint behavior, D1 writes, APNs payloads, auth or error

@@ -2,6 +2,7 @@ import { env, createExecutionContext, waitOnExecutionContext } from "cloudflare:
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 import { apnsEndpoint, buildApnsPayload } from "../src/apns";
+import { assertCompleteTranslations, MESSAGES, SUPPORTED_LANGUAGES } from "../src/messages";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 const EXAMPLE_RELAY_SECRET = "example-relay-secret";
@@ -263,10 +264,53 @@ describe("DJConnect API worker", () => {
 			history_revision: "42",
 			client_message_id: "msg-1",
 			open_target: "history",
+			locale: "nl-NL",
 		});
 		const serialized = JSON.stringify(payload);
 		expect(serialized).toContain("Ask DJ heeft geantwoord.");
 		expect(serialized).not.toMatch(/prompt|response_text|assistant|spotify|token|secret|history_memory/i);
+	});
+
+	it("has complete translations for every supported language", () => {
+		expect(() => assertCompleteTranslations()).not.toThrow();
+		const englishKeys = Object.keys(MESSAGES.en).sort();
+		for (const language of SUPPORTED_LANGUAGES) {
+			expect(Object.keys(MESSAGES[language]).sort()).toEqual(englishKeys);
+		}
+	});
+
+	it("returns stable error codes with optional localized messages", async () => {
+		const response = await dispatchWithHeaders("/v1/install/token", {
+			ha_install_id: "example-ha-install",
+			label: "example-ha",
+		}, {
+			"accept-language": "de-DE,de;q=0.8",
+		});
+
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({
+			error: "missing_bootstrap_proof",
+			message: "Der Bootstrap-Nachweis ist erforderlich.",
+		});
+	});
+
+	it("localizes APNs notification text from the registered locale", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth, {
+			device_id: "example-french-device",
+			apns_token: "example-french-apns-token",
+			locale: "fr-FR",
+		});
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const event = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_confirm",
+		}, installAuth);
+
+		expect(event.status).toBe(200);
+		const payload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as { aps: { alert: { title: string; body: string } } };
+		expect(payload.aps.alert).toEqual({ title: "Ask DJ", body: "Ask DJ attend votre choix." });
 	});
 
 	it("rejects push event payloads with raw prompt, response, history, memory or token fields", async () => {

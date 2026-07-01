@@ -40,6 +40,24 @@ Response:
 { "ok": true, "service": "djconnect-api" }
 ```
 
+## Error Responses
+
+Error responses keep the language-neutral `error` code stable for clients. If a
+client sends `Accept-Language` or a `lang` query parameter, the response may also
+include a localized `message` in one of the supported languages: `en`, `nl`,
+`de`, `fr` or `es`. Unsupported locales fall back to English.
+
+Example:
+
+```json
+{
+  "error": "missing_bootstrap_proof",
+  "message": "The bootstrap proof is required."
+}
+```
+
+Clients must make decisions from `error`, not from localized message text.
+
 ## POST /v1/install/bootstrap-proof
 
 Issues a short-lived, one-time bootstrap proof for an existing
@@ -267,9 +285,14 @@ Request:
 
 Allowed `event_type` values:
 
-- `ask_dj_response`: sends "Ask DJ heeft geantwoord."
-- `ask_dj_confirm`: sends "Ask DJ wacht op je keuze."
-- `playback_change`: sends a generic DJConnect update
+- `ask_dj_response`: sends a concise localized "Ask DJ has replied" alert.
+- `ask_dj_confirm`: sends a concise localized "Ask DJ is waiting" alert.
+- `playback_change`: sends a concise localized generic DJConnect update.
+
+APNs alert text is selected from the registered client `locale` when available.
+Supported languages are `en`, `nl`, `de`, `fr` and `es`; unsupported locales
+fall back to English. APNs payload keys, event values and `open_target` values
+are protocol fields and are never localized.
 
 Response:
 

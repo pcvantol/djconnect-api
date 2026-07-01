@@ -11,11 +11,11 @@ export interface PushDeliveryResult {
 
 export async function deliverPushEvent(env: AppEnv, input: PushEventRequest): Promise<PushDeliveryResult> {
 	const registrations = await findActiveRegistrations(env.DB, input);
-	const payload = buildApnsPayload(input);
 	let delivered = 0;
 	let failed = 0;
 
 	for (const registration of registrations) {
+		const payload = buildApnsPayload({ ...input, locale: registration.locale });
 		const result = await sendApns(env, registration, payload);
 		if (result.ok) {
 			delivered += 1;

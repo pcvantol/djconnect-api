@@ -1,4 +1,5 @@
 import { base64Url, decryptSecret } from "./crypto";
+import { notificationText, resolveSupportedLanguage, type SupportedLanguage } from "./messages";
 import type { ApnsEnvironment, ApnsResult, AppEnv, EventType, Registration } from "./types";
 
 export type Fetcher = typeof fetch;
@@ -12,24 +13,15 @@ export function apnsEndpoint(environment: ApnsEnvironment, token: string): strin
 	return `${APNS_HOSTS[environment]}/3/device/${token}`;
 }
 
-export function notificationText(eventType: EventType): { title: string; body: string } {
-	switch (eventType) {
-		case "ask_dj_confirm":
-			return { title: "Ask DJ", body: "Ask DJ wacht op je keuze." };
-		case "ask_dj_response":
-			return { title: "Ask DJ", body: "Ask DJ heeft geantwoord." };
-		case "playback_change":
-			return { title: "DJConnect", body: "DJConnect heeft een update." };
-	}
-}
-
 export function buildApnsPayload(input: {
 	event_type: EventType;
 	history_revision?: string | number;
 	client_message_id?: string;
 	open_target?: string;
+	locale?: string | null;
+	language?: SupportedLanguage;
 }): Record<string, unknown> {
-	const alert = notificationText(input.event_type);
+	const alert = notificationText(input.event_type, input.language ?? resolveSupportedLanguage(input.locale));
 	return {
 		aps: {
 			alert,

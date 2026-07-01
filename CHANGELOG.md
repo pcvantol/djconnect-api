@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.7 - 2026-07-01
+
+- Added centralized localization-ready API and APNs message handling for
+  English, Dutch, German, French and Spanish.
+- Kept API error codes stable and language-neutral while adding optional
+  localized `message` text when clients send `Accept-Language` or `lang`.
+- Localized APNs alert text from each registered client locale, with English
+  fallback and unchanged protocol fields.
+- Added validation coverage that fails when a supported language is missing a
+  message key, plus tests for localized API errors and APNs payload text.
+- Updated API contract, contributor guidance and technical design docs so future
+  user-facing messages must be added in every supported language.
+
 ## 1.0.6 - 2026-06-20
 
 - Added `OPERATOR_RUNBOOK.md` with the production operator procedure for

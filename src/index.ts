@@ -2,7 +2,8 @@ import { sha256Hex } from "./crypto";
 import { listRegistrations, revokeToken } from "./handlers/admin";
 import { issueBootstrapProofHandler, issueInstallTokenHandler, rotateInstallTokenHandler } from "./handlers/install";
 import { registerDevice, sendPushEvent, unregisterDevice } from "./handlers/push";
-import { HttpError, json } from "./http";
+import { errorJson, HttpError, json } from "./http";
+import type { ApiMessageKey } from "./messages";
 import type { AppEnv } from "./types";
 
 type RouteHandler = (request: Request, env: AppEnv, ctx: ExecutionContext, url: URL) => Promise<Response>;
@@ -56,10 +57,10 @@ export default {
 			return await route(request, env as AppEnv, ctx);
 		} catch (error) {
 			if (error instanceof HttpError) {
-				return json({ error: error.code }, { status: error.status });
+				return errorJson(request, error.code as ApiMessageKey, { status: error.status });
 			}
 			console.error(JSON.stringify({ level: "error", message: "unhandled_error" }));
-			return json({ error: "internal_error" }, { status: 500 });
+			return errorJson(request, "internal_error", { status: 500 });
 		}
 	},
 } satisfies ExportedHandler<Env>;
@@ -75,7 +76,7 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 		return match.handler(request, env, ctx, url);
 	}
 
-	return json({ error: "not_found" }, { status: 404 });
+	return errorJson(request, "not_found", { status: 404 });
 }
 
 export async function tokenHashForTest(token: string): Promise<string> {
