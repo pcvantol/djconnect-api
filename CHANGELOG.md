@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.8 - 2026-07-01
+
+- Tightened localization error handling by typing `HttpError` codes against the
+  central API message-key catalog.
+- Improved `Accept-Language` handling so quality values are honored and the best
+  supported language is selected before falling back to English.
+- Refined German, French and Spanish message copy with proper accents and added
+  tests for `lang` override and unsupported-language fallback.
+- Synchronized cross-repo API/prompt guidance for localized central API errors
+  and APNs notification copy.
+
 ## 1.0.7 - 2026-07-01
 
 - Added centralized localization-ready API and APNs message handling for

@@ -1,5 +1,9 @@
 import { HttpError } from "./http";
+import type { ApiMessageKey } from "./messages";
 import type { AdminRegistrationsQuery, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
+
+type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_install_id" | "token_id";
+type MissingStringKey = `missing_${RequiredStringField}`;
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
 const VALID_BOOTSTRAP_CLIENT_TYPES = new Set(["ios", "macos", "watchos", "raspberry_pi", "esp32", "conversation_agent"]);
@@ -153,7 +157,7 @@ function clampNumber(value: string | null, fallback: number, min: number, max: n
 	return parsed;
 }
 
-function optionalEnum(value: string | null, allowed: Set<string>, errorCode: string): string | undefined {
+function optionalEnum(value: string | null, allowed: Set<string>, errorCode: ApiMessageKey): string | undefined {
 	if (value === null || value.trim() === "") return undefined;
 	if (!allowed.has(value)) {
 		throw new HttpError(400, errorCode);
@@ -161,15 +165,15 @@ function optionalEnum(value: string | null, allowed: Set<string>, errorCode: str
 	return value;
 }
 
-function optionalBoolean(value: string | null, errorCode: string): boolean | undefined {
+function optionalBoolean(value: string | null, errorCode: ApiMessageKey): boolean | undefined {
 	if (value === null || value.trim() === "") return undefined;
 	if (value === "true" || value === "1") return true;
 	if (value === "false" || value === "0") return false;
 	throw new HttpError(400, errorCode);
 }
 
-function requireString(value: unknown, field: string): void {
+function requireString(value: unknown, field: RequiredStringField): void {
 	if (typeof value !== "string" || value.trim() === "") {
-		throw new HttpError(400, `missing_${field}`);
+		throw new HttpError(400, `missing_${field}` satisfies MissingStringKey);
 	}
 }

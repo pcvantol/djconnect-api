@@ -45,7 +45,9 @@ Response:
 Error responses keep the language-neutral `error` code stable for clients. If a
 client sends `Accept-Language` or a `lang` query parameter, the response may also
 include a localized `message` in one of the supported languages: `en`, `nl`,
-`de`, `fr` or `es`. Unsupported locales fall back to English.
+`de`, `fr` or `es`. `Accept-Language` quality values are honored across
+supported languages. Unsupported locales fall back to the best supported
+language in the header, or English when none is present.
 
 Example:
 

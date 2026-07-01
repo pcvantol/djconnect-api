@@ -145,10 +145,10 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		invalid_label: "Das Label ist ungültig.",
 		invalid_pagination: "Die Paginierungsparameter sind ungültig.",
 		invalid_reason: "Der Widerrufsgrund ist ungültig.",
-		invalid_ttl_seconds: "Die Gueltigkeitsdauer ist ungueltig.",
+		invalid_ttl_seconds: "Die Gültigkeitsdauer ist ungültig.",
 		missing_apns_token: "Das APNs-Token ist erforderlich.",
 		missing_bootstrap_proof: "Der Bootstrap-Nachweis ist erforderlich.",
-		missing_device_id: "Die Geraete-ID ist erforderlich.",
+		missing_device_id: "Die Geräte-ID ist erforderlich.",
 		missing_ha_install_id: "Die Installations-ID ist erforderlich.",
 		missing_token_id: "Die Token-ID ist erforderlich.",
 		not_found: "Der angeforderte Endpunkt wurde nicht gefunden.",
@@ -163,80 +163,80 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		"apns.playback_change.body": "DJConnect hat ein Update.",
 	},
 	fr: {
-		admin_auth_required: "L'autorisation operateur est requise.",
+		admin_auth_required: "L'autorisation opérateur est requise.",
 		auth_required: "Une autorisation est requise.",
-		bootstrap_proof_expired: "La preuve de demarrage a expire.",
-		bootstrap_proof_used: "La preuve de demarrage a deja ete utilisee.",
-		bootstrap_rate_limited: "Trop de tentatives de demarrage. Reessayez plus tard.",
+		bootstrap_proof_expired: "La preuve de démarrage a expiré.",
+		bootstrap_proof_used: "La preuve de démarrage a déjà été utilisée.",
+		bootstrap_rate_limited: "Trop de tentatives de démarrage. Réessayez plus tard.",
 		install_auth_required: "L'autorisation de l'installation est requise.",
-		install_id_mismatch: "L'installation ne correspond pas a la preuve de demarrage.",
-		install_token_scope_mismatch: "Le jeton d'installation ne correspond pas a cette installation.",
-		internal_error: "La requete n'a pas pu etre terminee.",
+		install_id_mismatch: "L'installation ne correspond pas à la preuve de démarrage.",
+		install_token_scope_mismatch: "Le jeton d'installation ne correspond pas à cette installation.",
+		internal_error: "La requête n'a pas pu être terminée.",
 		invalid_apns_environment: "L'environnement APNs est invalide.",
-		invalid_bootstrap_proof: "La preuve de demarrage est invalide.",
+		invalid_bootstrap_proof: "La preuve de démarrage est invalide.",
 		invalid_client_type: "Le type de client est invalide.",
 		invalid_disabled: "Le filtre disabled est invalide.",
-		invalid_event_type: "Le type d'evenement est invalide.",
+		invalid_event_type: "Le type d'événement est invalide.",
 		invalid_ha_user_hash: "Le hash utilisateur est invalide.",
 		invalid_invalid: "Le filtre invalid est invalide.",
-		invalid_json: "Le corps de la requete doit etre du JSON valide.",
-		invalid_label: "Le libelle est invalide.",
-		invalid_pagination: "Les parametres de pagination sont invalides.",
-		invalid_reason: "Le motif de revocation est invalide.",
-		invalid_ttl_seconds: "La duree de validite est invalide.",
+		invalid_json: "Le corps de la requête doit être du JSON valide.",
+		invalid_label: "Le libellé est invalide.",
+		invalid_pagination: "Les paramètres de pagination sont invalides.",
+		invalid_reason: "Le motif de révocation est invalide.",
+		invalid_ttl_seconds: "La durée de validité est invalide.",
 		missing_apns_token: "Le jeton APNs est requis.",
-		missing_bootstrap_proof: "La preuve de demarrage est requise.",
+		missing_bootstrap_proof: "La preuve de démarrage est requise.",
 		missing_device_id: "L'ID de l'appareil est requis.",
 		missing_ha_install_id: "L'ID d'installation est requis.",
 		missing_token_id: "L'ID du jeton est requis.",
-		not_found: "Le point de terminaison demande est introuvable.",
-		relay_secret_not_configured: "Le secret du relais n'est pas configure.",
-		unsafe_payload: "La requete contient des champs sensibles non pris en charge.",
-		unsupported_media_type: "La requete doit utiliser application/json.",
+		not_found: "Le point de terminaison demandé est introuvable.",
+		relay_secret_not_configured: "Le secret du relais n'est pas configuré.",
+		unsafe_payload: "La requête contient des champs sensibles non pris en charge.",
+		unsupported_media_type: "La requête doit utiliser application/json.",
 		"apns.ask_dj_confirm.title": "Ask DJ",
 		"apns.ask_dj_confirm.body": "Ask DJ attend votre choix.",
 		"apns.ask_dj_response.title": "Ask DJ",
-		"apns.ask_dj_response.body": "Ask DJ a repondu.",
+		"apns.ask_dj_response.body": "Ask DJ a répondu.",
 		"apns.playback_change.title": "DJConnect",
-		"apns.playback_change.body": "DJConnect a une mise a jour.",
+		"apns.playback_change.body": "DJConnect a une mise à jour.",
 	},
 	es: {
-		admin_auth_required: "Se requiere autorizacion de operador.",
-		auth_required: "Se requiere autorizacion.",
+		admin_auth_required: "Se requiere autorización de operador.",
+		auth_required: "Se requiere autorización.",
 		bootstrap_proof_expired: "La prueba de arranque ha caducado.",
-		bootstrap_proof_used: "La prueba de arranque ya se uso.",
-		bootstrap_rate_limited: "Demasiados intentos de arranque. Intentalo de nuevo mas tarde.",
-		install_auth_required: "Se requiere autorizacion de instalacion.",
-		install_id_mismatch: "La instalacion no coincide con la prueba de arranque.",
-		install_token_scope_mismatch: "El token de instalacion no coincide con esta instalacion.",
+		bootstrap_proof_used: "La prueba de arranque ya se usó.",
+		bootstrap_rate_limited: "Demasiados intentos de arranque. Inténtalo de nuevo más tarde.",
+		install_auth_required: "Se requiere autorización de instalación.",
+		install_id_mismatch: "La instalación no coincide con la prueba de arranque.",
+		install_token_scope_mismatch: "El token de instalación no coincide con esta instalación.",
 		internal_error: "No se pudo completar la solicitud.",
-		invalid_apns_environment: "El entorno APNs no es valido.",
-		invalid_bootstrap_proof: "La prueba de arranque no es valida.",
-		invalid_client_type: "El tipo de cliente no es valido.",
-		invalid_disabled: "El filtro disabled no es valido.",
-		invalid_event_type: "El tipo de evento no es valido.",
-		invalid_ha_user_hash: "El hash de usuario no es valido.",
-		invalid_invalid: "El filtro invalid no es valido.",
-		invalid_json: "El cuerpo de la solicitud debe ser JSON valido.",
-		invalid_label: "La etiqueta no es valida.",
-		invalid_pagination: "Los parametros de paginacion no son validos.",
-		invalid_reason: "El motivo de revocacion no es valido.",
-		invalid_ttl_seconds: "La duracion de validez no es valida.",
+		invalid_apns_environment: "El entorno APNs no es válido.",
+		invalid_bootstrap_proof: "La prueba de arranque no es válida.",
+		invalid_client_type: "El tipo de cliente no es válido.",
+		invalid_disabled: "El filtro disabled no es válido.",
+		invalid_event_type: "El tipo de evento no es válido.",
+		invalid_ha_user_hash: "El hash de usuario no es válido.",
+		invalid_invalid: "El filtro invalid no es válido.",
+		invalid_json: "El cuerpo de la solicitud debe ser JSON válido.",
+		invalid_label: "La etiqueta no es válida.",
+		invalid_pagination: "Los parámetros de paginación no son válidos.",
+		invalid_reason: "El motivo de revocación no es válido.",
+		invalid_ttl_seconds: "La duración de validez no es válida.",
 		missing_apns_token: "Se requiere el token APNs.",
 		missing_bootstrap_proof: "Se requiere la prueba de arranque.",
 		missing_device_id: "Se requiere el ID del dispositivo.",
-		missing_ha_install_id: "Se requiere el ID de instalacion.",
+		missing_ha_install_id: "Se requiere el ID de instalación.",
 		missing_token_id: "Se requiere el ID del token.",
-		not_found: "No se encontro el endpoint solicitado.",
-		relay_secret_not_configured: "El secreto del relay no esta configurado.",
+		not_found: "No se encontró el endpoint solicitado.",
+		relay_secret_not_configured: "El secreto del relay no está configurado.",
 		unsafe_payload: "La solicitud contiene campos sensibles no admitidos.",
 		unsupported_media_type: "La solicitud debe usar application/json.",
 		"apns.ask_dj_confirm.title": "Ask DJ",
-		"apns.ask_dj_confirm.body": "Ask DJ espera tu eleccion.",
+		"apns.ask_dj_confirm.body": "Ask DJ espera tu elección.",
 		"apns.ask_dj_response.title": "Ask DJ",
 		"apns.ask_dj_response.body": "Ask DJ ha respondido.",
 		"apns.playback_change.title": "DJConnect",
-		"apns.playback_change.body": "DJConnect tiene una actualizacion.",
+		"apns.playback_change.body": "DJConnect tiene una actualización.",
 	},
 };
 
@@ -278,7 +278,9 @@ export function preferredResponseLanguage(request: Request): SupportedLanguage |
 	if (explicit) return resolveSupportedLanguage(explicit);
 	const acceptLanguage = request.headers.get("accept-language");
 	if (!acceptLanguage) return undefined;
-	return resolveSupportedLanguage(parseAcceptLanguage(acceptLanguage));
+	return parseAcceptLanguages(acceptLanguage)
+		.map((tag) => tag.toLowerCase().split("-")[0])
+		.find(isSupportedLanguage) ?? DEFAULT_LANGUAGE;
 }
 
 export function assertCompleteTranslations(): void {
@@ -300,9 +302,20 @@ function isSupportedLanguage(value: string): value is SupportedLanguage {
 	return SUPPORTED_LANGUAGES.includes(value as SupportedLanguage);
 }
 
-function parseAcceptLanguage(header: string): string | undefined {
+function parseAcceptLanguages(header: string): string[] {
 	return header
 		.split(",")
-		.map((part) => part.trim().split(";")[0]?.trim())
-		.find(Boolean);
+		.map(parseLanguageRange)
+		.filter((range): range is { tag: string; quality: number; index: number } => range !== undefined)
+		.sort((left, right) => right.quality - left.quality || left.index - right.index)
+		.map((range) => range.tag);
+}
+
+function parseLanguageRange(part: string, index: number): { tag: string; quality: number; index: number } | undefined {
+	const [rawTag, ...params] = part.trim().split(";").map((value) => value.trim());
+	if (!rawTag || rawTag === "*") return undefined;
+	const qualityParam = params.find((param) => param.toLowerCase().startsWith("q="));
+	const quality = qualityParam ? Number(qualityParam.slice(2)) : 1;
+	if (!Number.isFinite(quality) || quality <= 0 || quality > 1) return undefined;
+	return { tag: rawTag, quality, index };
 }

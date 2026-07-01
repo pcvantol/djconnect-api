@@ -284,13 +284,39 @@ describe("DJConnect API worker", () => {
 			ha_install_id: "example-ha-install",
 			label: "example-ha",
 		}, {
-			"accept-language": "de-DE,de;q=0.8",
+			"accept-language": "zh-CN;q=1, nl-NL;q=0.4, de-DE;q=0.9, fr-FR;q=0.6",
 		});
 
 		expect(response.status).toBe(400);
 		expect(await response.json()).toEqual({
 			error: "missing_bootstrap_proof",
 			message: "Der Bootstrap-Nachweis ist erforderlich.",
+		});
+	});
+
+	it("lets lang override Accept-Language and falls back to English when needed", async () => {
+		const localized = await dispatchWithHeaders("/v1/install/token?lang=es-MX", {
+			ha_install_id: "example-ha-install",
+			label: "example-ha",
+		}, {
+			"accept-language": "de-DE;q=1",
+		});
+		expect(localized.status).toBe(400);
+		expect(await localized.json()).toEqual({
+			error: "missing_bootstrap_proof",
+			message: "Se requiere la prueba de arranque.",
+		});
+
+		const fallback = await dispatchWithHeaders("/v1/install/token", {
+			ha_install_id: "example-ha-install",
+			label: "example-ha",
+		}, {
+			"accept-language": "zh-CN;q=1, de-DE;q=2, *;q=0.5",
+		});
+		expect(fallback.status).toBe(400);
+		expect(await fallback.json()).toEqual({
+			error: "missing_bootstrap_proof",
+			message: "The bootstrap proof is required.",
 		});
 	});
 
@@ -311,6 +337,7 @@ describe("DJConnect API worker", () => {
 		expect(event.status).toBe(200);
 		const payload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as { aps: { alert: { title: string; body: string } } };
 		expect(payload.aps.alert).toEqual({ title: "Ask DJ", body: "Ask DJ attend votre choix." });
+		expect(JSON.stringify(payload)).toContain("Ask DJ attend votre choix.");
 	});
 
 	it("rejects push event payloads with raw prompt, response, history, memory or token fields", async () => {
