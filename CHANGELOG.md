@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.9 - 2026-07-04
+
+- Added privacy-safe production diagnostics for push registration and delivery
+  health via `GET /v1/admin/diagnostics`.
+- Added D1 diagnostics tables for aggregate API status/error-code counts and
+  APNs delivery failure reason counts without storing request bodies, headers,
+  raw install IDs, device IDs, APNs tokens, prompts or assistant responses.
+- Extended push relay auditing with APNs failure reason/status summaries by
+  client type.
+- Added tests that verify diagnostics expose operational issue counts while
+  excluding raw identifiers, tokens and secrets.
+
 ## 1.0.8 - 2026-07-01
 
 - Tightened localization error handling by typing `HttpError` codes against the

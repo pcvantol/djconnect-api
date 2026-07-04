@@ -103,6 +103,10 @@ Pattern:
   routing fields.
 - `install_tokens` stores per-install token hashes and rotation metadata.
 - `relay_events` stores minimal counts only.
+- `api_diagnostics` stores privacy-safe method, normalized route, status and
+  stable API error-code data for production troubleshooting.
+- `push_delivery_failures` stores APNs failure reason/status/count aggregates
+  by client type for relay delivery troubleshooting.
 - Audit rows intentionally exclude prompts, responses, history, memory and
   secrets.
 

@@ -4,7 +4,7 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
-Current release: `1.0.8`.
+Current release: `1.0.9`.
 
 ## Cloudflare Setup
 
@@ -193,7 +193,7 @@ environment-specific Wrangler configuration when added.
 - Cloudflare Worker secrets are configured for `APNS_PRIVATE_KEY`,
   `DJCONNECT_RELAY_SECRET` and `APNS_TOKEN_ENCRYPTION_KEY`.
 - GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
-- The latest release is `v1.0.8`.
+- The latest release is `v1.0.9`.
 
 ## Development
 
@@ -314,6 +314,11 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 - `GET /v1/admin/registrations` requires the same bootstrap/operator auth,
   rejects per-install `djci_...` tokens and returns only privacy-safe
   registration metadata for the admin website.
+- `GET /v1/admin/diagnostics` requires the same bootstrap/operator auth and
+  returns privacy-safe aggregate production diagnostics for registrations,
+  push delivery, APNs failure reasons and API error codes. It never returns raw
+  request bodies, headers, install IDs, device IDs, APNs tokens, prompts or
+  assistant responses.
 - `POST /v1/operator/install-token/revoke` requires bootstrap/operator auth
   and disables one compromised per-install token by `ha_install_id` plus token
   ID. It never accepts or returns raw `djci_...` token material and never
@@ -324,6 +329,10 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 - APNs endpoint selection uses each registration's `apns_environment`.
 - Invalid APNs tokens (`BadDeviceToken`, `Unregistered`, or HTTP 410) are marked disabled and invalid.
 - Audit rows intentionally avoid prompts, responses, tokens, chat history, and secrets.
+- Diagnostics rows intentionally store only method, normalized route, status,
+  API error code and APNs failure reason/status/count aggregates. They do not
+  store request bodies, Authorization headers, IP addresses, raw install IDs,
+  raw device IDs or APNs tokens.
 - New APNs registrations store device tokens encrypted at rest in D1 with
   `APNS_TOKEN_ENCRYPTION_KEY`. The legacy nullable `apns_token` column remains
   only as a migration fallback for old rows and should stay empty for new rows.

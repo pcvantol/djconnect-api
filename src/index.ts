@@ -1,13 +1,19 @@
 import { sha256Hex } from "./crypto";
-import { listRegistrations, revokeToken } from "./handlers/admin";
+import { diagnostics, listRegistrations, revokeToken } from "./handlers/admin";
 import { issueBootstrapProofHandler, issueInstallTokenHandler, rotateInstallTokenHandler } from "./handlers/install";
 import { registerDevice, sendPushEvent, unregisterDevice } from "./handlers/push";
 import { errorJson, HttpError, json } from "./http";
+import { recordApiDiagnostic } from "./repository";
 import type { AppEnv } from "./types";
 
 type RouteHandler = (request: Request, env: AppEnv, ctx: ExecutionContext, url: URL) => Promise<Response>;
 
 const routes: Array<{ method: string; path: string; handler: RouteHandler }> = [
+	{
+		method: "GET",
+		path: "/v1/admin/diagnostics",
+		handler: (request, env, _ctx, url) => diagnostics(request, env, url),
+	},
 	{
 		method: "GET",
 		path: "/v1/admin/registrations",
@@ -52,14 +58,38 @@ const routes: Array<{ method: string; path: string; handler: RouteHandler }> = [
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
+		const appEnv = env as AppEnv;
+		const url = new URL(request.url);
+		let routePath = url.pathname;
 		try {
-			return await route(request, env as AppEnv, ctx);
+			const response = await route(request, appEnv, ctx);
+			routePath = routePathFor(request.method, url.pathname);
+			ctx.waitUntil(recordApiDiagnostic(appEnv.DB, {
+				method: request.method,
+				route: routePath,
+				status: response.status,
+			}));
+			return response;
 		} catch (error) {
 			if (error instanceof HttpError) {
-				return errorJson(request, error.code, { status: error.status });
+				const response = errorJson(request, error.code, { status: error.status });
+				ctx.waitUntil(recordApiDiagnostic(appEnv.DB, {
+					method: request.method,
+					route: routePathFor(request.method, url.pathname),
+					status: response.status,
+					error_code: error.code,
+				}));
+				return response;
 			}
 			console.error(JSON.stringify({ level: "error", message: "unhandled_error" }));
-			return errorJson(request, "internal_error", { status: 500 });
+			const response = errorJson(request, "internal_error", { status: 500 });
+			ctx.waitUntil(recordApiDiagnostic(appEnv.DB, {
+				method: request.method,
+				route: routePathFor(request.method, url.pathname),
+				status: response.status,
+				error_code: "internal_error",
+			}));
+			return response;
 		}
 	},
 } satisfies ExportedHandler<Env>;
@@ -75,7 +105,14 @@ async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Prom
 		return match.handler(request, env, ctx, url);
 	}
 
-	return errorJson(request, "not_found", { status: 404 });
+	throw new HttpError(404, "not_found");
+}
+
+function routePathFor(method: string, pathname: string): string {
+	const match = routes.find((candidate) => candidate.method === method && candidate.path === pathname);
+	if (match) return match.path;
+	if (method === "GET" && pathname === "/health") return "/health";
+	return "unmatched";
 }
 
 export async function tokenHashForTest(token: string): Promise<string> {
