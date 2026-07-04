@@ -35,6 +35,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Dependency and tool freshness report
+        run: |
+          node --version
+          npm --version
+          npx wrangler --version
+          npm run deps:report
+
       - name: Typecheck
         run: npx tsc --noEmit
 
