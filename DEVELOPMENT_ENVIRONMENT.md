@@ -206,6 +206,10 @@ Not allowed:
   `/Users/pcvantol/Documents/GitHub/djconnect`.
 - Do not include secrets, private data or proprietary third-party material in
   prompts, agent logs, screenshots, issues or test fixtures.
+- Before every release, review third-party package and tool freshness:
+  `npm outdated`, `npm run deps:report`, `node --version`, `npm --version` and
+  `npx wrangler --version`. Update intentionally, keep `package-lock.json`
+  committed and refresh `THIRD_PARTY_NOTICES.md` if declared tooling changes.
 - Release cleanup is part of the normal release cycle: run
   `./cleanup_old_releases.sh --keep 1` as a dry-run first, then
   `./cleanup_old_releases.sh --keep 1 --execute` after the new GitHub Release

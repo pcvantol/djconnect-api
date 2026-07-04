@@ -285,6 +285,22 @@ assistant responses, Spotify tokens, Home Assistant tokens or chat history.
 
 Release hygiene follows the canonical cross-repo checklist in `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. Use `CHANGELOG.md` as the GitHub Release body.
 
+Before cutting a release, review and update third-party packages, dependencies
+and developer tools intentionally:
+
+```sh
+npm outdated
+npm run deps:report
+node --version
+npm --version
+npx wrangler --version
+```
+
+When updates are needed, use targeted `npm install -D <package>@latest` or
+`npm update --save-dev`, commit `package.json` and `package-lock.json`, rerun
+the full validation flow and refresh `THIRD_PARTY_NOTICES.md` if declared
+tooling changes.
+
 Use the cleanup helper during every release cycle. First inspect the dry-run:
 
 ```sh

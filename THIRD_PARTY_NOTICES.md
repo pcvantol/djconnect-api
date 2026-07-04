@@ -25,7 +25,9 @@ sponsorship, partnership or official support by Apple Inc.
 ## Node.js And npm Packages
 
 Development and test tooling is installed through npm and recorded in
-`package-lock.json`. Declared development dependencies include:
+`package-lock.json`. Release validation includes an explicit dependency and
+tool freshness review (`npm outdated`, `npm run deps:report`, Node.js, npm and
+Wrangler versions). Declared development dependencies include:
 
 - `wrangler`
 - `typescript`

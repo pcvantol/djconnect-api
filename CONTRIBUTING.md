@@ -100,6 +100,11 @@ Maintainer releases should follow the shared DJConnect release hygiene in
 For this repo, release validation includes:
 
 - Review canonical cross-repo contract docs.
+- Review and update third-party packages, dependency lockfiles and developer
+  tools before cutting a release. Use `npm outdated`, update intentionally with
+  targeted `npm install -D <package>@latest` or `npm update --save-dev`, then
+  commit the resulting `package.json`/`package-lock.json` changes.
+- Update `THIRD_PARTY_NOTICES.md` when declared third-party tooling changes.
 - Update `CHANGELOG.md`.
 - Run type generation, typecheck, tests, local D1 migration validation and the
   public repository secret scan.
