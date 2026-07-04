@@ -89,6 +89,73 @@ export interface AdminRegistrationsQuery {
 	ha_install_id?: string;
 }
 
+export interface AdminDiagnosticsQuery {
+	since_hours: number;
+}
+
+export interface ApiDiagnosticSummary {
+	window_hours: number;
+	totals: {
+		total: number;
+		ok: number;
+		client_error: number;
+		server_error: number;
+	};
+	by_route: Array<{
+		method: string;
+		route: string;
+		status: number;
+		error_code: string | null;
+		count: number;
+	}>;
+	by_error: Array<{
+		error_code: string;
+		status: number;
+		count: number;
+	}>;
+}
+
+export interface AdminDiagnostics {
+	ok: true;
+	generated_at: string;
+	window_hours: number;
+	registrations: {
+		total: number;
+		active: number;
+		disabled: number;
+		invalid: number;
+		by_client: Array<{
+			client_type: ClientType;
+			apns_environment: ApnsEnvironment;
+			disabled: boolean;
+			invalid: boolean;
+			count: number;
+		}>;
+	};
+	registration_errors: Array<{ code: string; count: number }>;
+	relay: {
+		events: number;
+		targeted: number;
+		delivered: number;
+		failed: number;
+		by_event: Array<{
+			event_type: string;
+			client_type: ClientType | null;
+			events: number;
+			targeted: number;
+			delivered: number;
+			failed: number;
+		}>;
+	};
+	apns_failures: Array<{
+		reason: string;
+		status: number;
+		client_type: ClientType | null;
+		count: number;
+	}>;
+	api: ApiDiagnosticSummary;
+}
+
 export interface AdminRegistration {
 	id: string;
 	ha_install_id_hash: string;
@@ -140,6 +207,13 @@ export interface ApnsResult {
 	status: number;
 	reason?: string;
 	endpoint: string;
+}
+
+export interface PushFailureSummary {
+	client_type: ClientType;
+	status: number;
+	reason: string;
+	count: number;
 }
 
 export interface InstallTokenRecord {

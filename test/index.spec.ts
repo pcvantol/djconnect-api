@@ -33,7 +33,9 @@ describe("DJConnect API worker", () => {
 	beforeEach(async () => {
 		testEnv.APNS_PRIVATE_KEY = await makePrivateKeyPem();
 		testEnv.DJCONNECT_SMOKE_TEST_MODE = "disabled";
+		await env.DB.exec("DELETE FROM push_delivery_failures");
 		await env.DB.exec("DELETE FROM relay_events");
+		await env.DB.exec("DELETE FROM api_diagnostics");
 		await env.DB.exec("DELETE FROM registrations");
 		await env.DB.exec("DELETE FROM install_tokens");
 		await env.DB.exec("DELETE FROM bootstrap_proofs");
@@ -537,6 +539,13 @@ describe("DJConnect API worker", () => {
 			WHERE device_id = ?
 		`).bind("example-invalid-device").first<{ disabled: number; invalid: number; last_error_code: string }>();
 		expect(invalid).toEqual({ disabled: 1, invalid: 1, last_error_code: "Unregistered" });
+
+		const failure = await env.DB.prepare(`
+			SELECT apns_status, apns_reason, count
+			FROM push_delivery_failures
+			WHERE apns_reason = ?
+		`).bind("Unregistered").first<{ apns_status: number; apns_reason: string; count: number }>();
+		expect(failure).toEqual({ apns_status: 410, apns_reason: "Unregistered", count: 1 });
 	});
 
 	it("supports smoke-test mode without calling APNs for example tokens", async () => {
@@ -618,6 +627,51 @@ describe("DJConnect API worker", () => {
 
 		const perInstall = await dispatchGet("/v1/admin/registrations", installAuth);
 		expect(perInstall.status).toBe(403);
+	});
+
+	it("summarizes production diagnostics without exposing raw identifiers or tokens", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth, {
+			device_id: "example-invalid-device",
+			apns_token: "example-invalid-apns-token",
+		});
+		vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ reason: "BadDeviceToken" }), { status: 400 }));
+
+		const event = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+		}, installAuth);
+		expect(event.status).toBe(200);
+
+		const invalidRegister = await dispatch("/v1/push/register", {
+			...registerPayload(),
+			apns_token: "",
+		}, installAuth);
+		expect(invalidRegister.status).toBe(400);
+
+		const response = await dispatchGet("/v1/admin/diagnostics?since_hours=24", AUTH);
+		expect(response.status).toBe(200);
+		const body = await response.json() as {
+			ok: boolean;
+			registrations: { total: number; invalid: number };
+			registration_errors: Array<{ code: string; count: number }>;
+			relay: { failed: number };
+			apns_failures: Array<{ reason: string; status: number; count: number }>;
+			api: { by_error: Array<{ error_code: string; status: number; count: number }> };
+		};
+
+		expect(body.ok).toBe(true);
+		expect(body.registrations).toMatchObject({ total: 1, invalid: 1 });
+		expect(body.registration_errors).toContainEqual({ code: "BadDeviceToken", count: 1 });
+		expect(body.relay.failed).toBe(1);
+		expect(body.apns_failures).toContainEqual({ reason: "BadDeviceToken", status: 400, client_type: "ios", count: 1 });
+		expect(body.api.by_error).toContainEqual({ error_code: "missing_apns_token", status: 400, count: 1 });
+
+		const serialized = JSON.stringify(body);
+		expect(serialized).not.toContain("example-ha-install");
+		expect(serialized).not.toContain("example-invalid-device");
+		expect(serialized).not.toContain("example-invalid-apns-token");
+		expect(serialized).not.toContain(EXAMPLE_RELAY_SECRET);
 	});
 
 	it("filters and paginates admin registrations", async () => {
@@ -935,6 +989,25 @@ CREATE TABLE IF NOT EXISTS relay_events (
 	target_count INTEGER NOT NULL DEFAULT 0,
 	success_count INTEGER NOT NULL DEFAULT 0,
 	error_count INTEGER NOT NULL DEFAULT 0,
+	created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS api_diagnostics (
+	id TEXT PRIMARY KEY,
+	method TEXT NOT NULL,
+	route TEXT NOT NULL,
+	status INTEGER NOT NULL,
+	error_code TEXT,
+	created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS push_delivery_failures (
+	id TEXT PRIMARY KEY,
+	relay_event_id TEXT NOT NULL,
+	client_type TEXT CHECK (client_type IS NULL OR client_type IN ('ios', 'macos', 'watchos')),
+	apns_status INTEGER NOT NULL,
+	apns_reason TEXT NOT NULL,
+	count INTEGER NOT NULL DEFAULT 0,
 	created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `;

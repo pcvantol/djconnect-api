@@ -1,6 +1,6 @@
 import { buildApnsPayload, isInvalidTokenReason, sendApns } from "../apns";
 import { auditEvent, findActiveRegistrations, markRegistrationError, markRegistrationSuccess } from "../repository";
-import type { AppEnv, PushEventRequest } from "../types";
+import type { AppEnv, ClientType, PushEventRequest, PushFailureSummary } from "../types";
 
 export interface PushDeliveryResult {
 	matched: number;
@@ -13,6 +13,7 @@ export async function deliverPushEvent(env: AppEnv, input: PushEventRequest): Pr
 	const registrations = await findActiveRegistrations(env.DB, input);
 	let delivered = 0;
 	let failed = 0;
+	const failures = new Map<string, PushFailureSummary>();
 
 	for (const registration of registrations) {
 		const payload = buildApnsPayload({ ...input, locale: registration.locale });
@@ -22,6 +23,7 @@ export async function deliverPushEvent(env: AppEnv, input: PushEventRequest): Pr
 			await markRegistrationSuccess(env.DB, registration.id);
 		} else {
 			failed += 1;
+			incrementFailure(failures, registration.client_type, result.status, result.reason ?? `HTTP_${result.status}`);
 			await markRegistrationError(
 				env.DB,
 				registration.id,
@@ -38,7 +40,18 @@ export async function deliverPushEvent(env: AppEnv, input: PushEventRequest): Pr
 		target: registrations.length,
 		success: delivered,
 		error: failed,
+		failures: [...failures.values()],
 	});
 
 	return { matched: registrations.length, delivered, failed, audit };
+}
+
+function incrementFailure(failures: Map<string, PushFailureSummary>, clientType: ClientType, status: number, reason: string): void {
+	const key = `${clientType}:${status}:${reason}`;
+	const existing = failures.get(key);
+	if (existing) {
+		existing.count += 1;
+		return;
+	}
+	failures.set(key, { client_type: clientType, status, reason, count: 1 });
 }

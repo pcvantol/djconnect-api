@@ -374,3 +374,108 @@ The response never includes raw APNs tokens, APNs token ciphertext, nonces,
 encryption key versions, relay secrets, Home Assistant tokens, Spotify tokens,
 prompts, responses or chat history. Install and device identifiers are returned
 only as stable SHA-256 prefixes.
+
+## GET /v1/admin/diagnostics
+
+Returns a privacy-safe production diagnostics summary for the DJConnect admin
+website and operator investigations.
+
+Requires bootstrap/operator auth using `DJCONNECT_RELAY_SECRET` through bearer
+auth or HMAC signature. Per-install `djci_...` tokens are rejected and must not
+be used by admin tooling.
+
+Query parameters:
+
+- `since_hours`: optional diagnostics window from 1 to 720 hours. Default: 24.
+
+Example:
+
+```http
+GET /v1/admin/diagnostics?since_hours=24
+Authorization: Bearer <DJCONNECT_RELAY_SECRET>
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "generated_at": "2026-07-04T06:00:00.000Z",
+  "window_hours": 24,
+  "registrations": {
+    "total": 3,
+    "active": 2,
+    "disabled": 1,
+    "invalid": 1,
+    "by_client": [
+      {
+        "client_type": "ios",
+        "apns_environment": "sandbox",
+        "disabled": false,
+        "invalid": false,
+        "count": 2
+      }
+    ]
+  },
+  "registration_errors": [
+    {
+      "code": "BadDeviceToken",
+      "count": 1
+    }
+  ],
+  "relay": {
+    "events": 4,
+    "targeted": 5,
+    "delivered": 4,
+    "failed": 1,
+    "by_event": [
+      {
+        "event_type": "ask_dj_response",
+        "client_type": null,
+        "events": 4,
+        "targeted": 5,
+        "delivered": 4,
+        "failed": 1
+      }
+    ]
+  },
+  "apns_failures": [
+    {
+      "reason": "BadDeviceToken",
+      "status": 400,
+      "client_type": "ios",
+      "count": 1
+    }
+  ],
+  "api": {
+    "window_hours": 24,
+    "totals": {
+      "total": 20,
+      "ok": 18,
+      "client_error": 2,
+      "server_error": 0
+    },
+    "by_route": [
+      {
+        "method": "POST",
+        "route": "/v1/push/register",
+        "status": 400,
+        "error_code": "missing_apns_token",
+        "count": 1
+      }
+    ],
+    "by_error": [
+      {
+        "error_code": "missing_apns_token",
+        "status": 400,
+        "count": 1
+      }
+    ]
+  }
+}
+```
+
+The response is aggregate-only. It never includes raw request or response
+bodies, Authorization headers, IP addresses, raw install IDs, raw device IDs,
+APNs tokens, encrypted APNs token material, relay secrets, Home Assistant
+tokens, Spotify tokens, prompts, responses or chat history.

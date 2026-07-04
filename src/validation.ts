@@ -1,6 +1,6 @@
 import { HttpError } from "./http";
 import type { ApiMessageKey } from "./messages";
-import type { AdminRegistrationsQuery, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
+import type { AdminDiagnosticsQuery, AdminRegistrationsQuery, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
 type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_install_id" | "token_id";
 type MissingStringKey = `missing_${RequiredStringField}`;
@@ -130,6 +130,12 @@ export function validateAdminRegistrationsQuery(url: URL): AdminRegistrationsQue
 		...(disabled !== undefined ? { disabled } : {}),
 		...(invalid !== undefined ? { invalid } : {}),
 		...(haInstallId ? { ha_install_id: haInstallId } : {}),
+	};
+}
+
+export function validateAdminDiagnosticsQuery(url: URL): AdminDiagnosticsQuery {
+	return {
+		since_hours: clampNumber(url.searchParams.get("since_hours"), 24, 1, 24 * 30),
 	};
 }
 
