@@ -14,10 +14,10 @@
     "provision:cloudflare": "scripts/provision_cloudflare.sh"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.16.18",
-    "@types/node": "^26.0.0",
-    "typescript": "^5.5.2",
+    "@cloudflare/vitest-pool-workers": "^0.18.0",
+    "@types/node": "^26.1.0",
+    "typescript": "^6.0.3",
     "vitest": "~4.1.9",
-    "wrangler": "^4.103.0"
+    "wrangler": "^4.107.0"
   }
 }
