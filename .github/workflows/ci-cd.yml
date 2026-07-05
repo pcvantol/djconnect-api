@@ -125,21 +125,28 @@ jobs:
         run: |
           set -euo pipefail
 
+          current_workflow_id="$(gh api "repos/${REPOSITORY}/actions/runs/${CURRENT_RUN_ID}" --jq '.workflow_id')"
           workflow_ids="$(gh api "repos/${REPOSITORY}/actions/workflows" --paginate --jq '.workflows[].id')"
 
           for workflow_id in ${workflow_ids}; do
+            keep_limit="${KEEP_RUNS}"
+            if [ "${workflow_id}" = "${current_workflow_id}" ]; then
+              keep_limit="$((KEEP_RUNS - 1))"
+            fi
+
             mapfile -t run_ids < <(
               gh api "repos/${REPOSITORY}/actions/workflows/${workflow_id}/runs?status=completed&per_page=100" \
                 --paginate \
-                --jq '.workflow_runs[].id'
+                --jq '.workflow_runs | sort_by(.created_at) | reverse | .[].id'
             )
 
-            if [ "${#run_ids[@]}" -le "${KEEP_RUNS}" ]; then
+            if [ "${#run_ids[@]}" -le "${keep_limit}" ]; then
               continue
             fi
 
-            for run_id in "${run_ids[@]:${KEEP_RUNS}}"; do
-              if [ "${run_id}" = "${CURRENT_RUN_ID}" ]; then
+            for index in "${!run_ids[@]}"; do
+              run_id="${run_ids[$index]}"
+              if [ "${index}" -lt "${keep_limit}" ] || [ "${run_id}" = "${CURRENT_RUN_ID}" ]; then
                 continue
               fi
 
