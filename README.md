@@ -285,6 +285,9 @@ assistant responses, Spotify tokens, Home Assistant tokens or chat history.
 
 Release hygiene follows the canonical cross-repo checklist in `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. Use `CHANGELOG.md` as the GitHub Release body.
 
+Before every release, review translations in all five supported languages:
+`en`, `nl`, `de`, `fr` and `es`.
+
 Before cutting a release, review and update third-party packages, dependencies
 and developer tools intentionally:
 

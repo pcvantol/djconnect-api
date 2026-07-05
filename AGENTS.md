@@ -51,6 +51,9 @@ rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|APNS_PRIVATE_KEY|Bearer 
 Hits for env-var names/placeholders/source parsing/generated comments are ok.
 Real secret values are not.
 
+Also review translations in all five supported languages before every release:
+`en`, `nl`, `de`, `fr` and `es`.
+
 ## Node.js Compatibility
 
 https://developers.cloudflare.com/workers/runtime-apis/nodejs/

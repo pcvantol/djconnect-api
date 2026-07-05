@@ -185,6 +185,8 @@ Before every release:
 - Review canonical cross-repo docs in the Home Assistant integration repo.
 - Update `CHANGELOG.md`.
 - Update docs when behavior, setup, security posture or release flow changes.
+- Review translations in all five supported languages: `en`, `nl`, `de`, `fr`
+  and `es`.
 - Run tests/typecheck/local migration validation.
 - Run the public repository secret scan.
 - Attempt remote D1 migration and Worker deploy when Cloudflare credentials are
