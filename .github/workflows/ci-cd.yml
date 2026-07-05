@@ -102,3 +102,50 @@ jobs:
 
       - name: Health smoke test
         run: curl -fsS https://api.djconnect.dev/health
+
+  cleanup-workflow-runs:
+    name: Cleanup old workflow runs
+    needs:
+      - validate
+      - deploy
+    if: always() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write
+      contents: read
+
+    steps:
+      - name: Delete old completed workflow runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+          KEEP_RUNS: 25
+        run: |
+          set -euo pipefail
+
+          workflow_ids="$(gh api "repos/${REPOSITORY}/actions/workflows" --paginate --jq '.workflows[].id')"
+
+          for workflow_id in ${workflow_ids}; do
+            mapfile -t run_ids < <(
+              gh api "repos/${REPOSITORY}/actions/workflows/${workflow_id}/runs?status=completed&per_page=100" \
+                --paginate \
+                --jq '.workflow_runs[].id'
+            )
+
+            if [ "${#run_ids[@]}" -le "${KEEP_RUNS}" ]; then
+              continue
+            fi
+
+            for run_id in "${run_ids[@]:${KEEP_RUNS}}"; do
+              if [ "${run_id}" = "${CURRENT_RUN_ID}" ]; then
+                continue
+              fi
+
+              echo "Deleting completed workflow run ${run_id} for workflow ${workflow_id}"
+              gh api \
+                --method DELETE \
+                "repos/${REPOSITORY}/actions/runs/${run_id}"
+            done
+          done
