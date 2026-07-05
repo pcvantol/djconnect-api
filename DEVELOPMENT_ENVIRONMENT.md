@@ -210,6 +210,8 @@ Not allowed:
   `npm outdated`, `npm run deps:report`, `node --version`, `npm --version` and
   `npx wrangler --version`. Update intentionally, keep `package-lock.json`
   committed and refresh `THIRD_PARTY_NOTICES.md` if declared tooling changes.
+- Before every release, review translations in all five supported languages:
+  `en`, `nl`, `de`, `fr` and `es`.
 - Release cleanup is part of the normal release cycle: run
   `./cleanup_old_releases.sh --keep 1` as a dry-run first, then
   `./cleanup_old_releases.sh --keep 1 --execute` after the new GitHub Release

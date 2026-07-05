@@ -14,6 +14,8 @@ Before release work:
 - Run `git status --short`.
 - Run `npx tsc --noEmit`.
 - Run `npm test`.
+- Review translations in all five supported languages: `en`, `nl`, `de`,
+  `fr` and `es`.
 - Run the public repository secret scan from the current release checklist.
 - Keep release notes in `CHANGELOG.md`.
 

@@ -100,6 +100,8 @@ Maintainer releases should follow the shared DJConnect release hygiene in
 For this repo, release validation includes:
 
 - Review canonical cross-repo contract docs.
+- Review translations in all five supported languages: `en`, `nl`, `de`, `fr`
+  and `es`.
 - Review and update third-party packages, dependency lockfiles and developer
   tools before cutting a release. Use `npm outdated`, update intentionally with
   targeted `npm install -D <package>@latest` or `npm update --save-dev`, then
