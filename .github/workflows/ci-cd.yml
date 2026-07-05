@@ -121,7 +121,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
           CURRENT_RUN_ID: ${{ github.run_id }}
-          KEEP_RUNS: 25
+          KEEP_RUNS: 2
         run: |
           set -euo pipefail
 
