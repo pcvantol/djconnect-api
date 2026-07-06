@@ -112,6 +112,9 @@ For this repo, release validation includes:
   public repository secret scan.
 - Attempt remote D1 migration and Worker deploy when Cloudflare credentials are
   available.
+- Verify the release commit is based on `origin/main` before publishing.
+- Push the current release commit explicitly to the intended release branch
+  instead of relying on a locally up-to-date branch name.
 - Create/push a semver tag such as `v1.0.0`.
 - Publish a GitHub Release using the matching `CHANGELOG.md` section.
 - Run `./cleanup_old_releases.sh --keep 1` as a dry-run before publishing.

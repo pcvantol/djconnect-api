@@ -283,7 +283,7 @@ assistant responses, Spotify tokens, Home Assistant tokens or chat history.
 
 ## Release
 
-Release hygiene follows the canonical cross-repo checklist in `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. Use `CHANGELOG.md` as the GitHub Release body.
+Release hygiene follows the canonical cross-repo checklist in `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. Before publishing, verify the release commit is based on `origin/main`; push the current release commit explicitly to the intended release branch; and use only the matching `CHANGELOG.md` version section as the GitHub Release body.
 
 Before every release, review translations in all five supported languages:
 `en`, `nl`, `de`, `fr` and `es`.

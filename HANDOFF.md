@@ -191,7 +191,11 @@ Before every release:
 - Run the public repository secret scan.
 - Attempt remote D1 migration and Worker deploy when Cloudflare credentials are
   available.
-- Use `CHANGELOG.md` as GitHub Release body.
+- Verify the release commit is based on `origin/main` before publishing.
+- Push the current release commit explicitly to the intended release branch
+  instead of relying on a locally up-to-date branch name.
+- Use only the matching `CHANGELOG.md` version section as the GitHub Release
+  body.
 - Run `./cleanup_old_releases.sh --keep 1` dry-run before publishing, then
   `./cleanup_old_releases.sh --keep 1 --execute` by default after the new
   GitHub Release is published and verified. This also removes old completed

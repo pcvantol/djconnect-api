@@ -12,11 +12,13 @@ Cross-repo source of truth:
 Before release work:
 
 - Run `git status --short`.
+- Verify the release commit is based on `origin/main` before publishing.
 - Run `npx tsc --noEmit`.
 - Run `npm test`.
 - Review translations in all five supported languages: `en`, `nl`, `de`,
   `fr` and `es`.
 - Run the public repository secret scan from the current release checklist.
-- Keep release notes in `CHANGELOG.md`.
+- Publish GitHub Release notes from only the matching `CHANGELOG.md` version
+  section.
 
 Cloudflare secrets must be set only through Cloudflare secrets/configuration, never in source, docs, tests or fixtures.
