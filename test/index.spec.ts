@@ -108,6 +108,17 @@ describe("DJConnect API worker", () => {
 		expect(await staleResponse.json()).toEqual({ error: "auth_required" });
 	});
 
+	it("rejects bootstrap proofs for non-Apple clients", async () => {
+		const response = await dispatch("/v1/install/bootstrap-proof", {
+			ha_install_id: "example-ha-install",
+			client_type: "esp32",
+			device_id: "example-device",
+		}, AUTH);
+
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({ error: "invalid_client_type" });
+	});
+
 	it("rejects expired, reused and mismatched bootstrap proofs", async () => {
 		const expiredProof = await insertBootstrapProof({
 			ha_install_id: "example-ha-install",
@@ -361,6 +372,17 @@ describe("DJConnect API worker", () => {
 		}
 	});
 
+	it("rejects non-Ask-DJ APNs push events", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		const response = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "playback_change",
+		}, installAuth);
+
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({ error: "invalid_event_type" });
+	});
+
 	it("registers and unregisters a device in D1", async () => {
 		const installAuth = await issueInstallAuth("example-ha-install");
 		const register = await dispatch("/v1/push/register", registerPayload(), installAuth);
@@ -470,7 +492,7 @@ describe("DJConnect API worker", () => {
 
 		const event = await dispatch("/v1/push/event", {
 			ha_install_id: "example-ha-install",
-			event_type: "playback_change",
+			event_type: "ask_dj_response",
 			client_types: ["ios", "watchos"],
 		}, installAuth);
 		const body = await event.json() as { matched: number; delivered: number; failed: number };
@@ -829,7 +851,7 @@ function bootstrapProofPayload(overrides: Partial<{
 	ha_install_id: string;
 	integration: string;
 	integration_version: string;
-	client_type: "ios" | "macos" | "watchos" | "raspberry_pi" | "esp32" | "conversation_agent";
+	client_type: "ios" | "macos" | "watchos";
 	device_id: string;
 	pairing_session_id: string;
 	ttl_seconds: number;
@@ -851,7 +873,7 @@ function installTokenPayload(overrides: Partial<{
 	label: string;
 	integration: string;
 	integration_version: string;
-	client_type: "ios" | "macos" | "watchos" | "raspberry_pi" | "esp32" | "conversation_agent";
+	client_type: "ios" | "macos" | "watchos";
 	device_id: string;
 	bootstrap_proof: string;
 }> = {}) {
@@ -966,7 +988,7 @@ CREATE TABLE IF NOT EXISTS bootstrap_proofs (
 	ha_install_id TEXT NOT NULL,
 	integration TEXT,
 	integration_version TEXT,
-	client_type TEXT NOT NULL CHECK (client_type IN ('ios', 'macos', 'watchos', 'raspberry_pi', 'esp32', 'conversation_agent')),
+	client_type TEXT NOT NULL CHECK (client_type IN ('ios', 'macos', 'watchos')),
 	device_id TEXT NOT NULL,
 	pairing_session_id TEXT,
 	expires_at TEXT NOT NULL,
@@ -984,7 +1006,7 @@ CREATE TABLE IF NOT EXISTS bootstrap_rate_limits (
 CREATE TABLE IF NOT EXISTS relay_events (
 	id TEXT PRIMARY KEY,
 	ha_install_id TEXT NOT NULL,
-	event_type TEXT NOT NULL CHECK (event_type IN ('ask_dj_response', 'ask_dj_confirm', 'playback_change')),
+	event_type TEXT NOT NULL CHECK (event_type IN ('ask_dj_response', 'ask_dj_confirm')),
 	client_type TEXT CHECK (client_type IS NULL OR client_type IN ('ios', 'macos', 'watchos')),
 	target_count INTEGER NOT NULL DEFAULT 0,
 	success_count INTEGER NOT NULL DEFAULT 0,

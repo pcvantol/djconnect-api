@@ -94,7 +94,10 @@ Response:
 
 The API stores only the proof hash. The raw proof is returned once, must not be
 logged, and expires after a short TTL. Proofs are bound to `ha_install_id`,
-`client_type` and `device_id`.
+`client_type` and `device_id`. Proofs are only issued for Apple push clients:
+`ios`, `macos` and `watchos`. ESP32, Raspberry Pi, Windows and
+Assist-agent-only entries do not use APNs push and must not request central API
+bootstrap proofs.
 
 ## POST /v1/install/token
 
@@ -289,7 +292,11 @@ Allowed `event_type` values:
 
 - `ask_dj_response`: sends a concise localized "Ask DJ has replied" alert.
 - `ask_dj_confirm`: sends a concise localized "Ask DJ is waiting" alert.
-- `playback_change`: sends a concise localized generic DJConnect update.
+
+Push policy is strict: central APNs events are only for Ask DJ replies after an
+explicit user Ask DJ request and Ask DJ confirmations waiting for a user choice.
+Do not send APNs for track, playback, queue, volume, mood, idle suggestion,
+ambient/system, status, polling or Spotify progress updates.
 
 APNs alert text is selected from the registered client `locale` when available.
 Supported languages are `en`, `nl`, `de`, `fr` and `es`; unsupported locales

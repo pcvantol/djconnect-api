@@ -41,9 +41,7 @@ export type ApnsMessageKey =
 	| "apns.ask_dj_confirm.title"
 	| "apns.ask_dj_confirm.body"
 	| "apns.ask_dj_response.title"
-	| "apns.ask_dj_response.body"
-	| "apns.playback_change.title"
-	| "apns.playback_change.body";
+	| "apns.ask_dj_response.body";
 
 export type MessageKey = ApiMessageKey | ApnsMessageKey;
 
@@ -83,8 +81,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		"apns.ask_dj_confirm.body": "Ask DJ is waiting for your choice.",
 		"apns.ask_dj_response.title": "Ask DJ",
 		"apns.ask_dj_response.body": "Ask DJ has replied.",
-		"apns.playback_change.title": "DJConnect",
-		"apns.playback_change.body": "DJConnect has an update.",
 	},
 	nl: {
 		admin_auth_required: "Operatorautorisatie is vereist.",
@@ -121,8 +117,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		"apns.ask_dj_confirm.body": "Ask DJ wacht op je keuze.",
 		"apns.ask_dj_response.title": "Ask DJ",
 		"apns.ask_dj_response.body": "Ask DJ heeft geantwoord.",
-		"apns.playback_change.title": "DJConnect",
-		"apns.playback_change.body": "DJConnect heeft een update.",
 	},
 	de: {
 		admin_auth_required: "Operatorautorisierung ist erforderlich.",
@@ -159,8 +153,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		"apns.ask_dj_confirm.body": "Ask DJ wartet auf deine Auswahl.",
 		"apns.ask_dj_response.title": "Ask DJ",
 		"apns.ask_dj_response.body": "Ask DJ hat geantwortet.",
-		"apns.playback_change.title": "DJConnect",
-		"apns.playback_change.body": "DJConnect hat ein Update.",
 	},
 	fr: {
 		admin_auth_required: "L'autorisation opérateur est requise.",
@@ -197,8 +189,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		"apns.ask_dj_confirm.body": "Ask DJ attend votre choix.",
 		"apns.ask_dj_response.title": "Ask DJ",
 		"apns.ask_dj_response.body": "Ask DJ a répondu.",
-		"apns.playback_change.title": "DJConnect",
-		"apns.playback_change.body": "DJConnect a une mise à jour.",
 	},
 	es: {
 		admin_auth_required: "Se requiere autorización de operador.",
@@ -235,8 +225,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		"apns.ask_dj_confirm.body": "Ask DJ espera tu elección.",
 		"apns.ask_dj_response.title": "Ask DJ",
 		"apns.ask_dj_response.body": "Ask DJ ha respondido.",
-		"apns.playback_change.title": "DJConnect",
-		"apns.playback_change.body": "DJConnect tiene una actualización.",
 	},
 };
 
@@ -248,10 +236,6 @@ const APNS_KEYS: Record<EventType, { title: ApnsMessageKey; body: ApnsMessageKey
 	ask_dj_response: {
 		title: "apns.ask_dj_response.title",
 		body: "apns.ask_dj_response.body",
-	},
-	playback_change: {
-		title: "apns.playback_change.title",
-		body: "apns.playback_change.body",
 	},
 };
 

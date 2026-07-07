@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_registrations_token_hash
 CREATE TABLE IF NOT EXISTS relay_events (
 	id TEXT PRIMARY KEY,
 	ha_install_id TEXT NOT NULL,
-	event_type TEXT NOT NULL CHECK (event_type IN ('ask_dj_response', 'ask_dj_confirm', 'playback_change')),
+	event_type TEXT NOT NULL CHECK (event_type IN ('ask_dj_response', 'ask_dj_confirm')),
 	client_type TEXT CHECK (client_type IS NULL OR client_type IN ('ios', 'macos', 'watchos')),
 	target_count INTEGER NOT NULL DEFAULT 0,
 	success_count INTEGER NOT NULL DEFAULT 0,

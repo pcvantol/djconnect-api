@@ -73,7 +73,9 @@ The production auth model is:
   `DJCONNECT_RELAY_SECRET` as a fallback.
 - Bootstrap proofs are stored hashed, bound to `ha_install_id`, `client_type`
   and `device_id`, expire quickly and are marked used after successful token
-  issuance.
+  issuance. They are only for Apple push clients (`ios`, `macos`, `watchos`);
+  ESP32, Raspberry Pi, Windows and Assist-agent-only entries do not use APNs
+  push and must not request central API bootstrap proofs.
 - Bootstrap proof consumption is D1 rate-limited by hashed IP, install ID and
   device ID keys. Rate-limit rows must not store raw proofs or tokens.
 - `/v1/push/register`, `/v1/push/unregister`, `/v1/push/event` and
@@ -106,7 +108,10 @@ This API stores only push routing metadata and minimal audit rows. It must not s
 - Spotify tokens
 - APNs provider key material
 
-Apple push payloads are generic wake/sync signals. Clients fetch current data from their own Home Assistant instance after opening.
+Apple push payloads are generic wake/sync signals. Send APNs only for
+`ask_dj_response` and `ask_dj_confirm`; do not push playback, track, queue,
+volume, mood, idle, status, polling or Spotify progress updates. Clients fetch
+current data from their own Home Assistant instance after opening.
 
 ## Admin Data Exposure
 

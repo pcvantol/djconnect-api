@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS bootstrap_proofs (
 	ha_install_id TEXT NOT NULL,
 	integration TEXT,
 	integration_version TEXT,
-	client_type TEXT NOT NULL CHECK (client_type IN ('ios', 'macos', 'watchos', 'raspberry_pi', 'esp32', 'conversation_agent')),
+	client_type TEXT NOT NULL CHECK (client_type IN ('ios', 'macos', 'watchos')),
 	device_id TEXT NOT NULL,
 	pairing_session_id TEXT,
 	expires_at TEXT NOT NULL,

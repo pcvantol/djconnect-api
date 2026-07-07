@@ -6,9 +6,8 @@ type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_
 type MissingStringKey = `missing_${RequiredStringField}`;
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
-const VALID_BOOTSTRAP_CLIENT_TYPES = new Set(["ios", "macos", "watchos", "raspberry_pi", "esp32", "conversation_agent"]);
 const VALID_ENVIRONMENTS = new Set(["sandbox", "production"]);
-const VALID_EVENTS = new Set(["ask_dj_response", "ask_dj_confirm", "playback_change"]);
+const VALID_EVENTS = new Set(["ask_dj_response", "ask_dj_confirm"]);
 const FORBIDDEN_PAYLOAD_KEYS = new Set([
 	"prompt",
 	"raw_prompt",
@@ -37,7 +36,7 @@ export function validateInstallTokenRequest(input: InstallTokenRequest): void {
 	requireString(input.ha_install_id, "ha_install_id");
 	requireString(input.bootstrap_proof, "bootstrap_proof");
 	requireString(input.device_id, "device_id");
-	if (!VALID_BOOTSTRAP_CLIENT_TYPES.has(input.client_type ?? "")) {
+	if (!VALID_CLIENT_TYPES.has(input.client_type ?? "")) {
 		throw new HttpError(400, "invalid_client_type");
 	}
 	if (input.ha_user_hash !== undefined && typeof input.ha_user_hash !== "string") {
@@ -51,7 +50,7 @@ export function validateInstallTokenRequest(input: InstallTokenRequest): void {
 export function validateBootstrapProofRequest(input: BootstrapProofRequest): void {
 	requireString(input.ha_install_id, "ha_install_id");
 	requireString(input.device_id, "device_id");
-	if (!VALID_BOOTSTRAP_CLIENT_TYPES.has(input.client_type)) {
+	if (!VALID_CLIENT_TYPES.has(input.client_type)) {
 		throw new HttpError(400, "invalid_client_type");
 	}
 	if (input.ttl_seconds !== undefined && (!Number.isInteger(input.ttl_seconds) || input.ttl_seconds < 60 || input.ttl_seconds > 600)) {

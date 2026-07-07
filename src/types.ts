@@ -1,7 +1,7 @@
 export type ClientType = "ios" | "macos" | "watchos";
-export type BootstrapClientType = ClientType | "raspberry_pi" | "esp32" | "conversation_agent";
+export type BootstrapClientType = ClientType;
 export type ApnsEnvironment = "sandbox" | "production";
-export type EventType = "ask_dj_response" | "ask_dj_confirm" | "playback_change";
+export type EventType = "ask_dj_response" | "ask_dj_confirm";
 
 export interface AppEnv {
 	DB: D1Database;
