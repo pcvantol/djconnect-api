@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.10 - 2026-07-07
+
+- Aligned the central APNs relay contract with the canonical DJConnect
+  cross-repo sync prompt.
+- Restricted bootstrap proofs to Apple push clients only: `ios`, `macos` and
+  `watchos`.
+- Removed `playback_change` from accepted APNs relay event types so central
+  push events are limited to explicit Ask DJ reply and confirmation flows.
+- Added a D1 migration that drops legacy non-Apple bootstrap proof rows and
+  legacy non-Ask-DJ relay audit rows while tightening table constraints.
+- Updated API/security documentation and tests for the stricter push policy.
+
 ## 1.0.9 - 2026-07-04
 
 - Added privacy-safe production diagnostics for push registration and delivery
