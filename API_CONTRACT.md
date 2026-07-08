@@ -142,6 +142,12 @@ Response:
 
 Store the returned token in Home Assistant config entry storage. The raw token
 is returned once and is stored by the API only as a SHA-256 hash.
+The proof format is `djcboot_...`; validity is checked against D1 by proof
+hash, `ha_install_id`, `client_type`, `device_id`, expiry and one-time
+consumption. The proof must have been issued and registered by the central API;
+a locally generated HA or Apple client proof is rejected as
+`invalid_bootstrap_proof`. `app_bundle_id`, `push_environment` and APNs
+token/provider key material are not required for install-token minting.
 
 Failure codes:
 

@@ -68,9 +68,10 @@ Public Home Assistant/HACS installations must not receive that bootstrap
 secret.
 
 `POST /v1/install/token` is proof-only. It consumes a valid `djcboot_...` proof
-bound to `ha_install_id`, `client_type` and `device_id`, then returns a
-per-install `djci_...` token. Proofs are stored hashed and consumption is
-rate-limited by hashed IP/install/device keys in D1.
+previously issued/registered by the central API, bound to `ha_install_id`,
+`client_type` and `device_id`, then returns a per-install `djci_...` token.
+Locally generated HA or Apple client proofs are rejected. Proofs are stored
+hashed and consumption is rate-limited by hashed IP/install/device keys in D1.
 
 `/v1/push/*` and `/v1/install/rotate` require a per-install `djci_...` token
 scoped to the request `ha_install_id`.

@@ -84,6 +84,20 @@ describe("DJConnect API worker", () => {
 		expect(proofRow?.used_at).toEqual(expect.any(String));
 	});
 
+	it("does not require APNs token material or provider keys for install-token minting", async () => {
+		const proof = await issueBootstrapProof({ client_type: "macos", device_id: "example-macos-device" });
+		testEnv.APNS_PRIVATE_KEY = "";
+		const response = await dispatch("/v1/install/token", installTokenPayload({
+			bootstrap_proof: proof,
+			client_type: "macos",
+			device_id: "example-macos-device",
+		}));
+
+		expect(response.status).toBe(200);
+		const body = await response.json() as { install_token: string };
+		expect(body.install_token).toMatch(/^djci_/);
+	});
+
 	it("accepts valid HMAC bootstrap auth for proof issuing and rejects stale HMAC timestamps", async () => {
 		const body = {
 			ha_install_id: "example-ha-install",
@@ -120,6 +134,12 @@ describe("DJConnect API worker", () => {
 	});
 
 	it("rejects expired, reused and mismatched bootstrap proofs", async () => {
+		const unregistered = await dispatch("/v1/install/token", installTokenPayload({
+			bootstrap_proof: "djcboot_example-ha-generated-proof",
+		}));
+		expect(unregistered.status).toBe(401);
+		expect(await unregistered.json()).toEqual({ error: "invalid_bootstrap_proof" });
+
 		const expiredProof = await insertBootstrapProof({
 			ha_install_id: "example-ha-install",
 			client_type: "ios",
