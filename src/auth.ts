@@ -4,28 +4,24 @@ import { findInstallTokenByBearer, markInstallTokenUsed } from "./repository";
 import type { AppEnv } from "./types";
 
 export async function requireBootstrapAuth(request: Request, env: AppEnv): Promise<void> {
-	const authorization = request.headers.get("authorization") ?? "";
-	const expected = env.DJCONNECT_RELAY_SECRET;
-
-	if (!expected) {
+	const authorized = await verifySharedSecretAuth(request, env.DJCONNECT_RELAY_SECRET);
+	if (authorized === "missing_secret") {
 		throw new HttpError(500, "relay_secret_not_configured");
 	}
-
-	if (authorization.startsWith("Bearer ")) {
-		const token = authorization.slice("Bearer ".length).trim();
-		if (token && (await timingSafeEqualString(token, expected))) {
-			return;
-		}
+	if (authorized) {
+		return;
 	}
 
-	const hmacHeader = request.headers.get("x-djconnect-signature");
-	const timestamp = request.headers.get("x-djconnect-timestamp");
-	if (hmacHeader && timestamp) {
-		const body = await request.clone().arrayBuffer();
-		const valid = await verifyHmac(body, timestamp, hmacHeader, expected);
-		if (valid) {
-			return;
-		}
+	throw new HttpError(401, "auth_required");
+}
+
+export async function requirePairingIssuerAuth(request: Request, env: AppEnv): Promise<void> {
+	const authorized = await verifySharedSecretAuth(request, env.DJCONNECT_PAIRING_ISSUER_SECRET);
+	if (authorized === "missing_secret") {
+		throw new HttpError(500, "pairing_issuer_secret_not_configured");
+	}
+	if (authorized) {
+		return;
 	}
 
 	throw new HttpError(401, "auth_required");
@@ -63,6 +59,30 @@ export async function requireInstallAuth(request: Request, env: AppEnv, haInstal
 	}
 
 	await markInstallTokenUsed(env.DB, record.id);
+}
+
+async function verifySharedSecretAuth(request: Request, expected: string | undefined): Promise<boolean | "missing_secret"> {
+	const authorization = request.headers.get("authorization") ?? "";
+
+	if (!expected) {
+		return "missing_secret";
+	}
+
+	if (authorization.startsWith("Bearer ")) {
+		const token = authorization.slice("Bearer ".length).trim();
+		if (token && (await timingSafeEqualString(token, expected))) {
+			return true;
+		}
+	}
+
+	const hmacHeader = request.headers.get("x-djconnect-signature");
+	const timestamp = request.headers.get("x-djconnect-timestamp");
+	if (hmacHeader && timestamp) {
+		const body = await request.clone().arrayBuffer();
+		return verifyHmac(body, timestamp, hmacHeader, expected);
+	}
+
+	return false;
 }
 
 async function verifyHmac(

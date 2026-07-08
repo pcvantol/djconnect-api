@@ -3,10 +3,10 @@
 STOP. Your knowledge of Cloudflare Workers APIs and limits may be outdated. Always retrieve current documentation before any Workers, KV, R2, D1, Durable Objects, Queues, Vectorize, AI, or Agents SDK task.
 
 This repository is public/open-source safe by default. Never commit APNs `.p8`
-private keys, `DJCONNECT_RELAY_SECRET`, real APNs device tokens, Home Assistant
-tokens, Spotify tokens, Cloudflare API tokens, production user/install/device
-IDs, raw prompts, raw assistant responses, full chat history or logs containing
-request bodies.
+private keys, `DJCONNECT_RELAY_SECRET`, `DJCONNECT_PAIRING_ISSUER_SECRET`,
+real APNs device tokens, Home Assistant tokens, Spotify tokens, Cloudflare API
+tokens, production user/install/device IDs, raw prompts, raw assistant
+responses, full chat history or logs containing request bodies.
 
 Use only example fixture values such as `example-ha-install`,
 `example-user-hash`, `example-apns-token` and `dev.djconnect.ios`.
@@ -45,7 +45,7 @@ Before release, also run:
 
 ```sh
 git diff --check
-rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|APNS_PRIVATE_KEY|Bearer [A-Za-z0-9]|sk-|xox|ghp_|spotify_refresh|refresh_token|device_token" .
+rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|DJCONNECT_PAIRING_ISSUER_SECRET|APNS_PRIVATE_KEY|Bearer [A-Za-z0-9]|sk-|xox|ghp_|spotify_refresh|refresh_token|device_token" .
 ```
 
 Hits for env-var names/placeholders/source parsing/generated comments are ok.

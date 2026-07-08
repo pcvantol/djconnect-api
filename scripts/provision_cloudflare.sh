@@ -13,7 +13,8 @@ Options:
   --dry-run                 Plan selected actions without making changes. Default.
   --execute                 Actually run selected actions. Default is dry-run.
   --all                     Run secrets, remote migration, deploy, domain setup and smoke test.
-  --set-secrets             Set APNS_PRIVATE_KEY, DJCONNECT_RELAY_SECRET and
+  --set-secrets             Set APNS_PRIVATE_KEY, DJCONNECT_RELAY_SECRET,
+                            DJCONNECT_PAIRING_ISSUER_SECRET and
                             APNS_TOKEN_ENCRYPTION_KEY with Wrangler.
   --migrate                 Apply D1 migrations to the remote djconnect_api database.
   --deploy                  Deploy the Worker with Wrangler.
@@ -24,6 +25,9 @@ Options:
                             Required with --set-secrets.
   --relay-secret-env NAME   Environment variable containing the relay secret.
                             Default: DJCONNECT_RELAY_SECRET_VALUE.
+  --pairing-issuer-secret-env NAME
+                            Environment variable containing the pairing issuer
+                            secret. Default: DJCONNECT_PAIRING_ISSUER_SECRET_VALUE.
   --apns-token-key-env NAME Environment variable containing a base64 32-byte
                             APNs token encryption key.
                             Default: APNS_TOKEN_ENCRYPTION_KEY_VALUE.
@@ -40,6 +44,7 @@ Examples:
   scripts/provision_cloudflare.sh --all
   scripts/provision_cloudflare.sh --execute --migrate --deploy --smoke-test
   DJCONNECT_RELAY_SECRET_VALUE='...' \
+  DJCONNECT_PAIRING_ISSUER_SECRET_VALUE='...' \
   APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
     scripts/provision_cloudflare.sh --execute --set-secrets \
     --apns-private-key-file /secure/path/key.p8
@@ -54,6 +59,7 @@ CUSTOM_DOMAIN=false
 SMOKE_TEST=false
 APNS_PRIVATE_KEY_FILE=""
 RELAY_SECRET_ENV="DJCONNECT_RELAY_SECRET_VALUE"
+PAIRING_ISSUER_SECRET_ENV="DJCONNECT_PAIRING_ISSUER_SECRET_VALUE"
 APNS_TOKEN_KEY_ENV="APNS_TOKEN_ENCRYPTION_KEY_VALUE"
 ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-}"
 API_TOKEN_ENV="CLOUDFLARE_API_TOKEN"
@@ -113,6 +119,14 @@ while [[ $# -gt 0 ]]; do
         exit 64
       fi
       RELAY_SECRET_ENV="$2"
+      shift 2
+      ;;
+    --pairing-issuer-secret-env)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        echo "--pairing-issuer-secret-env requires an environment variable name." >&2
+        exit 64
+      fi
+      PAIRING_ISSUER_SECRET_ENV="$2"
       shift 2
       ;;
     --apns-token-key-env)
@@ -386,6 +400,7 @@ verify_cloudflare_token
 if [[ "$SET_SECRETS" == true ]]; then
   set_worker_secret_from_file "APNS_PRIVATE_KEY" "$APNS_PRIVATE_KEY_FILE"
   set_worker_secret_from_env "DJCONNECT_RELAY_SECRET" "$RELAY_SECRET_ENV"
+  set_worker_secret_from_env "DJCONNECT_PAIRING_ISSUER_SECRET" "$PAIRING_ISSUER_SECRET_ENV"
   set_apns_token_encryption_key "$APNS_TOKEN_KEY_ENV"
 fi
 

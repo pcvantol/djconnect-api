@@ -67,6 +67,12 @@ short-lived one-time `djcboot_...` proof for an existing pairing context.
 Public Home Assistant/HACS installations must not receive that bootstrap
 secret.
 
+`POST /v1/pairing/bootstrap-proof` is the trusted Apple pairing issuer
+endpoint. It requires `DJCONNECT_PAIRING_ISSUER_SECRET`, a
+`pairing_session_id`, and returns a central-issued one-time proof for the Apple
+client to pass to HA during push registration. Apple clients and HA/HACS must
+not receive the pairing issuer secret.
+
 `POST /v1/install/token` is proof-only. It consumes a valid `djcboot_...` proof
 previously issued/registered by the central API, bound to `ha_install_id`,
 `client_type` and `device_id`, then returns a per-install `djci_...` token.
@@ -147,6 +153,8 @@ Cloudflare production setup is active:
 
 - `APNS_PRIVATE_KEY` is installed as a Cloudflare Worker secret.
 - `DJCONNECT_RELAY_SECRET` is installed as a Cloudflare Worker secret.
+- `DJCONNECT_PAIRING_ISSUER_SECRET` must be installed as a Cloudflare Worker
+  secret before the trusted Apple pairing issuer endpoint can mint proofs.
 - `APNS_TOKEN_ENCRYPTION_KEY` must be installed as a Cloudflare Worker secret
   before encrypted APNs registrations are accepted.
 - `DJCONNECT_SMOKE_TEST_MODE=enabled` is installed as a Cloudflare Worker

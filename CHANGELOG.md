@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.11 - 2026-07-08
+
+- Added trusted Apple pairing issuer support via
+  `POST /v1/pairing/bootstrap-proof`, guarded by a separate pairing issuer
+  secret and required `pairing_session_id`.
+- Restored bootstrap proof metadata columns in D1 so proof issuing keeps
+  `integration` and `integration_version` storage aligned with the Worker code.
+- Documented the trusted pairing issuer secret, provisioning flow and strict
+  central-issued proof contract.
+
 ## 1.0.10 - 2026-07-07
 
 - Aligned the central APNs relay contract with the canonical DJConnect

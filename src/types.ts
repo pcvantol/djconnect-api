@@ -14,6 +14,7 @@ export interface AppEnv {
 	APNS_ENVIRONMENT: ApnsEnvironment;
 	APNS_TOKEN_ENCRYPTION_KEY: string;
 	DJCONNECT_RELAY_SECRET: string;
+	DJCONNECT_PAIRING_ISSUER_SECRET?: string;
 	DJCONNECT_SMOKE_TEST_MODE?: string;
 }
 

@@ -1,8 +1,8 @@
-import { requireAdminAuth, requireInstallAuth } from "../auth";
+import { requireAdminAuth, requireInstallAuth, requirePairingIssuerAuth } from "../auth";
 import { json, readJson } from "../http";
 import { consumeBootstrapProof, enforceBootstrapRateLimit, issueBootstrapProof, issueInstallToken, rotateInstallToken } from "../repository";
 import type { AppEnv, BootstrapProofRequest, InstallTokenRequest, RotateInstallTokenRequest } from "../types";
-import { requireBearerHeader, validateBootstrapProofRequest, validateInstallTokenRequest, validateRotateInstallToken } from "../validation";
+import { requireBearerHeader, validateBootstrapProofRequest, validateInstallTokenRequest, validatePairingBootstrapProofRequest, validateRotateInstallToken } from "../validation";
 
 export async function issueBootstrapProofHandler(request: Request, env: AppEnv): Promise<Response> {
 	await requireAdminAuth(request, env);
@@ -10,6 +10,19 @@ export async function issueBootstrapProofHandler(request: Request, env: AppEnv):
 	validateBootstrapProofRequest(input);
 	const result = await issueBootstrapProof(env.DB, input);
 	return json({ ok: true, id: result.id, bootstrap_proof: result.proof, proof_hash: result.proofHash, expires_at: result.expiresAt });
+}
+
+export async function issuePairingBootstrapProofHandler(request: Request, env: AppEnv): Promise<Response> {
+	await requirePairingIssuerAuth(request, env);
+	const input = await readJson<BootstrapProofRequest>(request);
+	validatePairingBootstrapProofRequest(input);
+	await enforceBootstrapRateLimit(env.DB, {
+		ip: clientIp(request),
+		ha_install_id: input.ha_install_id,
+		device_id: input.device_id,
+	});
+	const result = await issueBootstrapProof(env.DB, input);
+	return json({ ok: true, success: true, bootstrap_proof: result.proof, expires_at: result.expiresAt });
 }
 
 export async function issueInstallTokenHandler(request: Request, env: AppEnv): Promise<Response> {

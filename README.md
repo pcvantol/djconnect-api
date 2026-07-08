@@ -4,7 +4,7 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
-Current release: `1.0.10`.
+Current release: `1.0.11`.
 
 ## Cloudflare Setup
 
@@ -30,6 +30,7 @@ and the relay secret through an environment variable. The values are not echoed:
 
 ```sh
 DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+DJCONNECT_PAIRING_ISSUER_SECRET_VALUE='replace-with-long-random-secret' \
 APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
   npm run provision:cloudflare -- --execute --set-secrets \
   --apns-private-key-file /secure/path/to/key.p8
@@ -84,6 +85,7 @@ Set required secrets through Cloudflare only:
 ```sh
 npx wrangler secret put APNS_PRIVATE_KEY
 npx wrangler secret put DJCONNECT_RELAY_SECRET
+npx wrangler secret put DJCONNECT_PAIRING_ISSUER_SECRET
 npx wrangler secret put APNS_TOKEN_ENCRYPTION_KEY
 ```
 
@@ -96,6 +98,10 @@ Use a long random value for `DJCONNECT_RELAY_SECRET`; never commit the value.
 This is a bootstrap/operator secret only. Do not ship it in HACS or client
 code. Public Home Assistant installations use per-install `djci_...` tokens
 issued by `POST /v1/install/token`.
+
+Use a separate long random value for `DJCONNECT_PAIRING_ISSUER_SECRET`. This is
+for the trusted Apple pairing issuer flow only. Do not ship it in HACS or Apple
+clients.
 
 Generate `APNS_TOKEN_ENCRYPTION_KEY` as a base64-encoded 32-byte key and store
 it only as a Cloudflare Worker secret:
@@ -113,6 +119,7 @@ Automated equivalent:
 
 ```sh
 DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+DJCONNECT_PAIRING_ISSUER_SECRET_VALUE='replace-with-long-random-secret' \
 APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
   scripts/provision_cloudflare.sh --execute --set-secrets \
   --apns-private-key-file /secure/path/to/key.p8
@@ -191,9 +198,10 @@ environment-specific Wrangler configuration when added.
 - `https://api.djconnect.dev/health` is live.
 - Remote D1 migrations are applied.
 - Cloudflare Worker secrets are configured for `APNS_PRIVATE_KEY`,
-  `DJCONNECT_RELAY_SECRET` and `APNS_TOKEN_ENCRYPTION_KEY`.
+  `DJCONNECT_RELAY_SECRET`, `DJCONNECT_PAIRING_ISSUER_SECRET` and
+  `APNS_TOKEN_ENCRYPTION_KEY`.
 - GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
-- The latest release is `v1.0.10`.
+- The latest release is `v1.0.11`.
 
 ## Development
 
@@ -245,10 +253,10 @@ Required GitHub Actions secret:
   is not called.
 
 Worker runtime secrets such as `APNS_PRIVATE_KEY`,
-`DJCONNECT_RELAY_SECRET`, `APNS_TOKEN_ENCRYPTION_KEY` and
-`DJCONNECT_SMOKE_TEST_MODE` stay in Cloudflare Worker secrets. Only
-`DJCONNECT_RELAY_SECRET` is duplicated into GitHub Actions, and only to run the
-operator-authenticated staging-safe E2E smoke test.
+`DJCONNECT_RELAY_SECRET`, `DJCONNECT_PAIRING_ISSUER_SECRET`,
+`APNS_TOKEN_ENCRYPTION_KEY` and `DJCONNECT_SMOKE_TEST_MODE` stay in Cloudflare
+Worker secrets. Only `DJCONNECT_RELAY_SECRET` is duplicated into GitHub Actions,
+and only to run the operator-authenticated staging-safe E2E smoke test.
 
 ## Postman
 
@@ -324,6 +332,10 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 
 - `POST /v1/install/bootstrap-proof` is the operator/admin pairing endpoint
   that issues short-lived one-time `djcboot_...` proofs.
+- `POST /v1/pairing/bootstrap-proof` is the trusted Apple pairing issuer
+  endpoint. It requires `DJCONNECT_PAIRING_ISSUER_SECRET`, requires a
+  `pairing_session_id`, and returns a one-time proof without exposing the proof
+  hash. It is not a public unauthenticated bootstrap endpoint.
 - `POST /v1/install/token` is proof-only: it consumes a valid `djcboot_...`
   proof that was issued/registered by the central API and does not accept
   `DJCONNECT_RELAY_SECRET` as a fallback. Locally generated HA or Apple client

@@ -1,6 +1,6 @@
 import { sha256Hex } from "./crypto";
 import { diagnostics, listRegistrations, revokeToken } from "./handlers/admin";
-import { issueBootstrapProofHandler, issueInstallTokenHandler, rotateInstallTokenHandler } from "./handlers/install";
+import { issueBootstrapProofHandler, issueInstallTokenHandler, issuePairingBootstrapProofHandler, rotateInstallTokenHandler } from "./handlers/install";
 import { registerDevice, sendPushEvent, unregisterDevice } from "./handlers/push";
 import { errorJson, HttpError, json } from "./http";
 import { recordApiDiagnostic } from "./repository";
@@ -28,6 +28,11 @@ const routes: Array<{ method: string; path: string; handler: RouteHandler }> = [
 		method: "POST",
 		path: "/v1/install/bootstrap-proof",
 		handler: (request, env) => issueBootstrapProofHandler(request, env),
+	},
+	{
+		method: "POST",
+		path: "/v1/pairing/bootstrap-proof",
+		handler: (request, env) => issuePairingBootstrapProofHandler(request, env),
 	},
 	{
 		method: "POST",

@@ -39,7 +39,7 @@ npx wrangler d1 migrations apply djconnect_api --local
 Run the public repository scan before publishing or requesting review:
 
 ```sh
-rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|APNS_PRIVATE_KEY|Bearer [A-Za-z0-9]|sk-|xox|ghp_|spotify_refresh|refresh_token|device_token" .
+rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|DJCONNECT_PAIRING_ISSUER_SECRET|APNS_PRIVATE_KEY|Bearer [A-Za-z0-9]|sk-|xox|ghp_|spotify_refresh|refresh_token|device_token" .
 ```
 
 Hits for environment variable names, placeholders, generated type comments or

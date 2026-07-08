@@ -99,6 +99,43 @@ logged, and expires after a short TTL. Proofs are bound to `ha_install_id`,
 Assist-agent-only entries do not use APNs push and must not request central API
 bootstrap proofs.
 
+## POST /v1/pairing/bootstrap-proof
+
+Issues a short-lived, one-time bootstrap proof for the Apple client pairing
+issuer flow. This endpoint is not public bootstrap: it requires a trusted
+pairing issuer secret through bearer auth or HMAC signature using
+`DJCONNECT_PAIRING_ISSUER_SECRET`. Apple clients and HA/HACS must not contain
+this secret.
+
+Request:
+
+```json
+{
+  "ha_install_id": "example-ha-install",
+  "integration": "djconnect_hacs",
+  "integration_version": "3.2.37",
+  "client_type": "macos",
+  "device_id": "djconnect-macos-XXXXXXXXXXXX",
+  "pairing_session_id": "example-pairing-session",
+  "ttl_seconds": 600
+}
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "success": true,
+  "bootstrap_proof": "djcboot_example-bootstrap-proof-returned-once",
+  "expires_at": "2026-07-08T12:10:00.000Z"
+}
+```
+
+The pairing issuer must only call this endpoint after validating the pairing
+session. The API stores only the proof hash and binds the proof to
+`ha_install_id`, `client_type`, `device_id` and `pairing_session_id`.
+
 ## POST /v1/install/token
 
 Issues a per-install token. This endpoint is proof-only: it does not accept

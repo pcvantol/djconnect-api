@@ -36,6 +36,9 @@ Required Cloudflare secrets:
 - `DJCONNECT_RELAY_SECRET`: long random relay shared secret for authenticated
   trusted bootstrap/operator calls that issue per-install tokens. Never commit
   the value. Do not ship it in HACS or client code.
+- `DJCONNECT_PAIRING_ISSUER_SECRET`: separate long random shared secret for the
+  trusted Apple pairing issuer flow. Never commit the value. Do not ship it in
+  HACS or client code.
 - `APNS_TOKEN_ENCRYPTION_KEY`: base64-encoded 32-byte key used to encrypt APNs
   device tokens before D1 storage. Generate with `openssl rand -base64 32`.
   Never commit, print, log, or copy it into GitHub Actions.
@@ -66,6 +69,8 @@ The production auth model is:
 
 - `DJCONNECT_RELAY_SECRET` stays server/operator-side and is used only for
   trusted admin/pairing calls such as `POST /v1/install/bootstrap-proof`.
+- `DJCONNECT_PAIRING_ISSUER_SECRET` stays in the trusted pairing issuer
+  environment and is used only for `POST /v1/pairing/bootstrap-proof`.
 - Each Home Assistant installation receives its own `djci_...` install token.
   The HACS integration provisions this automatically during setup; users do not
   normally paste tokens manually. `POST /v1/install/token` requires a

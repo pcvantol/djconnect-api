@@ -2,7 +2,7 @@ import { HttpError } from "./http";
 import type { ApiMessageKey } from "./messages";
 import type { AdminDiagnosticsQuery, AdminRegistrationsQuery, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
-type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_install_id" | "token_id";
+type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_install_id" | "pairing_session_id" | "token_id";
 type MissingStringKey = `missing_${RequiredStringField}`;
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
@@ -56,6 +56,11 @@ export function validateBootstrapProofRequest(input: BootstrapProofRequest): voi
 	if (input.ttl_seconds !== undefined && (!Number.isInteger(input.ttl_seconds) || input.ttl_seconds < 60 || input.ttl_seconds > 600)) {
 		throw new HttpError(400, "invalid_ttl_seconds");
 	}
+}
+
+export function validatePairingBootstrapProofRequest(input: BootstrapProofRequest): void {
+	validateBootstrapProofRequest(input);
+	requireString(input.pairing_session_id, "pairing_session_id");
 }
 
 export function validateRotateInstallToken(input: RotateInstallTokenRequest): void {

@@ -95,6 +95,7 @@ Required secrets must be set through Cloudflare secrets/configuration:
 ```sh
 npx wrangler secret put APNS_PRIVATE_KEY
 npx wrangler secret put DJCONNECT_RELAY_SECRET
+npx wrangler secret put DJCONNECT_PAIRING_ISSUER_SECRET
 npx wrangler secret put APNS_TOKEN_ENCRYPTION_KEY
 npx wrangler secret put DJCONNECT_SMOKE_TEST_MODE
 ```
@@ -176,7 +177,7 @@ credentials.
 Before every release, run:
 
 ```sh
-rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|APNS_PRIVATE_KEY|Bearer [A-Za-z0-9]|sk-|xox|ghp_|spotify_refresh|refresh_token|device_token" .
+rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|DJCONNECT_PAIRING_ISSUER_SECRET|APNS_PRIVATE_KEY|Bearer [A-Za-z0-9]|sk-|xox|ghp_|spotify_refresh|refresh_token|device_token" .
 ```
 
 Allowed hits:

@@ -6,8 +6,10 @@ import { assertCompleteTranslations, MESSAGES, SUPPORTED_LANGUAGES } from "../sr
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 const EXAMPLE_RELAY_SECRET = "example-relay-secret";
+const EXAMPLE_PAIRING_ISSUER_SECRET = "example-pairing-issuer-secret";
 const EXAMPLE_APNS_TOKEN_ENCRYPTION_KEY = btoa("0123456789abcdef0123456789abcdef");
 const AUTH = `Bearer ${EXAMPLE_RELAY_SECRET}`;
+const PAIRING_AUTH = `Bearer ${EXAMPLE_PAIRING_ISSUER_SECRET}`;
 
 const testEnv = {
 	...env,
@@ -20,6 +22,7 @@ const testEnv = {
 	APNS_ENVIRONMENT: "sandbox",
 	APNS_TOKEN_ENCRYPTION_KEY: EXAMPLE_APNS_TOKEN_ENCRYPTION_KEY,
 	DJCONNECT_RELAY_SECRET: EXAMPLE_RELAY_SECRET,
+	DJCONNECT_PAIRING_ISSUER_SECRET: EXAMPLE_PAIRING_ISSUER_SECRET,
 	DJCONNECT_SMOKE_TEST_MODE: "disabled",
 };
 
@@ -120,6 +123,48 @@ describe("DJConnect API worker", () => {
 		);
 		expect(staleResponse.status).toBe(401);
 		expect(await staleResponse.json()).toEqual({ error: "auth_required" });
+	});
+
+	it("issues pairing bootstrap proofs only for trusted pairing issuers", async () => {
+		const payload = bootstrapProofPayload({
+			client_type: "macos",
+			device_id: "djconnect-macos-XXXXXXXXXXXX",
+			integration_version: "3.2.37",
+			pairing_session_id: "example-pairing-session",
+		});
+
+		const relaySecret = await dispatch("/v1/pairing/bootstrap-proof", payload, AUTH);
+		expect(relaySecret.status).toBe(401);
+		expect(await relaySecret.json()).toEqual({ error: "auth_required" });
+
+		const missingPairingSession = await dispatch("/v1/pairing/bootstrap-proof", {
+			...payload,
+			pairing_session_id: undefined,
+		}, PAIRING_AUTH);
+		expect(missingPairingSession.status).toBe(400);
+		expect(await missingPairingSession.json()).toEqual({ error: "missing_pairing_session_id" });
+
+		const response = await dispatchWithHeaders(
+			"/v1/pairing/bootstrap-proof",
+			payload,
+			await hmacHeaders(payload, Math.floor(Date.now() / 1000), EXAMPLE_PAIRING_ISSUER_SECRET),
+		);
+		expect(response.status).toBe(200);
+		const body = await response.json() as { ok: boolean; success: boolean; bootstrap_proof: string; proof_hash?: string; expires_at: string };
+		expect(body.ok).toBe(true);
+		expect(body.success).toBe(true);
+		expect(body.bootstrap_proof).toMatch(/^djcboot_/);
+		expect(body.proof_hash).toBeUndefined();
+		expect(Date.parse(body.expires_at)).toBeGreaterThan(Date.now());
+
+		const token = await dispatch("/v1/install/token", installTokenPayload({
+			bootstrap_proof: body.bootstrap_proof,
+			client_type: "macos",
+			device_id: "djconnect-macos-XXXXXXXXXXXX",
+		}));
+		expect(token.status).toBe(200);
+		const tokenBody = await token.json() as { install_token: string };
+		expect(tokenBody.install_token).toMatch(/^djci_/);
 	});
 
 	it("rejects bootstrap proofs for non-Apple clients", async () => {
@@ -658,7 +703,9 @@ describe("DJConnect API worker", () => {
 		expect(serialized).not.toContain("APNS_PRIVATE_KEY");
 		expect(serialized).not.toContain("APNS_TOKEN_ENCRYPTION_KEY");
 		expect(serialized).not.toContain("DJCONNECT_RELAY_SECRET");
+		expect(serialized).not.toContain("DJCONNECT_PAIRING_ISSUER_SECRET");
 		expect(serialized).not.toContain(EXAMPLE_RELAY_SECRET);
+		expect(serialized).not.toContain(EXAMPLE_PAIRING_ISSUER_SECRET);
 	});
 
 	it("protects admin registrations from anonymous and per-install auth", async () => {
@@ -810,12 +857,12 @@ async function dispatchWithHeaders(path: string, body: unknown, headers: Record<
 	return response;
 }
 
-async function hmacHeaders(body: unknown, timestamp: number): Promise<Record<string, string>> {
+async function hmacHeaders(body: unknown, timestamp: number, secret = EXAMPLE_RELAY_SECRET): Promise<Record<string, string>> {
 	const serializedBody = JSON.stringify(body);
 	const payload = `${timestamp}.${serializedBody}`;
 	const key = await crypto.subtle.importKey(
 		"raw",
-		new TextEncoder().encode(EXAMPLE_RELAY_SECRET),
+		new TextEncoder().encode(secret),
 		{ name: "HMAC", hash: "SHA-256" },
 		false,
 		["sign"],
