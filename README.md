@@ -325,7 +325,9 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 - `POST /v1/install/bootstrap-proof` is the operator/admin pairing endpoint
   that issues short-lived one-time `djcboot_...` proofs.
 - `POST /v1/install/token` is proof-only: it consumes a valid `djcboot_...`
-  proof and does not accept `DJCONNECT_RELAY_SECRET` as a fallback.
+  proof that was issued/registered by the central API and does not accept
+  `DJCONNECT_RELAY_SECRET` as a fallback. Locally generated HA or Apple client
+  proofs are rejected.
 - The Home Assistant/HACS integration provisions its per-install `djci_...`
   token automatically during setup and stores it in Home Assistant config entry
   options. Manual API URL/token controls are support-only override/rotation
