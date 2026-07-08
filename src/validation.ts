@@ -8,6 +8,11 @@ type MissingStringKey = `missing_${RequiredStringField}`;
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
 const VALID_ENVIRONMENTS = new Set(["sandbox", "production"]);
 const VALID_EVENTS = new Set(["ask_dj_response", "ask_dj_confirm"]);
+const APP_BUNDLE_CLIENT_TYPES = new Map([
+	["dev.djconnect.ios", "ios"],
+	["dev.djconnect.mac", "macos"],
+	["dev.djconnect.ios.watch", "watchos"],
+]);
 const FORBIDDEN_PAYLOAD_KEYS = new Set([
 	"prompt",
 	"raw_prompt",
@@ -59,8 +64,29 @@ export function validateBootstrapProofRequest(input: BootstrapProofRequest): voi
 }
 
 export function validatePairingBootstrapProofRequest(input: BootstrapProofRequest): void {
-	validateBootstrapProofRequest(input);
-	requireString(input.pairing_session_id, "pairing_session_id");
+	if (typeof input.ha_install_id !== "string" || input.ha_install_id.trim() === "") {
+		throw new HttpError(409, "bootstrap_proof_unavailable");
+	}
+	requireString(input.device_id, "device_id");
+	const expectedClientType = APP_BUNDLE_CLIENT_TYPES.get(input.app_bundle_id ?? "");
+	if (!expectedClientType) {
+		throw new HttpError(400, "invalid_app_bundle_id");
+	}
+	if (!VALID_CLIENT_TYPES.has(input.client_type) || input.client_type !== expectedClientType) {
+		throw new HttpError(400, "invalid_client_type");
+	}
+	if (!VALID_ENVIRONMENTS.has(input.push_environment ?? "")) {
+		throw new HttpError(400, "invalid_push_environment");
+	}
+	if (!isValidAppleClientDeviceId(input.device_id, input.client_type)) {
+		throw new HttpError(409, "bootstrap_proof_unavailable");
+	}
+	if (input.integration !== undefined && input.integration !== "djconnect_hacs") {
+		throw new HttpError(409, "bootstrap_proof_unavailable");
+	}
+	if (input.ttl_seconds !== undefined && (!Number.isInteger(input.ttl_seconds) || input.ttl_seconds < 60 || input.ttl_seconds > 600)) {
+		throw new HttpError(400, "invalid_ttl_seconds");
+	}
 }
 
 export function validateRotateInstallToken(input: RotateInstallTokenRequest): void {
@@ -186,4 +212,8 @@ function requireString(value: unknown, field: RequiredStringField): void {
 	if (typeof value !== "string" || value.trim() === "") {
 		throw new HttpError(400, `missing_${field}` satisfies MissingStringKey);
 	}
+}
+
+function isValidAppleClientDeviceId(value: string, clientType: string): boolean {
+	return new RegExp(`^djconnect-${clientType}-[A-Za-z0-9_-]{8,128}$`).test(value);
 }

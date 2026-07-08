@@ -68,10 +68,11 @@ Public Home Assistant/HACS installations must not receive that bootstrap
 secret.
 
 `POST /v1/pairing/bootstrap-proof` is the trusted Apple pairing issuer
-endpoint. It requires `DJCONNECT_PAIRING_ISSUER_SECRET`, a
-`pairing_session_id`, and returns a central-issued one-time proof for the Apple
-client to pass to HA during push registration. Apple clients and HA/HACS must
-not receive the pairing issuer secret.
+endpoint. It does not require Apple apps to embed backend secrets; it validates
+known DJConnect Apple bundle IDs, matching client types, push environment and
+stable Apple client device IDs, then returns a central-issued one-time proof for
+the Apple client to pass to HA during push registration. Apple clients and
+HA/HACS must not receive relay, pairing issuer or APNs provider secrets.
 
 `POST /v1/install/token` is proof-only. It consumes a valid `djcboot_...` proof
 previously issued/registered by the central API, bound to `ha_install_id`,

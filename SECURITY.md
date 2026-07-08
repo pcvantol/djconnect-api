@@ -69,8 +69,9 @@ The production auth model is:
 
 - `DJCONNECT_RELAY_SECRET` stays server/operator-side and is used only for
   trusted admin/pairing calls such as `POST /v1/install/bootstrap-proof`.
-- `DJCONNECT_PAIRING_ISSUER_SECRET` stays in the trusted pairing issuer
-  environment and is used only for `POST /v1/pairing/bootstrap-proof`.
+- `POST /v1/pairing/bootstrap-proof` is client-safe for Apple apps and does
+  not require embedded relay, pairing issuer, APNs provider or backend tokens.
+  It issues proofs only after validating known DJConnect Apple app metadata.
 - Each Home Assistant installation receives its own `djci_...` install token.
   The HACS integration provisions this automatically during setup; users do not
   normally paste tokens manually. `POST /v1/install/token` requires a

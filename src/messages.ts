@@ -8,6 +8,7 @@ export const DEFAULT_LANGUAGE: SupportedLanguage = "en";
 export type ApiMessageKey =
 	| "admin_auth_required"
 	| "auth_required"
+	| "bootstrap_proof_unavailable"
 	| "bootstrap_proof_expired"
 	| "bootstrap_proof_used"
 	| "bootstrap_rate_limited"
@@ -16,6 +17,7 @@ export type ApiMessageKey =
 	| "install_token_scope_mismatch"
 	| "internal_error"
 	| "invalid_apns_environment"
+	| "invalid_app_bundle_id"
 	| "invalid_bootstrap_proof"
 	| "invalid_client_type"
 	| "invalid_disabled"
@@ -23,6 +25,7 @@ export type ApiMessageKey =
 	| "invalid_ha_user_hash"
 	| "invalid_invalid"
 	| "invalid_json"
+	| "invalid_push_environment"
 	| "invalid_label"
 	| "invalid_pagination"
 	| "invalid_reason"
@@ -51,6 +54,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 	en: {
 		admin_auth_required: "Operator authorization is required.",
 		auth_required: "Authorization is required.",
+		bootstrap_proof_unavailable: "A bootstrap proof is not available for this pairing context.",
 		bootstrap_proof_expired: "The bootstrap proof has expired.",
 		bootstrap_proof_used: "The bootstrap proof was already used.",
 		bootstrap_rate_limited: "Too many bootstrap attempts. Try again later.",
@@ -59,6 +63,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		install_token_scope_mismatch: "The install token does not match this install.",
 		internal_error: "The request could not be completed.",
 		invalid_apns_environment: "The APNs environment is invalid.",
+		invalid_app_bundle_id: "The app bundle ID is invalid.",
 		invalid_bootstrap_proof: "The bootstrap proof is invalid.",
 		invalid_client_type: "The client type is invalid.",
 		invalid_disabled: "The disabled filter is invalid.",
@@ -66,6 +71,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		invalid_ha_user_hash: "The user hash is invalid.",
 		invalid_invalid: "The invalid filter is invalid.",
 		invalid_json: "The request body must be valid JSON.",
+		invalid_push_environment: "The push environment is invalid.",
 		invalid_label: "The label is invalid.",
 		invalid_pagination: "The pagination parameters are invalid.",
 		invalid_reason: "The revoke reason is invalid.",
@@ -89,6 +95,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 	nl: {
 		admin_auth_required: "Operatorautorisatie is vereist.",
 		auth_required: "Autorisatie is vereist.",
+		bootstrap_proof_unavailable: "Er is geen bootstrapbewijs beschikbaar voor deze koppelcontext.",
 		bootstrap_proof_expired: "Het bootstrapbewijs is verlopen.",
 		bootstrap_proof_used: "Het bootstrapbewijs is al gebruikt.",
 		bootstrap_rate_limited: "Te veel bootstrappogingen. Probeer het later opnieuw.",
@@ -97,6 +104,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		install_token_scope_mismatch: "Het installatietoken hoort niet bij deze installatie.",
 		internal_error: "Het verzoek kon niet worden voltooid.",
 		invalid_apns_environment: "De APNs-omgeving is ongeldig.",
+		invalid_app_bundle_id: "De app bundle-ID is ongeldig.",
 		invalid_bootstrap_proof: "Het bootstrapbewijs is ongeldig.",
 		invalid_client_type: "Het clienttype is ongeldig.",
 		invalid_disabled: "Het disabled-filter is ongeldig.",
@@ -104,6 +112,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		invalid_ha_user_hash: "De gebruikershash is ongeldig.",
 		invalid_invalid: "Het invalid-filter is ongeldig.",
 		invalid_json: "De request body moet geldige JSON zijn.",
+		invalid_push_environment: "De pushomgeving is ongeldig.",
 		invalid_label: "Het label is ongeldig.",
 		invalid_pagination: "De paginaparameters zijn ongeldig.",
 		invalid_reason: "De intrekkingsreden is ongeldig.",
@@ -127,6 +136,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 	de: {
 		admin_auth_required: "Operatorautorisierung ist erforderlich.",
 		auth_required: "Autorisierung ist erforderlich.",
+		bootstrap_proof_unavailable: "Für diesen Pairing-Kontext ist kein Bootstrap-Nachweis verfügbar.",
 		bootstrap_proof_expired: "Der Bootstrap-Nachweis ist abgelaufen.",
 		bootstrap_proof_used: "Der Bootstrap-Nachweis wurde bereits verwendet.",
 		bootstrap_rate_limited: "Zu viele Bootstrap-Versuche. Bitte versuche es später erneut.",
@@ -135,6 +145,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		install_token_scope_mismatch: "Das Installationstoken passt nicht zu dieser Installation.",
 		internal_error: "Die Anfrage konnte nicht abgeschlossen werden.",
 		invalid_apns_environment: "Die APNs-Umgebung ist ungültig.",
+		invalid_app_bundle_id: "Die App-Bundle-ID ist ungültig.",
 		invalid_bootstrap_proof: "Der Bootstrap-Nachweis ist ungültig.",
 		invalid_client_type: "Der Clienttyp ist ungültig.",
 		invalid_disabled: "Der disabled-Filter ist ungültig.",
@@ -142,6 +153,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		invalid_ha_user_hash: "Der Benutzerhash ist ungültig.",
 		invalid_invalid: "Der invalid-Filter ist ungültig.",
 		invalid_json: "Der Request Body muss gültiges JSON sein.",
+		invalid_push_environment: "Die Push-Umgebung ist ungültig.",
 		invalid_label: "Das Label ist ungültig.",
 		invalid_pagination: "Die Paginierungsparameter sind ungültig.",
 		invalid_reason: "Der Widerrufsgrund ist ungültig.",
@@ -165,6 +177,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 	fr: {
 		admin_auth_required: "L'autorisation opérateur est requise.",
 		auth_required: "Une autorisation est requise.",
+		bootstrap_proof_unavailable: "Aucune preuve de démarrage n'est disponible pour ce contexte de jumelage.",
 		bootstrap_proof_expired: "La preuve de démarrage a expiré.",
 		bootstrap_proof_used: "La preuve de démarrage a déjà été utilisée.",
 		bootstrap_rate_limited: "Trop de tentatives de démarrage. Réessayez plus tard.",
@@ -173,6 +186,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		install_token_scope_mismatch: "Le jeton d'installation ne correspond pas à cette installation.",
 		internal_error: "La requête n'a pas pu être terminée.",
 		invalid_apns_environment: "L'environnement APNs est invalide.",
+		invalid_app_bundle_id: "L'ID de bundle de l'app est invalide.",
 		invalid_bootstrap_proof: "La preuve de démarrage est invalide.",
 		invalid_client_type: "Le type de client est invalide.",
 		invalid_disabled: "Le filtre disabled est invalide.",
@@ -180,6 +194,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		invalid_ha_user_hash: "Le hash utilisateur est invalide.",
 		invalid_invalid: "Le filtre invalid est invalide.",
 		invalid_json: "Le corps de la requête doit être du JSON valide.",
+		invalid_push_environment: "L'environnement push est invalide.",
 		invalid_label: "Le libellé est invalide.",
 		invalid_pagination: "Les paramètres de pagination sont invalides.",
 		invalid_reason: "Le motif de révocation est invalide.",
@@ -203,6 +218,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 	es: {
 		admin_auth_required: "Se requiere autorización de operador.",
 		auth_required: "Se requiere autorización.",
+		bootstrap_proof_unavailable: "No hay una prueba de arranque disponible para este contexto de emparejamiento.",
 		bootstrap_proof_expired: "La prueba de arranque ha caducado.",
 		bootstrap_proof_used: "La prueba de arranque ya se usó.",
 		bootstrap_rate_limited: "Demasiados intentos de arranque. Inténtalo de nuevo más tarde.",
@@ -211,6 +227,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		install_token_scope_mismatch: "El token de instalación no coincide con esta instalación.",
 		internal_error: "No se pudo completar la solicitud.",
 		invalid_apns_environment: "El entorno APNs no es válido.",
+		invalid_app_bundle_id: "El ID de paquete de la app no es válido.",
 		invalid_bootstrap_proof: "La prueba de arranque no es válida.",
 		invalid_client_type: "El tipo de cliente no es válido.",
 		invalid_disabled: "El filtro disabled no es válido.",
@@ -218,6 +235,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		invalid_ha_user_hash: "El hash de usuario no es válido.",
 		invalid_invalid: "El filtro invalid no es válido.",
 		invalid_json: "El cuerpo de la solicitud debe ser JSON válido.",
+		invalid_push_environment: "El entorno push no es válido.",
 		invalid_label: "La etiqueta no es válida.",
 		invalid_pagination: "Los parámetros de paginación no son válidos.",
 		invalid_reason: "El motivo de revocación no es válido.",

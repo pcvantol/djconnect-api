@@ -102,10 +102,10 @@ bootstrap proofs.
 ## POST /v1/pairing/bootstrap-proof
 
 Issues a short-lived, one-time bootstrap proof for the Apple client pairing
-issuer flow. This endpoint is not public bootstrap: it requires a trusted
-pairing issuer secret through bearer auth or HMAC signature using
-`DJCONNECT_PAIRING_ISSUER_SECRET`. Apple clients and HA/HACS must not contain
-this secret.
+issuer flow. This endpoint is client-safe: Apple clients do not include
+`DJCONNECT_PAIRING_ISSUER_SECRET`, `DJCONNECT_RELAY_SECRET`, APNs provider keys
+or backend tokens. The API validates known DJConnect Apple app metadata and
+returns privacy-safe errors when a proof is unavailable.
 
 Request:
 
@@ -117,7 +117,8 @@ Request:
   "client_type": "macos",
   "device_id": "djconnect-macos-XXXXXXXXXXXX",
   "pairing_session_id": "example-pairing-session",
-  "ttl_seconds": 600
+  "app_bundle_id": "dev.djconnect.mac",
+  "push_environment": "production"
 }
 ```
 
@@ -132,9 +133,10 @@ Response:
 }
 ```
 
-The pairing issuer must only call this endpoint after validating the pairing
-session. The API stores only the proof hash and binds the proof to
-`ha_install_id`, `client_type`, `device_id` and `pairing_session_id`.
+The API stores only the proof hash and binds the proof to `ha_install_id`,
+`client_type`, `device_id` and optional `pairing_session_id`. The request must
+use a known app bundle ID, a matching Apple client type, `sandbox` or
+`production` push environment, and a stable DJConnect Apple device ID.
 
 ## POST /v1/install/token
 

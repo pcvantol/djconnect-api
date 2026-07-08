@@ -31,12 +31,14 @@ export interface InstallTokenRequest {
 }
 
 export interface BootstrapProofRequest {
-	ha_install_id: string;
+	ha_install_id?: string;
 	integration?: string;
 	integration_version?: string;
 	client_type: BootstrapClientType;
 	device_id: string;
 	pairing_session_id?: string;
+	app_bundle_id?: string;
+	push_environment?: ApnsEnvironment;
 	ttl_seconds?: number;
 }
 

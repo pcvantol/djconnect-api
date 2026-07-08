@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.12 - 2026-07-08
+
+- Changed `POST /v1/pairing/bootstrap-proof` to a client-safe trusted Apple
+  issuer flow that does not require Apple apps to embed
+  `DJCONNECT_PAIRING_ISSUER_SECRET`, `DJCONNECT_RELAY_SECRET`, APNs provider
+  keys or backend tokens.
+- Added strict Apple metadata validation for known DJConnect bundle IDs,
+  matching `ios`, `macos` and `watchos` client types, `sandbox` or
+  `production` push environments and stable DJConnect Apple device IDs.
+- Kept pairing proofs short-lived, one-time-use and server-side traceable via
+  the existing D1 bootstrap proof store while returning only the raw
+  `djcboot_...` proof and expiry to the client.
+- Added privacy-safe pairing issuer errors and translations for all supported
+  API languages.
+
 ## 1.0.11 - 2026-07-08
 
 - Added trusted Apple pairing issuer support via

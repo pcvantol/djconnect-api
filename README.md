@@ -333,9 +333,10 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
 - `POST /v1/install/bootstrap-proof` is the operator/admin pairing endpoint
   that issues short-lived one-time `djcboot_...` proofs.
 - `POST /v1/pairing/bootstrap-proof` is the trusted Apple pairing issuer
-  endpoint. It requires `DJCONNECT_PAIRING_ISSUER_SECRET`, requires a
-  `pairing_session_id`, and returns a one-time proof without exposing the proof
-  hash. It is not a public unauthenticated bootstrap endpoint.
+  endpoint. It does not require Apple apps to embed backend secrets; instead it
+  validates known DJConnect Apple bundle IDs, matching client types, push
+  environment and stable Apple client device IDs before returning a one-time
+  proof without exposing the proof hash.
 - `POST /v1/install/token` is proof-only: it consumes a valid `djcboot_...`
   proof that was issued/registered by the central API and does not accept
   `DJCONNECT_RELAY_SECRET` as a fallback. Locally generated HA or Apple client

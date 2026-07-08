@@ -125,30 +125,17 @@ describe("DJConnect API worker", () => {
 		expect(await staleResponse.json()).toEqual({ error: "auth_required" });
 	});
 
-	it("issues pairing bootstrap proofs only for trusted pairing issuers", async () => {
+	it("issues client-safe pairing bootstrap proofs for trusted Apple app metadata", async () => {
 		const payload = bootstrapProofPayload({
 			client_type: "macos",
 			device_id: "djconnect-macos-XXXXXXXXXXXX",
 			integration_version: "3.2.37",
 			pairing_session_id: "example-pairing-session",
+			app_bundle_id: "dev.djconnect.mac",
+			push_environment: "production",
 		});
 
-		const relaySecret = await dispatch("/v1/pairing/bootstrap-proof", payload, AUTH);
-		expect(relaySecret.status).toBe(401);
-		expect(await relaySecret.json()).toEqual({ error: "auth_required" });
-
-		const missingPairingSession = await dispatch("/v1/pairing/bootstrap-proof", {
-			...payload,
-			pairing_session_id: undefined,
-		}, PAIRING_AUTH);
-		expect(missingPairingSession.status).toBe(400);
-		expect(await missingPairingSession.json()).toEqual({ error: "missing_pairing_session_id" });
-
-		const response = await dispatchWithHeaders(
-			"/v1/pairing/bootstrap-proof",
-			payload,
-			await hmacHeaders(payload, Math.floor(Date.now() / 1000), EXAMPLE_PAIRING_ISSUER_SECRET),
-		);
+		const response = await dispatch("/v1/pairing/bootstrap-proof", payload);
 		expect(response.status).toBe(200);
 		const body = await response.json() as { ok: boolean; success: boolean; bootstrap_proof: string; proof_hash?: string; expires_at: string };
 		expect(body.ok).toBe(true);
@@ -156,6 +143,7 @@ describe("DJConnect API worker", () => {
 		expect(body.bootstrap_proof).toMatch(/^djcboot_/);
 		expect(body.proof_hash).toBeUndefined();
 		expect(Date.parse(body.expires_at)).toBeGreaterThan(Date.now());
+		expect(Date.parse(body.expires_at)).toBeLessThanOrEqual(Date.now() + 5 * 60 * 1000 + 2000);
 
 		const token = await dispatch("/v1/install/token", installTokenPayload({
 			bootstrap_proof: body.bootstrap_proof,
@@ -165,6 +153,49 @@ describe("DJConnect API worker", () => {
 		expect(token.status).toBe(200);
 		const tokenBody = await token.json() as { install_token: string };
 		expect(tokenBody.install_token).toMatch(/^djci_/);
+	});
+
+	it("rejects unsafe Apple pairing bootstrap metadata without requiring app secrets", async () => {
+		const payload = bootstrapProofPayload({
+			device_id: "djconnect-ios-XXXXXXXXXXXX",
+			app_bundle_id: "dev.djconnect.ios",
+			push_environment: "sandbox",
+		});
+
+		const missingInstall = await dispatch("/v1/pairing/bootstrap-proof", {
+			...payload,
+			ha_install_id: undefined,
+		});
+		expect(missingInstall.status).toBe(409);
+		expect(await missingInstall.json()).toEqual({ error: "bootstrap_proof_unavailable" });
+
+		const wrongBundle = await dispatch("/v1/pairing/bootstrap-proof", {
+			...payload,
+			app_bundle_id: "dev.djconnect.unknown",
+		});
+		expect(wrongBundle.status).toBe(400);
+		expect(await wrongBundle.json()).toEqual({ error: "invalid_app_bundle_id" });
+
+		const mismatchedClient = await dispatch("/v1/pairing/bootstrap-proof", {
+			...payload,
+			client_type: "macos",
+		});
+		expect(mismatchedClient.status).toBe(400);
+		expect(await mismatchedClient.json()).toEqual({ error: "invalid_client_type" });
+
+		const wrongEnvironment = await dispatch("/v1/pairing/bootstrap-proof", {
+			...payload,
+			push_environment: "development",
+		});
+		expect(wrongEnvironment.status).toBe(400);
+		expect(await wrongEnvironment.json()).toEqual({ error: "invalid_push_environment" });
+
+		const wrongDeviceId = await dispatch("/v1/pairing/bootstrap-proof", {
+			...payload,
+			device_id: "example-device",
+		});
+		expect(wrongDeviceId.status).toBe(409);
+		expect(await wrongDeviceId.json()).toEqual({ error: "bootstrap_proof_unavailable" });
 	});
 
 	it("rejects bootstrap proofs for non-Apple clients", async () => {
@@ -921,6 +952,8 @@ function bootstrapProofPayload(overrides: Partial<{
 	client_type: "ios" | "macos" | "watchos";
 	device_id: string;
 	pairing_session_id: string;
+	app_bundle_id: string;
+	push_environment: string;
 	ttl_seconds: number;
 }> = {}) {
 	return {
@@ -930,6 +963,8 @@ function bootstrapProofPayload(overrides: Partial<{
 		client_type: "ios",
 		device_id: "example-device",
 		pairing_session_id: "example-pairing-session",
+		app_bundle_id: "dev.djconnect.ios",
+		push_environment: "sandbox",
 		...overrides,
 	};
 }
