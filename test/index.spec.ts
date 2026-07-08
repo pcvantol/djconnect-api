@@ -169,6 +169,13 @@ describe("DJConnect API worker", () => {
 		expect(missingInstall.status).toBe(409);
 		expect(await missingInstall.json()).toEqual({ error: "bootstrap_proof_unavailable" });
 
+		const missingPairingSession = await dispatch("/v1/pairing/bootstrap-proof", {
+			...payload,
+			pairing_session_id: undefined,
+		});
+		expect(missingPairingSession.status).toBe(400);
+		expect(await missingPairingSession.json()).toEqual({ error: "missing_pairing_session_id" });
+
 		const wrongBundle = await dispatch("/v1/pairing/bootstrap-proof", {
 			...payload,
 			app_bundle_id: "dev.djconnect.unknown",

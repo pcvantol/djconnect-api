@@ -134,9 +134,10 @@ Response:
 ```
 
 The API stores only the proof hash and binds the proof to `ha_install_id`,
-`client_type`, `device_id` and optional `pairing_session_id`. The request must
-use a known app bundle ID, a matching Apple client type, `sandbox` or
-`production` push environment, and a stable DJConnect Apple device ID.
+`client_type`, `device_id` and `pairing_session_id`. The request must use a
+known app bundle ID, a matching Apple client type, a non-empty
+`pairing_session_id`, `sandbox` or `production` push environment, and a stable
+DJConnect Apple device ID.
 
 ## POST /v1/install/token
 

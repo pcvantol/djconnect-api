@@ -4,7 +4,7 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
-Current release: `1.0.11`.
+Current release: `1.0.12`.
 
 ## Cloudflare Setup
 
@@ -201,7 +201,7 @@ environment-specific Wrangler configuration when added.
   `DJCONNECT_RELAY_SECRET`, `DJCONNECT_PAIRING_ISSUER_SECRET` and
   `APNS_TOKEN_ENCRYPTION_KEY`.
 - GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
-- The latest release is `v1.0.11`.
+- The latest release is `v1.0.12`.
 
 ## Development
 

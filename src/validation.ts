@@ -68,6 +68,7 @@ export function validatePairingBootstrapProofRequest(input: BootstrapProofReques
 		throw new HttpError(409, "bootstrap_proof_unavailable");
 	}
 	requireString(input.device_id, "device_id");
+	requireString(input.pairing_session_id, "pairing_session_id");
 	const expectedClientType = APP_BUNDLE_CLIENT_TYPES.get(input.app_bundle_id ?? "");
 	if (!expectedClientType) {
 		throw new HttpError(400, "invalid_app_bundle_id");
