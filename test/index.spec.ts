@@ -374,6 +374,110 @@ describe("DJConnect API worker", () => {
 		expect(await response.json()).toEqual({ error: "unsafe_payload" });
 	});
 
+	it("runs a privacy-safe E2E contract smoke flow", async () => {
+		testEnv.DJCONNECT_SMOKE_TEST_MODE = "enabled";
+		const health = await dispatchGet("/health");
+		expect(health.status).toBe(200);
+		expect(await health.json()).toEqual({ ok: true, service: "djconnect-api" });
+
+		const proof = await issueBootstrapProof({
+			ha_install_id: "example-smoke-install",
+			device_id: "example-smoke-device",
+			pairing_session_id: "example-smoke-pairing",
+			ttl_seconds: 600,
+		});
+		const tokenResponse = await dispatch("/v1/install/token", installTokenPayload({
+			ha_install_id: "example-smoke-install",
+			device_id: "example-smoke-device",
+			label: "example-smoke",
+			integration_version: "example-ci",
+			bootstrap_proof: proof,
+		}));
+		expect(tokenResponse.status).toBe(200);
+		const tokenBody = await tokenResponse.json() as { install_token: string };
+		expect(tokenBody.install_token).toMatch(/^djci_/);
+
+		const reusedProof = await dispatch("/v1/install/token", installTokenPayload({
+			ha_install_id: "example-smoke-install",
+			device_id: "example-smoke-device",
+			bootstrap_proof: proof,
+		}));
+		expect(reusedProof.status).toBe(409);
+		expect(await reusedProof.json()).toEqual({ error: "bootstrap_proof_used" });
+
+		const unauthRegister = await dispatch("/v1/push/register", registerPayload({
+			ha_install_id: "example-smoke-install",
+			device_id: "example-smoke-device",
+			apns_token: "example-smoke-apns-token",
+		}));
+		expect(unauthRegister.status).toBe(401);
+
+		const installAuth = `Bearer ${tokenBody.install_token}`;
+		const register = await dispatch("/v1/push/register", registerPayload({
+			ha_install_id: "example-smoke-install",
+			device_id: "example-smoke-device",
+			apns_token: "example-smoke-apns-token",
+			app_version: "example-ci",
+			locale: "en-US",
+		}), installAuth);
+		expect(register.status).toBe(200);
+
+		const fetchMock = vi.spyOn(globalThis, "fetch");
+		const event = await dispatch("/v1/push/event", {
+			ha_install_id: "example-smoke-install",
+			ha_user_hash: "example-user-hash",
+			event_type: "ask_dj_response",
+			history_revision: "example-smoke-revision",
+			client_message_id: "example-smoke-message",
+			open_target: "history",
+			client_types: ["ios"],
+			announcement: {
+				delivery: "both",
+				audio_available: true,
+				speaker_delivery: "attempted",
+				audio_url: "https://example.invalid/audio.mp3",
+				text: "example full announcement text",
+				prompt: "example raw prompt",
+				history: ["example history"],
+				token: "example-token",
+				target: { entity_id: "media_player.example" },
+			},
+		}, installAuth);
+		expect(event.status).toBe(200);
+		expect(await event.json()).toMatchObject({ ok: true, matched: 1, delivered: 1, failed: 0 });
+		expect(fetchMock).not.toHaveBeenCalled();
+
+		const payload = buildApnsPayload({
+			event_type: "ask_dj_response",
+			announcement: {
+				delivery: "both",
+				audio_available: true,
+				speaker_delivery: "attempted",
+				audio_url: "https://example.invalid/audio.mp3",
+				text: "example full announcement text",
+				prompt: "example raw prompt",
+				history: ["example history"],
+				token: "example-token",
+				target: { entity_id: "media_player.example" },
+			} as never,
+		});
+		const serializedPayload = JSON.stringify(payload);
+		expect(payload.announcement).toEqual({
+			delivery: "both",
+			audio_available: true,
+			speaker_delivery: "attempted",
+		});
+		expect(serializedPayload).not.toMatch(/audio\.mp3|full announcement|raw prompt|example history|example-token|media_player/i);
+
+		const unregister = await dispatch("/v1/push/unregister", {
+			ha_install_id: "example-smoke-install",
+			device_id: "example-smoke-device",
+			client_type: "ios",
+			apns_token: "example-smoke-apns-token",
+		}, installAuth);
+		expect(unregister.status).toBe(200);
+	});
+
 	it("builds an APNs payload without prompts, responses, or secrets", () => {
 		const payload = buildApnsPayload({
 			event_type: "ask_dj_response",

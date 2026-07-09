@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.14 - 2026-07-09
+
+- Added a CI-friendly local E2E contract smoke test for the central API flow:
+  `/health`, bootstrap proof issuance, proof-to-install-token exchange, push
+  register, push event, proof reuse rejection, auth-required push routes,
+  privacy-safe announcement sanitization and unregister cleanup.
+- Hardened the staging-safe smoke script with health validation, negative auth
+  checks, proof one-time-use coverage, cleanup, redacted failure output and
+  example-only smoke payloads.
+- Added a conditional GitHub Actions staging smoke job that runs only when
+  `DJCONNECT_RELAY_SECRET` is available and maps it to
+  `DJCONNECT_RELAY_SECRET_VALUE` without logging secret values.
+- Documented local contract testing, staging smoke execution and privacy-safe
+  example payload constraints.
+
 ## 1.0.13 - 2026-07-09
 
 - Added optional privacy-safe Ask DJ `announcement` push hints for

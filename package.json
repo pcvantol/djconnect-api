@@ -1,6 +1,6 @@
 {
   "name": "djconnect-api",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
@@ -8,6 +8,8 @@
     "deps:report": "node scripts/deps_report.mjs",
     "start": "wrangler dev",
     "test": "vitest",
+    "test:e2e": "vitest run test/index.spec.ts -t \"privacy-safe E2E contract smoke flow\"",
+    "test:smoke": "scripts/smoke_e2e.sh",
     "cf-typegen": "wrangler types",
     "postman:test": "npx --yes newman run postman/djconnect-api.postman_collection.json --env-var baseUrl=https://api.djconnect.dev --bail",
     "smoke:e2e": "scripts/smoke_e2e.sh",

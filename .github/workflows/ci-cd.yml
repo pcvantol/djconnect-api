@@ -54,6 +54,9 @@ jobs:
       - name: Test
         run: npm test -- --run
 
+      - name: Local E2E contract smoke
+        run: npm run test:e2e
+
       - name: Postman contract smoke test
         run: npm run postman:test
 
@@ -102,6 +105,40 @@ jobs:
 
       - name: Health smoke test
         run: curl -fsS https://api.djconnect.dev/health
+
+  staging-smoke:
+    name: Staging-safe smoke E2E
+    needs:
+      - validate
+      - deploy
+    if: always() && needs.validate.result == 'success' && (needs.deploy.result == 'success' || needs.deploy.result == 'skipped') && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HAS_DJCONNECT_RELAY_SECRET: ${{ secrets.DJCONNECT_RELAY_SECRET != '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Skip staging smoke without relay secret
+        if: env.HAS_DJCONNECT_RELAY_SECRET != 'true'
+        run: echo "Skipping staging-safe smoke E2E because DJCONNECT_RELAY_SECRET is not available."
+
+      - name: Run staging-safe smoke E2E
+        if: env.HAS_DJCONNECT_RELAY_SECRET == 'true'
+        run: npm run smoke:e2e
+        env:
+          DJCONNECT_RELAY_SECRET_VALUE: ${{ secrets.DJCONNECT_RELAY_SECRET }}
 
   cleanup-workflow-runs:
     name: Cleanup old workflow runs

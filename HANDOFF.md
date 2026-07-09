@@ -4,7 +4,7 @@
 
 - Repository: `pcvantol/djconnect-api`.
 - Runtime: Cloudflare Worker.
-- Current release: `1.0.12`.
+- Current release: `1.0.14`.
 - Purpose: central APNs push relay for DJConnect Apple clients.
 - Public API target: `https://api.djconnect.dev`.
 - D1 database: `djconnect_api`.
@@ -169,9 +169,17 @@ Cloudflare production setup is active:
 GitHub Actions CI/CD is configured in `.github/workflows/ci-cd.yml`:
 
 - `Validate` runs on pull requests and pushes to `main`.
+- `Validate` runs the fast Worker/Vitest suite and the focused local E2E
+  contract smoke command `npm run test:e2e`.
 - `Deploy` runs on pushes to `main` after validation.
+- `Staging-safe smoke E2E` runs on `main` pushes and manual dispatches after
+  validation/deploy, but only executes the live smoke script when GitHub
+  Actions secret `DJCONNECT_RELAY_SECRET` is available. Without the secret it
+  logs a skip message and does not call privileged endpoints.
 - GitHub secret `CLOUDFLARE_API_TOKEN` is configured with Workers deploy, D1
   migration and Workers Routes edit permissions for `djconnect.dev`.
+- GitHub secret `DJCONNECT_RELAY_SECRET` is mapped only to
+  `DJCONNECT_RELAY_SECRET_VALUE` for `scripts/smoke_e2e.sh`; do not log it.
 - The latest `main` CI/CD run is green.
 
 Manual/operator provisioning remains available with:
@@ -218,4 +226,5 @@ Before every release:
 - Build a temporary dual-key/backfill implementation before the first planned
   `APNS_TOKEN_ENCRYPTION_KEY` rotation.
 - Keep GitHub Actions `DJCONNECT_RELAY_SECRET` configured so the staging-safe
-  E2E smoke test continues to run.
+  smoke E2E job can cover proof issuance, token exchange, push register/event
+  and unregister using only `example-smoke-...` values.

@@ -61,6 +61,12 @@ GitHub Actions may contain `DJCONNECT_RELAY_SECRET` only for the staging-safe
 E2E smoke test. Do not expose it to pull requests from untrusted forks, logs, or
 non-CI tooling.
 
+CI maps that GitHub secret to the runtime environment variable
+`DJCONNECT_RELAY_SECRET_VALUE` only for `scripts/smoke_e2e.sh`. The script does
+not enable shell tracing, does not print secret values or raw token-bearing
+response bodies, and skips live staging coverage when the secret is absent.
+Local and CI contract tests use only `example-...` fixture values.
+
 ## Relay Auth
 
 Public HACS integrations must not contain a global DJConnect secret.

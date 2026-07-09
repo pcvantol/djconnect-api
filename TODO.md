@@ -34,9 +34,12 @@
 
 ## Testing
 
-- Enable the staging-safe E2E smoke test in CI by setting GitHub Actions secret
-  `DJCONNECT_RELAY_SECRET` to the same value as the Cloudflare Worker secret.
-  `DJCONNECT_SMOKE_TEST_MODE=enabled` is already required on the Worker side.
+- Keep the local E2E contract smoke command (`npm run test:e2e`) in PR
+  validation.
+- Keep the staging-safe E2E smoke test enabled in CI by setting GitHub Actions
+  secret `DJCONNECT_RELAY_SECRET` to the same value as the Cloudflare Worker
+  secret. `DJCONNECT_SMOKE_TEST_MODE=enabled` is already required on the Worker
+  side.
 
 ## Documentation
 

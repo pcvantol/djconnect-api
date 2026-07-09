@@ -4,7 +4,7 @@ Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
 
-Current release: `1.0.12`.
+Current release: `1.0.14`.
 
 ## Cloudflare Setup
 
@@ -201,16 +201,35 @@ environment-specific Wrangler configuration when added.
   `DJCONNECT_RELAY_SECRET`, `DJCONNECT_PAIRING_ISSUER_SECRET` and
   `APNS_TOKEN_ENCRYPTION_KEY`.
 - GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
-- The latest release is `v1.0.12`.
+- The latest release is `v1.0.14`.
 
 ## Development
 
 ```sh
 npm install
 npm test -- --run
+npm run test:e2e
 npx tsc --noEmit
 npm run dev
 ```
+
+`npm test -- --run` runs the fast local Worker/Vitest contract suite.
+`npm run test:e2e` runs the focused privacy-safe proof -> install token ->
+register -> push event -> unregister contract smoke flow against the local
+Worker test runtime. It uses only `example-...` install IDs, APNs tokens and
+payload values, enables Worker smoke-test mode, and does not call APNs.
+
+For staging-safe live smoke testing against `https://api.djconnect.dev`, set
+the relay secret only in the environment and run:
+
+```sh
+DJCONNECT_RELAY_SECRET_VALUE='replace-with-ci-secret' npm run smoke:e2e
+```
+
+The smoke script refuses shell tracing, redacts response bodies on failures,
+uses only `example-smoke-...` IDs/tokens and requires the deployed Worker secret
+`DJCONNECT_SMOKE_TEST_MODE=enabled` so example APNs tokens are counted without
+real APNs delivery.
 
 Deploy:
 

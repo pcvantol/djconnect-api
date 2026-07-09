@@ -27,14 +27,45 @@ require_command() {
 require_command curl
 require_command node
 
-post_json() {
-  local path="$1"
-  local body="$2"
-  local auth="${3:-}"
+response_files=()
+cleanup_response_files() {
+  if [[ "${#response_files[@]}" -gt 0 ]]; then
+    rm -f "${response_files[@]}"
+  fi
+}
+trap cleanup_response_files EXIT
+
+get_health() {
   local response_file
   local status_code
 
   response_file="$(mktemp)"
+  response_files+=("$response_file")
+  status_code="$(curl -sS -o "$response_file" -w '%{http_code}' "${API_URL}/health")"
+  if [[ "$status_code" != "200" ]]; then
+    echo "Request /health failed with HTTP ${status_code}. Response redacted." >&2
+    exit 1
+  fi
+  node -e '
+const fs=require("fs");
+const body=JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+if (body.ok !== true || body.service !== "djconnect-api") {
+  console.error("Unexpected health response shape.");
+  process.exit(1);
+}
+' "$response_file"
+}
+
+post_json() {
+  local path="$1"
+  local body="$2"
+  local auth="${3:-}"
+  local expected_status="${4:-2xx}"
+  local response_file
+  local status_code
+
+  response_file="$(mktemp)"
+  response_files+=("$response_file")
   if [[ -n "$auth" ]]; then
     status_code="$(curl -sS -o "$response_file" -w '%{http_code}' \
       -X POST "${API_URL}${path}" \
@@ -48,8 +79,13 @@ post_json() {
       --data "$body")"
   fi
 
-  if [[ "$status_code" -lt 200 || "$status_code" -ge 300 ]]; then
-    echo "Request ${path} failed with HTTP ${status_code}. Response redacted at ${response_file}." >&2
+  if [[ "$expected_status" == "2xx" ]]; then
+    if [[ "$status_code" -lt 200 || "$status_code" -ge 300 ]]; then
+      echo "Request ${path} failed with HTTP ${status_code}. Response redacted." >&2
+      exit 1
+    fi
+  elif [[ "$status_code" != "$expected_status" ]]; then
+    echo "Request ${path} returned HTTP ${status_code}; expected ${expected_status}. Response redacted." >&2
     exit 1
   fi
   printf '%s' "$response_file"
@@ -60,6 +96,9 @@ json_get() {
   local field="$2"
   node -e "const fs=require('fs'); const body=JSON.parse(fs.readFileSync(process.argv[1], 'utf8')); const value=body[process.argv[2]]; if (!value) process.exit(1); process.stdout.write(String(value));" "$file" "$field"
 }
+
+echo "Smoke E2E: checking health"
+get_health
 
 echo "Smoke E2E: issuing bootstrap proof for ${HA_INSTALL_ID}"
 proof_body="$(node -e '
@@ -76,7 +115,6 @@ process.stdout.write(JSON.stringify(body));
 ' "$HA_INSTALL_ID" "$CLIENT_TYPE" "$DEVICE_ID")"
 proof_response="$(post_json "/v1/install/bootstrap-proof" "$proof_body" "$DJCONNECT_RELAY_SECRET_VALUE")"
 bootstrap_proof="$(json_get "$proof_response" bootstrap_proof)"
-rm -f "$proof_response"
 
 echo "Smoke E2E: exchanging proof for install token"
 token_body="$(node -e '
@@ -94,8 +132,29 @@ process.stdout.write(JSON.stringify(body));
 ' "$HA_INSTALL_ID" "$CLIENT_TYPE" "$DEVICE_ID" "$bootstrap_proof")"
 token_response="$(post_json "/v1/install/token" "$token_body")"
 install_token="$(json_get "$token_response" install_token)"
-rm -f "$token_response"
+
+echo "Smoke E2E: verifying bootstrap proof is one-time"
+post_json "/v1/install/token" "$token_body" "" "409" >/dev/null
 unset bootstrap_proof
+unset token_body
+
+echo "Smoke E2E: verifying push routes require install token"
+unauth_register_body="$(node -e '
+const body = {
+  ha_install_id: process.argv[1],
+  ha_user_hash: "example-user-hash",
+  device_id: process.argv[2],
+  client_type: process.argv[3],
+  apns_token: process.argv[4],
+  apns_environment: "sandbox",
+  app_bundle_id: "dev.djconnect.ios",
+  app_version: "example-ci",
+  locale: "en-US",
+  categories: ["ask_dj"],
+};
+process.stdout.write(JSON.stringify(body));
+' "$HA_INSTALL_ID" "$DEVICE_ID" "$CLIENT_TYPE" "$APNS_TOKEN")"
+post_json "/v1/push/register" "$unauth_register_body" "" "401" >/dev/null
 
 echo "Smoke E2E: registering example Apple client"
 register_body="$(node -e '
@@ -114,7 +173,6 @@ const body = {
 process.stdout.write(JSON.stringify(body));
 ' "$HA_INSTALL_ID" "$DEVICE_ID" "$CLIENT_TYPE" "$APNS_TOKEN")"
 register_response="$(post_json "/v1/push/register" "$register_body" "$install_token")"
-rm -f "$register_response"
 
 echo "Smoke E2E: sending privacy-safe event"
 event_body="$(node -e '
@@ -126,6 +184,17 @@ const body = {
   client_message_id: "example-ci-message",
   open_target: "history",
   client_types: ["ios"],
+  announcement: {
+    delivery: "both",
+    audio_available: true,
+    speaker_delivery: "attempted",
+    audio_url: "https://example.invalid/audio.mp3",
+    text: "example full announcement text",
+    prompt: "example raw prompt",
+    history: ["example history"],
+    token: "example-token",
+    target: { entity_id: "media_player.example" },
+  },
 };
 process.stdout.write(JSON.stringify(body));
 ' "$HA_INSTALL_ID")"
@@ -138,7 +207,18 @@ if (body.matched !== 1 || body.delivered !== 1 || body.failed !== 0) {
   process.exit(1);
 }
 ' "$event_response"
-rm -f "$event_response"
+
+echo "Smoke E2E: unregistering example Apple client"
+unregister_body="$(node -e '
+const body = {
+  ha_install_id: process.argv[1],
+  device_id: process.argv[2],
+  client_type: process.argv[3],
+  apns_token: process.argv[4],
+};
+process.stdout.write(JSON.stringify(body));
+' "$HA_INSTALL_ID" "$DEVICE_ID" "$CLIENT_TYPE" "$APNS_TOKEN")"
+post_json "/v1/push/unregister" "$unregister_body" "$install_token" >/dev/null
 unset install_token
 
 echo "Smoke E2E: success"
