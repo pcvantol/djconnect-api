@@ -1,5 +1,23 @@
 # Cloudflare Workers
 
+This repository follows the canonical DJConnect design foundation in `pcvantol/djconnect`.
+
+Before product, protocol, trust, privacy, release or CI changes, consult the canonical foundation docs in the HA integration repo:
+
+- `DJCONNECT_CONSTITUTION.md`
+- `PRODUCT_VISION.md`
+- `DESIGN_PRINCIPLES.md`
+- `ARCHITECTURE_PRINCIPLES.md`
+- `DOMAIN_MODEL.md`
+- `CLIENT_CAPABILITY_MATRIX.md`
+- `PRODUCT_LANGUAGE.md`
+- `PLATFORM_GOVERNANCE.md`
+- `PLATFORM_QUALITY_STANDARD.md`
+- `SYNC_PROMPTS.md`
+- `PRODUCT_ROADMAP.md`
+
+Repo-local Cloudflare/API/security rules below remain authoritative for API-specific work.
+
 STOP. Your knowledge of Cloudflare Workers APIs and limits may be outdated. Always retrieve current documentation before any Workers, KV, R2, D1, Durable Objects, Queues, Vectorize, AI, or Agents SDK task.
 
 This repository is public/open-source safe by default. Never commit APNs `.p8`
