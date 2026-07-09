@@ -1,27 +1,11 @@
-# DJConnect API Chat Bootstrap
+# Deprecated
 
-Work in `/Users/pcvantol/Documents/GitHub/djconnect-api`.
+This file is no longer the primary bootstrap for DJConnect Codex sessions.
 
-This repository is the central Cloudflare Worker API for DJConnect APNs push relay. Treat it as public/open-source: never commit APNs private keys, relay secrets, APNs device tokens, Home Assistant tokens, Spotify tokens, production install IDs, raw prompts, raw assistant responses or chat history.
+Use `pcvantol/djconnect/BOOTSTRAP_CODEX_SESSION.md`.
 
-Cross-repo source of truth:
+Temporary release or handoff notes should live in dedicated handoff/release
+documents, not in the platform bootstrap.
 
-- `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`
-- `/Users/pcvantol/Documents/GitHub/djconnect/API_CONTRACT.md`
-
-For release or push-contract work, review this repo against the
-`DJ Announcement Output Sync` section in `SYNC_PROMPTS.md` as a QA step.
-
-Before release work:
-
-- Run `git status --short`.
-- Verify the release commit is based on `origin/main` before publishing.
-- Run `npx tsc --noEmit`.
-- Run `npm test`.
-- Review translations in all five supported languages: `en`, `nl`, `de`,
-  `fr` and `es`.
-- Run the public repository secret scan from the current release checklist.
-- Publish GitHub Release notes from only the matching `CHANGELOG.md` version
-  section.
-
-Cloudflare secrets must be set only through Cloudflare secrets/configuration, never in source, docs, tests or fixtures.
+Do not delete this file while release scripts, tests or historical references
+still mention `CHAT_BOOTSTRAP.md`.
