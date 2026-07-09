@@ -1,5 +1,18 @@
 # Cloudflare Workers
 
+## DJConnect Platform Bootstrap
+
+For a clean Codex/AI-agent session, first follow the canonical platform bootstrap:
+
+`pcvantol/djconnect/BOOTSTRAP_CODEX_SESSION.md`
+
+Then continue with the repository-specific instructions in this file.
+
+This repository extends the DJConnect Platform Foundation. It does not redefine it.
+
+This must be additive only. Existing repo-specific AGENTS guidance remains authoritative for implementation details.
+
+
 This repository follows the canonical DJConnect design foundation in `pcvantol/djconnect`.
 
 Before product, protocol, trust, privacy, release or CI changes, consult the canonical foundation docs in the HA integration repo:
