@@ -361,6 +361,14 @@ Use `--keep-workflow-runs N` to keep more completed Actions runs, or
   `/v1/install/rotate` require a per-install token scoped to the request
   `ha_install_id`.
 - APNs endpoint selection uses each registration's `apns_environment`.
+- Ask DJ response pushes may carry only compact privacy-safe announcement hints:
+  `announcement.delivery`, `announcement.audio_available` and
+  `announcement.speaker_delivery`. The relay strips unsafe announcement fields
+  such as TTS/audio URLs, DJ text, prompts, history, memory, token/secret values
+  and arbitrary nested target/entity metadata before APNs delivery.
+- APNs remains only a wake/sync/attention signal. Clients must fetch the
+  canonical Ask DJ response from Home Assistant after push; push is never the
+  source of truth for announcement text or audio.
 - Invalid APNs tokens (`BadDeviceToken`, `Unregistered`, or HTTP 410) are marked disabled and invalid.
 - Audit rows intentionally avoid prompts, responses, tokens, chat history, and secrets.
 - Diagnostics rows intentionally store only method, normalized route, status,

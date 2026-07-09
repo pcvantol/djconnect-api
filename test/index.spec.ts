@@ -475,6 +475,140 @@ describe("DJConnect API worker", () => {
 		}
 	});
 
+	it("accepts and forwards safe Ask DJ announcement push hints", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth);
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const response = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+			history_revision: 123,
+			client_message_id: "client-1",
+			open_target: "ask_dj",
+			announcement: {
+				delivery: "both",
+				audio_available: true,
+				speaker_delivery: "attempted",
+			},
+		}, installAuth);
+
+		expect(response.status).toBe(200);
+		const payload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as Record<string, unknown>;
+		expect(payload.announcement).toEqual({
+			delivery: "both",
+			audio_available: true,
+			speaker_delivery: "attempted",
+		});
+		expect(payload).toMatchObject({
+			event_type: "ask_dj_response",
+			history_revision: "123",
+			client_message_id: "client-1",
+			open_target: "ask_dj",
+		});
+	});
+
+	it("strips unsafe announcement fields before APNs delivery", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth);
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const response = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+			announcement: {
+				delivery: "client_device",
+				audio_available: true,
+				speaker_delivery: "none",
+				audio_url: "https://example.invalid/tts.mp3",
+				text: "full DJ announcement text",
+				prompt: "play something private",
+				history: [{ role: "assistant", message: "private" }],
+				token: "example-token",
+				target: { entity_id: "media_player.private_room" },
+			},
+		}, installAuth);
+
+		expect(response.status).toBe(200);
+		const payloadText = String(fetchMock.mock.calls[0]?.[1]?.body);
+		expect(payloadText).not.toMatch(/audio_url|full DJ announcement|play something private|history|example-token|media_player/i);
+		expect(JSON.parse(payloadText).announcement).toEqual({
+			delivery: "client_device",
+			audio_available: true,
+			speaker_delivery: "none",
+		});
+	});
+
+	it("drops invalid announcement enum values safely", async () => {
+		const payload = buildApnsPayload({
+			event_type: "ask_dj_response",
+			announcement: {
+				delivery: "invalid" as never,
+				audio_available: true,
+				speaker_delivery: "attempted",
+			},
+		});
+		expect(payload.announcement).toEqual({
+			audio_available: true,
+			speaker_delivery: "attempted",
+		});
+
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth);
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const response = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+			announcement: {
+				delivery: "announce_everywhere",
+				audio_available: true,
+				speaker_delivery: "loudly",
+			},
+		}, installAuth);
+
+		expect(response.status).toBe(200);
+		const delivered = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as { announcement?: unknown };
+		expect(delivered.announcement).toEqual({ audio_available: true });
+	});
+
+	it("keeps APNs alert body generic even when unsafe DJ text is present in announcement", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth);
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const response = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+			announcement: {
+				delivery: "both",
+				text: "Here is the full DJ answer",
+			},
+		}, installAuth);
+
+		expect(response.status).toBe(200);
+		const payload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as { aps: { alert: { body: string } } };
+		expect(payload.aps.alert.body).toBe("Ask DJ heeft geantwoord.");
+		expect(JSON.stringify(payload)).not.toContain("Here is the full DJ answer");
+	});
+
+	it("continues to deliver push events without announcement hints", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		await registerDevice(installAuth);
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+
+		const response = await dispatch("/v1/push/event", {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+		}, installAuth);
+		const body = await response.json() as { matched: number; delivered: number; failed: number };
+
+		expect(response.status).toBe(200);
+		expect(body).toMatchObject({ matched: 1, delivered: 1, failed: 0 });
+		const payload = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as { announcement?: unknown };
+		expect(payload.announcement).toBeUndefined();
+	});
+
 	it("rejects non-Ask-DJ APNs push events", async () => {
 		const installAuth = await issueInstallAuth("example-ha-install");
 		const response = await dispatch("/v1/push/event", {

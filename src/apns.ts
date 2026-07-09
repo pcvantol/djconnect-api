@@ -1,6 +1,7 @@
 import { base64Url, decryptSecret } from "./crypto";
 import { notificationText, resolveSupportedLanguage, type SupportedLanguage } from "./messages";
-import type { ApnsEnvironment, ApnsResult, AppEnv, EventType, Registration } from "./types";
+import type { AnnouncementHint, ApnsEnvironment, ApnsResult, AppEnv, EventType, Registration } from "./types";
+import { sanitizeAnnouncementHint } from "./validation";
 
 export type Fetcher = typeof fetch;
 
@@ -20,8 +21,10 @@ export function buildApnsPayload(input: {
 	open_target?: string;
 	locale?: string | null;
 	language?: SupportedLanguage;
+	announcement?: AnnouncementHint;
 }): Record<string, unknown> {
 	const alert = notificationText(input.event_type, input.language ?? resolveSupportedLanguage(input.locale));
+	const announcement = sanitizeAnnouncementHint(input.announcement);
 	return {
 		aps: {
 			alert,
@@ -33,6 +36,7 @@ export function buildApnsPayload(input: {
 		history_revision: input.history_revision == null ? undefined : String(input.history_revision),
 		client_message_id: input.client_message_id,
 		open_target: input.open_target ?? "ask_dj",
+		announcement,
 	};
 }
 

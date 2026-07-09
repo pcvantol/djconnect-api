@@ -2,6 +2,14 @@ export type ClientType = "ios" | "macos" | "watchos";
 export type BootstrapClientType = ClientType;
 export type ApnsEnvironment = "sandbox" | "production";
 export type EventType = "ask_dj_response" | "ask_dj_confirm";
+export type AnnouncementDelivery = "client_device" | "both" | "ha_speaker" | "text_only";
+export type AnnouncementSpeakerDelivery = "attempted" | "none";
+
+export interface AnnouncementHint {
+	delivery?: AnnouncementDelivery;
+	audio_available?: boolean;
+	speaker_delivery?: AnnouncementSpeakerDelivery;
+}
 
 export interface AppEnv {
 	DB: D1Database;
@@ -80,6 +88,7 @@ export interface PushEventRequest {
 	client_message_id?: string;
 	open_target?: "ask_dj" | "history" | "playback";
 	client_types?: ClientType[];
+	announcement?: AnnouncementHint;
 }
 
 export interface AdminRegistrationsQuery {

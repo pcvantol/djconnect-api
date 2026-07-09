@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.13 - 2026-07-09
+
+- Added optional privacy-safe Ask DJ `announcement` push hints for
+  `POST /v1/push/event`.
+- Sanitized announcement metadata so APNs may receive only compact
+  `delivery`, `audio_available` and `speaker_delivery` fields.
+- Stripped unsafe announcement fields such as TTS/audio URLs, DJ text, prompts,
+  history, memory, token/secret values and nested target/entity metadata before
+  APNs delivery.
+- Kept APNs alert copy generic and localized by event type while preserving the
+  existing wake/sync-only push policy.
+- Updated API documentation and tests for safe forwarding, unsafe-field
+  stripping, invalid enum handling and backwards compatibility without
+  announcement hints.
+
 ## 1.0.12 - 2026-07-08
 
 - Changed `POST /v1/pairing/bootstrap-proof` to a client-safe trusted Apple

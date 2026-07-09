@@ -330,6 +330,11 @@ Request:
   "history_revision": "42",
   "client_message_id": "example-client-message",
   "open_target": "history",
+  "announcement": {
+    "delivery": "both",
+    "audio_available": true,
+    "speaker_delivery": "attempted"
+  },
   "client_types": ["ios", "watchos"]
 }
 ```
@@ -349,6 +354,22 @@ Supported languages are `en`, `nl`, `de`, `fr` and `es`; unsupported locales
 fall back to English. APNs payload keys, event values and `open_target` values
 are protocol fields and are never localized.
 
+`ask_dj_response` may include an optional privacy-safe `announcement` hint.
+Only these compact metadata fields are accepted and forwarded to APNs:
+
+- `delivery`: `client_device`, `both`, `ha_speaker` or `text_only`.
+- `audio_available`: boolean.
+- `speaker_delivery`: `attempted` or `none`.
+
+Invalid announcement enum values and any other announcement keys are stripped.
+Forbidden fields such as `audio_url`, `text`, `dj_text`, `message`, `prompt`,
+`history`, `memory`, `raw_audio`, token/secret/authorization values and nested
+target/entity metadata are never stored, logged, returned or included in APNs
+payloads. APNs remains a wake/sync/attention signal only: it must not carry TTS
+audio, temporary audio URLs, full DJ text, prompts, Ask DJ history or Music DNA.
+Clients must sync the canonical Ask DJ response over HTTP, websocket or history
+after receiving push before deciding any local announcement autoplay behavior.
+
 Response:
 
 ```json
@@ -360,7 +381,8 @@ Response:
 }
 ```
 
-The event body must not include raw prompts, raw assistant responses, Spotify tokens, HA tokens, or chat history.
+The event body must not include raw prompts, raw assistant responses, Spotify
+tokens, HA tokens, chat history, TTS audio or temporary audio URLs.
 
 Clients should open and sync directly with their own Home Assistant instance, especially `/api/djconnect/ask_dj/history`.
 

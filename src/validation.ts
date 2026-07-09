@@ -1,6 +1,6 @@
 import { HttpError } from "./http";
 import type { ApiMessageKey } from "./messages";
-import type { AdminDiagnosticsQuery, AdminRegistrationsQuery, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
+import type { AdminDiagnosticsQuery, AdminRegistrationsQuery, AnnouncementHint, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
 type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_install_id" | "pairing_session_id" | "token_id";
 type MissingStringKey = `missing_${RequiredStringField}`;
@@ -8,6 +8,8 @@ type MissingStringKey = `missing_${RequiredStringField}`;
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
 const VALID_ENVIRONMENTS = new Set(["sandbox", "production"]);
 const VALID_EVENTS = new Set(["ask_dj_response", "ask_dj_confirm"]);
+const VALID_ANNOUNCEMENT_DELIVERIES = new Set(["client_device", "both", "ha_speaker", "text_only"]);
+const VALID_SPEAKER_DELIVERIES = new Set(["attempted", "none"]);
 const APP_BUNDLE_CLIENT_TYPES = new Map([
 	["dev.djconnect.ios", "ios"],
 	["dev.djconnect.mac", "macos"],
@@ -133,7 +135,8 @@ export function validateUnregister(input: UnregisterRequest): void {
 
 export function validatePushEvent(input: PushEventRequest): void {
 	requireString(input.ha_install_id, "ha_install_id");
-	rejectForbiddenPayloadKeys(input);
+	input.announcement = sanitizeAnnouncementHint(input.announcement);
+	rejectForbiddenPayloadKeys(input, new Set(["announcement"]));
 	if (!VALID_EVENTS.has(input.event_type)) {
 		throw new HttpError(400, "invalid_event_type");
 	}
@@ -142,6 +145,24 @@ export function validatePushEvent(input: PushEventRequest): void {
 			throw new HttpError(400, "invalid_client_type");
 		}
 	}
+}
+
+export function sanitizeAnnouncementHint(value: unknown): AnnouncementHint | undefined {
+	if (value === null || typeof value !== "object" || Array.isArray(value)) return undefined;
+	const input = value as Record<string, unknown>;
+	const output: AnnouncementHint = {};
+
+	if (typeof input.delivery === "string" && VALID_ANNOUNCEMENT_DELIVERIES.has(input.delivery)) {
+		output.delivery = input.delivery as AnnouncementHint["delivery"];
+	}
+	if (typeof input.audio_available === "boolean") {
+		output.audio_available = input.audio_available;
+	}
+	if (typeof input.speaker_delivery === "string" && VALID_SPEAKER_DELIVERIES.has(input.speaker_delivery)) {
+		output.speaker_delivery = input.speaker_delivery as AnnouncementHint["speaker_delivery"];
+	}
+
+	return Object.keys(output).length > 0 ? output : undefined;
 }
 
 export function validateAdminRegistrationsQuery(url: URL): AdminRegistrationsQuery {
@@ -170,17 +191,18 @@ export function validateAdminDiagnosticsQuery(url: URL): AdminDiagnosticsQuery {
 	};
 }
 
-function rejectForbiddenPayloadKeys(value: unknown): void {
+function rejectForbiddenPayloadKeys(value: unknown, allowedUnsafeContainers = new Set<string>()): void {
 	if (value === null || typeof value !== "object") return;
 	for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
 		const normalized = key.toLowerCase();
+		if (allowedUnsafeContainers.has(normalized)) continue;
 		if (FORBIDDEN_PAYLOAD_KEYS.has(normalized)) {
 			throw new HttpError(400, "unsafe_payload");
 		}
 		if (Array.isArray(child)) {
-			for (const item of child) rejectForbiddenPayloadKeys(item);
+			for (const item of child) rejectForbiddenPayloadKeys(item, allowedUnsafeContainers);
 		} else {
-			rejectForbiddenPayloadKeys(child);
+			rejectForbiddenPayloadKeys(child, allowedUnsafeContainers);
 		}
 	}
 }
