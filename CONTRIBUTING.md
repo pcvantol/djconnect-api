@@ -100,6 +100,12 @@ Maintainer releases should follow the shared DJConnect release hygiene in
 For this repo, release validation includes:
 
 - Review canonical cross-repo contract docs.
+- Review the `DJ Announcement Output Sync` section in
+  `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. For the central
+  API, confirm push payloads remain wake/sync only and carry only safe
+  announcement hints such as delivery, audio availability and speaker delivery,
+  never generated text, prompts, history, TTS audio or temporary `audio_url`
+  values.
 - Review translations in all five supported languages: `en`, `nl`, `de`, `fr`
   and `es`.
 - Review and update third-party packages, dependency lockfiles and developer

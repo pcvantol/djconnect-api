@@ -9,6 +9,9 @@ Cross-repo source of truth:
 - `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`
 - `/Users/pcvantol/Documents/GitHub/djconnect/API_CONTRACT.md`
 
+For release or push-contract work, review this repo against the
+`DJ Announcement Output Sync` section in `SYNC_PROMPTS.md` as a QA step.
+
 Before release work:
 
 - Run `git status --short`.
