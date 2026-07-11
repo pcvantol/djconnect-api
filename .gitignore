@@ -1,7 +1,6 @@
 # Logs
 
 logs
-.DS_Store
 *.p8
 _.log
 npm-debug.log_
@@ -167,3 +166,23 @@ dist
 .env*
 !.env.example
 .wrangler/
+
+# DJConnect shared local metadata
+.DS_Store
+**/.DS_Store
+.AppleDouble
+**/.AppleDouble
+.LSOverride
+**/.LSOverride
+._*
+**/._*
+.Spotlight-V100/
+**/.Spotlight-V100/
+.Trashes/
+**/.Trashes/
+.fseventsd/
+**/.fseventsd/
+Thumbs.db
+**/Thumbs.db
+Desktop.ini
+**/Desktop.ini
