@@ -21,4 +21,4 @@ jobs:
       owner: pcvantol/djconnect-api
 
   semgrep:
-    uses: pcvantol/djconnect/.github/workflows/djconnect-semgrep-ci.yml@main
+    uses: pcvantol/djconnect/.github/workflows/djconnect-semgrep-ci.yml@b02217ab54ff5a93e9ba5ae406ac608f43ff8792

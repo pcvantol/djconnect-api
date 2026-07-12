@@ -26,6 +26,6 @@ jobs:
       owner: pcvantol/djconnect-api
 
   codeql:
-    uses: pcvantol/djconnect/.github/workflows/djconnect-codeql-ci.yml@main
+    uses: pcvantol/djconnect/.github/workflows/djconnect-codeql-ci.yml@b02217ab54ff5a93e9ba5ae406ac608f43ff8792
     with:
       languages: javascript-typescript
