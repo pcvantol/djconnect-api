@@ -26,6 +26,6 @@ jobs:
       owner: pcvantol/djconnect-api
 
   codeql:
-    uses: pcvantol/djconnect/.github/workflows/djconnect-codeql-ci.yml@b02217ab54ff5a93e9ba5ae406ac608f43ff8792
+    uses: pcvantol/djconnect/.github/workflows/djconnect-codeql-ci.yml@7cff5e8f77b13075062a8d5bf8a803959a3b54af # Batch 2 scanner pins
     with:
       languages: javascript-typescript
