@@ -21,4 +21,4 @@ jobs:
       owner: pcvantol/djconnect-api
 
   semgrep:
-    uses: pcvantol/djconnect/.github/workflows/djconnect-semgrep-ci.yml@main
+    uses: pcvantol/djconnect/.github/workflows/djconnect-semgrep-ci.yml@7cff5e8f77b13075062a8d5bf8a803959a3b54af # Batch 2 scanner pins
