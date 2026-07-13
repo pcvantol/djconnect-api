@@ -1,6 +1,6 @@
 {
   "name": "djconnect-api",
-  "version": "1.0.14",
+  "version": "3.3.0",
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
