@@ -63,6 +63,22 @@ jobs:
       - name: Test
         run: npm test -- --run
 
+      - name: Generate post-merge coverage evidence
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          npm run test:coverage
+          printf '%s\n' "$GITHUB_SHA" > coverage-main-sha.txt
+
+      - name: Upload post-merge coverage evidence
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: api-cobertura-coverage
+          path: |
+            coverage/cobertura-coverage.xml
+            coverage-main-sha.txt
+          if-no-files-found: error
+
       - name: Local E2E contract smoke
         run: npm run test:e2e
 
