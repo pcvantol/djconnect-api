@@ -1,0 +1,98 @@
+name: API Worker post-deployment smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha: {required: true, type: string}
+      manifest_id: {required: true, type: string}
+      artifact_id: {required: true, type: string}
+      artifact_sha256: {required: true, type: string}
+      target: {required: true, type: choice, options: [cloudflare_workers_production]}
+      platform_version: {required: true, type: string}
+      release_profile: {required: true, type: choice, options: [INTERNAL_RELEASE]}
+      deployment_workflow_run: {required: true, type: string}
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate bounded smoke request
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+          PLATFORM_VERSION: ${{ inputs.platform_version }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+          DEPLOYMENT_WORKFLOW_RUN: ${{ inputs.deployment_workflow_run }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$CANDIDATE_SHA" | grep -Eq '^[0-9a-f]{40}$'
+          printf '%s' "$MANIFEST_ID" | grep -Eq '^release-[A-Za-z0-9._-]+$'
+          printf '%s' "$ARTIFACT_ID" | grep -Eq '^[0-9]+$'
+          printf '%s' "$ARTIFACT_SHA256" | grep -Eq '^[0-9a-f]{64}$'
+          test "$TARGET" = cloudflare_workers_production
+          printf '%s' "$PLATFORM_VERSION" | grep -Eq '^[0-9]+\.[0-9]+$'
+          test "$RELEASE_PROFILE" = INTERNAL_RELEASE
+          printf '%s' "$DEPLOYMENT_WORKFLOW_RUN" | grep -Eq '^[0-9]+$'
+      - name: Download deployment evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: api-worker-deployment-evidence
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.deployment_workflow_run }}
+          path: deployment-evidence
+      - name: Verify deployment evidence identity
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          set -euo pipefail
+          evidence=deployment-evidence/api-worker-deployment-evidence.json
+          test "$(jq -r '.candidate_sha' "$evidence")" = "$CANDIDATE_SHA"
+          test "$(jq -r '.manifest_id' "$evidence")" = "$MANIFEST_ID"
+          test "$(jq -r '.artifact_id' "$evidence")" = "$ARTIFACT_ID"
+          test "$(jq -r '.artifact_sha256' "$evidence")" = "$ARTIFACT_SHA256"
+          test "$(jq -r '.target' "$evidence")" = "$TARGET"
+          test "$(jq -r '.deployment_result' "$evidence")" = DEPLOYED_PENDING_SMOKE
+      - name: Read bounded public API health
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 3 --retry-delay 5 --max-time 10 https://api.djconnect.dev/health > /tmp/api-health.json
+          jq -e '.ok == true and .service == "djconnect-api"' /tmp/api-health.json >/dev/null
+      - name: Publish redacted smoke evidence
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+          PLATFORM_VERSION: ${{ inputs.platform_version }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+          DEPLOYMENT_WORKFLOW_RUN: ${{ inputs.deployment_workflow_run }}
+          SMOKE_WORKFLOW_RUN: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          from datetime import UTC, datetime
+          import json, os
+          timestamp = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+          with open("api-worker-smoke-evidence.json", "w", encoding="utf-8") as file:
+              json.dump({"schema_version": 1, "kind": "post_deployment_smoke", "repository": os.environ["GITHUB_REPOSITORY"], "candidate_sha": os.environ["CANDIDATE_SHA"], "manifest_id": os.environ["MANIFEST_ID"], "artifact_id": os.environ["ARTIFACT_ID"], "artifact_sha256": os.environ["ARTIFACT_SHA256"], "target": os.environ["TARGET"], "platform_version": os.environ["PLATFORM_VERSION"], "release_profile": os.environ["RELEASE_PROFILE"], "deployment_workflow_run": os.environ["DEPLOYMENT_WORKFLOW_RUN"], "smoke_workflow_run": os.environ["SMOKE_WORKFLOW_RUN"], "runner_identity": "github-hosted-ubuntu", "route_type": "public_http_health", "protocol": "https", "endpoint_class": "api_health", "authentication_mode": "none", "expected_version": "NOT_IMPLEMENTED", "observed_version": "NOT_IMPLEMENTED", "health_result": "PASS", "websocket_result": "NOT_APPLICABLE", "startup_marker_result": "NOT_IMPLEMENTED", "crash_log_result": "NOT_IMPLEMENTED", "retry_count": 3, "stabilization_window": "not_implemented", "timestamps": {"completed_at": timestamp}, "final_result": "SMOKE_INCONCLUSIVE", "failure_classification": "version_and_runtime_health_contract_incomplete", "recovery_reference": "docs/release/PLATFORM_3_3_DEPLOYMENT_CONSUMER_INVENTORY.md", "timestamp": timestamp}, file, sort_keys=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: api-worker-smoke-evidence
+          path: api-worker-smoke-evidence.json
+          if-no-files-found: error
+      - name: Fail closed until API version and bounded runtime health are observable
+        run: |
+          echo "SMOKE_INCONCLUSIVE: the public API health route does not expose candidate version or bounded runtime-health evidence."
+          exit 1

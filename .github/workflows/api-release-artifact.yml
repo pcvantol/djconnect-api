@@ -1,0 +1,58 @@
+name: API release artifact
+
+on:
+  workflow_run:
+    workflows: [Validate]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 26
+          cache: npm
+      - name: Build the exact Worker bundle
+        run: |
+          set -euo pipefail
+          npm ci
+          npx wrangler deploy --dry-run --outdir bundle
+          sed -i '/sourceMappingURL=/d' bundle/index.js
+          rm -f bundle/README.md bundle/index.js.map
+          test -f bundle/index.js
+          mkdir release
+          cp -R bundle migrations release/
+          cp package.json package-lock.json wrangler.jsonc release/
+          tar -czf djconnect-api-release.tar.gz release
+          sha256sum djconnect-api-release.tar.gz | awk '{print $1}' > djconnect-api-release.sha256
+      - id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: djconnect-api-release-${{ github.event.workflow_run.head_sha }}
+          path: djconnect-api-release.tar.gz
+          if-no-files-found: error
+      - name: Publish artifact evidence
+        env:
+          CANDIDATE_SHA: ${{ github.event.workflow_run.head_sha }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          python - <<'PY'
+          from datetime import UTC, datetime
+          import json, os
+          with open("api-release-artifact-evidence.json", "w", encoding="utf-8") as file:
+              json.dump({"schema_version": 1, "kind": "api_worker_release_artifact", "repository": os.environ["GITHUB_REPOSITORY"], "candidate_sha": os.environ["CANDIDATE_SHA"], "artifact_id": os.environ["ARTIFACT_ID"], "artifact_sha256": open("djconnect-api-release.sha256", encoding="utf-8").read().strip(), "timestamp": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")}, file, sort_keys=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: api-release-artifact-evidence
+          path: api-release-artifact-evidence.json
+          if-no-files-found: error

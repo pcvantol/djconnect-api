@@ -1,0 +1,116 @@
+name: Deploy API Worker release artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      action: {required: true, type: choice, options: [deployment]}
+      candidate_sha: {required: true, type: string}
+      execution_mode: {required: true, type: choice, options: [execute]}
+      manifest_id: {required: true, type: string}
+      artifact_id: {required: true, type: string}
+      artifact_sha256: {required: true, type: string}
+      target: {required: true, type: choice, options: [cloudflare_workers_production]}
+      platform_version: {required: true, type: string}
+      release_profile: {required: true, type: choice, options: [INTERNAL_RELEASE]}
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: api-worker-production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Validate manifest-bound deployment request
+        env:
+          ACTION: ${{ inputs.action }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          EXECUTION_MODE: ${{ inputs.execution_mode }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+          PLATFORM_VERSION: ${{ inputs.platform_version }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+        run: |
+          set -euo pipefail
+          test "$ACTION" = deployment
+          test "$EXECUTION_MODE" = execute
+          test "$TARGET" = cloudflare_workers_production
+          test "$RELEASE_PROFILE" = INTERNAL_RELEASE
+          printf '%s' "$CANDIDATE_SHA" | grep -Eq '^[0-9a-f]{40}$'
+          printf '%s' "$MANIFEST_ID" | grep -Eq '^release-[A-Za-z0-9._-]+$'
+          printf '%s' "$ARTIFACT_ID" | grep -Eq '^[0-9]+$'
+          printf '%s' "$ARTIFACT_SHA256" | grep -Eq '^[0-9a-f]{64}$'
+          printf '%s' "$PLATFORM_VERSION" | grep -Eq '^[0-9]+\.[0-9]+$'
+      - name: Refuse dispatch without an approved operational manifest source
+        run: |
+          echo "PRIVATE_NETWORK_DEPLOYMENT_NOT_AUTHORIZED: no approved current-main operational release manifest is available for this target."
+          exit 1
+      - id: artifact
+        name: Verify immutable artifact provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          metadata="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}")"
+          test "$(jq -r '.expired' <<<"$metadata")" = false
+          run_id="$(jq -r '.workflow_run.id' <<<"$metadata")"
+          run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")"
+          test "$(jq -r '.conclusion' <<<"$run")" = success
+          test "$(jq -r '.head_branch' <<<"$run")" = main
+          test "$(jq -r '.head_sha' <<<"$run")" = "$CANDIDATE_SHA"
+          test "$(jq -r '.name' <<<"$run")" = 'API release artifact'
+          printf 'run_id=%s\n' "$run_id" >> "$GITHUB_OUTPUT"
+      - name: Download immutable API artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ inputs.artifact_id }}
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.artifact.outputs.run_id }}
+          path: artifact
+      - name: Deploy exact bundled Worker and migrations
+        env:
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          test "$(sha256sum artifact/djconnect-api-release.tar.gz | awk '{print $1}')" = "$ARTIFACT_SHA256"
+          mkdir release
+          tar -xzf artifact/djconnect-api-release.tar.gz -C release
+          cd release/release
+          test -f bundle/index.js
+          test -f wrangler.jsonc
+          test -d migrations
+          npm ci --ignore-scripts
+          ./node_modules/.bin/wrangler d1 migrations apply djconnect_api --remote --config wrangler.jsonc
+          ./node_modules/.bin/wrangler deploy bundle/index.js --no-bundle --config wrangler.jsonc
+      - name: Publish redacted deployment evidence
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+          PLATFORM_VERSION: ${{ inputs.platform_version }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+          DEPLOYMENT_WORKFLOW_RUN: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          from datetime import UTC, datetime
+          import json, os
+          with open("api-worker-deployment-evidence.json", "w", encoding="utf-8") as file:
+              json.dump({"schema_version": 1, "kind": "api_worker_production_deployment", "repository": os.environ["GITHUB_REPOSITORY"], "candidate_sha": os.environ["CANDIDATE_SHA"], "manifest_id": os.environ["MANIFEST_ID"], "artifact_id": os.environ["ARTIFACT_ID"], "artifact_sha256": os.environ["ARTIFACT_SHA256"], "target": os.environ["TARGET"], "platform_version": os.environ["PLATFORM_VERSION"], "release_profile": os.environ["RELEASE_PROFILE"], "deployment_workflow_run": os.environ["DEPLOYMENT_WORKFLOW_RUN"], "deployment_result": "DEPLOYED_PENDING_SMOKE", "timestamp": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")}, file, sort_keys=True)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: api-worker-deployment-evidence
+          path: api-worker-deployment-evidence.json
+          if-no-files-found: error
