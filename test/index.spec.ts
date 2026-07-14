@@ -378,7 +378,13 @@ describe("DJConnect API worker", () => {
 		testEnv.DJCONNECT_SMOKE_TEST_MODE = "enabled";
 		const health = await dispatchGet("/health");
 		expect(health.status).toBe(200);
-		expect(await health.json()).toEqual({ ok: true, service: "djconnect-api" });
+		expect(await health.json()).toEqual({
+			ok: true,
+			service: "djconnect-api",
+			version: "3.3.0",
+			release_sha: "development",
+			runtime: "cloudflare_worker",
+		});
 
 		const proof = await issueBootstrapProof({
 			ha_install_id: "example-smoke-install",
