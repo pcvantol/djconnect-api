@@ -98,78 +98,10 @@ jobs:
             fi
           fi
 
-  deploy:
-    name: Deploy
-    needs: validate
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
-
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
-        with:
-          node-version: 26
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Apply remote D1 migrations
-        run: npx wrangler d1 migrations apply djconnect_api --remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-
-      - name: Deploy Worker
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-
-      - name: Health smoke test
-        run: curl -fsS https://api.djconnect.dev/health
-
-  staging-smoke:
-    name: Staging-safe smoke E2E
-    needs:
-      - validate
-      - deploy
-    if: always() && needs.validate.result == 'success' && (needs.deploy.result == 'success' || needs.deploy.result == 'skipped') && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      HAS_DJCONNECT_RELAY_SECRET: ${{ secrets.DJCONNECT_RELAY_SECRET != '' }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
-
-      - name: Setup Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
-        with:
-          node-version: 26
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Skip staging smoke without relay secret
-        if: env.HAS_DJCONNECT_RELAY_SECRET != 'true'
-        run: echo "Skipping staging-safe smoke E2E because DJCONNECT_RELAY_SECRET is not available."
-
-      - name: Run staging-safe smoke E2E
-        if: env.HAS_DJCONNECT_RELAY_SECRET == 'true'
-        run: npm run smoke:e2e
-        env:
-          DJCONNECT_RELAY_SECRET_VALUE: ${{ secrets.DJCONNECT_RELAY_SECRET }}
-
   cleanup-workflow-runs:
     name: Cleanup old workflow runs
     needs:
       - validate
-      - deploy
     if: always() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
     runs-on: ubuntu-latest
     timeout-minutes: 10

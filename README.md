@@ -200,7 +200,8 @@ environment-specific Wrangler configuration when added.
 - Cloudflare Worker secrets are configured for `APNS_PRIVATE_KEY`,
   `DJCONNECT_RELAY_SECRET`, `DJCONNECT_PAIRING_ISSUER_SECRET` and
   `APNS_TOKEN_ENCRYPTION_KEY`.
-- GitHub Actions CI/CD deploys `main` and smoke-tests `/health`.
+- GitHub Actions validates `main`; production deployment is a separate,
+  explicitly dispatched internal-release workflow.
 - The latest release is `v1.0.14`.
 
 ## Development
@@ -253,7 +254,8 @@ GitHub Actions runs `Validate` on pull requests and pushes to `main`:
 - staging-safe E2E smoke test when `DJCONNECT_RELAY_SECRET` is configured as a
   GitHub Actions secret
 
-Pushes to `main` also run the `Deploy` job:
+`Deploy API production` runs only after an explicit internal-release dispatch
+with a qualified exact-main-SHA and manifest identifier:
 
 - remote D1 migrations
 - Worker deploy
