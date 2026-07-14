@@ -4,6 +4,7 @@ import { issueBootstrapProofHandler, issueInstallTokenHandler, issuePairingBoots
 import { registerDevice, sendPushEvent, unregisterDevice } from "./handlers/push";
 import { errorJson, HttpError, json } from "./http";
 import { recordApiDiagnostic } from "./repository";
+import { RELEASE_SOURCE_SHA, RELEASE_VERSION } from "./releaseMetadata";
 import type { AppEnv } from "./types";
 
 type RouteHandler = (request: Request, env: AppEnv, ctx: ExecutionContext, url: URL) => Promise<Response>;
@@ -102,7 +103,13 @@ export default {
 async function route(request: Request, env: AppEnv, ctx: ExecutionContext): Promise<Response> {
 	const url = new URL(request.url);
 	if (request.method === "GET" && url.pathname === "/health") {
-		return json({ ok: true, service: "djconnect-api" });
+		return json({
+			ok: true,
+			service: "djconnect-api",
+			version: RELEASE_VERSION,
+			release_sha: RELEASE_SOURCE_SHA,
+			runtime: "cloudflare_worker",
+		});
 	}
 
 	const match = routes.find((candidate) => candidate.method === request.method && candidate.path === url.pathname);
