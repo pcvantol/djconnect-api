@@ -118,9 +118,12 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
-          test "$(sha256sum artifact/djconnect-api-release.tar.gz | awk '{print $1}')" = "$ARTIFACT_SHA256"
+          mapfile -t release_artifacts < <(find artifact -type f -name djconnect-api-release.tar.gz -print)
+          test "${#release_artifacts[@]}" -eq 1
+          release_artifact="${release_artifacts[0]}"
+          test "$(sha256sum "$release_artifact" | awk '{print $1}')" = "$ARTIFACT_SHA256"
           mkdir release
-          tar -xzf artifact/djconnect-api-release.tar.gz -C release
+          tar -xzf "$release_artifact" -C release
           cd release/release
           test -f bundle/index.js
           test -f wrangler.jsonc
