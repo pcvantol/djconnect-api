@@ -146,8 +146,8 @@ Cloudflare auth:
 - Remote D1 migration returned account authorization error `7403`.
 - Worker deploy returned Wrangler authentication error `10000`.
 
-These blockers are resolved as of `v1.0.2`; CI/CD now deploys `main`
-successfully.
+These blockers are resolved as of `v1.0.2`; the explicit production deployment
+workflow can deploy a qualified internal-release candidate successfully.
 
 ## Cloudflare And CI/CD Status
 
@@ -171,11 +171,11 @@ GitHub Actions CI/CD is configured in `.github/workflows/ci-cd.yml`:
 - `Validate` runs on pull requests and pushes to `main`.
 - `Validate` runs the fast Worker/Vitest suite and the focused local E2E
   contract smoke command `npm run test:e2e`.
-- `Deploy` runs on pushes to `main` after validation.
-- `Staging-safe smoke E2E` runs on `main` pushes and manual dispatches after
-  validation/deploy, but only executes the live smoke script when GitHub
-  Actions secret `DJCONNECT_RELAY_SECRET` is available. Without the secret it
-  logs a skip message and does not call privileged endpoints.
+- `Validate` never deploys. It produces CI and exact-main-SHA coverage
+  evidence only.
+- `.github/workflows/deploy-production.yml` runs only through an explicit,
+  bounded internal-release dispatch. It performs remote migration, deployment,
+  health validation and the optional staging-safe smoke.
 - GitHub secret `CLOUDFLARE_API_TOKEN` is configured with Workers deploy, D1
   migration and Workers Routes edit permissions for `djconnect.dev`.
 - GitHub secret `DJCONNECT_RELAY_SECRET` is mapped only to

@@ -87,8 +87,9 @@ fixed:
 - Remote D1 migration: Cloudflare error `7403`.
 - Worker deploy: Wrangler/Cloudflare auth error `10000`.
 
-Current production CI/CD deploys successfully with the GitHub Actions
-`CLOUDFLARE_API_TOKEN` secret.
+The explicit production deployment workflow can deploy a qualified
+internal-release candidate with the GitHub Actions `CLOUDFLARE_API_TOKEN`
+secret. CI validation itself has no deployment step.
 
 Required secrets must be set through Cloudflare secrets/configuration:
 

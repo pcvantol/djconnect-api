@@ -52,8 +52,8 @@
 
 - Status: resolved in `v1.0.2`.
 - Resolution: `CLOUDFLARE_API_TOKEN` now has D1 migration, Workers deploy,
-  Workers Routes edit and Zone read permissions. GitHub Actions CI/CD deploys
-  `main` successfully.
+  Workers Routes edit and Zone read permissions. The explicit production
+  deployment workflow can deploy a qualified internal-release candidate.
 
 ### api.djconnect.dev routing
 
