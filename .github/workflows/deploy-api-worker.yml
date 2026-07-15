@@ -106,7 +106,7 @@ jobs:
           test "$(jq -r '.name' <<<"$run")" = 'API release artifact'
           printf 'run_id=%s\n' "$run_id" >> "$GITHUB_OUTPUT"
       - name: Download immutable API artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
           artifact-ids: ${{ inputs.artifact_id }}
           github-token: ${{ github.token }}
@@ -148,7 +148,7 @@ jobs:
           with open("api-worker-deployment-evidence.json", "w", encoding="utf-8") as file:
               json.dump({"schema_version": 1, "kind": "api_worker_production_deployment", "repository": os.environ["GITHUB_REPOSITORY"], "candidate_sha": os.environ["CANDIDATE_SHA"], "manifest_id": os.environ["MANIFEST_ID"], "artifact_id": os.environ["ARTIFACT_ID"], "artifact_sha256": os.environ["ARTIFACT_SHA256"], "target": os.environ["TARGET"], "platform_version": os.environ["PLATFORM_VERSION"], "release_profile": os.environ["RELEASE_PROFILE"], "deployment_workflow_run": os.environ["DEPLOYMENT_WORKFLOW_RUN"], "deployment_result": "DEPLOYED_PENDING_SMOKE", "timestamp": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")}, file, sort_keys=True)
           PY
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: api-worker-deployment-evidence
           path: api-worker-deployment-evidence.json
