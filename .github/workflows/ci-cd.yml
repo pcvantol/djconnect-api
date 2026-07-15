@@ -21,7 +21,7 @@ jobs:
     name: Software Assurance governance
     permissions:
       contents: read
-    uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@5b235069a79f3f650e497a5b64a4bce4aeb1e031
+    uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@78852b8f714981794c63b92ff0d3083d06516099
     with:
       execution_profile: balanced
       owner: pcvantol/djconnect-api
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload post-merge coverage evidence
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: api-cobertura-coverage
           path: |
