@@ -168,6 +168,8 @@ dist
 .wrangler/
 
 # DJConnect shared local metadata
+# Local Technical Debt Engine evidence, baselines and qualifications
+/.tde/
 .DS_Store
 **/.DS_Store
 .AppleDouble
