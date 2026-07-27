@@ -1,0 +1,13 @@
+{
+  "identifier": "djconnect-api",
+  "name": "DJConnect API",
+  "repositoryRoot": "../..",
+  "repositoryType": "source",
+  "primaryLanguage": "TypeScript",
+  "defaultAssessmentProfile": "standard",
+  "metadata": {
+    "consumer": "DJConnect",
+    "rolloutPhase": "observe"
+  }
+}
+
