@@ -120,6 +120,11 @@ jobs:
           set -euo pipefail
 
           current_workflow_id="$(gh api "repos/${REPOSITORY}/actions/runs/${CURRENT_RUN_ID}" --jq '.workflow_id')"
+          protected_run_ids=()
+          pr_head_sha="$(gh api -H 'Accept: application/vnd.github+json' "repos/${REPOSITORY}/commits/${GITHUB_SHA}/pulls" --jq '[.[] | select(.merged_at and .base.ref == "main" and .merge_commit_sha == env.GITHUB_SHA)] | if length == 1 then .[0].head.sha else empty end' || true)"
+          if [ -n "${pr_head_sha}" ]; then
+            mapfile -t protected_run_ids < <(gh api "repos/${REPOSITORY}/actions/runs?head_sha=${pr_head_sha}&per_page=100" --paginate --jq '.workflow_runs[] | .id')
+          fi
           workflow_ids="$(gh api "repos/${REPOSITORY}/actions/workflows" --paginate --jq '.workflows[].id')"
 
           for workflow_id in ${workflow_ids}; do
@@ -140,7 +145,7 @@ jobs:
 
             for index in "${!run_ids[@]}"; do
               run_id="${run_ids[$index]}"
-              if [ "${index}" -lt "${keep_limit}" ] || [ "${run_id}" = "${CURRENT_RUN_ID}" ]; then
+              if [ "${index}" -lt "${keep_limit}" ] || [ "${run_id}" = "${CURRENT_RUN_ID}" ] || [[ " ${protected_run_ids[*]} " == *" ${run_id} "* ]]; then
                 continue
               fi
 
