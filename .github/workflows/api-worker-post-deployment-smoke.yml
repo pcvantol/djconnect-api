@@ -55,14 +55,14 @@ jobs:
           manifest="$(mktemp)"
           trap 'rm -f "$manifest"' EXIT
           curl --fail --silent --show-error --location \
-            https://raw.githubusercontent.com/pcvantol/djconnect/main/docs/release/PLATFORM_3_3_CURRENT_MAIN_MANIFEST_PROPOSAL.json \
+            https://raw.githubusercontent.com/pcvantol/djconnect/main/docs/release/PLATFORM_4_0_RC2_API_OPERATIONAL_MANIFEST.json \
             --output "$manifest"
           test "$(jq -r '.status' "$manifest")" = APPROVED_DEPLOYMENT_DISPATCH_PENDING
           test "$(jq -r '.approval.state' "$manifest")" = APPROVED
           test "$(jq -r '.manifest_id' "$manifest")" = "$MANIFEST_ID"
           test "$(jq -r '.release_profile' "$manifest")" = "$RELEASE_PROFILE"
           release_version="$(jq -r --arg sha "$CANDIDATE_SHA" '.repositories[] | select(.repository == "pcvantol/djconnect-api" and .source_sha == $sha) | .version' "$manifest")"
-          printf '%s' "$release_version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+          printf '%s' "$release_version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'
           jq -e --arg target "$TARGET" --arg artifact "$ARTIFACT_ID" --arg sha "$ARTIFACT_SHA256" \
             '.artifact_bindings[] | select(.target == $target and (.artifact_id | tostring) == $artifact and .artifact_sha256 == $sha)' \
             "$manifest" >/dev/null
