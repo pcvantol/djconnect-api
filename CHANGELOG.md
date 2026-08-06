@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.0-rc.2 - 2026-08-06
+
+- Prepared the central API for the DJConnect Platform 4.0 release candidate
+  train. The immutable release artifact embeds this version and its exact
+  source revision in the Worker health response.
+
 ## 1.0.14 - 2026-07-09
 
 - Added a CI-friendly local E2E contract smoke test for the central API flow:
