@@ -17,11 +17,11 @@
     "provision:cloudflare": "scripts/provision_cloudflare.sh"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.20.3",
-    "@types/node": "^26.1.2",
-    "@vitest/coverage-istanbul": "~4.1.9",
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
+    "@types/node": "^26.5.0",
+    "@vitest/coverage-istanbul": "~5.0.0",
     "typescript": "^7.0.2",
-    "vitest": "~4.1.11",
+    "vitest": "~5.0.0",
     "wrangler": "^4.120.0"
   },
   "allowScripts": {
