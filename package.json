@@ -18,16 +18,17 @@
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.22.0",
-    "@types/node": "^26.6.1",
+    "@types/node": "^26.6.2",
     "@vitest/coverage-istanbul": "~4.1.11",
     "typescript": "^7.0.2",
     "vitest": "~4.1.11",
-    "wrangler": "^4.132.0"
+    "wrangler": "^4.136.3"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
     "sharp@0.34.5": true,
-    "workerd@1.20260701.1": true,
+    "workerd@1.20260815.1": true,
+    "workerd@1.20260921.1": true,
     "fsevents": false
   }
 }
