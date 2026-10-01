@@ -15,9 +15,9 @@ permissions:
 jobs:
   reconcile:
     if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
-    uses: pcvantol/djconnect/.github/workflows/post-merge-release-evidence.yml@946fc839b19dda57230e44a38e170276f3c5eb12
+    uses: pcvantol/djconnect/.github/workflows/post-merge-release-evidence.yml@733ecc2836d40611b2b7472308a7175a6130c91a
     with:
-      policy_source_ref: 946fc839b19dda57230e44a38e170276f3c5eb12
+      policy_source_ref: 733ecc2836d40611b2b7472308a7175a6130c91a
       required_main_workflow: Validate
       required_check_contexts: '["Trusted Delivery qualification / Qualify trusted delivery"]'
       repository_role: active_source
