@@ -24,9 +24,13 @@
     "vitest": "~4.1.11",
     "wrangler": "^4.136.3"
   },
+  "overrides": {
+    "sharp": "0.35.4",
+    "undici": "7.29.1"
+  },
   "allowScripts": {
     "esbuild@0.28.1": true,
-    "sharp@0.34.5": true,
+    "sharp@0.35.4": true,
     "workerd@1.20260815.1": true,
     "workerd@1.20260921.1": true,
     "fsevents": false
