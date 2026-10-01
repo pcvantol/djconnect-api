@@ -19,7 +19,7 @@ jobs:
     with:
       policy_source_ref: 733ecc2836d40611b2b7472308a7175a6130c91a
       required_main_workflow: Validate
-      required_check_contexts: '["Trusted Delivery qualification / Qualify trusted delivery"]'
+      required_check_contexts: '["Trusted Delivery qualification / Qualify trusted delivery", "Validate", "Owner Authorization"]'
       repository_role: active_source
       coverage_artifact_name: api-cobertura-coverage
       durable_evidence_release_tag_prefix: internal-api
