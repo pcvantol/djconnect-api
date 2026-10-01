@@ -11,6 +11,12 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    # Cloudflare's test pool currently requires Vitest 4.
+    ignore:
+      - dependency-name: vitest
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitest/coverage-istanbul"
+        update-types: ["version-update:semver-major"]
     groups:
       npm-dependencies:
         patterns: ["*"]
