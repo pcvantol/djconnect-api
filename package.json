@@ -18,11 +18,11 @@
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.22.0",
-    "@types/node": "^26.6.3",
+    "@types/node": "^26.6.4",
     "@vitest/coverage-istanbul": "~4.1.11",
     "typescript": "^7.0.2",
     "vitest": "~4.1.11",
-    "wrangler": "^4.144.0"
+    "wrangler": "^4.148.0"
   },
   "overrides": {
     "sharp": "0.35.4",
