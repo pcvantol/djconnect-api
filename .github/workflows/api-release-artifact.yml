@@ -17,7 +17,7 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 1
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version: 26
           cache: npm
@@ -44,7 +44,7 @@ jobs:
           tar -czf djconnect-api-release.tar.gz release
           sha256sum djconnect-api-release.tar.gz | awk '{print $1}' > djconnect-api-release.sha256
       - id: upload
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: djconnect-api-release-${{ github.event.workflow_run.head_sha }}
           path: djconnect-api-release.tar.gz
@@ -60,7 +60,7 @@ jobs:
           with open("api-release-artifact-evidence.json", "w", encoding="utf-8") as file:
               json.dump({"schema_version": 1, "kind": "api_worker_release_artifact", "repository": os.environ["GITHUB_REPOSITORY"], "candidate_sha": os.environ["CANDIDATE_SHA"], "artifact_id": os.environ["ARTIFACT_ID"], "artifact_sha256": open("djconnect-api-release.sha256", encoding="utf-8").read().strip(), "timestamp": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")}, file, sort_keys=True)
           PY
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-release-artifact-evidence
           path: api-release-artifact-evidence.json
