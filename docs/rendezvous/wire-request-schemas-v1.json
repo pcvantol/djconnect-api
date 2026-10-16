@@ -1,0 +1,883 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:djconnect:rendezvous:1:review:0.3.0",
+  "$comment": "Review only. Validate using the route-selected $defs; full byte, raw-URL, freshness, crypto and authorization rules remain normative in WIRE_PROFILE_V1.md. No implementation or crypto acceptance.",
+  "$defs": {
+    "v": {
+      "const": "djc-rendezvous/1"
+    },
+    "opaque": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$"
+    },
+    "key_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9+/]{43}=$"
+    },
+    "transaction_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "time": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "public_key": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kty": {
+          "const": "RSA"
+        },
+        "n": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{342}$"
+        },
+        "e": {
+          "const": "AQAB"
+        }
+      },
+      "required": [
+        "kty",
+        "n",
+        "e"
+      ]
+    },
+    "client_data": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2731,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "assertion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 5462,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "attestation": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 43691,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "jwe": {
+      "type": "string",
+      "maxLength": 8192,
+      "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]{342}\\.[A-Za-z0-9_-]{16}\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]{22}$"
+    },
+    "create": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "browser_public_key": {
+          "$ref": "#/$defs/public_key"
+        },
+        "claim_commitment": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "generation",
+        "browser_public_key",
+        "claim_commitment"
+      ]
+    },
+    "inspect": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "qr_capability": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "qr_capability"
+      ]
+    },
+    "attestation_challenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "action": {
+          "enum": [
+            "register",
+            "delete-key"
+          ]
+        }
+      },
+      "required": [
+        "v",
+        "key_id",
+        "action"
+      ]
+    },
+    "attestation_register": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "attestation": {
+          "$ref": "#/$defs/attestation"
+        }
+      },
+      "required": [
+        "v",
+        "key_id",
+        "challenge_id",
+        "attestation"
+      ]
+    },
+    "submit_challenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "qr_capability": {
+          "$ref": "#/$defs/opaque"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "envelope_digest": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "qr_capability",
+        "key_id",
+        "envelope_digest"
+      ]
+    },
+    "submit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "qr_capability": {
+          "$ref": "#/$defs/opaque"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "client_data": {
+          "$ref": "#/$defs/client_data"
+        },
+        "assertion": {
+          "$ref": "#/$defs/assertion"
+        },
+        "destination_envelope": {
+          "$ref": "#/$defs/jwe"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "qr_capability",
+        "key_id",
+        "challenge_id",
+        "client_data",
+        "assertion",
+        "destination_envelope"
+      ]
+    },
+    "poll": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "claim_secret": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "claim_secret"
+      ]
+    },
+    "consume": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "claim_secret": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "claim_secret"
+      ]
+    },
+    "cancel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "claim_secret": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "claim_secret"
+      ]
+    },
+    "attestation_delete": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "client_data": {
+          "$ref": "#/$defs/client_data"
+        },
+        "assertion": {
+          "$ref": "#/$defs/assertion"
+        }
+      },
+      "required": [
+        "v",
+        "key_id",
+        "challenge_id",
+        "client_data",
+        "assertion"
+      ]
+    },
+    "qr_payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "djc-rendezvous-qr"
+        },
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "service_origin": {
+          "const": "https://api.djconnect.dev"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "browser_key_thumbprint": {
+          "$ref": "#/$defs/opaque"
+        },
+        "qr_capability": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "type",
+        "v",
+        "service_origin",
+        "transaction_id",
+        "generation",
+        "expires_at",
+        "browser_key_thumbprint",
+        "qr_capability"
+      ]
+    },
+    "create_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "created_at": {
+          "$ref": "#/$defs/time"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "browser_key_thumbprint": {
+          "$ref": "#/$defs/opaque"
+        },
+        "qr_payload": {
+          "$ref": "#/$defs/qr_payload"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "created_at",
+        "expires_at",
+        "browser_key_thumbprint",
+        "qr_payload"
+      ]
+    },
+    "inspect_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "browser_public_key": {
+          "$ref": "#/$defs/public_key"
+        },
+        "browser_key_thumbprint": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "expires_at",
+        "browser_public_key",
+        "browser_key_thumbprint"
+      ]
+    },
+    "attestation_challenge_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "challenge": {
+          "$ref": "#/$defs/opaque"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": [
+        "v",
+        "challenge_id",
+        "challenge",
+        "expires_at"
+      ]
+    },
+    "attestation_register_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "key_expires_at": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": [
+        "v",
+        "key_expires_at"
+      ]
+    },
+    "submit_challenge_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "challenge": {
+          "$ref": "#/$defs/opaque"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "client_data": {
+          "$ref": "#/$defs/client_data"
+        }
+      },
+      "required": [
+        "v",
+        "challenge_id",
+        "challenge",
+        "expires_at",
+        "client_data"
+      ]
+    },
+    "submit_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "accepted": {
+          "const": true
+        },
+        "operation_id": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "accepted",
+        "operation_id"
+      ]
+    },
+    "poll_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "ready",
+            "consumed",
+            "cancelled"
+          ]
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "retry_after_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120000
+        }
+      },
+      "required": [
+        "v",
+        "state",
+        "expires_at",
+        "retry_after_ms"
+      ]
+    },
+    "consume_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "state": {
+          "const": "consumed"
+        },
+        "destination_envelope": {
+          "$ref": "#/$defs/jwe"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": [
+        "v",
+        "state",
+        "destination_envelope",
+        "expires_at"
+      ]
+    },
+    "cancel_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "state": {
+          "const": "cancelled"
+        }
+      },
+      "required": [
+        "v",
+        "state"
+      ]
+    },
+    "attestation_delete_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "state": {
+          "const": "revoked"
+        },
+        "purge_at": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": [
+        "v",
+        "state",
+        "purge_at"
+      ]
+    },
+    "submit_client_data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "action": {
+          "const": "submit"
+        },
+        "service_origin": {
+          "const": "https://api.djconnect.dev"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "browser_key_thumbprint": {
+          "$ref": "#/$defs/opaque"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "challenge": {
+          "$ref": "#/$defs/opaque"
+        },
+        "envelope_digest": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "required": [
+        "v",
+        "action",
+        "service_origin",
+        "transaction_id",
+        "generation",
+        "browser_key_thumbprint",
+        "expires_at",
+        "key_id",
+        "challenge_id",
+        "challenge",
+        "envelope_digest"
+      ]
+    },
+    "delete_client_data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "action": {
+          "const": "delete-key"
+        },
+        "service_origin": {
+          "const": "https://api.djconnect.dev"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "challenge": {
+          "$ref": "#/$defs/opaque"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": [
+        "v",
+        "action",
+        "service_origin",
+        "key_id",
+        "challenge_id",
+        "challenge",
+        "expires_at"
+      ]
+    },
+    "plaintext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "transaction_id": {
+          "$ref": "#/$defs/transaction_id"
+        },
+        "generation": {
+          "$ref": "#/$defs/generation"
+        },
+        "browser_key_thumbprint": {
+          "$ref": "#/$defs/opaque"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "bootstrap_origin": {
+          "const": "https://vibecast.tv"
+        },
+        "display_entry_url": {
+          "type": "string",
+          "maxLength": 2048,
+          "pattern": "^https://[a-z0-9.-]+/djconnect/vibecast/display$"
+        },
+        "issuer_epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "v",
+        "transaction_id",
+        "generation",
+        "browser_key_thumbprint",
+        "expires_at",
+        "bootstrap_origin",
+        "display_entry_url",
+        "issuer_epoch"
+      ]
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "error": {
+          "enum": [
+            "invalid_request",
+            "unsupported_version",
+            "invalid_capability",
+            "invalid_sender_proof",
+            "attestation_required",
+            "app_not_supported",
+            "origin_denied",
+            "operation_conflict",
+            "already_submitted",
+            "already_consumed",
+            "cancelled",
+            "not_ready",
+            "expired",
+            "payload_too_large",
+            "unsupported_content_type",
+            "rate_limited",
+            "attestation_unavailable",
+            "service_unavailable"
+          ]
+        },
+        "retry_after_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120000
+        }
+      },
+      "required": [
+        "v",
+        "error"
+      ]
+    }
+  },
+  "anyOf": [
+    {
+      "$ref": "#/$defs/create"
+    },
+    {
+      "$ref": "#/$defs/inspect"
+    },
+    {
+      "$ref": "#/$defs/attestation_challenge"
+    },
+    {
+      "$ref": "#/$defs/attestation_register"
+    },
+    {
+      "$ref": "#/$defs/submit_challenge"
+    },
+    {
+      "$ref": "#/$defs/submit"
+    },
+    {
+      "$ref": "#/$defs/poll"
+    },
+    {
+      "$ref": "#/$defs/consume"
+    },
+    {
+      "$ref": "#/$defs/cancel"
+    },
+    {
+      "$ref": "#/$defs/attestation_delete"
+    },
+    {
+      "$ref": "#/$defs/qr_payload"
+    },
+    {
+      "$ref": "#/$defs/create_response"
+    },
+    {
+      "$ref": "#/$defs/inspect_response"
+    },
+    {
+      "$ref": "#/$defs/attestation_challenge_response"
+    },
+    {
+      "$ref": "#/$defs/attestation_register_response"
+    },
+    {
+      "$ref": "#/$defs/submit_challenge_response"
+    },
+    {
+      "$ref": "#/$defs/submit_response"
+    },
+    {
+      "$ref": "#/$defs/poll_response"
+    },
+    {
+      "$ref": "#/$defs/consume_response"
+    },
+    {
+      "$ref": "#/$defs/cancel_response"
+    },
+    {
+      "$ref": "#/$defs/attestation_delete_response"
+    },
+    {
+      "$ref": "#/$defs/submit_client_data"
+    },
+    {
+      "$ref": "#/$defs/delete_client_data"
+    },
+    {
+      "$ref": "#/$defs/plaintext"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
+  ]
+}

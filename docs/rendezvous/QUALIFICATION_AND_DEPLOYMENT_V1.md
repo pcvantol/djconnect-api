@@ -3,6 +3,17 @@
 Status: preparation only; see [contract review](CONTRACT_REVIEW_V1.md).
 No runtime, crypto vectors, production binding or release is delivered yet.
 
+Revision0.3 adds [KEY-STATE](KEY_STATE_V1.md), [wire/profile](WIRE_PROFILE_V1.md),
+machine request/response/clientData schemas and explicitly nonfunctional
+synthetic schema fixtures. The original limited-A owner choice is resolved;
+do not repeat it as a blocker. Exact policy/profile remains a technical review
+candidate, including its finite retention and bounded key-revocation window.
+
+Reproduce structural validation with Python plus `jsonschema==4.25.1` in an
+isolated environment: `python scripts/validate_rendezvous_contract.py`.
+No runtime dependency or workflow was changed for this optional design check.
+This checks schema/byte examples only; it is not an Apple/JWE/DO test.
+
 ## Local checkpoint — 2026-10-16
 
 On the contract branch based on `3bb5f2b01401827e8a1072e1668fbb4a2223f26f`:
@@ -31,6 +42,7 @@ requirements, not test results or executable cryptographic fixtures.
 | Wrong HA installation | App/HA selected-install mismatch denied; genuine different paired scanner classified separately without inventing TV-owner proof |
 | App Attest | Real independent vectors for chain/app/env/nonce/assertion/counter; no unauthenticated fallback |
 | App-key lifecycle | Privacy-qualified retention/deletion/recovery, cross-transaction counters and crash-safe authorization |
+| Finite key-state profile | Absolute30-day expiry, finite tombstone, no reset/rolling retention,5s internal authorization window and crash recovery |
 | Code-free UX | No A-only comparison, PAKE secret or extra TV input; only existing HA six digits |
 | Wrong / missing / null Origin | Browser denied; native requires independent proof |
 | Unsafe initial URL / IDNA | Apple and browser reject same raw-string corpus before normalization |

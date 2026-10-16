@@ -1,9 +1,16 @@
 # VibeCast rendezvous v1 — pre-implementation review candidate
 
 Assignment: `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`.
-Document revision: `0.2.0-draft`; proposed wire version: `djc-rendezvous/1`.
+Document revision: `0.3.0-draft`; proposed wire version: `djc-rendezvous/1`.
 Status: **BLOCKED_CONTRACT_REVIEW**. No endpoint below exists yet. This is
 a decision package, not a frozen consumer contract or a production manifest.
+
+Revision0.3 reconciles the resolved limited-A owner choice and current Core
+producer6e560061. [KEY-STATE](KEY_STATE_V1.md) now proposes exact finite retention,
+recovery and counter/transaction crash ordering; [WIRE profile](WIRE_PROFILE_V1.md)
+defines exact request/clientData/JWE candidates and interoperability gates.
+Those documents supersede the older sketches below where they refine fields,
+limits, lifecycles or owner-choice status. They remain joint-review candidates.
 
 ## Current owner correction and route disposition
 
@@ -19,8 +26,9 @@ does not authorize extra TV input or a mailbox implementation.
 The [code-free App Attest review](CODE_FREE_APP_ATTEST_REVIEW_V1.md) supplies the
 current concrete candidate, remaining claims, state/privacy conflict and release
 gates. App authenticity and HA-owner/installation authenticity remain different.
-No reduced security claim or residual-risk acceptance is inferred from the UX
-decision. Runtime remains blocked pending joint review of this revised scope.
+The subsequent explicit limited-A disposition API94/6226306251 has been read
+back from the original human exchange. The product choice is resolved; runtime
+still needs technical qualification of that precisely limited claim.
 
 API design acknowledges Core ROUTE-1 at exact
 `da9a08c0968fc914a9b1d1cf99ccff075cc78aa6`: independently authenticate the initial
@@ -51,7 +59,7 @@ aligned before runtime writes. These gates are still open.
 
 | ID | Required decision and evidence | Existing owner |
 | --- | --- | --- |
-| TRUST-1 | Assess the precise app-attested, locally paired destination claim versus independently verified HA-owner authority; no silent risk acceptance | Core + Apple + API, independent security reviewer |
+| TRUST-1 | Owner-selected limited genuine-app reported route; preserve copied-QR risk and reject stronger owner claims | Product choice resolved; technical review open |
 | TRUST-2 | Reviewed sender-authenticated encryption profile, library/version, browser/native interoperability and positive/negative cryptographic vectors | API + Apple + receiver, independent security reviewer |
 | ROUTE-1 | Direction acknowledged at Core da9a08c; joint raw-URL policy adoption and actual configured HA/proxy qualification remain open | Core + Apple + receiver |
 | WIRE-1 | Confirm QR framing, native scanner entry, code-free installation confirmation, error mapping, cancel/rotate and lost-consume behavior | Apple + receiver + Core, independent UX reviewer |
@@ -73,8 +81,8 @@ central paired-device registry may be silently repurposed as rendezvous trust.
 The current candidate uses Apple App Attest for the genuine app instance and
 existing Apple/Core pairing checks for the explicitly selected route. App Attest
 does not independently attest HA pairing or that the scanner belongs to the TV's
-intended user. The exact limited claim and remaining wrong-owner/phishing risk
-require joint security review; the stricter independently trusted HA-issuer
+intended user. The owner-selected limited claim and remaining wrong-owner risk
+require technical/security qualification; the stricter independently trusted HA-issuer
 alternative has no established root today. No custom ECDH/KDF/AEAD composition,
 extra code or encryption-only authentication claim is authorized.
 
@@ -109,8 +117,8 @@ field lengths and crypto framing require WIRE-1/TRUST-2 before wire freeze.
 | --- | --- | --- | --- |
 | Create | POST `/v1/rendezvous/create` | `generation`, `browser_public_key`, `claim_commitment` | 201: `transaction_id`, `generation`, `created_at`, `expires_at`, `qr_payload` |
 | Poll/reconnect | POST `/v1/rendezvous/poll` | `transaction_id`, `generation`, `claim_secret` | 200: `state`, `expires_at`, `retry_after_ms`; no destination envelope |
-| Submit challenge | POST `/v1/rendezvous/submit-challenge` | `transaction_id`, `generation`, `qr_capability`, `envelope_digest`, `key_id` | 200: one-time `challenge_id`, `challenge`, original `expires_at` |
-| Submit | POST `/v1/rendezvous/submit` | `transaction_id`, `generation`, `qr_capability`, `destination_envelope`, `challenge_id`, App Attest `assertion` plus approved key evidence | 202: `state: ready`; no browser secret |
+| Submit challenge | POST `/v1/rendezvous/submit-challenge` | `transaction_id`, `generation`, `qr_capability`, `envelope_digest`, `key_id` | 200: one-time `challenge_id`, `challenge`, `client_data`, original `expires_at` |
+| Submit | POST `/v1/rendezvous/submit` | `transaction_id`, `generation`, `qr_capability`, `destination_envelope`, `challenge_id`, `key_id`, `client_data`, App Attest `assertion` | 202: `accepted: true`, operation_id; no browser secret |
 | Consume | POST `/v1/rendezvous/consume` | `transaction_id`, `generation`, `claim_secret` | 200: `state: consumed`, `destination_envelope`, `expires_at` |
 | Cancel | POST `/v1/rendezvous/cancel` | `transaction_id`, `generation`, `claim_secret` | 200: `state: cancelled` |
 
@@ -174,7 +182,7 @@ no-store, no-referrer and nosniff. Receiver CSP/connect-src changes remain
 receiver-owned and require that lane's artifact qualification.
 
 Proposed application budgets, **not Cloudflare platform limits**:
-16 KiB streamed body ceiling including chunked requests, 8 KiB envelope ceiling,
+Endpoint-specific streamed ceilings in WIRE_PROFILE_V1.md,8KiB envelope ceiling,
 one in-flight poll per transaction, minimum poll interval 2 seconds, at most
 60 polls/transaction, 5 invalid authorized attempts/transaction and 5 creates
 per trusted edge IP/minute. Reject compressed request bodies and enforce limits

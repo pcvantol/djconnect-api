@@ -1,9 +1,14 @@
 # Code-free rendezvous / App Attest design assessment
 
-Assignment `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`; revision `0.2.0-draft`.
+Assignment `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`; revision `0.3.0-draft`.
 **REVIEW_CANDIDATE / NOT_FROZEN / NO_RUNTIME_GO**.
 This refines [API94](https://github.com/pcvantol/djconnect-api/pull/94), retaining
 the sole API writer and unchanged APNs/D1/operator/runtime configuration.
+
+Revision0.3 adds the exact [KEY-STATE policy](KEY_STATE_V1.md) and
+[wire/profile candidate](WIRE_PROFILE_V1.md). Their finite retention, crash
+ordering, request fields and crypto profile supersede earlier sketches here.
+No implementation/registry or runtime approval is implied.
 
 ## Authority and fresh continuation
 
@@ -45,8 +50,9 @@ submission race. B's later six digits do not repair phishing to a wrong A origin
 The alternative stronger claim needs a QR-bound HA issuer whose verification
 root the API/TV already trusts. Self-supplied HA JWKs and present APNs/bootstrap
 proofs do not establish it. No such root is delivered. Do not build a central
-paired-owner registry to manufacture one. Owner's no-extra-code decision does
-not itself accept the residual risks above or authorize weakening TRUST-1.
+paired-owner registry to manufacture one. The separately explicit owner
+disposition API94/6226306251 selects the limited claim and copied-QR risk above;
+no stronger owner claim is authorized. Its technical qualification remains open.
 
 ## Concrete candidate exchange for joint review
 
@@ -99,7 +105,8 @@ Current Apple [WWDC26 guidance](https://developer.apple.com/videos/play/wwdc2026
 also describes new validation-category and bundle-version signals. Pin applicable
 OS/distribution policy and fixtures; do not assume an older verifier handles
 those extensions. App Attest availability is checked through `isSupported`;
-do not claim all Macs are categorically unsupported. No unsupported device,
+iOS-only v1 excludes Mac/Catalyst/iOS-on-Mac; actual support remains
+subject to the qualified SDK/runtime and current official isSupported policy. No unsupported device,
 attestation outage or unknown key falls back to unauthenticated submission.
 
 Workers already uses `nodejs_compat`. Its
@@ -110,7 +117,8 @@ path-validation completeness or CPU/memory result has yet been measured here.
 Concrete verifier inspected: `uebelack/node-app-attest`, package1.0.1 at
 `f16c4bb71b737466872bc8b8a7dfd215364eaa83` (MIT; not archived; last push
 2026-03-16). It uses Node crypto/X509, CBOR, ASN.1 and PKI dependencies.
-This is an investigation candidate, **not selected or independently audited**.
+This is an investigation candidate, **not selected**; independent audit evidence
+for its use here has not been obtained.
 Source-review questions include complete certificate validity/path constraints,
 strict single-object CBOR handling, unsigned counter parsing, current Apple
 extensions and caller-side challenge checks. These are qualification questions,
@@ -138,8 +146,9 @@ explicit privacy/retention review; it is not anonymous transient transaction dat
 forbids permanent central user-data storage. Key/counter retention duration,
 deletion/recovery, re-attestation and App Attest key-generation cadence must be
 jointly resolved before this candidate is runnable. Neither a new key for every
-QR nor a stateless re-enrollment ticket is a qualified workaround. No exact
-retention duration or new identity service is selected by this draft.
+QR nor a stateless re-enrollment ticket is a qualified workaround. KEY_STATE_V1
+now specifies30-day absolute retention and bounded revocation/crash windows for
+review; that concrete policy is not yet implemented or privacy-approved.
 
 Cross-object atomicity is another concrete design requirement. An attested-key
 coordinator would serialize the counter update while a transaction DO owns
@@ -187,7 +196,7 @@ The existing regression suite qualifies only unchanged API behavior.
 
 | Gate | Required outcome before implementation |
 | --- | --- |
-| TRUST-1 | Joint disposition of app-reported paired route versus independent HA-owner verification, including genuine wrong-owner scan and malicious relay |
+| TRUST-1 | Product disposition resolved via6226306251; technically qualify the limited app-reported route without stronger owner claims |
 | TRUST-2 | Exact verified App Attest parser/verifier and JWE library/profile, pinned compatibility, independent positive/negative crypto vectors |
 | KEY-STATE | Privacy-approved nonpermanent key/counter lifecycle and crash-safe ownership/retry semantics |
 | WIRE-1 | Exact code-free scanner/clientData/request schemas and error/failure UX acknowledged by Apple/receiver |

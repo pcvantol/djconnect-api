@@ -1,6 +1,6 @@
 # DJConnect API Handoff
 
-## Active assignment — VibeCast rendezvous (2026-10-16)
+## Active assignment — VibeCast rendezvous (2026-10-17)
 
 `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016` is owner-selected; execution ACK:
 https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6222484621.
@@ -9,18 +9,22 @@ One admitted API writer, fresh baseline
 
 Status: **BLOCKED_CONTRACT_REVIEW before runtime implementation**. The
 [review candidate](docs/rendezvous/CONTRACT_REVIEW_V1.md) names the unresolved
-sender/paired-install trust anchor, reviewed crypto interoperability and exact
-HA entry/redirect policy. The canonical predecessor requires independent design
+finite key/counter lifecycle, exact verifier/wire/crypto interoperability and
+qualification of the explicitly limited paired-app reported route. The canonical predecessor requires independent design
 review before implementation; these are substantive security decisions.
 [Qualification/deployment preparation](docs/rendezvous/QUALIFICATION_AND_DEPLOYMENT_V1.md)
 records the required scenarios and deployment/rollback boundaries. Revision
-`0.2.0-draft` incorporates the owner's code-free route-A correction and API's
+`0.3.0-draft` incorporates the owner's code-free route-A correction and API's
 acknowledgement of Core ROUTE-1 `da9a08c`. The
 [App Attest design assessment](docs/rendezvous/CODE_FREE_APP_ATTEST_REVIEW_V1.md)
 records actual app-authenticity limits, paired-route trust, replay-state/privacy
 decisions and verifier qualification. No extra PAKE/comparison/TV code is selected.
-Neither
-document is a frozen consumer wire contract or production configuration.
+The owner limited-A choice is resolved at API94/6226306251; the original human
+exchange was independently read. Do not repeat that question.
+[KEY-STATE](docs/rendezvous/KEY_STATE_V1.md) and
+[wire/profile](docs/rendezvous/WIRE_PROFILE_V1.md) specify the new finite-state,
+crash/replay, request/clientData and JWE review candidate. None is a frozen
+consumer wire contract or production configuration.
 
 Next: existing Core/Apple/receiver owners resolve the named contract decisions,
 then independent technical/privacy and UX reviewers assess the exact candidate.
