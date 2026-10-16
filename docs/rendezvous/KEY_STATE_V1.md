@@ -40,9 +40,11 @@ provider retention. No automatic activity-based renewal or permanent denylist.
 No account, owner/Profile/Session/device ID, installation mapping, IP, HA URL or
 pairing credential is stored in key records. Keys still link activity across
 transactions during their finite lifetime; infra connection metadata is separate.
-The30-day retention and up-to120s minimal revocation tombstone require independent
-privacy/technical review before enabling this profile. No D1 migration, namespace
-or key registry is created by this document. The existing D1/APNs data stays out.
+The maximum active-key lifetime is30 days. After revocation the linkable
+key-address tombstone remains until original key expiry plus120s, so retention
+after early revocation can approach30 days plus120s. These finite periods require
+independent privacy/technical review before enabling this profile. No D1
+migration, namespace or key registry is created here. Existing D1/APNs stays out.
 
 ## Registration, rotation, deletion and recovery
 
