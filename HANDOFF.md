@@ -1,5 +1,28 @@
 # DJConnect API Handoff
 
+## Active assignment — VibeCast rendezvous (2026-10-16)
+
+`DJC-API-VIBECAST-RENDEZVOUS-V1-20261016` is owner-selected; execution ACK:
+https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6222484621.
+One admitted API writer, fresh baseline
+`3bb5f2b01401827e8a1072e1668fbb4a2223f26f`.
+
+Status: **BLOCKED_CONTRACT_REVIEW before runtime implementation**. The
+[review candidate](docs/rendezvous/CONTRACT_REVIEW_V1.md) names the unresolved
+sender/paired-install trust anchor, reviewed crypto interoperability and exact
+HA entry/redirect policy. The canonical predecessor requires independent design
+review before implementation; these are substantive security decisions.
+[Qualification/deployment preparation](docs/rendezvous/QUALIFICATION_AND_DEPLOYMENT_V1.md)
+records the required scenarios and deployment/rollback boundaries. Neither
+document is a frozen consumer wire contract or production configuration.
+
+Next: existing Core/Apple/receiver owners resolve the named contract decisions,
+then independent technical/privacy and UX reviewers assess the exact candidate.
+No new lanewriters or cross-repository source writes. Runtime, crypto fixtures,
+new-service CI/E2E, protected product merge and separate Finalization remain
+pending. Production deployment remains separately unauthorized. The existing
+APNs/D1/operator runtime is unchanged; historical state below is retained.
+
 ## Current State
 
 - Repository: `pcvantol/djconnect-api`.
