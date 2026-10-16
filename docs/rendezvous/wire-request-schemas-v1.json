@@ -451,7 +451,7 @@
         "browser_key_thumbprint"
       ]
     },
-    "attestation_challenge_response": {
+    "attestation_register_challenge_response": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -473,6 +473,44 @@
         "challenge_id",
         "challenge",
         "expires_at"
+      ]
+    },
+    "attestation_delete_challenge_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "challenge": {
+          "$ref": "#/$defs/opaque"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "client_data": {
+          "$ref": "#/$defs/client_data"
+        }
+      },
+      "required": [
+        "v",
+        "challenge_id",
+        "challenge",
+        "expires_at",
+        "client_data"
+      ]
+    },
+    "attestation_challenge_response": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/attestation_register_challenge_response"
+        },
+        {
+          "$ref": "#/$defs/attestation_delete_challenge_response"
+        }
       ]
     },
     "attestation_register_response": {
@@ -842,6 +880,12 @@
     },
     {
       "$ref": "#/$defs/inspect_response"
+    },
+    {
+      "$ref": "#/$defs/attestation_register_challenge_response"
+    },
+    {
+      "$ref": "#/$defs/attestation_delete_challenge_response"
     },
     {
       "$ref": "#/$defs/attestation_challenge_response"

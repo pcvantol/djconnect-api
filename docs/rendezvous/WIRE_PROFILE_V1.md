@@ -110,7 +110,7 @@ request validation does not implement runtime authorization or cryptography.
 | --- | --- | --- |
 | `/create` |201 transaction/generation/created_at/expires_at/qr_payload |4KiB |
 | `/inspect` |200 browser_public_key/browser_key_thumbprint/generation/expires_at |1KiB |
-| `/attestation/challenge` |200 challenge_id/challenge/expires_at |1KiB |
+| `/attestation/challenge` |200 challenge_id/challenge/expires_at; delete-key also client_data |1KiB |
 | `/attestation/register` |201 key_expires_at, no user/HA association |64KiB |
 | `/submit-challenge` |200 challenge_id/challenge/client_data/expires_at |1KiB |
 | `/submit` |202 accepted:true, operation_id=challenge_id; historical acceptance only |32KiB |
@@ -137,6 +137,12 @@ attests SHA256 of the server nonce bytes per Apple's documented API. Deletion
 has its own action `delete-key`, challenge, key_id and exact saved clientData;
 it cannot reuse a submit challenge/signature. Production server configuration
 selects the app/environment, never a client-declared development allowance.
+For action `delete-key`, the challenge response also returns `client_data`:
+the exact server-saved bytes in unpadded base64url. Native strictly parses and
+checks fixed protocol/service identity, action, key ID, challenge ID/nonce and
+expiry before asserting SHA256 of those exact bytes. The delete request echoes
+those bytes; the server requires exact equality with its saved clientData.
+Registration continues to use its separate nonce-hash attestation flow.
 The submit request echoes `client_data` for exact byte equality against the
 saved challenge; signature verification uses only those saved matched bytes.
 The machine schemas also define registration/delete responses;
@@ -151,6 +157,12 @@ Same operation with changed ciphertext/clientData conflicts; different operation
 cannot reuse nonce/assertion/counter. Burned authorization recovery,5s lease,
 cross-key concurrency and revocation windows are defined in KEY_STATE_V1.md.
 All operations recheck original120s expiry; cancel/rotate/new key never renew it.
+After a ready commit, an identical submit retry may recover the historical202
+from the transaction's immutable operation/request digest and QR-capability check,
+without a new key authorization, counter change or destination release. This
+also applies if the key coordinator's receipt has since been erased by revocation.
+Before ready, a retry still needs a current unexpired coordinator authorization.
+No response claims that a later cancelled/consumed transaction is currently ready.
 
 Fixed error shape `{v,error,retry_after_ms?}`. Codes: invalid_request400,
 unsupported_version400, invalid_capability401, invalid_sender_proof401,

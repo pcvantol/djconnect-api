@@ -30,6 +30,9 @@ This accepted product boundary does not approve storage, crypto or deployment.
 | Transaction | Original browser/key/generation/deadline, capability commitments, pending/ready/terminal state; ciphertext only while ready |120s fixed; clear ciphertext on consume/cancel; remove application state after original deadline |
 
 Time is server UTC integer milliseconds; equality with a deadline is expired.
+The key-address hash input is the exact compact UTF8 JSON array of
+`[environment,configured_app_policy_id,canonical_key_id]`; no concatenation of
+ambiguous strings and no client-selected app policy or namespace.
 Logical access is denied at the deadline even if an alarm is late. Cleanup alarms
 delete expired application rows and retry failures. Operational target: cleanup
 within15min of purge_at; overdue cleanup is a privacy incident/alert and pauses
@@ -122,12 +125,20 @@ arbitrary DO names. No new cryptographic receipt/signing scheme is introduced.
    burned. During the5s authorization window the same operation can finish
    identically; afterward obtain a fresh challenge/assertion with a higher counter
    if the transaction is still pending and unexpired. New challenge IDs cannot
-   reuse the old assertion. If ready already committed, status may report ready
-   for the original operation, without re-delivering any destination to the app.
+   reuse the old assertion. If ready already committed, an identical retry can
+   recover its historical accepted202 receipt, not the current transaction state
+   and without re-delivering any destination to the app.
 6. If a reply is lost after ready, retry/status returns the committed operation
    disposition; it is not evidence of browser consume or B admission. Browser
    consume remains one-time; a lost consume response needs a fresh QR. Local
    cancellation cannot recall a possibly committed/consumed address.
+
+The transaction keeps the immutable operation/request digest with its terminal
+state until the original expiry. An identical authenticated-capability retry can
+therefore recover the historical accepted receipt after the key coordinator's
+receipt was erased by revocation; no new authorization or state change occurs.
+Before ready, key revocation still prevents new authorization/lookup. A changed
+request for the same operation ID never recovers success.
 
 There is **no cross-DO atomic transaction**. Authorization at step2 is the
 key-authority admission point; step4 is the winning transaction-state point.

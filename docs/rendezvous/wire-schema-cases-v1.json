@@ -706,6 +706,42 @@
       }
     },
     {
+      "name": "attestation_delete_challenge_response-structural-positive",
+      "schema": "attestation_delete_challenge_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA"
+      }
+    },
+    {
+      "name": "attestation_delete_challenge_response-unknown-field",
+      "schema": "attestation_delete_challenge_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_delete_challenge_response-missing-version",
+      "schema": "attestation_delete_challenge_response",
+      "valid": false,
+      "value": {
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA"
+      }
+    },
+    {
       "name": "attestation_register_response-structural-positive",
       "schema": "attestation_register_response",
       "valid": true,
