@@ -28,9 +28,13 @@ requirements, not test results or executable cryptographic fixtures.
 | Concurrent double consume | Exactly one ciphertext response |
 | Replay / old rotated generation | Denied without reviving state |
 | Wrong browser / window | Claim or key mismatch denied |
-| Wrong HA installation | Selected-install proof mismatch denied |
+| Wrong HA installation | App/HA selected-install mismatch denied; genuine different paired scanner classified separately without inventing TV-owner proof |
+| App Attest | Real independent vectors for chain/app/env/nonce/assertion/counter; no unauthenticated fallback |
+| App-key lifecycle | Privacy-qualified retention/deletion/recovery, cross-transaction counters and crash-safe authorization |
+| Code-free UX | No A-only comparison, PAKE secret or extra TV input; only existing HA six digits |
 | Wrong / missing / null Origin | Browser denied; native requires independent proof |
-| Unsafe URL / redirects / IDNA | Apple and browser reject same negative corpus |
+| Unsafe initial URL / IDNA | Apple and browser reject same raw-string corpus before normalization |
+| Post-navigation redirects | Actual HA/proxy direct200/no-login configuration; acknowledge subsequent navigation is outside bootstrap control |
 | Cancel versus submit/consume | Linearizable winner, no result after winning cancellation |
 | Reconnect / suspended browser | Deadline unchanged; terminal state wins |
 | Lost consume response | No second release, explicit fresh QR |
@@ -60,6 +64,7 @@ Do not substitute JSON state examples for crypto or real E2E qualification.
 | D1/APNs | No schema, secret, registration or semantic migration |
 | Config | Exact service/browser origin, protocol enable switch, global admission ceiling, reviewed rate settings |
 | Secrets | Only new justified abuse/trust material after review; no HA/Profile/Session bearer |
+| App Attest state | No implicit device-key registry; resolve key/counter privacy, lifecycle and atomicity before configuration |
 | Artifact | Existing immutable API artifact must contain DO export/config/migration plus schema/vector digests |
 | Dispatch | Exact SHA/artifact/hash and approved operational manifest through existing protected deployment route |
 

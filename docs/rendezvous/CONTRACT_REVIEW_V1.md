@@ -1,9 +1,34 @@
 # VibeCast rendezvous v1 — pre-implementation review candidate
 
 Assignment: `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`.
-Document revision: `0.1.0-draft`; proposed wire version: `djc-rendezvous/1`.
+Document revision: `0.2.0-draft`; proposed wire version: `djc-rendezvous/1`.
 Status: **BLOCKED_CONTRACT_REVIEW**. No endpoint below exists yet. This is
 a decision package, not a frozen consumer contract or a production manifest.
+
+## Current owner correction and route disposition
+
+Owner decisions [6224544182](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6224544182)
+and [6224667994](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6224667994)
+supersede the comparison/OOB proposals in revision0.1.0. Route A is a QR shortcut
+for the already paired iPhone's explicitly selected existing external HA URL.
+No additional TV code, PAKE secret, mandatory comparison, account or pairing.
+Only the existing separate HA six-digit display admission follows navigation.
+Magic Wormhole/PAKE is not selected for v1; its transport feasibility research
+does not authorize extra TV input or a mailbox implementation.
+
+The [code-free App Attest review](CODE_FREE_APP_ATTEST_REVIEW_V1.md) supplies the
+current concrete candidate, remaining claims, state/privacy conflict and release
+gates. App authenticity and HA-owner/installation authenticity remain different.
+No reduced security claim or residual-risk acceptance is inferred from the UX
+decision. Runtime remains blocked pending joint review of this revised scope.
+
+API design acknowledges Core ROUTE-1 at exact
+`da9a08c0968fc914a9b1d1cf99ccff075cc78aa6`: independently authenticate the initial
+raw HTTPS route/context; navigate top-level; thereafter selected HA and its
+configured reverse proxy form the execution trust boundary. Direct200 without
+login/redirect is a measured configuration requirement, not a JS redirect fence.
+No iframe or central HA fetch/proxy. This acknowledges that direction, not a
+frozen or implemented Core/API/Apple/receiver contract.
 
 ## Authority and admission
 
@@ -26,10 +51,10 @@ aligned before runtime writes. These gates are still open.
 
 | ID | Required decision and evidence | Existing owner |
 | --- | --- | --- |
-| TRUST-1 | How the TV authenticates approval by the selected paired Apple/HA installation, including trust-anchor bootstrap, revocation and wrong-install rejection | Core + Apple, independent security reviewer |
+| TRUST-1 | Assess the precise app-attested, locally paired destination claim versus independently verified HA-owner authority; no silent risk acceptance | Core + Apple + API, independent security reviewer |
 | TRUST-2 | Reviewed sender-authenticated encryption profile, library/version, browser/native interoperability and positive/negative cryptographic vectors | API + Apple + receiver, independent security reviewer |
-| ROUTE-1 | Exact externally configured HTTPS HA display-entry path, allowed port/query policy, redirect behavior and binding to installation | Core + Apple |
-| WIRE-1 | Confirm QR framing, native scanner entry, comparison UI, error mapping, cancel/rotate and lost-consume behavior | Apple + receiver + Core, independent UX reviewer |
+| ROUTE-1 | Direction acknowledged at Core da9a08c; joint raw-URL policy adoption and actual configured HA/proxy qualification remain open | Core + Apple + receiver |
+| WIRE-1 | Confirm QR framing, native scanner entry, code-free installation confirmation, error mapping, cancel/rotate and lost-consume behavior | Apple + receiver + Core, independent UX reviewer |
 | OPS-1 | Account/plan, namespace admission budget, cost guard, infrastructure logging/retention and reviewed deploy artifact mapping | API/operator before deployment |
 
 ### Why TRUST-1 blocks runtime
@@ -45,12 +70,13 @@ push-registration proof. It does not attest an existing Apple/HA owner pairing.
 Neither that proof, APNs registration data, an install relay token nor a new
 central paired-device registry may be silently repurposed as rendezvous trust.
 
-Candidate review directions are a Core-issued scoped approval with a reviewed
-trust-anchor bootstrap, or a reviewed out-of-band device-comparison protocol.
-Neither direction is selected here. A comparison code alone is not a proof;
-its length, authenticated transcript, confirmation and resistance to substitution
-must be established by the chosen reviewed protocol. No custom ECDH/KDF/AEAD
-composition or unauthenticated encryption-only workaround is authorized.
+The current candidate uses Apple App Attest for the genuine app instance and
+existing Apple/Core pairing checks for the explicitly selected route. App Attest
+does not independently attest HA pairing or that the scanner belongs to the TV's
+intended user. The exact limited claim and remaining wrong-owner/phishing risk
+require joint security review; the stricter independently trusted HA-issuer
+alternative has no established root today. No custom ECDH/KDF/AEAD composition,
+extra code or encryption-only authentication claim is authorized.
 
 JWE (RFC 7516), JWA (RFC 7518), JWS (RFC 7515) and JWK thumbprints (RFC 7638)
 are possible standard building blocks, not a complete solution to TRUST-1.
@@ -83,7 +109,8 @@ field lengths and crypto framing require WIRE-1/TRUST-2 before wire freeze.
 | --- | --- | --- | --- |
 | Create | POST `/v1/rendezvous/create` | `generation`, `browser_public_key`, `claim_commitment` | 201: `transaction_id`, `generation`, `created_at`, `expires_at`, `qr_payload` |
 | Poll/reconnect | POST `/v1/rendezvous/poll` | `transaction_id`, `generation`, `claim_secret` | 200: `state`, `expires_at`, `retry_after_ms`; no destination envelope |
-| Submit | POST `/v1/rendezvous/submit` | `transaction_id`, `generation`, `qr_capability`, `destination_envelope`, approved sender proof as defined by TRUST-1 | 202: `state: ready`; no browser secret |
+| Submit challenge | POST `/v1/rendezvous/submit-challenge` | `transaction_id`, `generation`, `qr_capability`, `envelope_digest`, `key_id` | 200: one-time `challenge_id`, `challenge`, original `expires_at` |
+| Submit | POST `/v1/rendezvous/submit` | `transaction_id`, `generation`, `qr_capability`, `destination_envelope`, `challenge_id`, App Attest `assertion` plus approved key evidence | 202: `state: ready`; no browser secret |
 | Consume | POST `/v1/rendezvous/consume` | `transaction_id`, `generation`, `claim_secret` | 200: `state: consumed`, `destination_envelope`, `expires_at` |
 | Cancel | POST `/v1/rendezvous/cancel` | `transaction_id`, `generation`, `claim_secret` | 200: `state: cancelled` |
 
@@ -140,7 +167,7 @@ alarm is not a promise of immediate erasure from provider backups.
 
 Browser calls require exact Origin `https://vibecast.tv` and no cookies;
 missing, `null`, preview, suffix matches and arbitrary reflected origins fail.
-Native submit without Origin requires the separate TRUST-1 proof; missing
+Native submit without Origin requires the reviewed App Attest/request proof; missing
 Origin is never authorization. Restrict preflight to specified methods/headers,
 emit `Vary: Origin`, never wildcard or credentialed CORS. All responses use
 no-store, no-referrer and nosniff. Receiver CSP/connect-src changes remain
@@ -162,11 +189,18 @@ in-memory Worker counters cannot establish a global hard limit.
 
 URL policy must reject HTTP, userinfo, fragments, unexpected query/port/path,
 encoded separators/dot segments, ambiguous IDNA, local/private/link-local/IP
-literals and arbitrary redirect parameters. ROUTE-1 must determine supported
-external HA domains, canonical parsing and the exact permitted path. Native
+literals and arbitrary redirect parameters. Core's review profile proposes only
+canonical public ASCII non-IDNA DNS, implicit443 and exact
+`/djconnect/vibecast/display`, without query/fragment/trailing slash. Validate the
+original authenticated string before URL normalization; no consumer-side repair.
+Its forty lexical cases are not actual DNS/TLS/direct200 qualification. Native
 Apple verifies the configured selected installation over its existing pairing;
 the Worker never resolves or fetches the destination, checks TLS or probes HA.
 A TV navigation or redirect cannot be validated by a central fetch workaround.
+Once navigation starts the selected HA/proxy controls subsequent HTTP/content/
+service-worker navigation. No downstream-origin containment is promised. Before
+handoff bootstrap reports its own failures; afterward browser error UI can appear
+before HA loads. Only HA can report its B-admission state.
 
 ## Errors and user experience for review
 
@@ -193,9 +227,9 @@ may still encounter independent DNS/TLS/navigation failure. No HTTP fallback,
 manual IP requirement or certificate bypass. The separate Core HA display
 confirmation follows only after rendezvous navigation; no Session grant here.
 
-Review screen text in en/nl/de/fr/es. Compare code on both screens, show selected
-installation/destination for explicit owner confirmation and keep that code
-visually distinct from the subsequent HA six-digit display-admission code.
+Review screen text in en/nl/de/fr/es. Show selected installation/destination for
+explicit owner confirmation on iPhone. Do not add any A-only TV/comparison code.
+The later HA six-digit display-admission code is the only code in this flow.
 No extra login for an already paired owner. TV unsupported capability state
 must replace QR if secure-context/Web Crypto/required algorithm is absent.
 Actual WebKit/Chromium/native interop and older TV engines are NOT qualified.

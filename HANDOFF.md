@@ -13,7 +13,13 @@ sender/paired-install trust anchor, reviewed crypto interoperability and exact
 HA entry/redirect policy. The canonical predecessor requires independent design
 review before implementation; these are substantive security decisions.
 [Qualification/deployment preparation](docs/rendezvous/QUALIFICATION_AND_DEPLOYMENT_V1.md)
-records the required scenarios and deployment/rollback boundaries. Neither
+records the required scenarios and deployment/rollback boundaries. Revision
+`0.2.0-draft` incorporates the owner's code-free route-A correction and API's
+acknowledgement of Core ROUTE-1 `da9a08c`. The
+[App Attest design assessment](docs/rendezvous/CODE_FREE_APP_ATTEST_REVIEW_V1.md)
+records actual app-authenticity limits, paired-route trust, replay-state/privacy
+decisions and verifier qualification. No extra PAKE/comparison/TV code is selected.
+Neither
 document is a frozen consumer wire contract or production configuration.
 
 Next: existing Core/Apple/receiver owners resolve the named contract decisions,
