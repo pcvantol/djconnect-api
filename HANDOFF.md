@@ -14,7 +14,7 @@ qualification of the explicitly limited paired-app reported route. The canonical
 review before implementation; these are substantive security decisions.
 [Qualification/deployment preparation](docs/rendezvous/QUALIFICATION_AND_DEPLOYMENT_V1.md)
 records the required scenarios and deployment/rollback boundaries. Revision
-`0.3.0-draft` incorporates the owner's code-free route-A correction and API's
+`0.4.0-draft` incorporates the owner's code-free route-A correction and API's
 acknowledgement of Core ROUTE-1 `da9a08c`. The
 [App Attest design assessment](docs/rendezvous/CODE_FREE_APP_ATTEST_REVIEW_V1.md)
 records actual app-authenticity limits, paired-route trust, replay-state/privacy
@@ -34,6 +34,11 @@ for runtime. Full certificate/CBOR validation, actual Apple fixtures, current
 extension/receipt policy and native interop remain concrete open gates.
 Next: existing Core/Apple/receiver owners acknowledge the exact profile and
 produce their owned feasibility/interop evidence; API qualifies the verifier.
+[Enrollment recovery](docs/rendezvous/ENROLLMENT_RECOVERY_V1.md) incorporates
+Apple's reported Mac/Chromium checks and physical capability-only readback,
+and defines bounded uncertain-registration recovery without a key-generation
+loop. Actual app-bound fixtures, strict profile/verifier and Apple fraud-receipt
+policy remain open; no signing/entitlement failure is invented.
 No new lanewriters or cross-repository source writes. Runtime, crypto fixtures,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing

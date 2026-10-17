@@ -14,6 +14,11 @@ isolated environment: `python scripts/validate_rendezvous_contract.py`.
 No runtime dependency or workflow was changed for this optional design check.
 This checks schema/byte examples only; it is not an Apple/JWE/DO test.
 
+Revision0.4 adds [bounded enrollment recovery](ENROLLMENT_RECOVERY_V1.md), an
+action-separated recovery proof and structural cases/bytes. Apple-reported
+Mac/Chromium results are not API-reexecuted or promoted to iPhone/TV/service
+acceptance. Recovery race/crash/cooldown rows await an actual implementation.
+
 The separate [reference audit](VERIFIER_REFERENCE_AUDIT_V1.md) records15 actual
 software-signed synthetic observations on two Node runtimes. It demonstrates
 specific flaws in an unapproved reference; it is not a new-service acceptance

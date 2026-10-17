@@ -1,4 +1,4 @@
-# Rendezvous App Attest KEY-STATE — review candidate 0.3.0
+# Rendezvous App Attest KEY-STATE — review candidate 0.4.0
 
 Assignment `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`, existing API94 writer.
 **DESIGN_CANDIDATE / NOT_FROZEN / NO_RUNTIME_GO.** All durations and capacities
@@ -23,6 +23,7 @@ This accepted product boundary does not approve storage, crypto or deployment.
 | Attested key | Public key, app-policy ID, environment, highest unsigned32 counter, created_at, key_expires_at, status | Active for at most30 days from successful registration; never extended by activity |
 | Key address | SHA256 of environment, configured app-policy ID and canonical Apple key ID, under a fixed internal namespace | Linkable identifier; not anonymized, never a user/HA/paired-install index |
 | Enrollment challenge | Random32-byte nonce/ID, key address, action, created_at, expires_at |120s; one successful enrollment; no existing-key overwrite |
+| Enrollment result receipt | Enrollment operation ID, exact registration request digest, original key expiry/result | Original enrollment challenge deadline only; no replay after revocation/expiry |
 | Submit challenge | Exact clientData bytes/hash and transaction/key/envelope binding | Original transaction deadline, at most120s; no winner reservation |
 | Authorization | Operation ID, immutable tuple/digest, counter, admitted_at, authorization_expires_at | At most5s, capped by transaction and active-key deadline |
 | Operation receipt | Same operation binding and outcome, no envelope/URL | Until original transaction expiry, at most120s; retry never refreshes it |
@@ -55,8 +56,8 @@ Enrollment is controlled by the API: issue one bounded fresh challenge after
 admission limits, verify the complete Apple attestation and actual configured
 app identity/environment, then atomically create the key record with counter0.
 The same key cannot overwrite an existing active or tombstoned record or reset
-its counter. A duplicate exact enrollment operation may return its original
-result; it never resets created_at, expiry or counter. Unknown enrollment operation,
+its counter. A duplicate exact enrollment operation before the original challenge
+deadline may return its original result; it never resets created_at, expiry or counter. Unknown enrollment operation,
 expired nonce, caller public key alone or a cached old attestation fails closed.
 
 The app retains its install-local App Attest key handle, separate from HA pairing.
@@ -66,6 +67,8 @@ after day27; old key expires irrevocably at day30. This permits at most3 days
 overlap. No transfer of counters, public keys or identity from old to new key.
 Each key has its own registration challenge and actual Apple verification.
 No cross-device sharing, cloud backup or borrowed Mac/iPhone assertions.
+Day27 is eligibility at the next relevant foreground action, not a background
+scheduling guarantee. Day30 expiry is absolute even offline or suspended.
 
 This monthly cadence differs from Apple's typical once-per-user/device rollout
 guidance. **Apple-owner validation of its practicality, throttling and fraud-metric
@@ -87,6 +90,15 @@ it does not re-pair HA. Persist a pending enrollment attempt locally so an API
 timeout does not trigger key-generation loops. A timed-out attestation call uses
 Apple's documented retry handling; do not assume successful re-attestation of an
 already attested key. All recovery backoff is bounded and server-directed.
+
+[Enrollment recovery0.4](ENROLLMENT_RECOVERY_V1.md) supersedes generic retry
+wording: exact-request retry only inside the original challenge deadline;
+after uncertain enrollment, a fresh `recover-key` assertion can establish the
+still-active registered key and advance its counter. Unknown outcome pauses
+instead of automatically generating/re-attesting keys. It defines bounded
+local retry/cooldown/two-handle rules, no key-ID status oracle and no hardware
+key-erasure promise. Recovery receipts last only until their original challenge
+deadline and never outlive/revive a revoked or expired key.
 
 After purge the API cannot promise permanent device exclusion or remember every
 historical key. Old registration challenges remain expired and assertions for

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:djconnect:rendezvous:1:review:0.3.0",
+  "$id": "urn:djconnect:rendezvous:1:review:0.4.0",
   "$comment": "Review only. Validate using the route-selected $defs; full byte, raw-URL, freshness, crypto and authorization rules remain normative in WIRE_PROFILE_V1.md. No implementation or crypto acceptance.",
   "$defs": {
     "v": {
@@ -133,7 +133,8 @@
         "action": {
           "enum": [
             "register",
-            "delete-key"
+            "delete-key",
+            "recover-key"
           ]
         }
       },
@@ -839,6 +840,89 @@
         "v",
         "error"
       ]
+    },
+    "attestation_recover": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "client_data": {
+          "$ref": "#/$defs/client_data"
+        },
+        "assertion": {
+          "$ref": "#/$defs/assertion"
+        }
+      },
+      "required": [
+        "v",
+        "key_id",
+        "challenge_id",
+        "client_data",
+        "assertion"
+      ]
+    },
+    "attestation_recover_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "key_expires_at": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": [
+        "v",
+        "key_expires_at"
+      ]
+    },
+    "attestation_recover_challenge_response": {
+      "$ref": "#/$defs/attestation_delete_challenge_response"
+    },
+    "recover_client_data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "v": {
+          "$ref": "#/$defs/v"
+        },
+        "action": {
+          "const": "recover-key"
+        },
+        "service_origin": {
+          "const": "https://api.djconnect.dev"
+        },
+        "key_id": {
+          "$ref": "#/$defs/key_id"
+        },
+        "challenge_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "challenge": {
+          "$ref": "#/$defs/opaque"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "required": [
+        "v",
+        "action",
+        "service_origin",
+        "key_id",
+        "challenge_id",
+        "challenge",
+        "expires_at"
+      ]
     }
   },
   "anyOf": [
@@ -922,6 +1006,15 @@
     },
     {
       "$ref": "#/$defs/error"
+    },
+    {
+      "$ref": "#/$defs/attestation_recover"
+    },
+    {
+      "$ref": "#/$defs/attestation_recover_response"
+    },
+    {
+      "$ref": "#/$defs/recover_client_data"
     }
   ]
 }

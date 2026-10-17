@@ -24,12 +24,14 @@ def main():
         }
         if Draft202012Validator(selected).is_valid(case["value"]) != case["valid"]:
             raise SystemExit("Schema case failed: " + case["name"])
-    example = fixtures["client_data_byte_example"]
-    encoded = example["base64url"]
-    raw = base64.urlsafe_b64decode(encoded + "=" * (-len(encoded) % 4))
-    if raw.decode("utf-8") != example["utf8"] or json.loads(raw) != example["parsed"]:
-        raise SystemExit("clientData byte example mismatch")
-    print(f"PASS: {len(fixtures['cases'])} schema cases and clientData byte example")
+    examples = [fixtures["client_data_byte_example"],
+                *fixtures.get("management_client_data_byte_examples", [])]
+    for example in examples:
+        encoded = example["base64url"]
+        raw = base64.urlsafe_b64decode(encoded + "=" * (-len(encoded) % 4))
+        if raw.decode("utf-8") != example["utf8"] or json.loads(raw) != example["parsed"]:
+            raise SystemExit("clientData byte example mismatch")
+    print(f"PASS: {len(fixtures['cases'])} schema cases and {len(examples)} clientData byte examples")
     print("NOT_RUN: App Attest, JWE interoperability, DO/runtime, native and live chain")
 
 

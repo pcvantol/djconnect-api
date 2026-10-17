@@ -1,7 +1,7 @@
 # VibeCast rendezvous v1 — pre-implementation review candidate
 
 Assignment: `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`.
-Document revision: `0.3.0-draft`; proposed wire version: `djc-rendezvous/1`.
+Document revision: `0.4.0-draft`; proposed wire version: `djc-rendezvous/1`.
 Status: **BLOCKED_CONTRACT_REVIEW**. No endpoint below exists yet. This is
 a decision package, not a frozen consumer contract or a production manifest.
 
@@ -11,6 +11,13 @@ recovery and counter/transaction crash ordering; [WIRE profile](WIRE_PROFILE_V1.
 defines exact request/clientData/JWE candidates and interoperability gates.
 Those documents supersede the older sketches below where they refine fields,
 limits, lifecycles or owner-choice status. They remain joint-review candidates.
+
+Revision0.4 incorporates Apple's producer-reported Mac/Chromium evidence and
+specific enrollment-timeout finding in [bounded recovery](ENROLLMENT_RECOVERY_V1.md).
+It adds a fresh action-separated recover-key proof, original-deadline receipts,
+paused repair rather than key-generation loops, and structural schemas/examples.
+Actual app-bound App Attest/strict verifier/receipt policy remain open. No runtime
+or frozen contract follows from the reported interop success.
 
 ## Current owner correction and route disposition
 

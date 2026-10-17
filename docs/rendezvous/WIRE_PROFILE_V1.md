@@ -1,4 +1,4 @@
-# Code-free A wire and crypto profile — review candidate 0.3.0
+# Code-free A wire and crypto profile — review candidate 0.4.0
 
 **NOT_FROZEN / NO_RUNTIME_GO.** Proposed wire `djc-rendezvous/1`.
 Read [KEY-STATE](KEY_STATE_V1.md) and [the contract](CONTRACT_REVIEW_V1.md).
@@ -124,6 +124,7 @@ request validation does not implement runtime authorization or cryptography.
 | `/consume` |200 state consumed/destination_envelope/expires_at |1KiB |
 | `/cancel` |200 state cancelled; browser claim required |1KiB |
 | `/attestation/delete` |200 state revoked/purge_at; challenged assertion required |16KiB |
+| `/attestation/recover` |200 original key_expires_at; fresh recover-key assertion required |16KiB |
 
 QR is raw compact UTF8 JSON, **not a URL/deep-link**: closed object
 `{type:"djc-rendezvous-qr",v,service_origin,transaction_id,generation,
@@ -149,6 +150,13 @@ checks fixed protocol/service identity, action, key ID, challenge ID/nonce and
 expiry before asserting SHA256 of those exact bytes. The delete request echoes
 those bytes; the server requires exact equality with its saved clientData.
 Registration continues to use its separate nonce-hash attestation flow.
+Revision0.4 adds management action `recover-key` using the same challenge
+response shape as delete-key, but action-separated exact clientData and a
+separate recover endpoint. [Enrollment recovery](ENROLLMENT_RECOVERY_V1.md)
+defines deadlines/counters/receipts/errors and the paused local repair policy.
+There is no public registration status lookup or expiry extension. Machine
+schemas cover the new request/response, decoded recovery clientData and its
+exact byte example; structural validity never proves the signature or key state.
 The submit request echoes `client_data` for exact byte equality against the
 saved challenge; signature verification uses only those saved matched bytes.
 The machine schemas also define registration/delete responses;
