@@ -78,6 +78,14 @@ with corrected tuple-concurrencyP2 and scoped egress GO. Mock-adapter proof is
 not fresh live/provider proof. Production egress/cache/propagation/
 operator proof and full verifier/action composition remain gates. No public enrollment. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
+Receiver16/6241859224 now reports actual isolated Mac JOSESwift3.0.0↔Chromium/
+WebKit jose6.2.12 with28 profile-oracle denials; no signed-iOS or production-parser
+GO. The requested [API public-input JWE generator](docs/rendezvous/JWE_VECTOR_GENERATOR_V1.md)
+is now implemented with52 Node/CLI tests and scoped reviews GO, exact pinned
+artifact, reserved synthetic destinations and no private-key transfer/storage.
+Existing receiver owner can invoke it synchronously while its nonextractable
+browser key is alive; no stale public-key comment or new device capture required.
+Actual crossrun of this producer and full action/native/service gates remain.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing

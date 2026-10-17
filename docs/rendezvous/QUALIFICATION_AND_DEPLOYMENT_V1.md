@@ -45,6 +45,10 @@ adds68/34 actual OCSP/CRL/cache cases with corrected scoped component GO.
 local cases after a concurrencyP2 correction; production egress/cache/provider cleanup/propagation and
 full verifier/action composition still require qualification. Archived receipts fail
 freshness. The runtime acceptance matrix below remains NOT_RUN.
+[Public-input software JWE generator](JWE_VECTOR_GENERATOR_V1.md) now adds52
+local Node/CLI tests and scoped reviews for the receiver's live-key crossrun.
+Receiver-reported Mac/browser oracle evidence is not this producer crossrun,
+actual signed-iOS action evidence or runtime acceptance.
 
 ## Local checkpoint — 2026-10-16
 

@@ -21,6 +21,12 @@ Actual app-bound diagnostic fixtures have now been independently processed in
 wire fixtures, strict path/verifier and receipt storage policy remain open. No
 runtime or frozen contract follows from these results.
 
+Receiver16/6241859224 now delivers isolated Mac/browser profile-oracle evidence.
+[API's requested software JWE generator](JWE_VECTOR_GENERATOR_V1.md) is implemented
+with52 local cases and scoped reviews. This resolves the missing producer tool,
+not concrete crossrun, actual signed-iOS action binding, full verifier/action
+composition or joint freeze. Do not request stale ephemeral keys in comments.
+
 ## Current owner correction and route disposition
 
 Owner decisions [6224544182](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6224544182)
