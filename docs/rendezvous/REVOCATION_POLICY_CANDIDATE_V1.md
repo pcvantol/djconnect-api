@@ -88,11 +88,15 @@ Timeout, response-size and egress controls require implementation qualification.
 ## Current source evidence and remaining work
 
 [Public-source observations](apple-status-source-observations-v1.json) record one
-read-only CRL probe: advertised HTTP URL returned a CRL with valid signature,
+read-only CRL probe at the earlier storage checkpoint: advertised HTTP URL returned a CRL with valid signature,
 pinned issuer/AKI and current signed validity; measured receipt intermediate
 not listed. The same path over HTTPS returned404. This proves neither signer
 OCSP status nor App Attest leaf status or runtime availability. No OCSP request,
-fraud refresh, private proof upload or Apple credential use was performed.
+fraud refresh, private proof upload or Apple credential use was performed at
+that checkpoint. A subsequent [status component qualification](WORKER_STATUS_QUALIFICATION_V1.md)
+now verifies common signer/intermediate OCSP and issuer CRL under actual local
+workerd,68/34 tests, with bounded nonrenewing in-memory cache. Production egress/
+cache/propagation and full verifier/admission remain unqualified.
 
 Before runtime: independent policy review, actual OCSP compatibility and negative
 status corpus; authenticated cache/outage/expiry/revoked controls, fixed egress;

@@ -69,7 +69,9 @@ is a reviewed storage proposal. [CMS qualification](WORKER_RECEIPT_QUALIFICATION
 adds83/44 actual local workerd tests; diagnostic revocation is unchecked, and
 [local SQLite storage](WORKER_STORAGE_QUALIFICATION_V1.md) adds39 DO cases/types
 with cleanupP2 corrected. [Status policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md)
-has scoped design GO; actual OCSP/status/propagation/operations and complete
+has scoped design GO; [local common certificate status](WORKER_STATUS_QUALIFICATION_V1.md)
+adds68/34 OCSP/CRL/cache cases with scoped component GO. Production egress/
+cache/propagation/operations and complete
 verifier/action composition remain open. No consumer endpoint/schema change.
 
 ## Serialization and binding

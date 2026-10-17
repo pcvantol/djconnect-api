@@ -39,7 +39,9 @@ now adds83/44 diagnostic signature/path/field cases; actual revocation/status,
 complete-verifier review remain open. [Local receipt storage](WORKER_STORAGE_QUALIFICATION_V1.md)
 now adds39 actual SQLite DO cases+isolated types with a confirmed precommit
 cleanup alarm; scoped storage GO. [Status policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md)
-has scoped design GO; actual OCSP/cache/provider cleanup/propagation and
+has scoped design GO; [local common certificate status](WORKER_STATUS_QUALIFICATION_V1.md)
+adds68/34 actual OCSP/CRL/cache cases with corrected scoped component GO.
+Production egress/cache/provider cleanup/propagation and
 full verifier/action composition still require qualification. Archived receipts fail
 freshness. The runtime acceptance matrix below remains NOT_RUN.
 

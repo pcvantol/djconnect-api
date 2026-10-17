@@ -121,7 +121,9 @@ storage/privacy/runtime/deployment approval is inferred.
 
 [Revocation policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md) now distinguishes
 explicit offline pinned App Attest trust from required authenticated receipt status.
-It has scoped design reviews, not actual OCSP/cache/egress/propagation evidence.
+It had scoped design reviews at this storage checkpoint. The later
+[status component](WORKER_STATUS_QUALIFICATION_V1.md) adds local OCSP/CRL/cache
+evidence; production egress/cache/propagation remains unqualified.
 The dated public CRL sample is no live status cache or signer-status proof.
 
 Still required: complete verifier/status/action composition; production receipt-key

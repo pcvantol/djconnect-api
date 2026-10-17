@@ -69,8 +69,11 @@ now has39 actual DO tests+isolated types PASS. CleanupP2 fixed by confirmed
 alarm before sensitive commit, including no-client-retry tests; scoped storage GO.
 [Revocation policy candidate](docs/rendezvous/REVOCATION_POLICY_CANDIDATE_V1.md)
 has corrected scoped policy GO: explicit offline pinned App Attest profile and
-hard-fail receipt status direction. Actual OCSP/status/cache/propagation/operator
-proof and full verifier/action composition remain gates. No public enrollment. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
+hard-fail receipt status direction. [Common certificate status qualification](docs/rendezvous/WORKER_STATUS_QUALIFICATION_V1.md)
+now adds68 actual local workerd/34 public-only OCSP/CRL cases, exact tuple
+nonrenewing cache and separately verified common Apple status responses. CRL-entry
+extensionP2 corrected and scoped component GO. Production egress/cache/propagation/
+operator proof and full verifier/action composition remain gates. No public enrollment. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
