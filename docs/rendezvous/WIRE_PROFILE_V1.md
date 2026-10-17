@@ -67,7 +67,10 @@ producer fixtures; operation receipts are not Apple fraud receipts. The
 checks without CMS/enrollment GO. [Finite receipt policy](INITIAL_RECEIPT_POLICY_V1.md)
 is a reviewed storage proposal. [CMS qualification](WORKER_RECEIPT_QUALIFICATION_V1.md)
 adds83/44 actual local workerd tests; diagnostic revocation is unchecked, and
-production status/storage/full-composition review remain open.
+[local SQLite storage](WORKER_STORAGE_QUALIFICATION_V1.md) adds39 DO cases/types
+with cleanupP2 corrected. [Status policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md)
+has scoped design GO; actual OCSP/status/propagation/operations and complete
+verifier/action composition remain open. No consumer endpoint/schema change.
 
 ## Serialization and binding
 

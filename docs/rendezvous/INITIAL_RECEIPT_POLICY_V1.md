@@ -111,3 +111,9 @@ is not implementation approval or a fully resolved receipt production policy.
 actual workerd cases for the measured sandbox signer/fields and archived Apple
 receipts. This diagnostic stage explicitly leaves revocation unchecked and grants
 no enrollment/storage permission; the production gates above remain required.
+
+[Local storage qualification](WORKER_STORAGE_QUALIFICATION_V1.md) now adds39
+actual SQLite DO cases plus isolated types. Review cleanupP2 corrected with
+confirmed alarm before sensitive commit; scoped storage GO, not provider
+monitoring/backup/production-secret qualification. [Status policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md)
+now has corrected scoped design GO; actual OCSP/cache/propagation remains open.

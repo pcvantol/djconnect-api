@@ -36,7 +36,11 @@ actual workerd crypto/parser cases and a corrected DER regression; receipt remai
 UNVERIFIED in that adapter. [Receipt storage proposal](INITIAL_RECEIPT_POLICY_V1.md)
 has scoped review GO. [CMS workerd qualification](WORKER_RECEIPT_QUALIFICATION_V1.md)
 now adds83/44 diagnostic signature/path/field cases; actual revocation/status,
-production storage and complete-verifier review remain open. Archived receipts fail
+complete-verifier review remain open. [Local receipt storage](WORKER_STORAGE_QUALIFICATION_V1.md)
+now adds39 actual SQLite DO cases+isolated types with a confirmed precommit
+cleanup alarm; scoped storage GO. [Status policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md)
+has scoped design GO; actual OCSP/cache/provider cleanup/propagation and
+full verifier/action composition still require qualification. Archived receipts fail
 freshness. The runtime acceptance matrix below remains NOT_RUN.
 
 ## Local checkpoint — 2026-10-16

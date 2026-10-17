@@ -63,7 +63,14 @@ has scoped proposal reviews GO. [Receipt workerd qualification](docs/rendezvous/
 now adds83 private-fixture /44 public-only actual CMS/signature/path/field tests,
 including real Apple BER/unsorted authenticated payload and strict freshness
 denial. Diagnostic revocation bypass is explicit, NO_ENROLLMENT; full status
-policy/key operations/storage tests/composed-verifier review remain required. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
+policy/key operations/composed-verifier review remain required.
+[Local SQLite receipt storage](docs/rendezvous/WORKER_STORAGE_QUALIFICATION_V1.md)
+now has39 actual DO tests+isolated types PASS. CleanupP2 fixed by confirmed
+alarm before sensitive commit, including no-client-retry tests; scoped storage GO.
+[Revocation policy candidate](docs/rendezvous/REVOCATION_POLICY_CANDIDATE_V1.md)
+has corrected scoped policy GO: explicit offline pinned App Attest profile and
+hard-fail receipt status direction. Actual OCSP/status/cache/propagation/operator
+proof and full verifier/action composition remain gates. No public enrollment. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
