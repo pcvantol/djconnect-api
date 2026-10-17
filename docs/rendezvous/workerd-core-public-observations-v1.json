@@ -1,0 +1,207 @@
+{
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "scope": "LOCAL_WORKERD_APP_ATTEST_CORE_ONLY_RECEIPT_UNVERIFIED_NO_RUNTIME_GO",
+  "tests_passed": 44,
+  "genuine_attestations": 0,
+  "genuine_assertions": 0,
+  "cases": [
+    {
+      "name": "signed synthetic unsigned counter 1",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic unsigned counter 2147483648",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic unsigned counter 4294967295",
+      "status": "passed"
+    },
+    {
+      "name": "correctly signed unsupported policy: wrong-app",
+      "status": "passed"
+    },
+    {
+      "name": "correctly signed unsupported policy: wrong-flags",
+      "status": "passed"
+    },
+    {
+      "name": "correctly signed unsupported policy: unsupported-build",
+      "status": "passed"
+    },
+    {
+      "name": "correctly signed unsupported policy: category-number",
+      "status": "passed"
+    },
+    {
+      "name": "correctly signed unsupported policy: category-wrong-value",
+      "status": "passed"
+    },
+    {
+      "name": "correctly signed unsupported policy: extra-extension",
+      "status": "passed"
+    },
+    {
+      "name": "correctly signed unsupported policy: camelcase-alias",
+      "status": "passed"
+    },
+    {
+      "name": "counter predicate rejects replay",
+      "status": "passed"
+    },
+    {
+      "name": "counter predicate rejects older",
+      "status": "passed"
+    },
+    {
+      "name": "counter predicate rejects exhausted",
+      "status": "passed"
+    },
+    {
+      "name": "counter predicate rejects negative",
+      "status": "passed"
+    },
+    {
+      "name": "counter predicate rejects fractional",
+      "status": "passed"
+    },
+    {
+      "name": "counter predicate rejects overflow",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects trailing",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects wrong-clientData",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects invalid-point",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects empty-clientData",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects oversized-clientData",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects changed-signature",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects nonminimal-signature-sequence-length",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects trailing-signature-der",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects zero-signature-integers",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects extra-proof-field",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic assertion rejects string-signature",
+      "status": "passed"
+    },
+    {
+      "name": "nonminimal DER rejected below payload ceiling with valid canonical control",
+      "status": "passed"
+    },
+    {
+      "name": "single-hash signature cannot substitute Apple nonce signature",
+      "status": "passed"
+    },
+    {
+      "name": "decoder itself rejects duplicate-text",
+      "status": "passed"
+    },
+    {
+      "name": "decoder itself rejects duplicate-integer",
+      "status": "passed"
+    },
+    {
+      "name": "decoder itself rejects duplicate-nonminimal-integer",
+      "status": "passed"
+    },
+    {
+      "name": "decoder itself rejects truncated",
+      "status": "passed"
+    },
+    {
+      "name": "decoder itself rejects invalid-utf8",
+      "status": "passed"
+    },
+    {
+      "name": "decoder itself rejects trailing-object",
+      "status": "passed"
+    },
+    {
+      "name": "decoder itself rejects deep",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: duplicate-text",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: duplicate-integer",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: truncated",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: invalid-utf8",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: tagged-map",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: trailing-object",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: deep",
+      "status": "passed"
+    },
+    {
+      "name": "strict malformed CBOR: overlong-payload",
+      "status": "passed"
+    }
+  ],
+  "node": "v26.12.0",
+  "libraries": {
+    "cbor": "10.0.12",
+    "pkijs": "3.4.1",
+    "asn1js": "3.1.0"
+  },
+  "source_sha256": {
+    "app-attest-core-candidate.mjs": "272396b17f4cb4fdc836ae1a5929ab4f47520795bcf5f513f524c76f7b7e9b0e",
+    "app-attest-core.check.mjs": "8ec6f2c71203d45f7f530eebb62361878c0fb8aa74894f41a900d44cb5636e32",
+    "worker-path-candidate.mjs": "f3de5f68cf10e1374e7fa48b2ccf46cc4089390c66af7fe936b4410add04f831",
+    "run_core_workerd.mjs": "77b685ceefd95a5cd053bafc07f2bb0a2a1071d54d56a9d9a93728fb0d59b3fc"
+  },
+  "compatibility_date": "2026-06-20",
+  "not_run": [
+    "receipt CMS/fresh enrollment",
+    "revocation availability",
+    "exact action wire/DO state/replay atomicity",
+    "production/HA/TV chain",
+    "genuine private Apple fixtures"
+  ]
+}

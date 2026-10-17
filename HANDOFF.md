@@ -1,5 +1,96 @@
 # DJConnect API Handoff
 
+## Active assignment — VibeCast rendezvous (2026-10-17)
+
+`DJC-API-VIBECAST-RENDEZVOUS-V1-20261016` is owner-selected; execution ACK:
+https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6222484621.
+One admitted API writer, fresh baseline
+`3bb5f2b01401827e8a1072e1668fbb4a2223f26f`.
+
+Status: **BLOCKED_CONTRACT_REVIEW before runtime implementation**. The
+[review candidate](docs/rendezvous/CONTRACT_REVIEW_V1.md) names the unresolved
+finite key/counter lifecycle, exact verifier/wire/crypto interoperability and
+qualification of the explicitly limited paired-app reported route. The canonical predecessor requires independent design
+review before implementation; these are substantive security decisions.
+[Qualification/deployment preparation](docs/rendezvous/QUALIFICATION_AND_DEPLOYMENT_V1.md)
+records the required scenarios and deployment/rollback boundaries. Revision
+`0.4.0-draft` incorporates the owner's code-free route-A correction and API's
+acknowledgement of Core ROUTE-1 `da9a08c`. The
+[App Attest design assessment](docs/rendezvous/CODE_FREE_APP_ATTEST_REVIEW_V1.md)
+records actual app-authenticity limits, paired-route trust, replay-state/privacy
+decisions and verifier qualification. No extra PAKE/comparison/TV code is selected.
+The owner limited-A choice is resolved at API94/6226306251; the original human
+exchange was independently read. Do not repeat that question.
+[KEY-STATE](docs/rendezvous/KEY_STATE_V1.md) and
+[wire/profile](docs/rendezvous/WIRE_PROFILE_V1.md) specify the new finite-state,
+crash/replay, request/clientData and JWE review candidate. None is a frozen
+consumer wire contract or production configuration.
+
+The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
+twoP2 corrections; these do not constitute implementation or live qualification.
+[Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15
+synthetic observations on two Node runtimes; the unmodified reference is rejected
+for runtime. Full certificate/CBOR validation, current extension/receipt policy
+and native interop remain concrete open gates.
+Receiver profile0.4 consumer ACK is delivered (API94/6231693523; receiver16/6233688083);
+unchanged browser wire retains that bounded ACK. Existing Core/Apple/receiver
+owners retain their owned interop/acceptance; API qualifies the full verifier.
+[Enrollment recovery](docs/rendezvous/ENROLLMENT_RECOVERY_V1.md) incorporates
+Apple's reported Mac/Chromium checks and physical capability-only readback,
+and defines bounded uncertain-registration recovery without a key-generation
+loop. Apple has now delivered actual app-bound development fixtures and ACK0.4.
+[Genuine fixture qualification](docs/rendezvous/GENUINE_APP_ATTEST_QUALIFICATION_V1.md)
+records independently executed141 offline observations plus12 parser controls,
+two attestations/ten real assertions, nonce/key/receipt binding, SDK31-byte
+input behavior and preserved failed native assumption. Strict OpenSSL path mode
+rejects missing leaf AKI while standard validation passes. The subsequent
+[leaf-AKI policy](docs/rendezvous/LEAF_AKI_POLICY_V1.md) has independent policy GO
+and16 executed strict OpenSSL cases: one leaf-only exception, all other errors
+fatal, fixed root/exact chain, context-local state. This specific design blocker
+is resolved. [Local workerd path qualification](docs/rendezvous/WORKER_PATH_QUALIFICATION_V1.md)
+now executes a closed PKIJS3.4.1/ASN1js3.1.0 candidate:72 private-fixture /56
+public-only tests PASS. One independent P2 (non-CA leaf path length) corrected
+and re-reviewed; scoped path and UX/privacy GO. Full PKI/CMS/composed verifier,
+revocation/receipt production policy and actual runtime remain open; no product
+imports/dependencies or public service added.
+[Core workerd qualification](docs/rendezvous/WORKER_CORE_QUALIFICATION_V1.md)
+now adds93 private-fixture /44 public-only tests for original raw Apple proof
+binding/signatures and strict parser/counter predicates. An actual public DER
+failure was corrected with explicit short headers and a regression below the
+payload ceiling; failed history is retained. Receipt is still UNVERIFIED in
+that candidate. [Finite initial-receipt policy](docs/rendezvous/INITIAL_RECEIPT_POLICY_V1.md)
+has scoped proposal reviews GO. [Receipt workerd qualification](docs/rendezvous/WORKER_RECEIPT_QUALIFICATION_V1.md)
+now adds83 private-fixture /44 public-only actual CMS/signature/path/field tests,
+including real Apple BER/unsorted authenticated payload and strict freshness
+denial. Diagnostic revocation bypass is explicit, NO_ENROLLMENT; full status
+policy/key operations/composed-verifier review remain required.
+[Local SQLite receipt storage](docs/rendezvous/WORKER_STORAGE_QUALIFICATION_V1.md)
+now has39 actual DO tests+isolated types PASS. CleanupP2 fixed by confirmed
+alarm before sensitive commit, including no-client-retry tests; scoped storage GO.
+[Revocation policy candidate](docs/rendezvous/REVOCATION_POLICY_CANDIDATE_V1.md)
+has corrected scoped policy GO: explicit offline pinned App Attest profile and
+hard-fail receipt status direction. [Common certificate status qualification](docs/rendezvous/WORKER_STATUS_QUALIFICATION_V1.md)
+now adds68 actual local workerd/34 public-only OCSP/CRL cases, exact tuple
+nonrenewing cache and separately verified common Apple status responses. CRL-entry
+extensionP2 corrected and scoped component GO. [Fixed status egress](docs/rendezvous/WORKER_STATUS_EGRESS_QUALIFICATION_V1.md)
+now adds101/35 local cases including4s timeouts/64KiB streams/2s attempt bounds,
+with corrected tuple-concurrencyP2 and scoped egress GO. Mock-adapter proof is
+not fresh live/provider proof. Production egress/cache/propagation/
+operator proof and full verifier/action composition remain gates. No public enrollment. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
+technical/security and UX/privacy reviews GO for this evidence scope only.
+Receiver16/6241859224 now reports actual isolated Mac JOSESwift3.0.0↔Chromium/
+WebKit jose6.2.12 with28 profile-oracle denials; no signed-iOS or production-parser
+GO. The requested [API public-input JWE generator](docs/rendezvous/JWE_VECTOR_GENERATOR_V1.md)
+is now implemented with52 Node/CLI tests and scoped reviews GO, exact pinned
+artifact, reserved synthetic destinations and no private-key transfer/storage.
+Existing receiver owner can invoke it synchronously while its nonextractable
+browser key is alive; no stale public-key comment or new device capture required.
+Actual crossrun of this producer and full action/native/service gates remain.
+No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
+new-service CI/E2E, protected product merge and separate Finalization remain
+pending. Production deployment remains separately unauthorized. The existing
+APNs/D1/operator runtime is unchanged; historical state below is retained.
+
 ## Current State
 
 - Repository: `pcvantol/djconnect-api`.

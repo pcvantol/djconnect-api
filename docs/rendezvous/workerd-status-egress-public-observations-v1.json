@@ -1,0 +1,177 @@
+{
+  "public_inputs_sha256": {
+    "apple-root-g3-crl-sample.der": "e74917051b2fbcc1da37af1c82104bed95e546d50e5d713ed8f8473b14f7592c",
+    "apple-receipt-root.cer": "63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179",
+    "synthetic-status-v1.json": "a192b37e6b90a140f732290eec3e956039f013b0f0bf98d635f8bc45df386c9b"
+  },
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "scope": "LOCAL_WORKERD_COMMON_CERT_STATUS_ONLY_NO_ENROLLMENT_GO",
+  "tests_passed": 35,
+  "genuine_status_inputs": 0,
+  "synthetic_cases": 32,
+  "cases": [
+    {
+      "name": "untrusted certificate profile never emits a status request",
+      "status": "passed"
+    },
+    {
+      "name": "empty cache cannot be seeded with a caller status object",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: valid-delegation",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: issuer-signs-directly",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: revoked",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: unknown",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-target",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-certid-hash",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: missing-next-update",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: future-this-update",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: stale-this-update",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: next-update-equality",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: future-produced-at",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: missing-responder-eku",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-ca-delegation",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: expired-responder",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: expired-target",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: critical-response-extension",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: duplicate-single-response",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: missing-responder-certs",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-responder-id",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: tampered-signature",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: trailing-object",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: truncated",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: unsuccessful-response",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-valid",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-revoked",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-critical-entry",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-noncritical-entry",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-unknown-extension",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-wrong-aki",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-future",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-next-update-equality",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-tampered-signature",
+      "status": "passed"
+    },
+    {
+      "name": "public wrapper refuses even valid synthetic root",
+      "status": "passed"
+    }
+  ],
+  "node": "v26.12.0",
+  "libraries": {
+    "pkijs": "3.4.1",
+    "asn1js": "3.1.0"
+  },
+  "source_sha256": {
+    "receipt-status-candidate.mjs": "41b951b16919926cfb40e0aee8d82482d9096a297d7b9d6e7ec9be6304b970e8",
+    "receipt-status.check.mjs": "9d3ef09aa2657af66dc82e6a96898dac3a67cd79d68569a4010c4e95240bf679",
+    "receipt-status-client.mjs": "d20c4f02e1bf11e140a69849201c165a84f21c2099a0a694e46a74211f774e17",
+    "receipt-status-client.check.mjs": "7db6df55631541dd8f0825d66b98798c33342b7c2c20d3ea85511fe858557e31",
+    "run_status_workerd.mjs": "b0a76b6fc404cd64b5cb86f6d663631e9eb7c951db17395b2d083f0dc1ebb302",
+    "build_synthetic_status.py": "d56af12a9395e0ea4b8c460c923c83b87a677b10c6ce1429c94afb75dbcfaab7"
+  },
+  "compatibility_date": "2026-06-20",
+  "not_run": [
+    "production egress/operational cache/propagation",
+    "complete verifier/fresh enrollment",
+    "exact action wire/DO state/replay atomicity",
+    "production/HA/TV chain",
+    "genuine private Apple fixtures"
+  ]
+}
