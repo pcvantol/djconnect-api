@@ -32,8 +32,9 @@ twoP2 corrections; these do not constitute implementation or live qualification.
 synthetic observations on two Node runtimes; the unmodified reference is rejected
 for runtime. Full certificate/CBOR validation, current extension/receipt policy
 and native interop remain concrete open gates.
-Next: existing Core/Apple/receiver owners acknowledge the exact profile and
-produce their owned feasibility/interop evidence; API qualifies the verifier.
+Receiver profile0.4 consumer ACK is delivered (API94/6231693523; receiver16/6233688083);
+unchanged browser wire retains that bounded ACK. Existing Core/Apple/receiver
+owners retain their owned interop/acceptance; API qualifies the full verifier.
 [Enrollment recovery](docs/rendezvous/ENROLLMENT_RECOVERY_V1.md) incorporates
 Apple's reported Mac/Chromium checks and physical capability-only readback,
 and defines bounded uncertain-registration recovery without a key-generation
@@ -52,7 +53,14 @@ public-only tests PASS. One independent P2 (non-CA leaf path length) corrected
 and re-reviewed; scoped path and UX/privacy GO. Full PKI/CMS/composed verifier,
 revocation/receipt production policy and actual runtime remain open; no product
 imports/dependencies or public service added.
-Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
+[Core workerd qualification](docs/rendezvous/WORKER_CORE_QUALIFICATION_V1.md)
+now adds93 private-fixture /44 public-only tests for original raw Apple proof
+binding/signatures and strict parser/counter predicates. An actual public DER
+failure was corrected with explicit short headers and a regression below the
+payload ceiling; failed history is retained. Receipt is still UNVERIFIED in
+that candidate. [Finite initial-receipt policy](docs/rendezvous/INITIAL_RECEIPT_POLICY_V1.md)
+has scoped proposal reviews GO; CMS/revocation/key operations/storage tests and
+complete-verifier review remain required. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain

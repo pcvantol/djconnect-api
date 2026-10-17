@@ -31,7 +31,10 @@ delivered; [narrow leaf-AKI policy](LEAF_AKI_POLICY_V1.md) now has policy GO and
 16 executed strict OpenSSL cases. [Closed workerd path candidate](WORKER_PATH_QUALIFICATION_V1.md)
 now adds72 actual private-fixture /56 public-only local tests and scoped review GO.
 Full composed Worker verifier/receipt policy and DO/action/HA-chain qualification
-remain open. Archived receipts fail
+remain open. [Core qualification](WORKER_CORE_QUALIFICATION_V1.md) now adds93/44
+actual workerd crypto/parser cases and a corrected DER regression; receipt remains
+UNVERIFIED in that adapter. [Receipt storage proposal](INITIAL_RECEIPT_POLICY_V1.md)
+has scoped review GO but no CMS/revocation/storage implementation evidence. Archived receipts fail
 freshness. The runtime acceptance matrix below remains NOT_RUN.
 
 ## Local checkpoint — 2026-10-16

@@ -62,7 +62,10 @@ policy fail closed. App Attest enrollment is not HA pairing or a new account.
 assertion observations on two Node runtimes and specific source-only path/parser
 gaps. The reference remains rejected for runtime. Current Apple extension and
 fraud-receipt applicability/retention need explicit resolution with actual
-producer fixtures; operation receipts are not Apple fraud receipts.
+producer fixtures; operation receipts are not Apple fraud receipts. The
+[core qualification](WORKER_CORE_QUALIFICATION_V1.md) adds93/44 actual workerd
+checks without CMS/enrollment GO. [Finite receipt policy](INITIAL_RECEIPT_POLICY_V1.md)
+is a reviewed storage proposal; revocation/CMS/storage implementation remain open.
 
 ## Serialization and binding
 

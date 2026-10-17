@@ -21,6 +21,7 @@ This accepted product boundary does not approve storage, crypto or deployment.
 | Record | Contents | Eligibility / cleanup |
 | --- | --- | --- |
 | Attested key | Public key, app-policy ID, environment, highest unsigned32 counter, created_at, key_expires_at, status | Active for at most30 days from successful registration; never extended by activity |
+| Initial Apple receipt (reviewed proposal) | Encrypted verified original CMS, nonce/key version, minimal verified creation/type/policy; context bound to owning key | Same original key expiry, at most30days; erase at revoke/delete/expiry; no fraud refresh; exact [receipt policy](INITIAL_RECEIPT_POLICY_V1.md) |
 | Key address | SHA256 of environment, configured app-policy ID and canonical Apple key ID, under a fixed internal namespace | Linkable identifier; not anonymized, never a user/HA/paired-install index |
 | Enrollment challenge | Random32-byte nonce/ID, key address, action, created_at, expires_at |120s; one successful enrollment; no existing-key overwrite |
 | Enrollment result receipt | Enrollment operation ID, exact registration request digest, original key expiry/result | Original enrollment challenge deadline only; no replay after revocation/expiry |
