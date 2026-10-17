@@ -108,6 +108,10 @@ caller-provided raw hashes.
 
 ## Real unresolved certificate policy
 
+Subsequent disposition: [reviewed narrow leaf-AKI policy](LEAF_AKI_POLICY_V1.md)
+and a16-case strict OpenSSL probe now resolve this **design** question. Original
+observations below remain historical; Worker/full verifier qualification is pending.
+
 OpenSSL4 strict RFC validation rejects the genuine leaf with **error85, Missing
 Authority Key Identifier**, while its ordinary path validator accepts the chain.
 The qualifier records both, and does not hide the strict rejection, ignore

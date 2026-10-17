@@ -42,8 +42,11 @@ loop. Apple has now delivered actual app-bound development fixtures and ACK0.4.
 records independently executed141 offline observations plus12 parser controls,
 two attestations/ten real assertions, nonce/key/receipt binding, SDK31-byte
 input behavior and preserved failed native assumption. Strict OpenSSL path mode
-rejects missing leaf AKI while standard validation passes: explicit compatibility
-policy and maintained Worker-stack/full PKI/CMS/receipt policy remain unresolved.
+rejects missing leaf AKI while standard validation passes. The subsequent
+[leaf-AKI policy](docs/rendezvous/LEAF_AKI_POLICY_V1.md) has independent policy GO
+and16 executed strict OpenSSL cases: one leaf-only exception, all other errors
+fatal, fixed root/exact chain, context-local state. This specific design blocker
+is resolved; maintained Worker enforcement/full PKI/CMS/receipt policy remain open.
 Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,

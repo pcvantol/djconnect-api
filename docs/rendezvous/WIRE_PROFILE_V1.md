@@ -202,7 +202,9 @@ Address sent/ready/consumed/navigation initiated are never display connected.
 Apple has delivered actual app-bound development fixtures and ACK0.4;
 [offline qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md) records measured
 snake_case extensions/flags, real nonce/receipt/assertion binding and the strict
-leaf-AKI blocker. These diagnostic inputs are not actual action-specific wire
+leaf-AKI finding. Its [narrow policy](LEAF_AKI_POLICY_V1.md) now has policy GO and
+an executed strict OpenSSL probe; equivalent Worker enforcement remains pending.
+These diagnostic inputs are not actual action-specific wire
 clientData or live enrollment. The remaining obligation is qualified fresh
 action-separated fixtures with exact signed identity/environment and redacted public evidence;
 no private key or production/user payload in repository. Include app/prefix/env,

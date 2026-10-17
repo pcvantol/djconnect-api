@@ -27,7 +27,8 @@ matrix PASS, actual Apple proof or a qualified replacement verifier.
 [Genuine app-bound qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md) now
 records independently executed private development-fixture checks:141 offline
 observations and12 negative parser controls. The missing-fixture input is
-delivered; strict leaf-AKI policy/full verifier/receipt storage and actual
+delivered; [narrow leaf-AKI policy](LEAF_AKI_POLICY_V1.md) now has policy GO and
+16 executed strict OpenSSL cases. Full Worker verifier/receipt storage and actual
 workerd/DO/action/HA-chain qualification remain open. Archived receipts fail
 freshness. The runtime acceptance matrix below remains NOT_RUN.
 
