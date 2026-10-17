@@ -17,12 +17,12 @@
     "provision:cloudflare": "scripts/provision_cloudflare.sh"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.22.0",
-    "@types/node": "^26.6.4",
+    "@cloudflare/vitest-pool-workers": "^0.23.0",
+    "@types/node": "^26.6.5",
     "@vitest/coverage-istanbul": "~4.1.11",
     "typescript": "^7.0.2",
     "vitest": "~4.1.11",
-    "wrangler": "^4.148.0"
+    "wrangler": "^4.151.0"
   },
   "overrides": {
     "sharp": "0.35.4",
