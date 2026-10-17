@@ -58,6 +58,12 @@ must determine the exact library adapter behavior. Certificate expiry, malformed
 CBOR/ASN.1 lengths/duplicates/trailing objects and unsupported app/distribution
 policy fail closed. App Attest enrollment is not HA pairing or a new account.
 
+[Reference audit](VERIFIER_REFERENCE_AUDIT_V1.md) records15 executed synthetic
+assertion observations on two Node runtimes and specific source-only path/parser
+gaps. The reference remains rejected for runtime. Current Apple extension and
+fraud-receipt applicability/retention need explicit resolution with actual
+producer fixtures; operation receipts are not Apple fraud receipts.
+
 ## Serialization and binding
 
 All JSON is one UTF8 object, reject duplicate keys, invalid UTF8, trailing data,

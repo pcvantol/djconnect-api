@@ -26,8 +26,14 @@ exchange was independently read. Do not repeat that question.
 crash/replay, request/clientData and JWE review candidate. None is a frozen
 consumer wire contract or production configuration.
 
-Next: existing Core/Apple/receiver owners resolve the named contract decisions,
-then independent technical/privacy and UX reviewers assess the exact candidate.
+The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
+twoP2 corrections; these do not constitute implementation or live qualification.
+[Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15
+synthetic observations on two Node runtimes; the unmodified reference is rejected
+for runtime. Full certificate/CBOR validation, actual Apple fixtures, current
+extension/receipt policy and native interop remain concrete open gates.
+Next: existing Core/Apple/receiver owners acknowledge the exact profile and
+produce their owned feasibility/interop evidence; API qualifies the verifier.
 No new lanewriters or cross-repository source writes. Runtime, crypto fixtures,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing

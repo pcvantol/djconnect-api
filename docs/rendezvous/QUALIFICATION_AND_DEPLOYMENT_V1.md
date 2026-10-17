@@ -14,6 +14,11 @@ isolated environment: `python scripts/validate_rendezvous_contract.py`.
 No runtime dependency or workflow was changed for this optional design check.
 This checks schema/byte examples only; it is not an Apple/JWE/DO test.
 
+The separate [reference audit](VERIFIER_REFERENCE_AUDIT_V1.md) records15 actual
+software-signed synthetic observations on two Node runtimes. It demonstrates
+specific flaws in an unapproved reference; it is not a new-service acceptance
+matrix PASS, actual Apple proof or a qualified replacement verifier.
+
 ## Local checkpoint — 2026-10-16
 
 On the contract branch based on `3bb5f2b01401827e8a1072e1668fbb4a2223f26f`:
