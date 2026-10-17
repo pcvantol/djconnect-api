@@ -7,7 +7,9 @@ Same API94 writer; profile0.4.0-draft/wire djc-rendezvous/1 **NOT_FROZEN**.
 [tests](../../qualification/rendezvous/receipt-status.check.mjs):
 [68/68 local workerd cases PASS](workerd-status-observations-v1.json),
 [34/34 public-only cases PASS](workerd-status-public-observations-v1.json).
-These extend the separately qualified CMS and storage components; they do not
+These status-only results bind checkpoint e5d3c8d. The current runner also
+executes [egress qualification](WORKER_STATUS_EGRESS_QUALIFICATION_V1.md),101/35
+cases, with updated source hashes. These extend the separately qualified CMS and storage components; they do not
 compose them into an admission decision. Product imports, dependencies, bindings,
 routes, D1, secrets and deployment remain unchanged.
 

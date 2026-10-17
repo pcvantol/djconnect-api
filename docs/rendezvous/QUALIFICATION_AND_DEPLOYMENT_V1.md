@@ -41,7 +41,8 @@ now adds39 actual SQLite DO cases+isolated types with a confirmed precommit
 cleanup alarm; scoped storage GO. [Status policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md)
 has scoped design GO; [local common certificate status](WORKER_STATUS_QUALIFICATION_V1.md)
 adds68/34 actual OCSP/CRL/cache cases with corrected scoped component GO.
-Production egress/cache/provider cleanup/propagation and
+[Fixed egress qualification](WORKER_STATUS_EGRESS_QUALIFICATION_V1.md) adds101/35
+local cases after a concurrencyP2 correction; production egress/cache/provider cleanup/propagation and
 full verifier/action composition still require qualification. Archived receipts fail
 freshness. The runtime acceptance matrix below remains NOT_RUN.
 

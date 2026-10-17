@@ -72,7 +72,10 @@ has corrected scoped policy GO: explicit offline pinned App Attest profile and
 hard-fail receipt status direction. [Common certificate status qualification](docs/rendezvous/WORKER_STATUS_QUALIFICATION_V1.md)
 now adds68 actual local workerd/34 public-only OCSP/CRL cases, exact tuple
 nonrenewing cache and separately verified common Apple status responses. CRL-entry
-extensionP2 corrected and scoped component GO. Production egress/cache/propagation/
+extensionP2 corrected and scoped component GO. [Fixed status egress](docs/rendezvous/WORKER_STATUS_EGRESS_QUALIFICATION_V1.md)
+now adds101/35 local cases including4s timeouts/64KiB streams/2s attempt bounds,
+with corrected tuple-concurrencyP2 and scoped egress GO. Mock-adapter proof is
+not fresh live/provider proof. Production egress/cache/propagation/
 operator proof and full verifier/action composition remain gates. No public enrollment. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,

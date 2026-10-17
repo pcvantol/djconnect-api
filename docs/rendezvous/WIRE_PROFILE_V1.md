@@ -70,7 +70,8 @@ adds83/44 actual local workerd tests; diagnostic revocation is unchecked, and
 [local SQLite storage](WORKER_STORAGE_QUALIFICATION_V1.md) adds39 DO cases/types
 with cleanupP2 corrected. [Status policy candidate](REVOCATION_POLICY_CANDIDATE_V1.md)
 has scoped design GO; [local common certificate status](WORKER_STATUS_QUALIFICATION_V1.md)
-adds68/34 OCSP/CRL/cache cases with scoped component GO. Production egress/
+adds68/34 OCSP/CRL/cache cases with scoped component GO. [Fixed egress qualification](WORKER_STATUS_EGRESS_QUALIFICATION_V1.md) adds101/35
+local cases after a concurrencyP2 correction; production egress/
 cache/propagation/operations and complete
 verifier/action composition remain open. No consumer endpoint/schema change.
 

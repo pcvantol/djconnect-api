@@ -62,6 +62,19 @@ async function evaluate(kind,response,cert,issuer,root,pin,now){
  return kind==='ocsp'?ocsp(...args):kind==='crl'?crl(...args):null;
 }
 export async function qualifyCommonStatus(kind,response,cert,issuer,root){try{return await evaluate(kind,response,cert,issuer,root,PIN,Date.now());}catch{return null;}}
+export async function prepareCommonStatusRequest(kind,cert,issuer,root){
+ try{
+  cert=bytes(cert,8192);issuer=bytes(issuer,8192);root=bytes(root,8192);
+  const ctx=await context(cert,issuer,root,PIN,Date.now());
+  if(kind==='crl'){
+   need(same(issuer,root));return {role:'issuer-crl',url:'http://crl.apple.com/applerootcag3.crl',method:'GET',body:undefined,accept:'application/pkix-crl'};
+  }
+  need(kind==='ocsp');const isIssuer=same(issuer,root),request=new pki.OCSPRequest();
+  await request.createForCertificate(ctx.cert,{issuerCertificate:ctx.issuer,hashAlgorithm:'SHA-256'},ctx.engine);
+  const body=new Uint8Array(request.toSchema(true).toBER(false));need(body.length<=4096);
+  return {role:isIssuer?'issuer-ocsp':'signer-ocsp',url:'http://ocsp.apple.com/'+(isIssuer?'ocsp03-applerootcag3':'ocsp03-aaica5g101'),method:'POST',body,accept:'application/ocsp-response'};
+ }catch{return null;}
+}
 export async function qualifySyntheticStatus(f){try{need(f.scope==='synthetic-common-status-qualification-only');return await evaluate(f.kind,f.response,f.cert,f.issuer,f.root,f.pin,Date.now());}catch{return null;}}
 async function binding(kind,cert,issuer,root){
  const tuple=[kind,hex(await digest(cert)),hex(await digest(issuer)),hex(await digest(root))];

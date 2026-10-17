@@ -39,13 +39,13 @@ async function main() {
   for(const f of fixture.genuine)f.referenceTime=f.kind==='ocsp'?f.thisUpdate+60000:Date.parse('2026-10-17T20:41:16Z');
   await put('fixtures.mjs','export default '+JSON.stringify(fixture)+';\n');
   const sources={};
-  for(const name of ['receipt-status-candidate.mjs','receipt-status.check.mjs','run_status_workerd.mjs','build_synthetic_status.py']) {
+  for(const name of ['receipt-status-candidate.mjs','receipt-status.check.mjs','receipt-status-client.mjs','receipt-status-client.check.mjs','run_status_workerd.mjs','build_synthetic_status.py']) {
     const source=await readFile(new URL('./'+name,import.meta.url)); sources[name]=hash(source); await put(name,source);
   }
   await put('worker.mjs',"export default {fetch(){return new Response('qualification only',{status:503})}};\n");
   await put('wrangler.jsonc',JSON.stringify({name:'djc-private-status-qualification',main:'worker.mjs',workers_dev:false,compatibility_date:'2026-06-20',compatibility_flags:['nodejs_compat'],send_metrics:false,observability:{enabled:false}}));
   const aliases={pkijs:join(deps,'node_modules/pkijs/build/index.es.js'),asn1js:join(deps,'node_modules/asn1js/build/index.es.js'),'djc-status-fixtures':join(output,'fixtures.mjs')};
-  await put('vitest.config.mts',`import {defineConfig} from 'vitest/config';import {cloudflareTest} from '@cloudflare/vitest-pool-workers';export default defineConfig({resolve:{alias:${JSON.stringify(aliases)}},plugins:[cloudflareTest({wrangler:{configPath:'./wrangler.jsonc'}})],test:{include:['receipt-status.check.mjs'],testTimeout:20000}});\n`);
+  await put('vitest.config.mts',`import {defineConfig} from 'vitest/config';import {cloudflareTest} from '@cloudflare/vitest-pool-workers';export default defineConfig({resolve:{alias:${JSON.stringify(aliases)}},plugins:[cloudflareTest({wrangler:{configPath:'./wrangler.jsonc'}})],test:{include:['receipt-status.check.mjs','receipt-status-client.check.mjs'],testTimeout:20000}});\n`);
   const rr=createRequire(join(repo,'package.json'));
   const child=spawnSync(process.execPath,[join(dirname(rr.resolve('vitest/package.json')),'vitest.mjs'),'run','--config','vitest.config.mts','--reporter=json','--outputFile=results-private.json'],{cwd:output,encoding:'utf8',maxBuffer:8*1024*1024,env:{...process.env,WRANGLER_LOG_PATH:join(output,'wrangler.log'),CLOUDFLARE_SEND_METRICS:'false'}});
   await put('process-private.log',(child.stdout??'')+'\n'+(child.stderr??''));
@@ -65,7 +65,7 @@ async function main() {
   const miniflare=await metadata(createRequire(pool.path),'miniflare');
   const workerd=await metadata(createRequire(miniflare.path),'workerd');
   const publicInputs={};for(const name of ['apple-root-g3-crl-sample.der','apple-receipt-root.cer','synthetic-status-v1.json'])publicInputs[name]=hash(await readFile(new URL('./'+name,import.meta.url)));
-  const summary={public_inputs_sha256:publicInputs,pool:pool.version,miniflare:miniflare.version,workerd:workerd.version,scope:'LOCAL_WORKERD_COMMON_CERT_STATUS_ONLY_NO_ENROLLMENT_GO',tests_passed:result.numPassedTests,genuine_status_inputs:fixture.genuine.length,synthetic_cases:fixture.synthetic.length,cases:result.testResults.flatMap(f=>f.assertionResults.map(t=>({name:t.fullName,status:t.status}))),node:process.version,libraries:versions,source_sha256:sources,compatibility_date:'2026-06-20',not_run:['complete status egress/production cache/propagation','complete verifier/fresh enrollment','exact action wire/DO state/replay atomicity','production/HA/TV chain',...(privateArg?[]:['genuine private Apple fixtures'])]};
+  const summary={public_inputs_sha256:publicInputs,pool:pool.version,miniflare:miniflare.version,workerd:workerd.version,scope:'LOCAL_WORKERD_COMMON_CERT_STATUS_ONLY_NO_ENROLLMENT_GO',tests_passed:result.numPassedTests,genuine_status_inputs:fixture.genuine.length,synthetic_cases:fixture.synthetic.length,cases:result.testResults.flatMap(f=>f.assertionResults.map(t=>({name:t.fullName,status:t.status}))),node:process.version,libraries:versions,source_sha256:sources,compatibility_date:'2026-06-20',not_run:['production egress/operational cache/propagation','complete verifier/fresh enrollment','exact action wire/DO state/replay atomicity','production/HA/TV chain',...(privateArg?[]:['genuine private Apple fixtures'])]};
   await put('summary-sanitized.json',JSON.stringify(summary,null,2)+'\n');
   console.log('PASS: '+summary.tests_passed+' isolated workerd status cases; no enrollment GO.');
 }

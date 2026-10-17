@@ -96,7 +96,9 @@ fraud refresh, private proof upload or Apple credential use was performed at
 that checkpoint. A subsequent [status component qualification](WORKER_STATUS_QUALIFICATION_V1.md)
 now verifies common signer/intermediate OCSP and issuer CRL under actual local
 workerd,68/34 tests, with bounded nonrenewing in-memory cache. Production egress/
-cache/propagation and full verifier/admission remain unqualified.
+cache/propagation and full verifier/admission remain unqualified. Later
+[isolated fixed egress](WORKER_STATUS_EGRESS_QUALIFICATION_V1.md) adds101/35
+local tests and scoped egress GO, not live adapter/provider proof.
 
 Before runtime: independent policy review, actual OCSP compatibility and negative
 status corpus; authenticated cache/outage/expiry/revoked controls, fixed egress;
