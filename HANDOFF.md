@@ -46,7 +46,12 @@ rejects missing leaf AKI while standard validation passes. The subsequent
 [leaf-AKI policy](docs/rendezvous/LEAF_AKI_POLICY_V1.md) has independent policy GO
 and16 executed strict OpenSSL cases: one leaf-only exception, all other errors
 fatal, fixed root/exact chain, context-local state. This specific design blocker
-is resolved; maintained Worker enforcement/full PKI/CMS/receipt policy remain open.
+is resolved. [Local workerd path qualification](docs/rendezvous/WORKER_PATH_QUALIFICATION_V1.md)
+now executes a closed PKIJS3.4.1/ASN1js3.1.0 candidate:72 private-fixture /56
+public-only tests PASS. One independent P2 (non-CA leaf path length) corrected
+and re-reviewed; scoped path and UX/privacy GO. Full PKI/CMS/composed verifier,
+revocation/receipt production policy and actual runtime remain open; no product
+imports/dependencies or public service added.
 Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,

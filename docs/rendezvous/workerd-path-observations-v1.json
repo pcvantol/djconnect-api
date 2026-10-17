@@ -1,0 +1,316 @@
+{
+  "scope": "LOCAL_WORKERD_CERTIFICATE_PATH_CANDIDATE_NOT_COMPLETE_VERIFIER",
+  "tests_passed": 72,
+  "synthetic_cases": 55,
+  "genuine_paths": 2,
+  "cases": [
+    {
+      "name": "synthetic signed path: valid",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-missing-aki",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-missing-aki",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-wrong-aki",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-wrong-aki",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: root-missing-ski",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-missing-ski",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-is-ca",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-not-ca",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: root-not-ca",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-missing-bc",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-noncritical-bc",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-missing-ku",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-no-digital-signature",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-no-cert-sign",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: root-no-cert-sign",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-wrong-eku",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-extra-eku",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-missing-eku",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-missing-nonce",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-critical-nonce",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-rsa",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-p384",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-unsupported-sha512",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-unknown-critical",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-unknown-critical",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: root-unknown-critical",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-unknown-noncritical",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: root-pathlen-zero",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: wrong-issuer-name",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-future",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-expired",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-future",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: intermediate-expired",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: root-future",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: root-expired",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: wrong-root-pin",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: damaged-leaf",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: damaged-intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: damaged-root-self-signature",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: trailing-der",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: truncated-der",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: oversize",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: reversed",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: duplicate-extension",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: algorithm-mismatch",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: nonminimal-outer-length",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: indefinite-outer-length",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: outer-ecdsa-null-parameters",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: signature-unused-bits",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: invalid-ec-point",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: zero-serial",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: negative-serial",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: version-v1",
+      "status": "passed"
+    },
+    {
+      "name": "synthetic signed path: leaf-pathlen-without-ca",
+      "status": "passed"
+    },
+    {
+      "name": "genuine reviewed path: active",
+      "status": "passed"
+    },
+    {
+      "name": "genuine damaged leaf: active",
+      "status": "passed"
+    },
+    {
+      "name": "genuine damaged intermediate: active",
+      "status": "passed"
+    },
+    {
+      "name": "genuine reversed chain: active",
+      "status": "passed"
+    },
+    {
+      "name": "genuine wrong intermediate: active",
+      "status": "passed"
+    },
+    {
+      "name": "genuine time fault not-yet-valid: active",
+      "status": "passed"
+    },
+    {
+      "name": "genuine time fault expired: active",
+      "status": "passed"
+    },
+    {
+      "name": "genuine reviewed path: replacement",
+      "status": "passed"
+    },
+    {
+      "name": "genuine damaged leaf: replacement",
+      "status": "passed"
+    },
+    {
+      "name": "genuine damaged intermediate: replacement",
+      "status": "passed"
+    },
+    {
+      "name": "genuine reversed chain: replacement",
+      "status": "passed"
+    },
+    {
+      "name": "genuine wrong intermediate: replacement",
+      "status": "passed"
+    },
+    {
+      "name": "genuine time fault not-yet-valid: replacement",
+      "status": "passed"
+    },
+    {
+      "name": "genuine time fault expired: replacement",
+      "status": "passed"
+    },
+    {
+      "name": "no external fetch during genuine path qualification",
+      "status": "passed"
+    },
+    {
+      "name": "parallel valid and invalid verification keeps trust isolated",
+      "status": "passed"
+    },
+    {
+      "name": "fixed Apple wrapper never trusts the synthetic test root",
+      "status": "passed"
+    }
+  ],
+  "node": "v26.12.0",
+  "pkijs": "3.4.1",
+  "asn1js": "3.1.0",
+  "source_sha256": {
+    "worker-path-candidate.mjs": "f3de5f68cf10e1374e7fa48b2ccf46cc4089390c66af7fe936b4410add04f831",
+    "worker-path.check.mjs": "df347651c4be9ec99571064e16ec20a03b846d2a69d6ca9e62d03c260f6a77f9"
+  },
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "compatibility_date": "2026-06-20",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "not_run": [
+    "full composed App Attest verifier/CMS",
+    "revocation availability",
+    "enrollment/DO/recovery/races",
+    "production or HA/TV chain"
+  ]
+}

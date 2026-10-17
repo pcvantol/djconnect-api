@@ -203,7 +203,9 @@ Apple has delivered actual app-bound development fixtures and ACK0.4;
 [offline qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md) records measured
 snake_case extensions/flags, real nonce/receipt/assertion binding and the strict
 leaf-AKI finding. Its [narrow policy](LEAF_AKI_POLICY_V1.md) now has policy GO and
-an executed strict OpenSSL probe; equivalent Worker enforcement remains pending.
+an executed strict OpenSSL probe. [Closed workerd path qualification](WORKER_PATH_QUALIFICATION_V1.md)
+now adds72/56 local tests and scoped path review GO, without claiming complete
+strict-mode equivalence or a qualified composed verifier.
 These diagnostic inputs are not actual action-specific wire
 clientData or live enrollment. The remaining obligation is qualified fresh
 action-separated fixtures with exact signed identity/environment and redacted public evidence;

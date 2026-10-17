@@ -1,7 +1,7 @@
 # Reviewed Apple leaf-AKI policy v1
 
 Same API94 writer, existing0.4.0-draft wire design; no endpoint/schema change.
-**Policy review GO; strict OpenSSL probe measured; Worker/runtime pending.**
+**Policy review GO; strict OpenSSL probe and closed local workerd candidate measured; full verifier/runtime pending.**
 
 ## Exact rule
 
@@ -37,7 +37,9 @@ This probe checks **only certificate path policy**. Nonce value, saved challenge
 app/key binding, assertions, receipts, deadlines and full protocol validation
 remain required. It cannot enroll a key, transfer a route or grant HA ownership,
 screen rights or a Session. Measured development app/version/platform scope is
-unchanged; other shapes/distributions and Worker enforcement are not qualified.
+unchanged. Subsequent [closed Worker path qualification](WORKER_PATH_QUALIFICATION_V1.md)
+measures the selected profile, not general X.509/strict-mode equivalence or other
+Apple shapes/distributions.
 
 ## Executed tests and reproduction
 
@@ -81,8 +83,9 @@ GO**, noP1/P2. It subsequently assessed context-local state and the reported
 Supplied-material UX/privacy/evidence review also GO. Reviewers did not inspect
 Git/libraries/fixtures or execute code independently; receipts are in API90/PR94.
 
-Next: maintained Worker-compatible stack with equivalent enforcement and full
-negative PKI/CMS corpus/composed verifier review; finite initial-receipt production
+The maintained Worker path candidate now has72/56 executed local cases and scoped
+review GO; see its [exact limits](WORKER_PATH_QUALIFICATION_V1.md).
+Next: full negative PKI/CMS corpus/composed verifier review; finite initial-receipt production
 policy; wire actions/DO lifecycle/recovery/revoke/races and consumer freeze.
 No full-verifier, runtime, merge/Finalization or deployment approval follows.
 
