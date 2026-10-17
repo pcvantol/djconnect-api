@@ -216,7 +216,7 @@
   ],
   "source_sha256": {
     "generate_destination_vector.mjs": "15533bbd9e74c6557508ac11bbda26c4d851c3a62172c0790733b4b0c4891001",
-    "run_jwe_vectors.mjs": "59105c450b83bdf8c0a465ffe3bb3d4e61e3550d769aa02fa203b9fa54a84436",
+    "run_jwe_vectors.mjs": "3d062a1550188f58a8030a1d4ec2e7015b76e904ebcb92b183de6ec3dda3e83a",
     "jwe-dependency-provenance-v1.json": "81f4cd24e597028127776e6e3cc632ac84c9d5302103e68bfa1589e0dc3fdae3"
   },
   "private_material": "software RSA private keys process-memory only; not exported or persisted",

@@ -114,6 +114,15 @@ or run tests. No full crypto/wire/runtime approval follows. Existing40 API
 regressions,107 schema+2byte examples, types and offline projection pass separately.
 No user-facing translations changed; normal CI remains separate from local52.
 
+First normal CI at c21f3a0 ran its CodeQL analysis successfully but the security
+result gate FAILED with one high alert on first-occurrence string replacement
+in the duplicate-key negative fixture. The test builder now constructs the
+explicit duplicate prefix instead of a replace operation. Each duplicate fixture
+also proves valid JSON syntax before testing generator rejection, so a broken
+JSON string cannot masquerade as duplicate detection. Final52-case rerun passes;
+generator and manifest hashes are unchanged. No alert suppression, dismissal,
+workflow or gate change; the failed first CI remains part of delivery history.
+
 Receiver already reports Mac JOSESwift3.0.0↔Chromium/WebKit jose6.2.12, nonextractable
 keys and28 profile-oracle denials. That evidence predates this concrete API
 generator, is producer-reported, and explicitly uses predetermined fake destination/
