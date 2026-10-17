@@ -1,7 +1,7 @@
 # Rendezvous qualification and deployment preparation
 
 Status: preparation only; see [contract review](CONTRACT_REVIEW_V1.md).
-No runtime, crypto vectors, production binding or release is delivered yet.
+No runtime, public wire-vector package, production binding or release is delivered yet.
 
 Revision0.3 adds [KEY-STATE](KEY_STATE_V1.md), [wire/profile](WIRE_PROFILE_V1.md),
 machine request/response/clientData schemas and explicitly nonfunctional
@@ -23,6 +23,13 @@ The separate [reference audit](VERIFIER_REFERENCE_AUDIT_V1.md) records15 actual
 software-signed synthetic observations on two Node runtimes. It demonstrates
 specific flaws in an unapproved reference; it is not a new-service acceptance
 matrix PASS, actual Apple proof or a qualified replacement verifier.
+
+[Genuine app-bound qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md) now
+records independently executed private development-fixture checks:141 offline
+observations and12 negative parser controls. The missing-fixture input is
+delivered; strict leaf-AKI policy/full verifier/receipt storage and actual
+workerd/DO/action/HA-chain qualification remain open. Archived receipts fail
+freshness. The runtime acceptance matrix below remains NOT_RUN.
 
 ## Local checkpoint — 2026-10-16
 

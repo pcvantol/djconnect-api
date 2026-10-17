@@ -1,0 +1,641 @@
+{
+  "scope": "OFFLINE_GENUINE_FIXTURE_QUALIFICATION_NOT_RUNTIME_GO",
+  "attestations": 2,
+  "real_assertions": 10,
+  "checks": [
+    {
+      "name": "active:standard-openssl-path",
+      "result": "pass"
+    },
+    {
+      "name": "active:strict-rfc-mode-rejects-missing-leaf-aki",
+      "result": "pass"
+    },
+    {
+      "name": "active:wrong-trust-anchor",
+      "result": "rejected"
+    },
+    {
+      "name": "active:reversed-certificate-order-leaf-policy",
+      "result": "rejected"
+    },
+    {
+      "name": "active:before-certificate-validity",
+      "result": "rejected"
+    },
+    {
+      "name": "active:after-certificate-validity",
+      "result": "rejected"
+    },
+    {
+      "name": "active:damaged-leaf-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "active:leaf-not-ca",
+      "result": "pass"
+    },
+    {
+      "name": "active:intermediate-is-ca",
+      "result": "pass"
+    },
+    {
+      "name": "active:intermediate-key-cert-sign",
+      "result": "pass"
+    },
+    {
+      "name": "active:strict-der-nonce-binding",
+      "result": "pass"
+    },
+    {
+      "name": "active:changed-attestation-challenge",
+      "result": "rejected"
+    },
+    {
+      "name": "active:nonce-trailing-data",
+      "result": "rejected"
+    },
+    {
+      "name": "active:nonce-duplicate-field",
+      "result": "rejected"
+    },
+    {
+      "name": "active:nonce-wrong-length",
+      "result": "rejected"
+    },
+    {
+      "name": "active:credential-leaf-key-binding",
+      "result": "pass"
+    },
+    {
+      "name": "active:cose-leaf-binding",
+      "result": "pass"
+    },
+    {
+      "name": "active:app-id-binding",
+      "result": "pass"
+    },
+    {
+      "name": "active:wrong-app-id",
+      "result": "rejected"
+    },
+    {
+      "name": "active:development-marker",
+      "result": "pass"
+    },
+    {
+      "name": "active:production-policy-rejects-development",
+      "result": "rejected"
+    },
+    {
+      "name": "active:receipt-cms-signature-strict-path",
+      "result": "pass"
+    },
+    {
+      "name": "active:receipt-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "active:receipt-attested-cert-binding",
+      "result": "pass"
+    },
+    {
+      "name": "active:receipt-initial-type",
+      "result": "pass"
+    },
+    {
+      "name": "active:receipt-wrong-app",
+      "result": "rejected"
+    },
+    {
+      "name": "active:receipt-wrong-key",
+      "result": "rejected"
+    },
+    {
+      "name": "active:receipt-at-capture-time-model",
+      "result": "pass"
+    },
+    {
+      "name": "active:receipt-stale-model",
+      "result": "rejected"
+    },
+    {
+      "name": "active:receipt-future-model",
+      "result": "rejected"
+    },
+    {
+      "name": "active:receipt-now-stale-live-enrollment-denied",
+      "result": "rejected"
+    },
+    {
+      "name": "active:tampered-receipt",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion1:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion1:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion1:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion1:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion1:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion1:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion1:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion1:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion2:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion2:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion2:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion2:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion2:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion2:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion2:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion2:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion3:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion3:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion3:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion3:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion3:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion3:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion3:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion3:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion4:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion4:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion4:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion4:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion4:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "active:assertion4:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion4:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "active:assertion4:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:standard-openssl-path",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:strict-rfc-mode-rejects-missing-leaf-aki",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:wrong-trust-anchor",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:reversed-certificate-order-leaf-policy",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:before-certificate-validity",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:after-certificate-validity",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:damaged-leaf-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:leaf-not-ca",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:intermediate-is-ca",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:intermediate-key-cert-sign",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:strict-der-nonce-binding",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:changed-attestation-challenge",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:nonce-trailing-data",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:nonce-duplicate-field",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:nonce-wrong-length",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:credential-leaf-key-binding",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:cose-leaf-binding",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:app-id-binding",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:wrong-app-id",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:development-marker",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:production-policy-rejects-development",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:receipt-cms-signature-strict-path",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:receipt-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:receipt-attested-cert-binding",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:receipt-initial-type",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:receipt-wrong-app",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:receipt-wrong-key",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:receipt-at-capture-time-model",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:receipt-stale-model",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:receipt-future-model",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:receipt-now-stale-live-enrollment-denied",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:tampered-receipt",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion1:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion1:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion1:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion1:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion1:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion1:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion1:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion1:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion2:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion2:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion2:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion2:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion2:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion2:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion2:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion2:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion3:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion3:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion3:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion3:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion3:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion3:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion3:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion3:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion4:real-signature",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion4:openssl-cli-signature-adapter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion4:changed-client-data",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion4:changed-signature",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion4:changed-signed-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "replacement:assertion4:rp-app-id",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion4:monotone-counter",
+      "result": "pass"
+    },
+    {
+      "name": "replacement:assertion4:replay-equal-counter",
+      "result": "rejected"
+    },
+    {
+      "name": "sdk31:real-signature-over-31-byte-hash",
+      "result": "pass"
+    },
+    {
+      "name": "sdk31:server-hashes-saved-data-rejects-raw-hash",
+      "result": "rejected"
+    },
+    {
+      "name": "sdk31:counter5-not-reset",
+      "result": "pass"
+    },
+    {
+      "name": "sdk31:next-normal-signature-valid",
+      "result": "pass"
+    },
+    {
+      "name": "sdk31:next-counter6",
+      "result": "pass"
+    },
+    {
+      "name": "sdk31:wrong-attested-key",
+      "result": "rejected"
+    },
+    {
+      "name": "counter-model:missing",
+      "result": "rejected"
+    },
+    {
+      "name": "counter-model:nan",
+      "result": "rejected"
+    },
+    {
+      "name": "counter-model:zero",
+      "result": "rejected"
+    },
+    {
+      "name": "counter-model:reordered",
+      "result": "rejected"
+    },
+    {
+      "name": "counter-model:overflow",
+      "result": "rejected"
+    },
+    {
+      "name": "counter-model:upper-half",
+      "result": "pass"
+    },
+    {
+      "name": "counter-model:maximum",
+      "result": "pass"
+    }
+  ],
+  "decoder_negative_checks": [
+    {
+      "name": "trailing-object",
+      "result": "rejected"
+    },
+    {
+      "name": "duplicate-text-map-key",
+      "result": "rejected"
+    },
+    {
+      "name": "duplicate-integer-map-key",
+      "result": "rejected"
+    },
+    {
+      "name": "truncated",
+      "result": "rejected"
+    },
+    {
+      "name": "invalid-utf8",
+      "result": "rejected"
+    },
+    {
+      "name": "invalid-indefinite-text",
+      "result": "rejected"
+    },
+    {
+      "name": "depth-limit",
+      "result": "rejected"
+    },
+    {
+      "name": "payload-limit",
+      "result": "rejected"
+    },
+    {
+      "name": "unknown-extension",
+      "result": "rejected"
+    },
+    {
+      "name": "wrong-category-type",
+      "result": "rejected"
+    },
+    {
+      "name": "wrong-version",
+      "result": "rejected"
+    },
+    {
+      "name": "camelcase-substitution",
+      "result": "rejected"
+    }
+  ],
+  "public_root_sha256": {
+    "attestation": "1cb9823ba28ba6ad2d33a006941de2ae4f513ef1d4e831b9f7e0fa7b6242c932",
+    "receipt": "63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179"
+  },
+  "python": "3.15.0",
+  "cryptography": "50.0.2",
+  "asn1crypto": "1.5.1",
+  "crypto_backend": "OpenSSL 4.0.3 29 Sep 2026",
+  "openssl_cli": "OpenSSL 4.0.3 29 Sep 2026 (Library: OpenSSL 4.0.3 29 Sep 2026)",
+  "archived_receipts_now_stale": 2,
+  "strict_attestation_path": "REJECTED_MISSING_LEAF_AKI_NO_SILENT_EXCEPTION",
+  "native_input_boundary_test": "FAILED_ASSUMPTION_SDK_REQUIRES_32_BYTES_NOT_RELABELED_PASS",
+  "not_run": [
+    "full adversarial PKI corpus",
+    "revocation availability",
+    "production enrollment",
+    "workerd/DO races/crashes",
+    "server recovery/revoke",
+    "HA/TV E2E"
+  ]
+}

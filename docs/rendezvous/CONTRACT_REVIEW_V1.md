@@ -16,8 +16,10 @@ Revision0.4 incorporates Apple's producer-reported Mac/Chromium evidence and
 specific enrollment-timeout finding in [bounded recovery](ENROLLMENT_RECOVERY_V1.md).
 It adds a fresh action-separated recover-key proof, original-deadline receipts,
 paused repair rather than key-generation loops, and structural schemas/examples.
-Actual app-bound App Attest/strict verifier/receipt policy remain open. No runtime
-or frozen contract follows from the reported interop success.
+Actual app-bound diagnostic fixtures have now been independently processed in
+[offline qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md). Action-specific
+wire fixtures, strict path/verifier and receipt storage policy remain open. No
+runtime or frozen contract follows from these results.
 
 ## Current owner correction and route disposition
 

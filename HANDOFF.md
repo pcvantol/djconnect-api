@@ -30,16 +30,23 @@ The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.
 [Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15
 synthetic observations on two Node runtimes; the unmodified reference is rejected
-for runtime. Full certificate/CBOR validation, actual Apple fixtures, current
-extension/receipt policy and native interop remain concrete open gates.
+for runtime. Full certificate/CBOR validation, current extension/receipt policy
+and native interop remain concrete open gates.
 Next: existing Core/Apple/receiver owners acknowledge the exact profile and
 produce their owned feasibility/interop evidence; API qualifies the verifier.
 [Enrollment recovery](docs/rendezvous/ENROLLMENT_RECOVERY_V1.md) incorporates
 Apple's reported Mac/Chromium checks and physical capability-only readback,
 and defines bounded uncertain-registration recovery without a key-generation
-loop. Actual app-bound fixtures, strict profile/verifier and Apple fraud-receipt
-policy remain open; no signing/entitlement failure is invented.
-No new lanewriters or cross-repository source writes. Runtime, crypto fixtures,
+loop. Apple has now delivered actual app-bound development fixtures and ACK0.4.
+[Genuine fixture qualification](docs/rendezvous/GENUINE_APP_ATTEST_QUALIFICATION_V1.md)
+records independently executed141 offline observations plus12 parser controls,
+two attestations/ten real assertions, nonce/key/receipt binding, SDK31-byte
+input behavior and preserved failed native assumption. Strict OpenSSL path mode
+rejects missing leaf AKI while standard validation passes: explicit compatibility
+policy and maintained Worker-stack/full PKI/CMS/receipt policy remain unresolved.
+Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
+technical/security and UX/privacy reviews GO for this evidence scope only.
+No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing
 APNs/D1/operator runtime is unchanged; historical state below is retained.

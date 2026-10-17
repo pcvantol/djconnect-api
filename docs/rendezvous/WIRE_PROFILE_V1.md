@@ -199,8 +199,12 @@ Address sent/ready/consumed/navigation initiated are never display connected.
 
 ## Interoperability exits, not fabricated fixtures
 
-Apple owner must produce actual fresh development-domain attestation/assertion
-fixtures with exact signed identity/environment and redacted public evidence;
+Apple has delivered actual app-bound development fixtures and ACK0.4;
+[offline qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md) records measured
+snake_case extensions/flags, real nonce/receipt/assertion binding and the strict
+leaf-AKI blocker. These diagnostic inputs are not actual action-specific wire
+clientData or live enrollment. The remaining obligation is qualified fresh
+action-separated fixtures with exact signed identity/environment and redacted public evidence;
 no private key or production/user payload in repository. Include app/prefix/env,
 CBOR/chain/counter/nonce mutation and reorder cases. The signed app must actually
 exercise current owner/context, missing route and monotone flow invalidation.

@@ -196,6 +196,9 @@ alarm and cleanup alert. Keep synthetic model tests separate from actual DO
 and Apple-device proof. None has been run for a runtime that does not exist yet.
 
 External gates: finite-state/privacy acceptance of this exact policy; Apple
-key-lifecycle cadence and real App Attest fixtures; verifier/path-validation
+key-lifecycle cadence and actual action-specific App Attest fixtures; verifier/path-validation
 qualification; actual DO race/crash tests; contractfreeze and independent reviews.
 The resolved copied-QR product choice is not another external gate.
+Actual app-bound diagnostic fixtures are delivered and independently processed
+in [offline qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md); this does not
+qualify the stored counter lifecycle, fresh wire actions or production registry.
