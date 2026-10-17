@@ -106,3 +106,8 @@ GO for this bounded storage/retention proposal, no P1/P2 in supplied scope. They
 did not execute code or inspect fixtures. CMS/revocation/encryption-key operations
 and storage lifecycle implementation/tests remain the gates listed above; this
 is not implementation approval or a fully resolved receipt production policy.
+
+[Local CMS qualification](WORKER_RECEIPT_QUALIFICATION_V1.md) now executes83/44
+actual workerd cases for the measured sandbox signer/fields and archived Apple
+receipts. This diagnostic stage explicitly leaves revocation unchecked and grants
+no enrollment/storage permission; the production gates above remain required.

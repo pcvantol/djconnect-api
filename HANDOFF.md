@@ -59,8 +59,11 @@ binding/signatures and strict parser/counter predicates. An actual public DER
 failure was corrected with explicit short headers and a regression below the
 payload ceiling; failed history is retained. Receipt is still UNVERIFIED in
 that candidate. [Finite initial-receipt policy](docs/rendezvous/INITIAL_RECEIPT_POLICY_V1.md)
-has scoped proposal reviews GO; CMS/revocation/key operations/storage tests and
-complete-verifier review remain required. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
+has scoped proposal reviews GO. [Receipt workerd qualification](docs/rendezvous/WORKER_RECEIPT_QUALIFICATION_V1.md)
+now adds83 private-fixture /44 public-only actual CMS/signature/path/field tests,
+including real Apple BER/unsorted authenticated payload and strict freshness
+denial. Diagnostic revocation bypass is explicit, NO_ENROLLMENT; full status
+policy/key operations/storage tests/composed-verifier review remain required. Archived receipts now fail freshness; no old proof is enrollable. Supplied-text
 technical/security and UX/privacy reviews GO for this evidence scope only.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain

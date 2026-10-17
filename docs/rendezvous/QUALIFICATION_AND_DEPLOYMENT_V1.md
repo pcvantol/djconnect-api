@@ -34,7 +34,9 @@ Full composed Worker verifier/receipt policy and DO/action/HA-chain qualificatio
 remain open. [Core qualification](WORKER_CORE_QUALIFICATION_V1.md) now adds93/44
 actual workerd crypto/parser cases and a corrected DER regression; receipt remains
 UNVERIFIED in that adapter. [Receipt storage proposal](INITIAL_RECEIPT_POLICY_V1.md)
-has scoped review GO but no CMS/revocation/storage implementation evidence. Archived receipts fail
+has scoped review GO. [CMS workerd qualification](WORKER_RECEIPT_QUALIFICATION_V1.md)
+now adds83/44 diagnostic signature/path/field cases; actual revocation/status,
+production storage and complete-verifier review remain open. Archived receipts fail
 freshness. The runtime acceptance matrix below remains NOT_RUN.
 
 ## Local checkpoint — 2026-10-16

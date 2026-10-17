@@ -65,7 +65,9 @@ fraud-receipt applicability/retention need explicit resolution with actual
 producer fixtures; operation receipts are not Apple fraud receipts. The
 [core qualification](WORKER_CORE_QUALIFICATION_V1.md) adds93/44 actual workerd
 checks without CMS/enrollment GO. [Finite receipt policy](INITIAL_RECEIPT_POLICY_V1.md)
-is a reviewed storage proposal; revocation/CMS/storage implementation remain open.
+is a reviewed storage proposal. [CMS qualification](WORKER_RECEIPT_QUALIFICATION_V1.md)
+adds83/44 actual local workerd tests; diagnostic revocation is unchecked, and
+production status/storage/full-composition review remain open.
 
 ## Serialization and binding
 
