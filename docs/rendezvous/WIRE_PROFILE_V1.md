@@ -46,7 +46,7 @@ Investigation pins, no dependency installed/selected for runtime:
 
 | Role | Exact source | Qualification status |
 | --- | --- | --- |
-| Browser/Node reference | panva/jose6.2.12, `505a55b8f73536082367b2614cb77e927ba96ec1` | Receiver-reported Mac/browser profile oracle; API generator52 Node cases; concrete producer crossrun/signed-iOS remain open |
+| Browser/Node reference | panva/jose6.2.12, `505a55b8f73536082367b2614cb77e927ba96ec1` | Receiver-reported Mac/browser profile oracle; API generator52 Node cases; concrete producer crossrun delivered16/6244059388; signed-iOS remains open |
 | Native reference | airsidemobile/JOSESwift3.0.0, `c2664a902e75c0426a1d43132bd4babc6fd173d3` | Receiver-reported Mac CLI interop; actual signed-iOS/action integration remains Apple-owned |
 | App Attest verifier reference | node-app-attest1.0.1, `f16c4bb71b737466872bc8b8a7dfd215364eaa83` | Unmodified source is not approved: complete chain validity/constraints, strict CBOR, unsigned counters and current Apple fields need qualified verification |
 
@@ -233,7 +233,9 @@ Receiver16/6241859224 now reports isolated Mac JOSESwift3.0.0↔Chromium/WebKit
 with28 profile-oracle denials; these are producer-reported software tests, not
 signed-iOS/service/full-parser evidence. [API generator](JWE_VECTOR_GENERATOR_V1.md)
 now supplies the requested synchronous public-input counterpart,52 local Node/CLI
-cases and scoped review GO. Its concrete consumer crossrun remains required.
+cases and scoped review GO. [Concrete consumer crossrun](RECEIVER_GENERATOR_CROSSRUN_INTAKE_V1.md)
+is now delivered16/6244059388: Chromium/WebKit,48 combined denial cases.
+API read receipt/hashes without independent reexecution; no repeat required.
 
 JWE: native JOSE library encrypts synthetic payload -> browser library decrypts;
 browser/Node reference encrypts -> independent native decrypts. Test identical

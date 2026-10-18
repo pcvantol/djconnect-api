@@ -47,8 +47,9 @@ full verifier/action composition still require qualification. Archived receipts 
 freshness. The runtime acceptance matrix below remains NOT_RUN.
 [Public-input software JWE generator](JWE_VECTOR_GENERATOR_V1.md) now adds52
 local Node/CLI tests and scoped reviews for the receiver's live-key crossrun.
-Receiver-reported Mac/browser oracle evidence is not this producer crossrun,
-actual signed-iOS action evidence or runtime acceptance.
+[Receiver concrete producer crossrun](RECEIVER_GENERATOR_CROSSRUN_INTAKE_V1.md)
+is now delivered for Chromium/WebKit with48 combined denials; API read receipt/
+hashes, no independent reexecution. This is not signed-iOS or runtime acceptance.
 [Local assertion coordinator](WORKER_ASSERTION_STATE_QUALIFICATION_V1.md) now
 adds75/73 actual SQLiteDO cases+types, with trusted fixture enrollment and
 diagnostic raw-input seeds kept distinct. No transactionDO, public admission or

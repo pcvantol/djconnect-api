@@ -85,7 +85,10 @@ is now implemented with52 Node/CLI tests and scoped reviews GO, exact pinned
 artifact, reserved synthetic destinations and no private-key transfer/storage.
 Existing receiver owner can invoke it synchronously while its nonextractable
 browser key is alive; no stale public-key comment or new device capture required.
-Actual crossrun of this producer and full action/native/service gates remain.
+[Concrete generator crossrun](docs/rendezvous/RECEIVER_GENERATOR_CROSSRUN_INTAKE_V1.md)
+is now delivered by receiver16/6244059388: Chromium/WebKit,48 combined denials.
+API read receipt/artifact hashes; no independent reexecution. Actual signed-iOS/
+full action/service gates remain; no repeat of the unchanged generator test.
 [Local assertion/key-state composition](docs/rendezvous/WORKER_ASSERTION_STATE_QUALIFICATION_V1.md)
 now adds75 actual SQLiteDO+types/73 public-only cases:39 storage regressions,
 34 software-signed action/state cases and2 optional genuine diagnostic signatures.
@@ -93,7 +96,10 @@ Exact saved clientData, nonce/counter/receipt atomic commit, current-policy/key
 rechecks, fixed5s internal leases, bounded unknown-key challenges and finite cleanup
 are exercised. Trusted fixture enrollment and diagnostic SQL seeds are explicit;
 no new native-wire/enrollment/transaction-DO/private-RPC/global-admission GO.
-Independent supplied-design/implementation and UX/privacy scoped reviews GO.
+Independent supplied-design/implementation GO is supplemented by full supplied
+coordinator/store/test text review at9e9a76f, no P1/P2; reviewer did not independently
+read Git or run tests. UX reviewer read both exact qualification/wire documents.
+No full enrollment/runtime security approval. Exact9e9a76f CI13SUCCESS/1cleanupSKIP.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing

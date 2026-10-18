@@ -129,13 +129,15 @@ generator, is producer-reported, and explicitly uses predetermined fake destinat
 epoch comparisons and a test-only flat JSON oracle. It is not independent HA-owner
 proof, a production parser, actual signed iOS action binding or this crossrun.
 
-## Required next handoff
+## Delivered consumer crossrun and remaining handoff
 
-Existing receiver owner: invoke this exact producer generator synchronously in
-both live browser harnesses, decrypt and apply its profile/context denial oracle;
-retain exact API/source/manifest pin, native/browsers/library identities and
-fixed-label results. No second writer, website publication or repeat structural
-ACK requested. Browser private keys stay nonextractable and local.
+[Receiver16/6244059388 intake](RECEIVER_GENERATOR_CROSSRUN_INTAKE_V1.md) now
+closes that exact concrete generator crossrun: Chromium/WebKit fresh keys,
+synchronous API CLI/native roundtrips and48 combined context/crypto denials.
+API independently read the receipt and matched receipt/probe/generator/manifest
+hashes; no API browser rerun. Earlier oracle-only evidence above remains historical.
+No repeat crossrun of the unchanged generator, website publication, structural ACK
+or private-key transfer is required. Full TRUST-2/joint freeze remains open.
 
 Existing Apple owner: retain responsibility for actual supported signed-iOS
 action/flow bindings and native integration. A Mac software CLI result cannot

@@ -140,7 +140,11 @@ as successful runs or signature vulnerabilities.
 
 Independent supplied-design and implementation security reviews: scoped
 coordinator-candidate GO, no P1/P2 in supplied guards/results. UX/privacy scoped
-GO. Reviewers did not independently inspect source/storage or execute tests.
+GO. A follow-up security review inspected complete supplied coordinator/store/test
+text from exact9e9a76f with matching hashes: no concrete P1/P2 within isolated QA.
+A second reviewer independently read the exact qualification and wire documents.
+Security reviewer did not independently read Git; neither reran tests or inspected
+live storage. Inherited helper/RPC hardening remains explicitly unqualified.
 These are not full enrollment/verifier, private RPC, transaction DO or runtime
 approvals. Existing40 API regressions/107schema+2bytes/types/projection pass
 separately; unchanged user-facing translations. Normal CI remains separate.
@@ -164,9 +168,10 @@ Still required: complete initial AppAttest/CMS/authenticated-status/encrypted-st
 enrollment, actual native action bytes, hardened private routing/RPC and global
 admission, transaction-DO atomic winner/consume/cancel with lease/capability/expiry
 checks, operational keys/cleanup and independent full review. Unchanged browser
-wire and JWE generator retain existing receiver ACK/pin; its actual consumer
-crossrun, supported signed-iOS integration and real HA/proxy/display chain remain
-separate. Joint freeze, protected product delivery, distinct Finalization and
+wire and JWE generator retain existing receiver ACK/pin. Its [actual consumer
+crossrun](RECEIVER_GENERATOR_CROSSRUN_INTAKE_V1.md) is now delivered, with API
+receipt/hash readback and no independent reexecution. Supported signed-iOS
+integration and real HA/proxy/display chain remain separate. Joint freeze, protected product delivery, distinct Finalization and
 authorized production deployment remain open.
 
 Primary guidance: [Cloudflare DO rules](https://developers.cloudflare.com/durable-objects/best-practices/rules-of-durable-objects/),
