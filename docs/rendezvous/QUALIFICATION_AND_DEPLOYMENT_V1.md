@@ -179,3 +179,14 @@ were read on 2026-10-16. Account plan, included/shared usage, measured duration,
 write amplification, traffic estimate and acceptable spend remain unverified.
 OPS-1 must produce a numerical budget and hard admission strategy before live
 enablement. No claimed free-tier fit, production SLA or funding approval.
+
+## Isolated HTTP/allocation qualification continuation
+
+[Ingress qualification](WORKER_INGRESS_QUALIFICATION_V1.md) records265 actual local
+workerd cases and strict types for closed transport and a private atomic
+allocation-budget candidate. Public dispatch, immutable allocator/unknown-ID
+coverage, trusted edge identity and provider-wide cost containment remain open.
+Its additional raw JSON syntax restrictions and numerical allocation policies
+require joint review before contract freeze; unchanged schemas alone do not
+prove those consumer promises. Default harness is disabled; no production
+binding, migration, secret or deployment is introduced.

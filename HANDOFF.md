@@ -54,6 +54,16 @@ counter burns and historical retries are tested. Public immutable allocator/
 controller/global admission and genuine native/fullservice proof remain open;
 this does not make the deployment/service ready. Product bindings/config unchanged.
 
+[Local HTTP and allocation-budget qualification](docs/rendezvous/WORKER_INGRESS_QUALIFICATION_V1.md)
+adds265 actual workerd cases+strict types: eleven bounded/versioned POST routes,
+closed requests/responses, exact Origin/CORS, streamed limits and a private atomic
+10,000/day transaction /500/day key /5-per-IP-minute allocation policy candidate.
+Default harness remains disabled; enabled dispatcher responses are transport QA.
+Additional raw JSON syntax restrictions are proposed, not frozen consumer wire.
+This does not qualify full public controller/unknown-ID allocation coverage,
+trusted edge IP provenance, complete abuse/cost containment or production.
+API retains that integration and operational work; consumer boundaries remain.
+
 The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.
 [Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15

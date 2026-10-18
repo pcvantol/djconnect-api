@@ -285,3 +285,14 @@ Sources checked17October: [Apple server validation](https://developer.apple.com/
 [isSupported](https://developer.apple.com/documentation/devicecheck/dcappattestservice/issupported),
 [JOSESwift3.0.0](https://github.com/airsidemobile/JOSESwift/tree/c2664a902e75c0426a1d43132bd4babc6fd173d3),
 [jose6.2.12](https://github.com/panva/jose/tree/505a55b8f73536082367b2614cb77e927ba96ec1).
+
+## Isolated HTTP/allocation qualification continuation
+
+[Ingress qualification](WORKER_INGRESS_QUALIFICATION_V1.md) records265 actual local
+workerd cases and strict types for closed transport and a private atomic
+allocation-budget candidate. Public dispatch, immutable allocator/unknown-ID
+coverage, trusted edge identity and provider-wide cost containment remain open.
+Its additional raw JSON syntax restrictions and numerical allocation policies
+require joint review before contract freeze; unchanged schemas alone do not
+prove those consumer promises. Default harness is disabled; no production
+binding, migration, secret or deployment is introduced.

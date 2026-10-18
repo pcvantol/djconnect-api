@@ -1,0 +1,1092 @@
+{
+  "scope": "LOCAL_HTTP_TRANSPORT_GLOBAL_ALLOCATION_BUDGET_QA_NO_PUBLIC_CONTROLLER_OR_EDGE_PROVENANCE_GO",
+  "tests_passed": 265,
+  "typecheck": "PASS",
+  "cases": [
+    {
+      "name": "identity HMAC matches independent standard Node computation",
+      "status": "passed"
+    },
+    {
+      "name": "same minute links identity; next minute/IP/secret changes pseudonym",
+      "status": "passed"
+    },
+    {
+      "name": "equivalent IPv6 spelling has one canonical per-minute identity",
+      "status": "passed"
+    },
+    {
+      "name": "invalid edge identity yields redacted error 0",
+      "status": "passed"
+    },
+    {
+      "name": "invalid edge identity yields redacted error 12",
+      "status": "passed"
+    },
+    {
+      "name": "invalid edge identity yields redacted error 14",
+      "status": "passed"
+    },
+    {
+      "name": "invalid edge identity yields redacted error 9",
+      "status": "passed"
+    },
+    {
+      "name": "invalid edge identity yields redacted error 26",
+      "status": "passed"
+    },
+    {
+      "name": "invalid edge identity yields redacted error 11",
+      "status": "passed"
+    },
+    {
+      "name": "invalid edge identity yields redacted error 14",
+      "status": "passed"
+    },
+    {
+      "name": "invalid identity secret rejected 0",
+      "status": "passed"
+    },
+    {
+      "name": "invalid identity secret rejected 8",
+      "status": "passed"
+    },
+    {
+      "name": "invalid identity secret rejected 45",
+      "status": "passed"
+    },
+    {
+      "name": "five creates per IP/minute; sixth changes neither global count nor bucket",
+      "status": "passed"
+    },
+    {
+      "name": "global transaction ceiling is atomic under concurrent distinct identities",
+      "status": "passed"
+    },
+    {
+      "name": "global key ceiling is atomic and does not create IP rows",
+      "status": "passed"
+    },
+    {
+      "name": "exhausted global quota cannot allocate a new IP bucket",
+      "status": "passed"
+    },
+    {
+      "name": "IP cardinality cap cannot create bucket or increment daily allocations",
+      "status": "passed"
+    },
+    {
+      "name": "UTC day rollover resets daily counters, not an old request window",
+      "status": "passed"
+    },
+    {
+      "name": "minute rollover resets per-IP allowance but never daily count",
+      "status": "passed"
+    },
+    {
+      "name": "retention deadline is minute start+120s and native alarm purges without retrying caller",
+      "status": "passed"
+    },
+    {
+      "name": "daily expiry removes all application rows and clears alarm",
+      "status": "passed"
+    },
+    {
+      "name": "earliest cleanup alarm is preserved across later allocations",
+      "status": "passed"
+    },
+    {
+      "name": "early alarm preserves counts and original purge deadline",
+      "status": "passed"
+    },
+    {
+      "name": "first alarm failure cannot allocate bucket or global count",
+      "status": "passed"
+    },
+    {
+      "name": "window and kill switch rechecked after alarm await",
+      "status": "passed"
+    },
+    {
+      "name": "SQL fault rolls back both IP and global count",
+      "status": "passed"
+    },
+    {
+      "name": "cleanup fault is retriable; disabled policy does not prevent erasure",
+      "status": "passed"
+    },
+    {
+      "name": "restart retains quota and original deadline",
+      "status": "passed"
+    },
+    {
+      "name": "lost reply/downstream failure do not refund an allocation",
+      "status": "passed"
+    },
+    {
+      "name": "closed runtime admission denies extra",
+      "status": "passed"
+    },
+    {
+      "name": "closed runtime admission denies window",
+      "status": "passed"
+    },
+    {
+      "name": "closed runtime admission denies fractional",
+      "status": "passed"
+    },
+    {
+      "name": "closed runtime admission denies non-number",
+      "status": "passed"
+    },
+    {
+      "name": "closed runtime admission denies bad-kind",
+      "status": "passed"
+    },
+    {
+      "name": "closed runtime admission denies noncanonical",
+      "status": "passed"
+    },
+    {
+      "name": "closed runtime admission denies extra-identity",
+      "status": "passed"
+    },
+    {
+      "name": "actual budget RPC hides helper cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "actual budget RPC hides helper policy",
+      "status": "passed"
+    },
+    {
+      "name": "actual budget RPC hides helper state",
+      "status": "passed"
+    },
+    {
+      "name": "actual budget RPC hides property env",
+      "status": "passed"
+    },
+    {
+      "name": "actual budget RPC hides property ctx",
+      "status": "passed"
+    },
+    {
+      "name": "actual budget RPC hides property #state",
+      "status": "passed"
+    },
+    {
+      "name": "wrong namespace object cannot mint allocation",
+      "status": "passed"
+    },
+    {
+      "name": "same-context overlapping engines still serialize quotas in SQL",
+      "status": "passed"
+    },
+    {
+      "name": "stored metadata contains no raw IP, secret, or long-lived IP identity",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus create-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus create-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus create-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus inspect-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus inspect-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus inspect-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_register-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_register-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_register-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_challenge-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_challenge-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_challenge-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus poll-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus poll-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus poll-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_client_data-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_client_data-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_client_data-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus plaintext-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus plaintext-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus plaintext-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus consume-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus consume-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus consume-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus cancel-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus cancel-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus cancel-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus qr_payload-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus qr_payload-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus qr_payload-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus delete_client_data-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus delete_client_data-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus delete_client_data-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus create_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus create_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus create_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus inspect_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus inspect_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus inspect_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete_challenge_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete_challenge_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete_challenge_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_register_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_register_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_register_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_challenge_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_challenge_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_challenge_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus submit_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus poll_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus poll_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus poll_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus consume_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus consume_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus consume_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus cancel_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus cancel_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus cancel_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete_response-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete_response-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_delete_response-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus error-structural-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus error-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus error-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus zero-generation",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus fractional-generation",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus version-mismatch",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus private-jwk",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus wrong-rsa-alg",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus padded-envelope-digest",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus url-safe-apple-key-id",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus wrong-transaction-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus root-create",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus root-unknown",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus root-scalar",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge-recovery-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge-recovery-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_challenge-recovery-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover-recovery-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover-recovery-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover-recovery-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover_response-recovery-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover_response-recovery-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover_response-recovery-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover_challenge_response-recovery-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover_challenge_response-recovery-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus attestation_recover_challenge_response-recovery-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus recover_client_data-recovery-positive",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus recover_client_data-recovery-unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus recover_client_data-recovery-missing-version",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus recover-clientdata-wrong-action-submit",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus recover-clientdata-wrong-action-delete-key",
+      "status": "passed"
+    },
+    {
+      "name": "existing schema corpus recover-clientdata-wrong-action-register",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /create",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /inspect",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /attestation/challenge",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /attestation/register",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /submit-challenge",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /submit",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /poll",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /consume",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /cancel",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /attestation/delete",
+      "status": "passed"
+    },
+    {
+      "name": "known request transport only /attestation/recover",
+      "status": "passed"
+    },
+    {
+      "name": "management challenge response needs exact client_data delete-key",
+      "status": "passed"
+    },
+    {
+      "name": "management challenge response needs exact client_data recover-key",
+      "status": "passed"
+    },
+    {
+      "name": "default harness and factory are disabled before any body or callback",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible Origin denial null",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible Origin denial https://evil.example",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible Origin denial https://vibecast.tv.evil.example",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible Origin denial https://vibecast.tv/",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible Origin denial HTTPS://VIBECAST.TV",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible Origin denial https://vibecast.tv:443",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible Origin denial ",
+      "status": "passed"
+    },
+    {
+      "name": "combined duplicate Origin value is rejected as visible through Headers",
+      "status": "passed"
+    },
+    {
+      "name": "browser route requires Origin /create",
+      "status": "passed"
+    },
+    {
+      "name": "browser route requires Origin /poll",
+      "status": "passed"
+    },
+    {
+      "name": "browser route requires Origin /consume",
+      "status": "passed"
+    },
+    {
+      "name": "browser route requires Origin /cancel",
+      "status": "passed"
+    },
+    {
+      "name": "absent Origin on native transport is never an authorization assertion",
+      "status": "passed"
+    },
+    {
+      "name": "preflight grants only exact origin POST Content-Type without state calls",
+      "status": "passed"
+    },
+    {
+      "name": "invalid preflight rejects {\"Origin\":\"https://vibecast.tv\",\"Access-Control-Request-Method\":\"GET\"}",
+      "status": "passed"
+    },
+    {
+      "name": "invalid preflight rejects {\"Origin\":\"https://vibecast.tv\",\"Access-Control-Request-Method\":\"POST\",\"Access-Control-Request-Headers\":\"Content-Type, Authorization\"}",
+      "status": "passed"
+    },
+    {
+      "name": "invalid preflight rejects {\"Origin\":\"null\",\"Access-Control-Request-Method\":\"POST\"}",
+      "status": "passed"
+    },
+    {
+      "name": "unsupported body transport before callback {\"Content-Type\":\"text/plain\"}",
+      "status": "passed"
+    },
+    {
+      "name": "unsupported body transport before callback {\"Content-Type\":\"application/json, application/json\"}",
+      "status": "passed"
+    },
+    {
+      "name": "unsupported body transport before callback {\"Content-Type\":\"application/json; charset=latin1\"}",
+      "status": "passed"
+    },
+    {
+      "name": "unsupported body transport before callback {\"Content-Type\":\"application/json; charset=utf-8\"}",
+      "status": "passed"
+    },
+    {
+      "name": "unsupported body transport before callback {\"Content-Encoding\":\"gzip\"}",
+      "status": "passed"
+    },
+    {
+      "name": "unsupported body transport before callback {\"Content-Encoding\":\"identity\"}",
+      "status": "passed"
+    },
+    {
+      "name": "explicit UTF8 Content-Type and JSON whitespace are accepted",
+      "status": "passed"
+    },
+    {
+      "name": "credentials are rejected without dispatch Cookie",
+      "status": "passed"
+    },
+    {
+      "name": "credentials are rejected without dispatch Authorization",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible route rejects /poll?token=PUBLIC",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible route rejects /poll#PUBLIC",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible route rejects /poll/",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible route rejects /unknown",
+      "status": "passed"
+    },
+    {
+      "name": "exact visible route rejects /%70oll",
+      "status": "passed"
+    },
+    {
+      "name": "foreign service URL and wrong method rejected before admission",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects duplicate",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects escaped duplicate",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects nested duplicate",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects BOM",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects NBSP",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects trailing",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects array",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects boolean",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects null",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects fraction",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects exponent",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects unsafe integer",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects invalid escape",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects prototype",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects depth",
+      "status": "passed"
+    },
+    {
+      "name": "strict request JSON rejects node-count",
+      "status": "passed"
+    },
+    {
+      "name": "invalid UTF8 denies rather than replacing or echoing bytes",
+      "status": "passed"
+    },
+    {
+      "name": "unsupported protocol version fails before admission",
+      "status": "passed"
+    },
+    {
+      "name": "closed schema and canonical base64 values fail before callbacks",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 attestation:1",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 attestation:5",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 assertion:1",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 assertion:5",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 client_data:1",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 client_data:5",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 jwe-header:1",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 jwe-header:5",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 jwe-ciphertext:1",
+      "status": "passed"
+    },
+    {
+      "name": "schema-valid undecodable base64 yields400 jwe-ciphertext:5",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /create",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /inspect",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /attestation/challenge",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /attestation/register",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /submit-challenge",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /submit",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /poll",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /consume",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /cancel",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /attestation/delete",
+      "status": "passed"
+    },
+    {
+      "name": "streamed raw endpoint ceiling /attestation/recover",
+      "status": "passed"
+    },
+    {
+      "name": "legal chunked request and exact raw limit accepted",
+      "status": "passed"
+    },
+    {
+      "name": "invalid/oversize Content-Length pre-rejected 1025",
+      "status": "passed"
+    },
+    {
+      "name": "invalid/oversize Content-Length pre-rejected -1",
+      "status": "passed"
+    },
+    {
+      "name": "invalid/oversize Content-Length pre-rejected 01",
+      "status": "passed"
+    },
+    {
+      "name": "invalid/oversize Content-Length pre-rejected 999999999999999999999",
+      "status": "passed"
+    },
+    {
+      "name": "stream byte count does not trust an undersized Content-Length",
+      "status": "passed"
+    },
+    {
+      "name": "stalled stream has bounded read deadline and cannot dispatch",
+      "status": "passed"
+    },
+    {
+      "name": "read await rechecks deadline-equality on data",
+      "status": "passed"
+    },
+    {
+      "name": "read await rechecks abort on data",
+      "status": "passed"
+    },
+    {
+      "name": "read await rechecks deadline-equality on done",
+      "status": "passed"
+    },
+    {
+      "name": "read await rechecks abort on done",
+      "status": "passed"
+    },
+    {
+      "name": "all fixed security headers are present on success and denial",
+      "status": "passed"
+    },
+    {
+      "name": "kill switch rechecked before-admit",
+      "status": "passed"
+    },
+    {
+      "name": "kill switch rechecked after-admit",
+      "status": "passed"
+    },
+    {
+      "name": "kill switch rechecked after-dispatch",
+      "status": "passed"
+    },
+    {
+      "name": "admission fail-closed and typed {\"ok\":false,\"error\":\"rate_limited\",\"retry_after_ms\":1001}",
+      "status": "passed"
+    },
+    {
+      "name": "admission fail-closed and typed {\"ok\":false,\"error\":\"service_unavailable\"}",
+      "status": "passed"
+    },
+    {
+      "name": "admission fail-closed and typed {\"ok\":\"yes\"}",
+      "status": "passed"
+    },
+    {
+      "name": "admission fail-closed and typed {\"ok\":true,\"grant\":\"PUBLIC\"}",
+      "status": "passed"
+    },
+    {
+      "name": "admission fail-closed and typed {\"ok\":false,\"error\":\"private-error\",\"retry_after_ms\":7}",
+      "status": "passed"
+    },
+    {
+      "name": "unreviewed downstream output never escapes 302:v,url",
+      "status": "passed"
+    },
+    {
+      "name": "unreviewed downstream output never escapes 200:v,state,expires_at,retry_after_ms,credential",
+      "status": "passed"
+    },
+    {
+      "name": "unreviewed downstream output never escapes 200:v,error",
+      "status": "passed"
+    },
+    {
+      "name": "unreviewed downstream output never escapes 500:v,error",
+      "status": "passed"
+    },
+    {
+      "name": "backend and admission exceptions are fixed redacted failures",
+      "status": "passed"
+    },
+    {
+      "name": "real private allocation budget admits five creates before QA dispatch and ignores spoofed forwarding hints",
+      "status": "passed"
+    }
+  ],
+  "source_sha256": {
+    "allocation-budget.ts": "a51bb7a0371a748f894bfc95f15a7f1ccecaedcb298f72ef0ad9f014b502d65e",
+    "allocation-budget.check.mjs": "b6f9ccf4b94101ed12552d9525ce482cc83c4c5e04efc26180aff481aa74c921",
+    "http-ingress.ts": "accecfda4ccc661f12067e2b582255f5a6a2a83c7bf98c3cb2de919f977d3511",
+    "http-ingress.check.mjs": "7a388f5e79840ecd8dad77eceb3f346e655ba8989a281e120e93e9059636e2d9",
+    "ingress-schema.d.ts": "bf3086f8adf0e41f8bb2cfa8d8fbb1921088af02e285618b256f86a122f951a2",
+    "ingress-harness.ts": "ba983972cf44fb78c13e033eb6bf7bbaa2d0aed895b4b1ed19f33eef58b7b575",
+    "run_ingress_workerd.mjs": "da0cadddd70107386a275e454d4801269261764bd5eaf2fa82ebac81cb2e8ae3",
+    "docs/rendezvous/wire-request-schemas-v1.json": "c00d495222a5bc719e5ef22280e4bbacbb7496f03740cb9c6ccf8b464f4d8a0d",
+    "docs/rendezvous/wire-schema-cases-v1.json": "3443cc6580997678d54d1f57ce0b30271134069cdd256d16ccea7446b9545e4a",
+    "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881"
+  },
+  "node": "v26.12.0",
+  "typescript": "7.0.2",
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "compatibility_date": "2026-06-20",
+  "not_run": [
+    "full public controller and unknown-namespace allocation coverage",
+    "trusted real edge-IP/header provenance",
+    "provider-wide request cost/WAF/global namespace configuration",
+    "genuine native and live HA/iPhone/TV chain",
+    "provider retention/cleanup monitoring/deployment"
+  ]
+}
