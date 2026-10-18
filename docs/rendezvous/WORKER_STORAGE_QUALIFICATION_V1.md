@@ -1,6 +1,11 @@
 # Local SQLite DO encrypted receipt storage qualification v1
 
 Same API94 writer; profile0.4.0-draft/wire djc-rendezvous/1 NOT_FROZEN.
+Original storage-only results below bind the bb85946 checkpoint. The later
+[assertion/key coordinator](WORKER_ASSERTION_STATE_QUALIFICATION_V1.md) reuses
+lifecycle/alarm hooks and reruns all39 storage cases within75/73 actual DO cases.
+It remains excluded from product admission.
+
 **Scoped internal storage qualification only — no public enrollment, proof,
 certificate-status, complete-verifier or runtime-admission GO.**
 

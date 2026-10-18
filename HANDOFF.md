@@ -1,6 +1,6 @@
 # DJConnect API Handoff
 
-## Active assignment — VibeCast rendezvous (2026-10-17)
+## Active assignment — VibeCast rendezvous (2026-10-18)
 
 `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016` is owner-selected; execution ACK:
 https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6222484621.
@@ -86,6 +86,14 @@ artifact, reserved synthetic destinations and no private-key transfer/storage.
 Existing receiver owner can invoke it synchronously while its nonextractable
 browser key is alive; no stale public-key comment or new device capture required.
 Actual crossrun of this producer and full action/native/service gates remain.
+[Local assertion/key-state composition](docs/rendezvous/WORKER_ASSERTION_STATE_QUALIFICATION_V1.md)
+now adds75 actual SQLiteDO+types/73 public-only cases:39 storage regressions,
+34 software-signed action/state cases and2 optional genuine diagnostic signatures.
+Exact saved clientData, nonce/counter/receipt atomic commit, current-policy/key
+rechecks, fixed5s internal leases, bounded unknown-key challenges and finite cleanup
+are exercised. Trusted fixture enrollment and diagnostic SQL seeds are explicit;
+no new native-wire/enrollment/transaction-DO/private-RPC/global-admission GO.
+Independent supplied-design/implementation and UX/privacy scoped reviews GO.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing

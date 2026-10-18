@@ -20,17 +20,19 @@ async function keyVersion(key:string){canonicalBase64(key,32,32);return base64Ur
 export class ReceiptKeyStore extends DurableObject<StoreEnv> {
   constructor(ctx:DurableObjectState,env:StoreEnv){super(ctx,env);ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS key_state (id INTEGER PRIMARY KEY CHECK(id=1), value TEXT NOT NULL)');}
   private queue:Promise<void>=Promise.resolve();
-  private locked<T>(fn:()=>Promise<T>):Promise<T>{const operation=this.queue.then(fn,fn);this.queue=operation.then(()=>{},()=>{});return operation;}
-  private load():RecordState|undefined{return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM key_state WHERE id=1').toArray().map(r=>JSON.parse(r.value) as RecordState)[0];}
-  private save(row:RecordState){this.ctx.storage.sql.exec('INSERT INTO key_state(id,value) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET value=excluded.value',JSON.stringify(row));}
-  private tombstone(r:Active):Tombstone{return {version:1,status:'revoked',keyAddress:r.keyAddress,expiresAt:r.expiresAt,purgeAt:r.expiresAt+120000};}
-  private expire(now:number){
+  protected locked<T>(fn:()=>Promise<T>):Promise<T>{const operation=this.queue.then(fn,fn);this.queue=operation.then(()=>{},()=>{});return operation;}
+  protected load():RecordState|undefined{return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM key_state WHERE id=1').toArray().map(r=>JSON.parse(r.value) as RecordState)[0];}
+  protected save(row:RecordState){this.ctx.storage.sql.exec('INSERT INTO key_state(id,value) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET value=excluded.value',JSON.stringify(row));}
+  protected removingKeyEvidence():void{}
+  protected nextCleanupAt():number|undefined{return undefined;}
+  protected tombstone(r:Active):Tombstone{this.removingKeyEvidence();return {version:1,status:'revoked',keyAddress:r.keyAddress,expiresAt:r.expiresAt,purgeAt:r.expiresAt+120000};}
+  protected expire(now:number){
     const r=this.load();if(r?.status==='active'){
       if(now>=r.expiresAt){this.save(this.tombstone(r));return this.load();}
       if(r.challengeExpiresAt!==undefined&&now>=r.challengeExpiresAt){delete r.operationId;delete r.requestDigest;delete r.challengeExpiresAt;r.revision++;this.save(r);}
     }return r;
   }
-  private async arm(){await this.locked(async()=>{const r=this.load();if(r)await this.ctx.storage.setAlarm(r.status==='active'?Math.min(r.challengeExpiresAt??r.expiresAt,r.expiresAt):r.purgeAt);else await this.ctx.storage.deleteAlarm();});}
+  protected async arm(){await this.locked(async()=>{const r=this.load(),extra=this.nextCleanupAt();const at=Math.min(r?(r.status==='active'?Math.min(r.challengeExpiresAt??r.expiresAt,r.expiresAt):r.purgeAt):Infinity,extra??Infinity);if(Number.isFinite(at))await this.ctx.storage.setAlarm(at);else await this.ctx.storage.deleteAlarm();});}
   private material(m:StoreMaterial,now:number){
     need(m&&Object.keys(m).sort().join(',')==='appPolicy,challengeCreatedAt,challengeExpiresAt,environment,keyAddress,operationId,publicPoint,receipt,receiptCreatedAt,requestDigest');
     need(/^[a-f0-9]{64}$/.test(m.keyAddress)&&m.appPolicy==='ios-dev-qualification/1'&&m.environment==='development');

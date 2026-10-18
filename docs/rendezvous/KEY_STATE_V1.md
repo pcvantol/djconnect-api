@@ -203,3 +203,10 @@ The resolved copied-QR product choice is not another external gate.
 Actual app-bound diagnostic fixtures are delivered and independently processed
 in [offline qualification](GENUINE_APP_ATTEST_QUALIFICATION_V1.md); this does not
 qualify the stored counter lifecycle, fresh wire actions or production registry.
+
+[Local assertion coordinator qualification](WORKER_ASSERTION_STATE_QUALIFICATION_V1.md)
+now executes75/73 SQLiteDO cases+types with unchanged core signatures and trusted
+test enrollment, including39 storage regressions. It closes this bounded nonce/
+counter/receipt/lease composition gap, not complete enrollment/native-wire/
+transaction-DO/global-admission/private-RPC or runtime acceptance. No new public
+contract field/TTL or consumer ACK is introduced.

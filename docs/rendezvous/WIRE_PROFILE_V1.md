@@ -73,7 +73,12 @@ has scoped design GO; [local common certificate status](WORKER_STATUS_QUALIFICAT
 adds68/34 OCSP/CRL/cache cases with scoped component GO. [Fixed egress qualification](WORKER_STATUS_EGRESS_QUALIFICATION_V1.md) adds101/35
 local cases after a concurrencyP2 correction; production egress/
 cache/propagation/operations and complete
-verifier/action composition remain open. No consumer endpoint/schema change.
+full enrollment/verifier/transaction composition remain open.
+[Local assertion coordinator](WORKER_ASSERTION_STATE_QUALIFICATION_V1.md) adds75/73
+SQLiteDO cases+types for exact server-saved actions and atomic counter/nonce/
+receipt/lease handling under trusted fixture enrollment. Actual signed-iOS wire,
+private routing/global admission and transaction ready/consume remain open.
+No consumer endpoint/schema change.
 
 ## Serialization and binding
 

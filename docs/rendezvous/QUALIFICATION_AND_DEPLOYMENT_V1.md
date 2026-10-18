@@ -49,6 +49,10 @@ freshness. The runtime acceptance matrix below remains NOT_RUN.
 local Node/CLI tests and scoped reviews for the receiver's live-key crossrun.
 Receiver-reported Mac/browser oracle evidence is not this producer crossrun,
 actual signed-iOS action evidence or runtime acceptance.
+[Local assertion coordinator](WORKER_ASSERTION_STATE_QUALIFICATION_V1.md) now
+adds75/73 actual SQLiteDO cases+types, with trusted fixture enrollment and
+diagnostic raw-input seeds kept distinct. No transactionDO, public admission or
+full enrollment/crypto/status composition is qualified by that component.
 
 ## Local checkpoint — 2026-10-16
 
