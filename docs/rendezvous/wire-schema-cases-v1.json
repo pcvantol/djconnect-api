@@ -1,0 +1,1378 @@
+{
+  "kind": "synthetic_schema_cases_only",
+  "profile": "0.4.0-draft",
+  "crypto_or_apple_validation": "NOT_RUN; all opaque values/proofs/RSA/envelope are nonfunctional synthetic placeholders",
+  "cases": [
+    {
+      "name": "create-structural-positive",
+      "schema": "create",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "generation": 1,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "create-unknown-field",
+      "schema": "create",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "generation": 1,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "create-missing-version",
+      "schema": "create",
+      "valid": false,
+      "value": {
+        "generation": 1,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "inspect-structural-positive",
+      "schema": "inspect",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "inspect-unknown-field",
+      "schema": "inspect",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "inspect-missing-version",
+      "schema": "inspect",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "attestation_challenge-structural-positive",
+      "schema": "attestation_challenge",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "action": "register"
+      }
+    },
+    {
+      "name": "attestation_challenge-unknown-field",
+      "schema": "attestation_challenge",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "action": "register",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_challenge-missing-version",
+      "schema": "attestation_challenge",
+      "valid": false,
+      "value": {
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "action": "register"
+      }
+    },
+    {
+      "name": "attestation_register-structural-positive",
+      "schema": "attestation_register",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "attestation": "AA"
+      }
+    },
+    {
+      "name": "attestation_register-unknown-field",
+      "schema": "attestation_register",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "attestation": "AA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_register-missing-version",
+      "schema": "attestation_register",
+      "valid": false,
+      "value": {
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "attestation": "AA"
+      }
+    },
+    {
+      "name": "submit_challenge-structural-positive",
+      "schema": "submit_challenge",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "submit_challenge-unknown-field",
+      "schema": "submit_challenge",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "submit_challenge-missing-version",
+      "schema": "submit_challenge",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "submit-structural-positive",
+      "schema": "submit",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "AA",
+        "assertion": "AA",
+        "destination_envelope": "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiZGpjLXJlbmRlenZvdXMtZGVzdGluYXRpb24randlIiwia2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSJ9.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAA.AA.AAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "submit-unknown-field",
+      "schema": "submit",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "AA",
+        "assertion": "AA",
+        "destination_envelope": "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiZGpjLXJlbmRlenZvdXMtZGVzdGluYXRpb24randlIiwia2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSJ9.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAA.AA.AAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "submit-missing-version",
+      "schema": "submit",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "AA",
+        "assertion": "AA",
+        "destination_envelope": "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiZGpjLXJlbmRlenZvdXMtZGVzdGluYXRpb24randlIiwia2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSJ9.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAA.AA.AAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "poll-structural-positive",
+      "schema": "poll",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "poll-unknown-field",
+      "schema": "poll",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "poll-missing-version",
+      "schema": "poll",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "attestation_delete-structural-positive",
+      "schema": "attestation_delete",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "AA",
+        "assertion": "AA"
+      }
+    },
+    {
+      "name": "attestation_delete-unknown-field",
+      "schema": "attestation_delete",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "AA",
+        "assertion": "AA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_delete-missing-version",
+      "schema": "attestation_delete",
+      "valid": false,
+      "value": {
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "AA",
+        "assertion": "AA"
+      }
+    },
+    {
+      "name": "submit_client_data-structural-positive",
+      "schema": "submit_client_data",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "submit",
+        "service_origin": "https://api.djconnect.dev",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "submit_client_data-unknown-field",
+      "schema": "submit_client_data",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "submit",
+        "service_origin": "https://api.djconnect.dev",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "submit_client_data-missing-version",
+      "schema": "submit_client_data",
+      "valid": false,
+      "value": {
+        "action": "submit",
+        "service_origin": "https://api.djconnect.dev",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "plaintext-structural-positive",
+      "schema": "plaintext",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "bootstrap_origin": "https://vibecast.tv",
+        "display_entry_url": "https://ha.example.org/djconnect/vibecast/display",
+        "issuer_epoch": "synthetic-process-epoch"
+      }
+    },
+    {
+      "name": "plaintext-unknown-field",
+      "schema": "plaintext",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "bootstrap_origin": "https://vibecast.tv",
+        "display_entry_url": "https://ha.example.org/djconnect/vibecast/display",
+        "issuer_epoch": "synthetic-process-epoch",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "plaintext-missing-version",
+      "schema": "plaintext",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "bootstrap_origin": "https://vibecast.tv",
+        "display_entry_url": "https://ha.example.org/djconnect/vibecast/display",
+        "issuer_epoch": "synthetic-process-epoch"
+      }
+    },
+    {
+      "name": "consume-structural-positive",
+      "schema": "consume",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "consume-unknown-field",
+      "schema": "consume",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "consume-missing-version",
+      "schema": "consume",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "cancel-structural-positive",
+      "schema": "cancel",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "cancel-unknown-field",
+      "schema": "cancel",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "cancel-missing-version",
+      "schema": "cancel",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "claim_secret": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "qr_payload-structural-positive",
+      "schema": "qr_payload",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "type": "djc-rendezvous-qr",
+        "service_origin": "https://api.djconnect.dev",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "expires_at": 1900000120000,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "qr_payload-unknown-field",
+      "schema": "qr_payload",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "type": "djc-rendezvous-qr",
+        "service_origin": "https://api.djconnect.dev",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "expires_at": 1900000120000,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "qr_payload-missing-version",
+      "schema": "qr_payload",
+      "valid": false,
+      "value": {
+        "type": "djc-rendezvous-qr",
+        "service_origin": "https://api.djconnect.dev",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "expires_at": 1900000120000,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "delete_client_data-structural-positive",
+      "schema": "delete_client_data",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "delete-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000
+      }
+    },
+    {
+      "name": "delete_client_data-unknown-field",
+      "schema": "delete_client_data",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "delete-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "delete_client_data-missing-version",
+      "schema": "delete_client_data",
+      "valid": false,
+      "value": {
+        "action": "delete-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000
+      }
+    },
+    {
+      "name": "create_response-structural-positive",
+      "schema": "create_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "created_at": 1900000000000,
+        "expires_at": 1900000120000,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "qr_payload": {
+          "v": "djc-rendezvous/1",
+          "type": "djc-rendezvous-qr",
+          "service_origin": "https://api.djconnect.dev",
+          "transaction_id": "00000000-0000-4000-8000-000000000001",
+          "generation": 1,
+          "expires_at": 1900000120000,
+          "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+      }
+    },
+    {
+      "name": "create_response-unknown-field",
+      "schema": "create_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "created_at": 1900000000000,
+        "expires_at": 1900000120000,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "qr_payload": {
+          "v": "djc-rendezvous/1",
+          "type": "djc-rendezvous-qr",
+          "service_origin": "https://api.djconnect.dev",
+          "transaction_id": "00000000-0000-4000-8000-000000000001",
+          "generation": 1,
+          "expires_at": 1900000120000,
+          "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "create_response-missing-version",
+      "schema": "create_response",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "created_at": 1900000000000,
+        "expires_at": 1900000120000,
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "qr_payload": {
+          "v": "djc-rendezvous/1",
+          "type": "djc-rendezvous-qr",
+          "service_origin": "https://api.djconnect.dev",
+          "transaction_id": "00000000-0000-4000-8000-000000000001",
+          "generation": 1,
+          "expires_at": 1900000120000,
+          "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+      }
+    },
+    {
+      "name": "inspect_response-structural-positive",
+      "schema": "inspect_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "expires_at": 1900000120000,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "inspect_response-unknown-field",
+      "schema": "inspect_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "expires_at": 1900000120000,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "inspect_response-missing-version",
+      "schema": "inspect_response",
+      "valid": false,
+      "value": {
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "expires_at": 1900000120000,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "attestation_challenge_response-structural-positive",
+      "schema": "attestation_challenge_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000
+      }
+    },
+    {
+      "name": "attestation_challenge_response-unknown-field",
+      "schema": "attestation_challenge_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_challenge_response-missing-version",
+      "schema": "attestation_challenge_response",
+      "valid": false,
+      "value": {
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000
+      }
+    },
+    {
+      "name": "attestation_delete_challenge_response-structural-positive",
+      "schema": "attestation_delete_challenge_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA"
+      }
+    },
+    {
+      "name": "attestation_delete_challenge_response-unknown-field",
+      "schema": "attestation_delete_challenge_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_delete_challenge_response-missing-version",
+      "schema": "attestation_delete_challenge_response",
+      "valid": false,
+      "value": {
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA"
+      }
+    },
+    {
+      "name": "attestation_register_response-structural-positive",
+      "schema": "attestation_register_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_expires_at": 1902592000000
+      }
+    },
+    {
+      "name": "attestation_register_response-unknown-field",
+      "schema": "attestation_register_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_expires_at": 1902592000000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_register_response-missing-version",
+      "schema": "attestation_register_response",
+      "valid": false,
+      "value": {
+        "key_expires_at": 1902592000000
+      }
+    },
+    {
+      "name": "submit_challenge_response-structural-positive",
+      "schema": "submit_challenge_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA"
+      }
+    },
+    {
+      "name": "submit_challenge_response-unknown-field",
+      "schema": "submit_challenge_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "submit_challenge_response-missing-version",
+      "schema": "submit_challenge_response",
+      "valid": false,
+      "value": {
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "client_data": "AA"
+      }
+    },
+    {
+      "name": "submit_response-structural-positive",
+      "schema": "submit_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "accepted": true,
+        "operation_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "submit_response-unknown-field",
+      "schema": "submit_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "accepted": true,
+        "operation_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "submit_response-missing-version",
+      "schema": "submit_response",
+      "valid": false,
+      "value": {
+        "accepted": true,
+        "operation_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "poll_response-structural-positive",
+      "schema": "poll_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "pending",
+        "expires_at": 1900000120000,
+        "retry_after_ms": 2000
+      }
+    },
+    {
+      "name": "poll_response-unknown-field",
+      "schema": "poll_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "pending",
+        "expires_at": 1900000120000,
+        "retry_after_ms": 2000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "poll_response-missing-version",
+      "schema": "poll_response",
+      "valid": false,
+      "value": {
+        "state": "pending",
+        "expires_at": 1900000120000,
+        "retry_after_ms": 2000
+      }
+    },
+    {
+      "name": "consume_response-structural-positive",
+      "schema": "consume_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "consumed",
+        "destination_envelope": "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiZGpjLXJlbmRlenZvdXMtZGVzdGluYXRpb24randlIiwia2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSJ9.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAA.AA.AAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000
+      }
+    },
+    {
+      "name": "consume_response-unknown-field",
+      "schema": "consume_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "consumed",
+        "destination_envelope": "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiZGpjLXJlbmRlenZvdXMtZGVzdGluYXRpb24randlIiwia2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSJ9.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAA.AA.AAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "consume_response-missing-version",
+      "schema": "consume_response",
+      "valid": false,
+      "value": {
+        "state": "consumed",
+        "destination_envelope": "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwidHlwIjoiZGpjLXJlbmRlenZvdXMtZGVzdGluYXRpb24randlIiwia2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSJ9.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.AAAAAAAAAAAAAAAA.AA.AAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1900000120000
+      }
+    },
+    {
+      "name": "cancel_response-structural-positive",
+      "schema": "cancel_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "cancelled"
+      }
+    },
+    {
+      "name": "cancel_response-unknown-field",
+      "schema": "cancel_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "cancelled",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "cancel_response-missing-version",
+      "schema": "cancel_response",
+      "valid": false,
+      "value": {
+        "state": "cancelled"
+      }
+    },
+    {
+      "name": "attestation_delete_response-structural-positive",
+      "schema": "attestation_delete_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "revoked",
+        "purge_at": 1902592120000
+      }
+    },
+    {
+      "name": "attestation_delete_response-unknown-field",
+      "schema": "attestation_delete_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "state": "revoked",
+        "purge_at": 1902592120000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_delete_response-missing-version",
+      "schema": "attestation_delete_response",
+      "valid": false,
+      "value": {
+        "state": "revoked",
+        "purge_at": 1902592120000
+      }
+    },
+    {
+      "name": "error-structural-positive",
+      "schema": "error",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "error": "invalid_sender_proof"
+      }
+    },
+    {
+      "name": "error-unknown-field",
+      "schema": "error",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "error": "invalid_sender_proof",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "error-missing-version",
+      "schema": "error",
+      "valid": false,
+      "value": {
+        "error": "invalid_sender_proof"
+      }
+    },
+    {
+      "name": "zero-generation",
+      "schema": "create",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "generation": 0,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "fractional-generation",
+      "schema": "create",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "generation": 1.5,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "version-mismatch",
+      "schema": "create",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/2",
+        "generation": 1,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "private-jwk",
+      "schema": "create",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "generation": 1,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB",
+          "d": "A"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "wrong-rsa-alg",
+      "schema": "create",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "generation": 1,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "Aw"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "padded-envelope-digest",
+      "schema": "submit_challenge",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      }
+    },
+    {
+      "name": "url-safe-apple-key-id",
+      "schema": "submit_challenge",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-4000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "___________________________________________",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "wrong-transaction-version",
+      "schema": "submit_challenge",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "transaction_id": "00000000-0000-1000-8000-000000000001",
+        "generation": 1,
+        "qr_capability": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "root-create",
+      "schema": "$root",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "generation": 1,
+        "browser_public_key": {
+          "kty": "RSA",
+          "n": "gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "e": "AQAB"
+        },
+        "claim_commitment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    },
+    {
+      "name": "root-unknown",
+      "schema": "$root",
+      "valid": false,
+      "value": {
+        "unsupported": true
+      }
+    },
+    {
+      "name": "root-scalar",
+      "schema": "$root",
+      "valid": false,
+      "value": 5
+    },
+    {
+      "name": "attestation_challenge-recovery-positive",
+      "schema": "attestation_challenge",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "action": "recover-key"
+      }
+    },
+    {
+      "name": "attestation_challenge-recovery-unknown-field",
+      "schema": "attestation_challenge",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "action": "recover-key",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_challenge-recovery-missing-version",
+      "schema": "attestation_challenge",
+      "valid": false,
+      "value": {
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "action": "recover-key"
+      }
+    },
+    {
+      "name": "attestation_recover-recovery-positive",
+      "schema": "attestation_recover",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InJlY292ZXIta2V5Iiwic2VydmljZV9vcmlnaW4iOiJodHRwczovL2FwaS5kamNvbm5lY3QuZGV2Iiwia2V5X2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0iLCJjaGFsbGVuZ2VfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImV4cGlyZXNfYXQiOjE3MDAwMDAxMjAwMDB9",
+        "assertion": "AA"
+      }
+    },
+    {
+      "name": "attestation_recover-recovery-unknown-field",
+      "schema": "attestation_recover",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InJlY292ZXIta2V5Iiwic2VydmljZV9vcmlnaW4iOiJodHRwczovL2FwaS5kamNvbm5lY3QuZGV2Iiwia2V5X2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0iLCJjaGFsbGVuZ2VfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImV4cGlyZXNfYXQiOjE3MDAwMDAxMjAwMDB9",
+        "assertion": "AA",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_recover-recovery-missing-version",
+      "schema": "attestation_recover",
+      "valid": false,
+      "value": {
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "client_data": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InJlY292ZXIta2V5Iiwic2VydmljZV9vcmlnaW4iOiJodHRwczovL2FwaS5kamNvbm5lY3QuZGV2Iiwia2V5X2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0iLCJjaGFsbGVuZ2VfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImV4cGlyZXNfYXQiOjE3MDAwMDAxMjAwMDB9",
+        "assertion": "AA"
+      }
+    },
+    {
+      "name": "attestation_recover_response-recovery-positive",
+      "schema": "attestation_recover_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_expires_at": 1702592000000
+      }
+    },
+    {
+      "name": "attestation_recover_response-recovery-unknown-field",
+      "schema": "attestation_recover_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "key_expires_at": 1702592000000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_recover_response-recovery-missing-version",
+      "schema": "attestation_recover_response",
+      "valid": false,
+      "value": {
+        "key_expires_at": 1702592000000
+      }
+    },
+    {
+      "name": "attestation_recover_challenge_response-recovery-positive",
+      "schema": "attestation_recover_challenge_response",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000,
+        "client_data": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InJlY292ZXIta2V5Iiwic2VydmljZV9vcmlnaW4iOiJodHRwczovL2FwaS5kamNvbm5lY3QuZGV2Iiwia2V5X2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0iLCJjaGFsbGVuZ2VfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImV4cGlyZXNfYXQiOjE3MDAwMDAxMjAwMDB9"
+      }
+    },
+    {
+      "name": "attestation_recover_challenge_response-recovery-unknown-field",
+      "schema": "attestation_recover_challenge_response",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000,
+        "client_data": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InJlY292ZXIta2V5Iiwic2VydmljZV9vcmlnaW4iOiJodHRwczovL2FwaS5kamNvbm5lY3QuZGV2Iiwia2V5X2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0iLCJjaGFsbGVuZ2VfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImV4cGlyZXNfYXQiOjE3MDAwMDAxMjAwMDB9",
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "attestation_recover_challenge_response-recovery-missing-version",
+      "schema": "attestation_recover_challenge_response",
+      "valid": false,
+      "value": {
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000,
+        "client_data": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InJlY292ZXIta2V5Iiwic2VydmljZV9vcmlnaW4iOiJodHRwczovL2FwaS5kamNvbm5lY3QuZGV2Iiwia2V5X2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0iLCJjaGFsbGVuZ2VfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImV4cGlyZXNfYXQiOjE3MDAwMDAxMjAwMDB9"
+      }
+    },
+    {
+      "name": "recover_client_data-recovery-positive",
+      "schema": "recover_client_data",
+      "valid": true,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "recover-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000
+      }
+    },
+    {
+      "name": "recover_client_data-recovery-unknown-field",
+      "schema": "recover_client_data",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "recover-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000,
+        "unknown_field": true
+      }
+    },
+    {
+      "name": "recover_client_data-recovery-missing-version",
+      "schema": "recover_client_data",
+      "valid": false,
+      "value": {
+        "action": "recover-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000
+      }
+    },
+    {
+      "name": "recover-clientdata-wrong-action-submit",
+      "schema": "recover_client_data",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "submit",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000
+      }
+    },
+    {
+      "name": "recover-clientdata-wrong-action-delete-key",
+      "schema": "recover_client_data",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "delete-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000
+      }
+    },
+    {
+      "name": "recover-clientdata-wrong-action-register",
+      "schema": "recover_client_data",
+      "valid": false,
+      "value": {
+        "v": "djc-rendezvous/1",
+        "action": "register",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000
+      }
+    }
+  ],
+  "client_data_byte_example": {
+    "parsed": {
+      "v": "djc-rendezvous/1",
+      "action": "submit",
+      "service_origin": "https://api.djconnect.dev",
+      "transaction_id": "00000000-0000-4000-8000-000000000001",
+      "generation": 1,
+      "browser_key_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "expires_at": 1900000120000,
+      "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+      "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "envelope_digest": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "utf8": "{\"v\":\"djc-rendezvous/1\",\"action\":\"submit\",\"service_origin\":\"https://api.djconnect.dev\",\"transaction_id\":\"00000000-0000-4000-8000-000000000001\",\"generation\":1,\"browser_key_thumbprint\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"expires_at\":1900000120000,\"key_id\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\",\"challenge_id\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"challenge\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"envelope_digest\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"}",
+    "base64url": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InN1Ym1pdCIsInNlcnZpY2Vfb3JpZ2luIjoiaHR0cHM6Ly9hcGkuZGpjb25uZWN0LmRldiIsInRyYW5zYWN0aW9uX2lkIjoiMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIiwiZ2VuZXJhdGlvbiI6MSwiYnJvd3Nlcl9rZXlfdGh1bWJwcmludCI6IkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEiLCJleHBpcmVzX2F0IjoxOTAwMDAwMTIwMDAwLCJrZXlfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBPSIsImNoYWxsZW5nZV9pZCI6IkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEiLCJjaGFsbGVuZ2UiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiZW52ZWxvcGVfZGlnZXN0IjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSJ9",
+    "note": "Byte encoding example only, not an App Attest assertion/testvector"
+  },
+  "management_client_data_byte_examples": [
+    {
+      "utf8": "{\"v\":\"djc-rendezvous/1\",\"action\":\"recover-key\",\"service_origin\":\"https://api.djconnect.dev\",\"key_id\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\",\"challenge_id\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"challenge\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"expires_at\":1700000120000}",
+      "base64url": "eyJ2IjoiZGpjLXJlbmRlenZvdXMvMSIsImFjdGlvbiI6InJlY292ZXIta2V5Iiwic2VydmljZV9vcmlnaW4iOiJodHRwczovL2FwaS5kamNvbm5lY3QuZGV2Iiwia2V5X2lkIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQT0iLCJjaGFsbGVuZ2VfaWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIiwiY2hhbGxlbmdlIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImV4cGlyZXNfYXQiOjE3MDAwMDAxMjAwMDB9",
+      "parsed": {
+        "v": "djc-rendezvous/1",
+        "action": "recover-key",
+        "service_origin": "https://api.djconnect.dev",
+        "key_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "challenge_id": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "challenge": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at": 1700000120000
+      }
+    }
+  ]
+}

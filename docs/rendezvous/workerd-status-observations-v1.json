@@ -1,0 +1,306 @@
+{
+  "public_inputs_sha256": {
+    "apple-root-g3-crl-sample.der": "e74917051b2fbcc1da37af1c82104bed95e546d50e5d713ed8f8473b14f7592c",
+    "apple-receipt-root.cer": "63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179",
+    "synthetic-status-v1.json": "a192b37e6b90a140f732290eec3e956039f013b0f0bf98d635f8bc45df386c9b"
+  },
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "scope": "LOCAL_WORKERD_COMMON_CERT_STATUS_ONLY_NO_ENROLLMENT_GO",
+  "tests_passed": 68,
+  "genuine_status_inputs": 3,
+  "synthetic_cases": 32,
+  "cases": [
+    {
+      "name": "actual common-certificate current eligibility: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status time denies before-thisUpdate: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status time denies nextUpdate-equality: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied signature: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied certificate: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied issuer: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied root: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied trailing: signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied oversized: signer",
+      "status": "passed"
+    },
+    {
+      "name": "private cache binds exact tuple/no mutation renewal: signer",
+      "status": "passed"
+    },
+    {
+      "name": "private cache denies clock rollback: signer",
+      "status": "passed"
+    },
+    {
+      "name": "actual common-certificate current eligibility: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status time denies before-thisUpdate: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status time denies nextUpdate-equality: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied signature: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied certificate: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied issuer: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied root: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied trailing: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied oversized: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "private cache binds exact tuple/no mutation renewal: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "private cache denies clock rollback: intermediate",
+      "status": "passed"
+    },
+    {
+      "name": "actual common-certificate current eligibility: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status time denies before-thisUpdate: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status time denies nextUpdate-equality: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied signature: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied certificate: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied issuer: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied root: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied trailing: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "signed status mutation denied oversized: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "private cache binds exact tuple/no mutation renewal: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "private cache denies clock rollback: intermediate-crl",
+      "status": "passed"
+    },
+    {
+      "name": "status verification has no outbound fetch",
+      "status": "passed"
+    },
+    {
+      "name": "empty cache cannot be seeded with a caller status object",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: valid-delegation",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: issuer-signs-directly",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: revoked",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: unknown",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-target",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-certid-hash",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: missing-next-update",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: future-this-update",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: stale-this-update",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: next-update-equality",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: future-produced-at",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: missing-responder-eku",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-ca-delegation",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: expired-responder",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: expired-target",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: critical-response-extension",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: duplicate-single-response",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: missing-responder-certs",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: wrong-responder-id",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: tampered-signature",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: trailing-object",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: truncated",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: unsuccessful-response",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-valid",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-revoked",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-critical-entry",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-noncritical-entry",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-unknown-extension",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-wrong-aki",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-future",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-next-update-equality",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic OCSP: crl-tampered-signature",
+      "status": "passed"
+    },
+    {
+      "name": "public wrapper refuses even valid synthetic root",
+      "status": "passed"
+    }
+  ],
+  "node": "v26.12.0",
+  "libraries": {
+    "pkijs": "3.4.1",
+    "asn1js": "3.1.0"
+  },
+  "source_sha256": {
+    "receipt-status-candidate.mjs": "2b91b1b1abea3871a50d670596dfa6c50495d6e719a4d95752ea877e8497fe85",
+    "receipt-status.check.mjs": "9d3ef09aa2657af66dc82e6a96898dac3a67cd79d68569a4010c4e95240bf679",
+    "run_status_workerd.mjs": "a3310f2f612e49a37667459655f76b20bed929f62213ddfd4253c011228c847d",
+    "build_synthetic_status.py": "d56af12a9395e0ea4b8c460c923c83b87a677b10c6ce1429c94afb75dbcfaab7"
+  },
+  "compatibility_date": "2026-06-20",
+  "not_run": [
+    "complete status egress/production cache/propagation",
+    "complete verifier/fresh enrollment",
+    "exact action wire/DO state/replay atomicity",
+    "production/HA/TV chain"
+  ]
+}
