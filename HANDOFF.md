@@ -26,6 +26,14 @@ exchange was independently read. Do not repeat that question.
 crash/replay, request/clientData and JWE review candidate. None is a frozen
 consumer wire contract or production configuration.
 
+[Transaction qualification design](docs/rendezvous/TRANSACTION_QUALIFICATION_DESIGN_V1.md)
+records the next API-owned state boundary and independent scoped design reviews,
+not an implemented transaction DO. Review corrected terminal recovery: a consumed
+transaction may start a fresh QR after authenticated status without impossible
+cancel-after-consume. Live pending/ready rotation still requires confirmed cancel;
+unknown outcome waits for original expiry. No qualified reusable server JWE parser
+is claimed. Public runtime remains behind the joint exact contract/security gate.
+
 The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.
 [Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15

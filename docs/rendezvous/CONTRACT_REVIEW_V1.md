@@ -166,9 +166,12 @@ releasing the envelope again. This UX tradeoff requires WIRE-1 review.
 
 Cancel and consume compete within the same storage transaction: whichever
 commits first wins. Repeated authenticated cancel on cancelled is idempotent;
-cancel after consume returns conflict. Rotation requires confirmed cancellation
-of the old generation before a new create; if cancellation is unavailable,
-clear local keys and wait until the old absolute deadline before new creation.
+cancel after consume returns conflict. Rotation of a live pending/ready
+transaction requires confirmed cancellation before a new create. An authenticated
+consumed/cancelled result, or the original absolute expiry, permits a fresh
+transaction and browser key without cancelling an already terminal transaction.
+If the old outcome is unknown and cancellation is unavailable, clear local keys
+and wait until the old absolute deadline before new creation.
 No API claims atomicity across different Durable Objects.
 
 Server `created_at + 120000` is the proposed fixed deadline. Every operation
@@ -179,8 +182,11 @@ Use persisted state and transactional compare-and-transition; input-gate
 serialization alone is insufficient across asynchronous validation.
 
 An alarm removes payloads/secrets at expiry; request-time deadline checks remain
-authoritative if alarm delivery is late. Terminal state retains only capability
-commitments and deadline until expiry, then all application rows are deleted.
+authoritative if alarm delivery is late. Terminal state retains capability
+commitments, the original binding/deadline and any committed immutable
+operation/request digest until expiry, then all application rows are deleted.
+That receipt acknowledges historical submit acceptance; it cannot return
+ciphertext or restore ready/consumed state.
 Missing state always fails closed and never reinitializes through poll/submit.
 Unknown IDs must be rejected before allocating durable state where possible.
 Physical storage deletion/backup retention must be qualified separately; an

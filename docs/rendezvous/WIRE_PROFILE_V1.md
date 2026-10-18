@@ -205,6 +205,19 @@ also applies if the key coordinator's receipt has since been erased by revocatio
 Before ready, a retry still needs a current unexpired coordinator authorization.
 No response claims that a later cancelled/consumed transaction is currently ready.
 
+Rotation requires confirmed cancellation only while the old transaction is live
+pending/ready. Authenticated consumed/cancelled state, or the original expiry,
+permits a fresh transaction with a fresh browser key. A lost consume response
+therefore leads to authenticated poll -> consumed -> fresh QR; do not cancel the
+already consumed transaction or redeliver its envelope. Unknown outcome plus
+unavailable cancellation requires waiting until the original deadline.
+
+The [transaction qualification design](TRANSACTION_QUALIFICATION_DESIGN_V1.md)
+records scoped independent design review and required race/fault tests. There is
+no qualified reusable server JWE parser yet. Structural envelope validation and
+the state implementation require their own source/test/review evidence; a trusted
+QA seam cannot establish parser or public runtime acceptance.
+
 Fixed error shape `{v,error,retry_after_ms?}`. Codes: invalid_request400,
 unsupported_version400, invalid_capability401, invalid_sender_proof401,
 attestation_required401, app_not_supported403, origin_denied403,
