@@ -127,6 +127,12 @@ now tests default nonce32 and original-deadline fail-closed orchestration,95/87
 cases; positives use explicit software stubs and old diagnostics remain separate.
 No registration atomicity/fresh native enrollment/full verifier/runtime GO.
 
+[Local atomic registration](WORKER_REGISTRATION_QUALIFICATION_V1.md) now
+adds141/137 workerd+isolated TypeScript cases, encrypted key/receipt plus nonce
+consumption in one SQL transaction and actual private-facade RPC denial tests.
+Initial positives use explicit software fixtures; fresh native enrollment,
+controller/global admission/transaction DO and public runtime remain unqualified.
+
 ## REST messages and limits for review
 
 All requests/responses include `v:"djc-rendezvous/1"`; see the machine-readable

@@ -107,6 +107,15 @@ path/status/receipt deadlines checked across awaits. Positive orchestration uses
 explicit software stubs; eight old diagnostic tests do not prove fresh enrollment.
 Core93/CMS83/API40 regressions pass after internal authenticated metadata additions.
 No atomic registration, private RPC, fresh genuine positive or public runtime GO.
+[Local atomic registration/private facade](docs/rendezvous/WORKER_REGISTRATION_QUALIFICATION_V1.md)
+now adds141/137 actual workerd cases+isolated TypeScript, including all75/73 prior
+storage/assertion regressions. Key/ciphertext and original nonce consumption share
+one SQL commit, with immutable retries, current/original policy guards and finite
+cleanup. Actual RPC denies20 helper methods/four private properties. Initial
+positive enrollment uses a separately constructed software fixture; default real
+verifier rejects fake/old proofs. No fresh genuine/native or global routing/
+admission/transaction/public-runtime GO. Scoped independent source/design and
+UX/privacy reviews GO;40 API regressions/roottypes/projection PASS.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing

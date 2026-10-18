@@ -25,6 +25,8 @@ export class ReceiptKeyStore extends DurableObject<StoreEnv> {
   protected save(row:RecordState){this.ctx.storage.sql.exec('INSERT INTO key_state(id,value) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET value=excluded.value',JSON.stringify(row));}
   protected removingKeyEvidence():void{}
   protected nextCleanupAt():number|undefined{return undefined;}
+  protected beforeInstallCommit(_m:StoreMaterial,_now:number):void{}
+  protected didInstallCommit(_m:StoreMaterial,_expiresAt:number):void{}
   protected tombstone(r:Active):Tombstone{this.removingKeyEvidence();return {version:1,status:'revoked',keyAddress:r.keyAddress,expiresAt:r.expiresAt,purgeAt:r.expiresAt+120000};}
   protected expire(now:number){
     const r=this.load();if(r?.status==='active'){
@@ -42,7 +44,7 @@ export class ReceiptKeyStore extends DurableObject<StoreEnv> {
     need(integer(m.challengeCreatedAt)&&integer(m.challengeExpiresAt)&&m.challengeExpiresAt>m.challengeCreatedAt&&m.challengeExpiresAt-m.challengeCreatedAt<=120000&&now>=m.challengeCreatedAt&&now<m.challengeExpiresAt);
   }
   // Trusted internal material only. This method does NOT validate App Attest/CMS/status/wire admission.
-  private async installInternal(m:StoreMaterial){
+  protected async installInternal(m:StoreMaterial){
     const now=Date.now();this.material(m,now);need(this.env.RECEIPT_ACTIVE_KEY);const version=await keyVersion(this.env.RECEIPT_ACTIVE_KEY);
     const row:Active={version:1,status:'active',objectId:this.ctx.id.toString(),keyAddress:m.keyAddress,appPolicy:m.appPolicy,environment:m.environment,createdAt:now,expiresAt:now+30*DAY,receiptCreatedAt:m.receiptCreatedAt,keyVersion:version,revision:1,publicPoint:m.publicPoint,counter:0,ciphertext:'',nonce:'',operationId:m.operationId,requestDigest:m.requestDigest,challengeExpiresAt:m.challengeExpiresAt};
     const encrypted=await encryptSecret(JSON.stringify({context:context(row),receipt:m.receipt}),this.env.RECEIPT_ACTIVE_KEY);
@@ -52,9 +54,9 @@ export class ReceiptKeyStore extends DurableObject<StoreEnv> {
       await this.ctx.storage.setAlarm(Math.min(prior??row.expiresAt,row.expiresAt,m.challengeExpiresAt));
       // Durable cleanup trigger is acknowledged BEFORE any sensitive SQL commit.
       return this.ctx.storage.transactionSync(()=>{
-      const at=Date.now();this.material(m,at);const old=this.expire(at);
+      const at=Date.now();this.material(m,at);this.beforeInstallCommit(m,at);const old=this.expire(at);
       if(old){need(old.status==='active'&&old.objectId===this.ctx.id.toString()&&old.keyAddress===m.keyAddress&&old.operationId===m.operationId&&old.requestDigest===m.requestDigest&&old.challengeExpiresAt!==undefined&&at<old.challengeExpiresAt);return {scope:'STORE_ONLY_NO_ENROLLMENT',expiresAt:old.expiresAt,duplicate:true};}
-      need(at<row.expiresAt);this.save(row);return {scope:'STORE_ONLY_NO_ENROLLMENT',expiresAt:row.expiresAt,duplicate:false};
+      need(at<row.expiresAt);this.save(row);this.didInstallCommit(m,row.expiresAt);return {scope:'STORE_ONLY_NO_ENROLLMENT',expiresAt:row.expiresAt,duplicate:false};
       });
     });
     // A failed later alarm acknowledgement leaves an unknown outcome, never triggers a second key/expiry.

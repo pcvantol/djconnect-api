@@ -60,6 +60,12 @@ adds95/87 cases, declaration-consumer typing and core93/CMS83/API40 regressions.
 Positive orchestration uses explicit stubs; default rawnonce32 and old diagnostic
 paths remain distinct. Atomic registration/fresh genuine positive/runtime remain open.
 
+[Local atomic registration](WORKER_REGISTRATION_QUALIFICATION_V1.md) now
+adds141/137 workerd+isolated TypeScript cases, encrypted key/receipt plus nonce
+consumption in one SQL transaction and actual private-facade RPC denial tests.
+Initial positives use explicit software fixtures; fresh native enrollment,
+controller/global admission/transaction DO and public runtime remain unqualified.
+
 ## Local checkpoint — 2026-10-16
 
 On the contract branch based on `3bb5f2b01401827e8a1072e1668fbb4a2223f26f`:
