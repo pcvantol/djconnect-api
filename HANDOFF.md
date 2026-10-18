@@ -32,7 +32,17 @@ not an implemented transaction DO. Review corrected terminal recovery: a consume
 transaction may start a fresh QR after authenticated status without impossible
 cancel-after-consume. Live pending/ready rotation still requires confirmed cancel;
 unknown outcome waits for original expiry. No qualified reusable server JWE parser
-is claimed. Public runtime remains behind the joint exact contract/security gate.
+is claimed by that design. Public runtime remains behind the joint exact contract/security gate.
+
+Protected source PR94 merged to `e67f402b5f9d1a3099850dd2f6d9edd42a004aa0`;
+candidate/main tree equality and all six post-merge workflows were verified,
+including artifact and POST_MERGE_RELEASE_EVIDENCE_QUALIFIED. That closes the
+source increment, not the assignment or separate Finalization/deployment.
+[Local framing qualification](docs/rendezvous/WORKER_FRAMING_QUALIFICATION_V1.md)
+adds92 actual workerd cases+isolated TypeScript for closed JWE/header/JWK shapes,
+exact-byte digest and copied thumbprint input. Structurally accepted ciphertext
+can still be cryptographically invalid; no AEAD/plaintext/sender or transaction
+acceptance is inferred. API retains state/controller/admission implementation.
 
 The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.

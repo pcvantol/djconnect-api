@@ -214,7 +214,9 @@ unavailable cancellation requires waiting until the original deadline.
 
 The [transaction qualification design](TRANSACTION_QUALIFICATION_DESIGN_V1.md)
 records scoped independent design review and required race/fault tests. There is
-no qualified reusable server JWE parser yet. Structural envelope validation and
+no transaction-integrated server JWE parser yet. [Local framing qualification](WORKER_FRAMING_QUALIFICATION_V1.md)
+adds92 workerd cases+types for a structural candidate, not AEAD acceptance.
+Structural envelope validation and
 the state implementation require their own source/test/review evidence; a trusted
 QA seam cannot establish parser or public runtime acceptance.
 

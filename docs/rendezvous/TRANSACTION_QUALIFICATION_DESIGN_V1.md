@@ -51,7 +51,9 @@ still win within its bounded lease after key revocation. See
 ## Parser and infrastructure prerequisites
 
 The generator/browser oracle is not a qualified reusable server compact-JWE
-parser. Either independently qualify strict protected-header/framing validation
+parser. [Local structural qualification](WORKER_FRAMING_QUALIFICATION_V1.md) now
+adds92 actual workerd cases+types for a candidate, not transaction integration.
+Independently review strict protected-header/framing validation
 before composition, or explicitly label any injected trusted QA validator as a
 software test seam. Never call such a seam parser or full service qualification.
 Server framing checks cannot inspect or validate the encrypted destination;
