@@ -100,6 +100,13 @@ Independent supplied-design/implementation GO is supplemented by full supplied
 coordinator/store/test text review at9e9a76f, no P1/P2; reviewer did not independently
 read Git or run tests. UX reviewer read both exact qualification/wire documents.
 No full enrollment/runtime security approval. Exact9e9a76f CI13SUCCESS/1cleanupSKIP.
+[Local composed enrollment evidence](docs/rendezvous/WORKER_ENROLLMENT_EVIDENCE_QUALIFICATION_V1.md)
+now adds95/87 workerd cases plus a typed declaration consumer: default exactnonce32,
+core->freshCMS->authenticated common issuerCRL/signerOCSP, original policy/challenge,
+path/status/receipt deadlines checked across awaits. Positive orchestration uses
+explicit software stubs; eight old diagnostic tests do not prove fresh enrollment.
+Core93/CMS83/API40 regressions pass after internal authenticated metadata additions.
+No atomic registration, private RPC, fresh genuine positive or public runtime GO.
 No new lanewriters or cross-repository source writes. Runtime, public wire vectors,
 new-service CI/E2E, protected product merge and separate Finalization remain
 pending. Production deployment remains separately unauthorized. The existing

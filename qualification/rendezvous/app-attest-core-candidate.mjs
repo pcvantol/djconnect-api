@@ -77,7 +77,9 @@ export async function qualifyAttestationCore(encoded, savedClientData, canonical
     const canonicalNonce = new asn1js.Sequence({ value: [new asn1js.Constructed({ idBlock: { tagClass: 3, tagNumber: 1 },
       value: [new asn1js.OctetString({ valueHex: expectedNonce })] })] });
     assert(equal(new Uint8Array(canonicalNonce.toBER(false)), extensions[0].extnValue.valueBlock.valueHexView));
-    return { scope: 'ATTESTATION_CORE_ONLY_RECEIPT_UNVERIFIED_NO_ENROLLMENT', point, receipt };
+    // Internal composition output only: already authenticated by this exact path/nonce check.
+    const certificateExpiresAt = Math.min(...[certificate, ...[intermediate, publicRoot].map(value => new pki.Certificate({ schema: der(value) }))].map(value => value.notAfter.value.getTime()));
+    return { scope: 'ATTESTATION_CORE_ONLY_RECEIPT_UNVERIFIED_NO_ENROLLMENT', point, receipt, attestedLeaf: leaf.slice(), certificateExpiresAt };
   } catch { return null; }
 }
 function assertionSignature(encoded) {

@@ -55,6 +55,11 @@ adds75/73 actual SQLiteDO cases+types, with trusted fixture enrollment and
 diagnostic raw-input seeds kept distinct. No transactionDO, public admission or
 full enrollment/crypto/status composition is qualified by that component.
 
+[Local enrollment evidence composition](WORKER_ENROLLMENT_EVIDENCE_QUALIFICATION_V1.md)
+adds95/87 cases, declaration-consumer typing and core93/CMS83/API40 regressions.
+Positive orchestration uses explicit stubs; default rawnonce32 and old diagnostic
+paths remain distinct. Atomic registration/fresh genuine positive/runtime remain open.
+
 ## Local checkpoint — 2026-10-16
 
 On the contract branch based on `3bb5f2b01401827e8a1072e1668fbb4a2223f26f`:

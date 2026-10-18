@@ -122,6 +122,11 @@ clientData as well as parsed binding, assertion and coordinator authorization.
 Changing whitespace/key order therefore requires a new challenge, not reusing
 the old assertion. This is byte binding, not a claimed cross-language JSON rule.
 
+[Composed local enrollment evidence](WORKER_ENROLLMENT_EVIDENCE_QUALIFICATION_V1.md)
+now tests default nonce32 and original-deadline fail-closed orchestration,95/87
+cases; positives use explicit software stubs and old diagnostics remain separate.
+No registration atomicity/fresh native enrollment/full verifier/runtime GO.
+
 ## REST messages and limits for review
 
 All requests/responses include `v:"djc-rendezvous/1"`; see the machine-readable

@@ -127,7 +127,9 @@ async function evaluate(encoded,attestedCert,clientData,anchor,pin,now){
   need(same(fields.get(2),APP)&&same(fields.get(3),attestedCert)&&same(fields.get(4),await hash(clientData)));
   need(same(fields.get(6),new TextEncoder().encode('ATTEST'))&&same(fields.get(7),new TextEncoder().encode('sandbox')));
   bounded(fields.get(5),1,1024);const created=instant(fields.get(12)),expires=instant(fields.get(21));need(expires>created);
-  return {scope:'CMS_SIGNATURE_PATH_FIELDS_ONLY_REVOCATION_UNCHECKED_NO_ENROLLMENT',created,expires,fresh:now>=created&&now-created<=300000&&now<expires};
+  // Internal authenticated common-cert tuple, never the device leaf from receipt field3.
+  return {scope:'CMS_SIGNATURE_PATH_FIELDS_ONLY_REVOCATION_UNCHECKED_NO_ENROLLMENT',created,expires,fresh:now>=created&&now-created<=300000&&now<expires,
+    signer:raw(leaf).slice(),issuer:raw(inter).slice(),root:raw(root).slice(),certificateExpiresAt:Math.min(...[leaf,inter,root].map(c=>c.notAfter.value.getTime()))};
 }
 export async function qualifyReceiptEvidence(encoded,attestedCert,clientData,anchor){
   try{return await evaluate(encoded,attestedCert,clientData,anchor,ROOT,Date.now());}catch{return null;}
