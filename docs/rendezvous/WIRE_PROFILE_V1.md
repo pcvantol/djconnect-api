@@ -220,6 +220,13 @@ Structural envelope validation and
 the state implementation require their own source/test/review evidence; a trusted
 QA seam cannot establish parser or public runtime acceptance.
 
+[Local transaction composition](WORKER_TRANSACTION_QUALIFICATION_V1.md) now adds
+322 actual workerd cases+types for private coordinator leases and SQLite
+winner/consume/cancel, including93 transaction cases. Initial enrollment is
+software; typed internal digests are not raw HTTP JSON canonicalization. Public
+immutable allocation/controller/global admission and genuine native chain remain
+separate gates. No public endpoint/schema or HA authority changes.
+
 Fixed error shape `{v,error,retry_after_ms?}`. Codes: invalid_request400,
 unsupported_version400, invalid_capability401, invalid_sender_proof401,
 attestation_required401, app_not_supported403, origin_denied403,

@@ -44,6 +44,16 @@ exact-byte digest and copied thumbprint input. Structurally accepted ciphertext
 can still be cryptographically invalid; no AEAD/plaintext/sender or transaction
 acceptance is inferred. API retains state/controller/admission implementation.
 
+[Local transaction composition](docs/rendezvous/WORKER_TRANSACTION_QUALIFICATION_V1.md)
+now adds322 actual workerd cases+strict types:93 transaction,92 framing and137
+public registration/storage/assertion cases. Actual software assertions/counters,
+private coordinator lease and SQLite winner/consume/cancel compose with standard
+JOSE encryption/decryption; initial enrollment remains explicitly software.
+Immutable120s allocator descriptors/object binding, purge/restart replay, races,
+counter burns and historical retries are tested. Public immutable allocator/
+controller/global admission and genuine native/fullservice proof remain open;
+this does not make the deployment/service ready. Product bindings/config unchanged.
+
 The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.
 [Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15

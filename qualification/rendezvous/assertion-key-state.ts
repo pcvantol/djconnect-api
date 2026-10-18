@@ -50,7 +50,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
  }
  private disposition(op:Operation,requestDigest:string,now:number){
   const row=this.active(now),policyUntil=this.policy(now);need(op.status==='authorized'&&op.requestDigest===requestDigest&&op.keyAddress===row.keyAddress&&now>=op.admittedAt!&&now<op.expiresAt);
-  if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
+  if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,admittedAt:op.admittedAt!,keyExpiresAt:op.keyExpiresAt!,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
   need(op.action==='recover-key');return {kind:'recovery-receipt' as const,keyExpiresAt:op.keyExpiresAt!,counter:op.counter!};
  }
  private async authorizeInternal(input:ProofInput){

@@ -1,7 +1,11 @@
 # Local transaction qualification design
 
 Profile `0.4.0-draft`, wire `djc-rendezvous/1`, existing API94 writer.
-**DESIGN ONLY / NOT_FROZEN / NO_TRANSACTION_IMPLEMENTATION_OR_RUNTIME_GO.**
+**DESIGN BASELINE / NOT_FROZEN / NO_PUBLIC_RUNTIME_GO.**
+Subsequent [local transaction composition](WORKER_TRANSACTION_QUALIFICATION_V1.md)
+executes322 workerd cases+types including93 transaction cases. Initial enrollment
+is software, public allocator/controller/admission and full native chain remain
+open; that measured evidence supersedes only the earlier missing-local-code claim.
 Registration producer `b191a9fa9cbde01bf3140728fbf40f954c1b4277` has
 141/137 local workerd cases plus isolated TypeScript, with software initial
 enrollment positives; that evidence does not implement the transaction below.
