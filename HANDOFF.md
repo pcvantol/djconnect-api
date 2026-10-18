@@ -73,6 +73,17 @@ only, not capability/HA authority; lost create never auto-retries or renews.
 Public controller/key-namespace coverage, edge provenance, costs and full chain
 remain separate. No product binding/config or public runtime enablement.
 
+[Private key-RPC admission/routing](docs/rendezvous/WORKER_KEY_ROUTING_QUALIFICATION_V1.md)
+adds490 actual workerd cases+strict types (54 new+436 regressions), plus265
+HTTP/budget regressions against the new source. Every selected key RPC is globally
+charged before child namespace access; registration additionally counts toward500
+attempts/day, including failures/identical retries.50,000calls/day is a proposed
+application cap, not production capacity. No long-lived key journal was built;
+known/unknown management challenges and same-key recovery remain unchanged.
+Trusted budget outages/rate failures retain their own transaction error codes.
+Full public gated composition, per-IP/edge/cost controls and native/physical
+acceptance remain OPEN; source delivery does not close the function.
+
 The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.
 [Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15

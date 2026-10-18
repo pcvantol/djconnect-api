@@ -201,3 +201,15 @@ allocation. No automatic fresh QR/retry after an unknown create outcome. This
 does not freeze public wire, qualify key namespaces or enable a public service.
 The fixed index adds RPC/bottleneck costs absent from the earlier64-call volume
 model; complete numerical operating costs and capacity remain unqualified.
+
+## Private global key-RPC admission continuation
+
+[Key routing qualification](WORKER_KEY_ROUTING_QUALIFICATION_V1.md) records490
+actual local workerd cases+strict types and265 HTTP/budget regressions. The
+proposed50,000/day global call gate precedes every selected key child access;
+the500/day ceiling counts registration ATTEMPTS, including failed/identical
+retries, not500 new installations. That capacity policy needs joint review
+before freeze. No long-lived key journal or changed recovery/key lifetime was
+implemented. Unknown-key challenges/coalescing remain; their child creation is
+bounded by routed-call admission, not forbidden. Public coverage/edge costs,
+operations, native and physical functional acceptance remain OPEN.

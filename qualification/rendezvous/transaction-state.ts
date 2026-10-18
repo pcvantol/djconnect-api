@@ -83,7 +83,8 @@ export class TransactionState {
       need(snapshot.state==='pending',snapshot.state==='cancelled'?'cancelled':'already_submitted');
       const envelope=await qualifyCompactJwe(input.destinationEnvelope,snapshot.thumbprint);need(envelope.ok);
       const address=hex(await jsonHash(['development',POLICY,input.keyId])),proofDigest=hex(await jsonHash(['submit',input.challengeId,address,input.clientData,input.assertion]));
-      const result=await this.#authorize(input.keyId,{operationId:input.challengeId,action:'submit',clientData:input.clientData,assertion:input.assertion}) as Authorization;
+      const result=await this.#authorize(input.keyId,{operationId:input.challengeId,action:'submit',clientData:input.clientData,assertion:input.assertion}) as Authorization|{ok:false;error:string};
+      if(result?.ok===false&&(result.error==='rate_limited'||result.error==='service_unavailable'))fail(result.error);
       need(result?.ok&&result.kind==='submit-authorization','invalid_sender_proof');const auth=structuredClone(result);
       return this.#ctx.storage.transactionSync(()=>{
         const r=this.#row(input.transactionId,input.generation,qrCommitment,'qrCommitment'),now=Date.now();

@@ -25,9 +25,9 @@ export async function deriveBudgetIdentity(trustedEdgeIp:string,secret:string):P
 }
 export class AllocationBudgetState {
   #ctx:DurableObjectState;#env:BudgetEnv;#busy=false;
-  constructor(ctx:DurableObjectState,env:BudgetEnv){this.#ctx=ctx;this.#env=env;ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS allocation_days(day INTEGER PRIMARY KEY, transactions INTEGER NOT NULL, keys INTEGER NOT NULL, expires_at INTEGER NOT NULL)');ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS allocation_ips(key TEXT PRIMARY KEY, minute INTEGER NOT NULL, count INTEGER NOT NULL, expires_at INTEGER NOT NULL)');}
+  constructor(ctx:DurableObjectState,env:BudgetEnv){this.#ctx=ctx;this.#env=env;ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS allocation_days(day INTEGER PRIMARY KEY, transactions INTEGER NOT NULL, keys INTEGER NOT NULL, expires_at INTEGER NOT NULL)');ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS allocation_key_calls(day INTEGER PRIMARY KEY, count INTEGER NOT NULL, expires_at INTEGER NOT NULL)');ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS allocation_ips(key TEXT PRIMARY KEY, minute INTEGER NOT NULL, count INTEGER NOT NULL, expires_at INTEGER NOT NULL)');}
   #policy(){need(this.#env.ALLOCATION_POLICY_ENABLED===BUDGET_POLICY&&this.#env.ADMISSION_STATE.idFromName(BUDGET_NAME).equals(this.#ctx.id));}
-  #cleanup(now:number){this.#ctx.storage.sql.exec('DELETE FROM allocation_ips WHERE expires_at<=?',now);this.#ctx.storage.sql.exec('DELETE FROM allocation_days WHERE expires_at<=?',now);}
+  #cleanup(now:number){this.#ctx.storage.sql.exec('DELETE FROM allocation_key_calls WHERE expires_at<=?',now);this.#ctx.storage.sql.exec('DELETE FROM allocation_ips WHERE expires_at<=?',now);this.#ctx.storage.sql.exec('DELETE FROM allocation_days WHERE expires_at<=?',now);}
   async admit(input:BudgetRequest):Promise<BudgetResult>{
     if(this.#busy)return {ok:false,error:'service_unavailable'};this.#busy=true;
     try{
@@ -50,11 +50,26 @@ export class AllocationBudgetState {
       });
     }catch{return {ok:false,error:'service_unavailable'};}finally{this.#busy=false;}
   }
-  async alarm(){if(this.#busy)throw new Error('qualification_cleanup_busy');this.#busy=true;try{const next=this.#ctx.storage.transactionSync(()=>{this.#cleanup(Date.now());return this.#ctx.storage.sql.exec<{at:number|null}>('SELECT MIN(expires_at) AS at FROM (SELECT expires_at FROM allocation_ips UNION ALL SELECT expires_at FROM allocation_days)').toArray()[0]?.at;});if(next===null||next===undefined)await this.#ctx.storage.deleteAlarm();else await this.#ctx.storage.setAlarm(next);}catch{throw new Error('qualification_cleanup_failed');}finally{this.#busy=false;}}
+  async admitKeyCall():Promise<BudgetResult>{
+    if(this.#busy)return {ok:false,error:'service_unavailable'};this.#busy=true;
+    try{
+      this.#policy();const now=Date.now(),day=Math.floor(now/86400000),deadline=(day+1)*86400000;
+      const alarm=await this.#ctx.storage.getAlarm();await this.#ctx.storage.setAlarm(Math.min(alarm??deadline,deadline));
+      return this.#ctx.storage.transactionSync(()=>{
+        this.#policy();const at=Date.now();need(at>=now&&Math.floor(at/86400000)===day);this.#cleanup(at);
+        const count=this.#ctx.storage.sql.exec<{count:number}>('SELECT count FROM allocation_key_calls WHERE day=?',day).toArray()[0]?.count??0;
+        if(count>=50000)return {ok:false as const,error:'rate_limited' as const,retry_after_ms:60000};
+        this.#ctx.storage.sql.exec('INSERT INTO allocation_key_calls(day,count,expires_at) VALUES(?,1,?) ON CONFLICT(day) DO UPDATE SET count=allocation_key_calls.count+1',day,deadline);
+        return {ok:true as const};
+      });
+    }catch{return {ok:false,error:'service_unavailable'};}finally{this.#busy=false;}
+  }
+  async alarm(){if(this.#busy)throw new Error('qualification_cleanup_busy');this.#busy=true;try{const next=this.#ctx.storage.transactionSync(()=>{this.#cleanup(Date.now());return this.#ctx.storage.sql.exec<{at:number|null}>('SELECT MIN(expires_at) AS at FROM (SELECT expires_at FROM allocation_ips UNION ALL SELECT expires_at FROM allocation_days UNION ALL SELECT expires_at FROM allocation_key_calls)').toArray()[0]?.at;});if(next===null||next===undefined)await this.#ctx.storage.deleteAlarm();else await this.#ctx.storage.setAlarm(next);}catch{throw new Error('qualification_cleanup_failed');}finally{this.#busy=false;}}
 }
 export class AllocationBudget extends DurableObject<BudgetEnv> {
   #state:AllocationBudgetState;
   constructor(ctx:DurableObjectState,env:BudgetEnv){super(ctx,env);this.#state=new AllocationBudgetState(ctx,env);}
   admit(input:BudgetRequest){return this.#state.admit(input);}
+  admitKeyCall(...args:unknown[]){return args.length===0?this.#state.admitKeyCall():{ok:false as const,error:'service_unavailable' as const};}
   alarm(){return this.#state.alarm();}
 }
