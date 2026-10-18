@@ -64,6 +64,15 @@ This does not qualify full public controller/unknown-ID allocation coverage,
 trusted edge IP provenance, complete abuse/cost containment or production.
 API retains that integration and operational work; consumer boundaries remain.
 
+[Private allocation/index routing qualification](docs/rendezvous/WORKER_INDEX_QUALIFICATION_V1.md)
+adds436 actual workerd cases+strict types:68 index/router,46 budget and322
+transaction/registration/framing regressions. Server immutable120s descriptors
+follow one budget charge; original admission minute is rechecked across awaits.
+Unknown/expired IDs fail before child namespace access. Index metadata is routing
+only, not capability/HA authority; lost create never auto-retries or renews.
+Public controller/key-namespace coverage, edge provenance, costs and full chain
+remain separate. No product binding/config or public runtime enablement.
+
 The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.
 [Verifier investigation](docs/rendezvous/VERIFIER_REFERENCE_AUDIT_V1.md) adds15

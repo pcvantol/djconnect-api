@@ -296,3 +296,14 @@ Its additional raw JSON syntax restrictions and numerical allocation policies
 require joint review before contract freeze; unchanged schemas alone do not
 prove those consumer promises. Default harness is disabled; no production
 binding, migration, secret or deployment is introduced.
+
+## Private transaction index continuation
+
+[Allocation/index qualification](WORKER_INDEX_QUALIFICATION_V1.md) records436
+actual local workerd cases+strict types, including existing322 transaction and46
+budget cases. Unknown/expired transaction IDs fail before child stub access via
+the private router. One original-window budget charge precedes immutable server
+allocation. No automatic fresh QR/retry after an unknown create outcome. This
+does not freeze public wire, qualify key namespaces or enable a public service.
+The fixed index adds RPC/bottleneck costs absent from the earlier64-call volume
+model; complete numerical operating costs and capacity remain unqualified.
