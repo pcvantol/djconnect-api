@@ -103,7 +103,7 @@ export class TransactionState {
 export class TransactionCoordinator extends DurableObject<TransactionEnv> {
   #state:TransactionState;
   // Namespace choices are trusted constructor-only seams, never RPC input selectors.
-  constructor(ctx:DurableObjectState,env:TransactionEnv,namespace=env.TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR){super(ctx,env);this.#state=new TransactionState(ctx,namespace,coordinatorAuthorizer(keys));}
+  constructor(ctx:DurableObjectState,env:TransactionEnv,namespace=env.TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize);}
   create(input:CreateTransaction){return this.#state.create(input);}
   inspect(input:ScanInput){return this.#state.inspect(input);}
   submit(input:SubmitInput){return this.#state.submit(input);}

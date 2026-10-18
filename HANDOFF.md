@@ -407,3 +407,14 @@ Before every release:
 - Keep GitHub Actions `DJCONNECT_RELAY_SECRET` configured so the staging-safe
   smoke E2E job can cover proof issuance, token exchange, push register/event
   and unregister using only `example-smoke-...` values.
+
+
+## Local HTTP-to-state composition continuation
+
+[HTTP composition qualification](docs/rendezvous/WORKER_HTTP_COMPOSITION_QUALIFICATION_V1.md) adds746 actual local workerd cases
+with strict types, including37 new composed HTTP cases and709 unique regressions.
+Eleven routes now join private state and budgeted key adapters in an isolated
+factory; software initial enrollment plus real P256/JOSE one-time delivery is
+proved locally. Default harness remains503. Profile0.4.0-draft remains NOT_FROZEN;
+public edge/abuse/operations, genuine native and real HA/TV acceptance stay OPEN.
+No product binding or deployment is enabled.

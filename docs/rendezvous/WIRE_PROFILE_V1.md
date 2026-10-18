@@ -141,7 +141,7 @@ request validation does not implement runtime authorization or cryptography.
 
 | POST route under `/v1/rendezvous` | Success | Maximum raw request body |
 | --- | --- | --- |
-| `/create` |201 transaction/generation/created_at/expires_at/qr_payload |4KiB |
+| `/create` |201 transaction/generation/created_at/expires_at/browser_key_thumbprint/qr_payload |4KiB |
 | `/inspect` |200 browser_public_key/browser_key_thumbprint/generation/expires_at |1KiB |
 | `/attestation/challenge` |200 challenge_id/challenge/expires_at; delete-key also client_data |1KiB |
 | `/attestation/register` |201 key_expires_at, no user/HA association |64KiB |
@@ -319,3 +319,14 @@ before freeze. No long-lived key journal or changed recovery/key lifetime was
 implemented. Unknown-key challenges/coalescing remain; their child creation is
 bounded by routed-call admission, not forbidden. Public coverage/edge costs,
 operations, native and physical functional acceptance remain OPEN.
+
+
+## Local HTTP-to-state composition continuation
+
+[HTTP composition qualification](WORKER_HTTP_COMPOSITION_QUALIFICATION_V1.md) adds746 actual local workerd cases
+with strict types, including37 new composed HTTP cases and709 unique regressions.
+Eleven routes now join private state and budgeted key adapters in an isolated
+factory; software initial enrollment plus real P256/JOSE one-time delivery is
+proved locally. Default harness remains503. Profile0.4.0-draft remains NOT_FROZEN;
+public edge/abuse/operations, genuine native and real HA/TV acceptance stay OPEN.
+No product binding or deployment is enabled.

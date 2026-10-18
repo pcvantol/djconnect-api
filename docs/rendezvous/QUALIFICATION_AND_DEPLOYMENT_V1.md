@@ -213,3 +213,14 @@ before freeze. No long-lived key journal or changed recovery/key lifetime was
 implemented. Unknown-key challenges/coalescing remain; their child creation is
 bounded by routed-call admission, not forbidden. Public coverage/edge costs,
 operations, native and physical functional acceptance remain OPEN.
+
+
+## Local HTTP-to-state composition continuation
+
+[HTTP composition qualification](WORKER_HTTP_COMPOSITION_QUALIFICATION_V1.md) adds746 actual local workerd cases
+with strict types, including37 new composed HTTP cases and709 unique regressions.
+Eleven routes now join private state and budgeted key adapters in an isolated
+factory; software initial enrollment plus real P256/JOSE one-time delivery is
+proved locally. Default harness remains503. Profile0.4.0-draft remains NOT_FROZEN;
+public edge/abuse/operations, genuine native and real HA/TV acceptance stay OPEN.
+No product binding or deployment is enabled.
