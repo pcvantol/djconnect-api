@@ -1,3 +1,10 @@
+> Current status/precedence: [implementation release record](IMPLEMENTATION_CONTRACT_RELEASE_V1.md).
+> NEWreceiverexceptionACK6270491529/6270497278 is RECEIVED/CLOSED; do not repeat
+> that review. Exact source/wire release is candidate outside protected main and
+> effective for consumerIMPLEMENTATION only after protected delivery+receipt.
+> Old draft/HOLD/openACK labels below are historical for that scope; ALL public,
+> native, operational, receiver-adoption and deployment gates remain separate.
+
 # Code-free A wire and crypto profile — review candidate 0.4.0
 
 **NOT_FROZEN / NO_RUNTIME_GO.** Proposed wire `djc-rendezvous/1`.

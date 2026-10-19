@@ -1,3 +1,10 @@
+> Current status/precedence: [implementation release record](IMPLEMENTATION_CONTRACT_RELEASE_V1.md).
+> NEWreceiverexceptionACK6270491529/6270497278 is RECEIVED/CLOSED; do not repeat
+> that review. Exact source/wire release is candidate outside protected main and
+> effective for consumerIMPLEMENTATION only after protected delivery+receipt.
+> Old draft/HOLD/openACK labels below are historical for that scope; ALL public,
+> native, operational, receiver-adoption and deployment gates remain separate.
+
 # VibeCast rendezvous v1 — pre-implementation review candidate
 
 Assignment: `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`.

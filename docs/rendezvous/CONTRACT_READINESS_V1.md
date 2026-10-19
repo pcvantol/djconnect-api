@@ -1,13 +1,19 @@
-# Exact contract-release decision: HOLD
+# Current decision: implementation release candidate; public activation HOLD
 
 Assignment `DJC-API-VIBECAST-RENDEZVOUS-V1-20261016`, same sole API writer/PR96.
-Profile `0.4.0-draft`, wire `djc-rendezvous/1`: **NOT_FROZEN**. Fresh admission:
+Historical source profile `0.4.0-draft`, wire `djc-rendezvous/1`. Current limited
+[implementation release record](IMPLEMENTATION_CONTRACT_RELEASE_V1.md) is the
+canonical status/precedence entry: candidate outside protected main, implementation
+contract released only on protected main plus exact delivery receipt. Public
+activation remains NOT_AUTHORIZED; no full production freeze/readiness claim. Fresh admission:
 https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6265985814.
 
 This is the current decision/index following full independent protocol/security
 and UX/privacy review of source `b1dee1794fb1a75801bbeca87ab2d87122ff3ba2`, plus
 separately reviewed local source corrections below. It is not a frozen contract,
-public entrypoint, consumer ACK, deployment authorization or live qualification.
+public entrypoint, deployment authorization or live qualification. The exact
+NEW receiver ACK6270491529/6270497278 is now RECEIVED; previous open-ACK status
+text in historical proof documents is superseded by the release record.
 
 ## Precedence and delivered evidence
 
@@ -84,17 +90,17 @@ released concurrency/SLA, executionpriority, actual native/browserfeedback,
 provider/public edge/load/cost or joint release. Busy503 can still block simultaneous
 terminal work; arbitrary sameIP terminal abuse can exhaust its16attempts.
 Original2000ms hint/120sTTL and finite key/retry semantics are unchanged.
-API owns remaining lost-create recovery and exact release; reviews are received,
+API owns exact protected implementation release; lost-create exception review is received,
 no unchanged capture/crossrun or generic ACK is requested. Timer stays off.
 
-## Concrete contract decisions still required
+## Current implementation release decisions and separate acceptance
 
 | ID | Exact open decision/evidence | Owner/action |
 | --- | --- | --- |
-| CREATE-RECOVERY | [New preQR proposal/reference](CREATE_RECOVERY_QUALIFICATION_V1.md) now has1184local checks/65pins: one fresh-authority replacement before anyQR, strict late-response/status/deadline fences and no serverexpiry/cancellation claim. | API proposal and bounded reference are qualified; existing receiver owner must ACK only this NEW exception/adoption before exact freeze. No current consumer activation or implicit override of existing rotation restrictions. |
-| POLL-NAT | Private policy/2 closes the demonstrated local starvation cases:54/54targets,126/126consumed. Full native/coupled browserfeedback/publicedge/load/cost and joint exact release remain open. Server minimum/hint stays2000ms. | API supplies exact reviewed correction and proof to existing owners for contract release. No general new receiver ACK or consumer workaround requested. Three seconds below is historical arithmetic only. |
-| APP-RECOVERY | [Local shared-key API evidence](SHARED_APP_KEY_QUALIFICATION_V1.md):1208checks/66pins,24newcases,58consumes across22deliverycases plus2expected expiryrefusals; samekey counters/receipts/budgets/originalday30expiry. | API local portion qualified; actual supported native signqueue/restart/24h/twohandle/day27rotation remains existing Apple-owned integration evidence. No per-installation enforcement or new native policy/ACK/capture/key-generation loop is inferred. |
-| EXACT-RELEASE | Bind agreed corrected contract/schemas/vectors, producer/consumer ACKs and independent protocol/security/UX review to exact source. | API release owner plus existing Core/Apple/receiver owners and independent reviewers. Current HOLD is not that release. |
+| CREATE-RECOVERY | Exactff9ff57proposal/reference and policy received both receiver independent ACKs [6270491529](https://github.com/pcvantol/djconnect-api/pull/96#issuecomment-6270491529)/6270497278. Proposal bytes unchanged. | CLOSED as a review request. Select only via exact protected implementation release; real receiver async/foreground/exposure/online/BFCache adoption remains required before activation. No repeatedACK. |
+| POLL-NAT | Privatepolicy/2 and local54/54targets/126consumes qualify disclosed matrix; limits explicitly selected by release record. | No new generic consumerreview. Actual coupled browserfeedback/provider/load/cost/abuse/SLA stays operational/acceptance work, not assumed capacityPASS. |
+| APP-RECOVERY | Apple6231637013 ACKs finite policy design. Local1208checks/66pins add samekeycounter/receipt/budget/originalexpiry evidence:24targets,22deliverycases/58consumes,2finiteexpiryrefusals. | Design/interface ACK preserved; actual nativequeue/restart/24h/twohandle/day27cadence/throttle/fraud practicality remains owning-native/product-enablement evidence. No new genericpolicyACK/captureloop or per-installation enforcement. |
+| EXACT-RELEASE | Full current security and UX release audits found no new concrete wire/design P1/P2 for consumerimplementation. One exact [release record](IMPLEMENTATION_CONTRACT_RELEASE_V1.md) pins source/schema/crypto/policy/ACKs with clear precedence. | API must obtain final record reviews, protected delivery/CI and exact-main receipt. Outside protected main it remains candidate; no consumeractivation or public runtime/deploy authorization. |
 
 Core retains raw HTTPS-route/context/selected-install checks and the separate
 B-screen admission contract. Core need not own receiver HTTP polling or Apple
@@ -164,3 +170,15 @@ API endpoint/schema/server runtime. Existing receiver reviews remain received;
 one NEW exception/adoption ACK is required, not an unchanged generic review.
 Current main a4322fe was normally merged; historical source/tool receipts retain
 their own exact pins.1184current-tool checks/126capacityconsumes are local only.
+
+
+## Received pre-QR review and current precedence
+
+The source snapshots above/linked qualification records recorded the pending
+receiverdecision before API refreshed it. Exact ACK6270491529/6270497278 has now
+been read in full; that NEWexceptionreview is CLOSED. The [implementation release
+record](IMPLEMENTATION_CONTRACT_RELEASE_V1.md) supersedes generic NOT_FROZEN/HOLD/
+openACK labels only for its exact SOURCE/WIRE implementation scope. It retains
+ALL22opsOPEN/null/false and true native/receiver/physical/live/production gates.
+Online/reconnect/start and persisted pageshow/BFCache must never replenish the
+once-only preQRallowance; actual adoption remains the existing receiverowner.
