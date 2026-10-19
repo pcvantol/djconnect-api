@@ -1,0 +1,391 @@
+{
+  "scope": "LOCAL_ENROLLMENT_EVIDENCE_COMPOSITION_NO_ATOMIC_REGISTRATION_OR_RUNTIME_GO",
+  "tests_passed": 87,
+  "type_contract_check": "PASS_DECLARATION_CONSUMER_NOT_JS_IMPLEMENTATION_TYPECHECK",
+  "genuine_archived_inputs": 0,
+  "source_sha256": {
+    "enrollment-evidence-candidate.mjs": "2e5ced44da548fc675045c8ddd9532f1de89325218f9c4cb5d702bf15bb4751d",
+    "enrollment-evidence-candidate.d.mts": "5e7724f5e916df30e427e48b87fb7c2851a0b39317aa2f492f736dc0b0064bbf",
+    "enrollment-evidence.check.mjs": "f34b335ecc7f0c713d56293a3b823308b22873c1b60facd387af5ee4255808dd",
+    "app-attest-core-candidate.mjs": "55a0069e8133504968bd60657a7c0a37ed9c6ade5ecc15431d2df678f38deb54",
+    "receipt-cms-candidate.mjs": "5c780e9404e95075a286f86feea7a0f8549cc8788b1ce55124decd08526e1e7f",
+    "worker-path-candidate.mjs": "f3de5f68cf10e1374e7fa48b2ccf46cc4089390c66af7fe936b4410add04f831",
+    "receipt-status-candidate.mjs": "41b951b16919926cfb40e0aee8d82482d9096a297d7b9d6e7ec9be6304b970e8",
+    "receipt-status-client.mjs": "d20c4f02e1bf11e140a69849201c165a84f21c2099a0a694e46a74211f774e17",
+    "run_enrollment_workerd.mjs": "e3e0272e8406b620a319631fcd1f401693412c5f8e34cff13746e8ad229d053b"
+  },
+  "trust_sha256": {
+    "attestation": "1cb9823ba28ba6ad2d33a006941de2ae4f513ef1d4e831b9f7e0fa7b6242c932",
+    "receipt": "63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179"
+  },
+  "node": "v26.12.0",
+  "libraries": {
+    "cbor": "10.0.12",
+    "pkijs": "3.4.1",
+    "asn1js": "3.1.0"
+  },
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "compatibility_date": "2026-06-20",
+  "cases": [
+    {
+      "name": "SOFTWARE_STUB_COMPOSITION success carries no enrollment or reusable authorization claim",
+      "status": "passed"
+    },
+    {
+      "name": "default factory rejects stub proof and never selects injected fixture functions",
+      "status": "passed"
+    },
+    {
+      "name": "default preserves exact nonce32 enrollment wire; rejects input length 31",
+      "status": "passed"
+    },
+    {
+      "name": "default preserves exact nonce32 enrollment wire; rejects input length 33",
+      "status": "passed"
+    },
+    {
+      "name": "exact saved bytes and only authenticated common tuples pass between stages",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: extra request field",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: proof missing",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: proof oversize",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: wrong key",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: noncanonical key",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: wrong operation",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: saved action",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: saved bytes empty",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: saved bytes oversize",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: challenge expiry equality",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: challenge future",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: challenge ttl",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: policy disabled",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: policy equality",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: policy variant",
+      "status": "passed"
+    },
+    {
+      "name": "precrypto closed state/request denial: state unknown field",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: core failure",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: CMS failure",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: core exception",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: different point",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: missing leaf",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: core certificate expired",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: receipt stale",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: receipt future",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: receipt expiry",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: receipt false fresh",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: CMS certificate expired",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: CMS wrong anchor",
+      "status": "passed"
+    },
+    {
+      "name": "composition rejects unverified component result: CMS missing signer",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status crl: unavailable",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status crl: unknown scope",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status crl: expiry equality",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status crl: future check",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status crl: future signed update",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status crl: extended cache",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status crl: past signed deadline",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status ocsp: unavailable",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status ocsp: unknown scope",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status ocsp: expiry equality",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status ocsp: future check",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status ocsp: future signed update",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status ocsp: extended cache",
+      "status": "passed"
+    },
+    {
+      "name": "hard-fail exact status ocsp: past signed deadline",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after core: revoke policy",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after core: new policy revision",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after core: saved bytes replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after core: key replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after core: expiry changed",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after core: original deadline passed",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after cms: revoke policy",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after cms: new policy revision",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after cms: saved bytes replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after cms: key replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after cms: expiry changed",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after cms: original deadline passed",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after crl: revoke policy",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after crl: new policy revision",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after crl: saved bytes replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after crl: key replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after crl: expiry changed",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after crl: original deadline passed",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after ocsp: revoke policy",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after ocsp: new policy revision",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after ocsp: saved bytes replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after ocsp: key replaced",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after ocsp: expiry changed",
+      "status": "passed"
+    },
+    {
+      "name": "current authority rechecked after ocsp: original deadline passed",
+      "status": "passed"
+    },
+    {
+      "name": "policy change during point digest is denied before CMS",
+      "status": "passed"
+    },
+    {
+      "name": "evidence cannot expire during later status: issuer status",
+      "status": "passed"
+    },
+    {
+      "name": "evidence cannot expire during later status: attestation certificate",
+      "status": "passed"
+    },
+    {
+      "name": "evidence cannot expire during later status: CMS certificate",
+      "status": "passed"
+    },
+    {
+      "name": "evidence cannot expire during later status: receipt expiry",
+      "status": "passed"
+    },
+    {
+      "name": "evidence cannot expire during later status: receipt freshness",
+      "status": "passed"
+    },
+    {
+      "name": "receipt freshness at exactly five minutes remains the existing inclusive millisecond policy",
+      "status": "passed"
+    },
+    {
+      "name": "request bytes copied before async work, including view-style Buffer slices: Uint8Array",
+      "status": "passed"
+    },
+    {
+      "name": "request bytes copied before async work, including view-style Buffer slices: Buffer",
+      "status": "passed"
+    },
+    {
+      "name": "one active verifier call; concurrent proof denied and exception releases busy guard",
+      "status": "passed"
+    },
+    {
+      "name": "component result aliases cannot renew a prior receipt/status decision",
+      "status": "passed"
+    },
+    {
+      "name": "private evidence deadline capped by policy",
+      "status": "passed"
+    },
+    {
+      "name": "private evidence deadline capped by challenge",
+      "status": "passed"
+    },
+    {
+      "name": "private evidence deadline capped by attestation",
+      "status": "passed"
+    },
+    {
+      "name": "private evidence deadline capped by CMS",
+      "status": "passed"
+    }
+  ],
+  "not_run": [
+    "fresh genuine composed enrollment positive",
+    "actual signed-iOS nonce32 enrollment integration",
+    "atomic challenge consumption/encrypted registration commit",
+    "hardened private RPC/global admission",
+    "live provider egress/cache/policy propagation",
+    "actual signed-iOS actions/HA/TV chain",
+    "production deployment",
+    "private genuine archived inputs"
+  ]
+}

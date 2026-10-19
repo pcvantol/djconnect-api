@@ -1,0 +1,182 @@
+{
+  "scope": "LOCAL_SQLITE_DO_ENCRYPTED_STORAGE_ONLY_NOT_ATTESTATION_STATUS_OR_PUBLIC_ADMISSION",
+  "tests_passed": 39,
+  "typecheck": "PASS",
+  "cases": [
+    {
+      "name": "no public enrollment/storage endpoint",
+      "status": "passed"
+    },
+    {
+      "name": "actual SQLite contains encrypted evidence and finite context, never plaintext",
+      "status": "passed"
+    },
+    {
+      "name": "exact enrollment retry keeps expiry/counter/ciphertext",
+      "status": "passed"
+    },
+    {
+      "name": "different operation/digest cannot overwrite active row",
+      "status": "passed"
+    },
+    {
+      "name": "encryption fails closed before commit: missing-key",
+      "status": "passed"
+    },
+    {
+      "name": "encryption fails closed before commit: invalid-short-key",
+      "status": "passed"
+    },
+    {
+      "name": "encryption fails closed before commit: noncanonical-key",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: stale-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: future-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: expired-challenge",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: too-long-challenge",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: invalid-key-id",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: wrong-app-policy",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: too-large-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "SQL failure rolls back complete registration; original bounded retry can commit",
+      "status": "passed"
+    },
+    {
+      "name": "enrollment operation receipt is erased at its original deadline",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: ciphertext",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: nonce",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: keyVersion",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: keyAddress",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: appPolicy",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: environment",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: createdAt",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: expiresAt",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: receiptCreatedAt",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: objectId",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: publicPoint",
+      "status": "passed"
+    },
+    {
+      "name": "whole row transplanted into another DO is denied",
+      "status": "passed"
+    },
+    {
+      "name": "wrong/missing decryption key denied; previous key supports bounded rotation",
+      "status": "passed"
+    },
+    {
+      "name": "parallel duplicate installs commit once with one immutable expiry",
+      "status": "passed"
+    },
+    {
+      "name": "same counter cannot be committed twice under parallel calls",
+      "status": "passed"
+    },
+    {
+      "name": "revocation erases evidence and public key, retains only finite tombstone",
+      "status": "passed"
+    },
+    {
+      "name": "expiry at equality denies access even before alarm and purges at tombstone deadline",
+      "status": "passed"
+    },
+    {
+      "name": "alarm expiry is idempotent and removes operation metadata first",
+      "status": "passed"
+    },
+    {
+      "name": "local DO restart preserves ciphertext/counter/expiry and retry result",
+      "status": "passed"
+    },
+    {
+      "name": "rotation concurrent with revoke never resurrects receipt or key",
+      "status": "passed"
+    },
+    {
+      "name": "first alarm failure prevents sensitive commit without client retry",
+      "status": "passed"
+    },
+    {
+      "name": "postcommit rearm failure retains durable trigger and cleans without client retry",
+      "status": "passed"
+    },
+    {
+      "name": "cleanup SQL failure denies access and manual retry removes sensitive fields",
+      "status": "passed"
+    }
+  ],
+  "source_sha256": {
+    "receipt-key-store.ts": "70bb7974fde857b398b552e82a34cfa0fa2c76ee84752fff3d675d8f5d63e850",
+    "receipt-store-harness.ts": "6907c602723dfb1508050f252aeb2636a513921f77505a3b958f85288d75677b",
+    "receipt-key-store.check.ts": "f234cbbd2c0164ab29bc98b6727c4843efe1fce22e5fe5410fb099968c806ef5",
+    "run_store_workerd.mjs": "527496aa3f6199e0feabf70c3179c10ca3abba38e322e0da69853d29c9aced27",
+    "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881"
+  },
+  "node": "v26.12.0",
+  "typescript": "7.0.2",
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "compatibility_date": "2026-06-20",
+  "not_run": [
+    "complete verifier/wire admission",
+    "revocation status policy",
+    "provider deployment/physical deletion/backups/cleanup monitoring",
+    "production/HA/iPhone/TV chain"
+  ]
+}

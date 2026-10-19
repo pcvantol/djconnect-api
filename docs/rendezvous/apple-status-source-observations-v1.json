@@ -1,0 +1,15 @@
+{
+  "scope": "PUBLIC_CRL_OFFLINE_INSPECTION_ONLY_NOT_OCSP_OR_RUNTIME_QUALIFICATION",
+  "source": "http://crl.apple.com/applerootcag3.crl",
+  "https_alternative_result": 404,
+  "signature_verified": true,
+  "issuer_matches_pinned_root": true,
+  "authority_matches_root_ski": true,
+  "this_update": "2026-08-25T00:08:08+00:00",
+  "next_update": "2027-01-07T00:08:07+00:00",
+  "current_validity": true,
+  "receipt_intermediate_listed_revoked": false,
+  "revoked_entries": 0,
+  "public_crl_sample_sha256": "e74917051b2fbcc1da37af1c82104bed95e546d50e5d713ed8f8473b14f7592c",
+  "sample_not_live_cache": true
+}
