@@ -118,7 +118,11 @@ wrong signature/issuer/installation, ciphertext/tag/nonce mutation, expired and
 replayed records. Record library versions, standards sections and vector hashes.
 Do not substitute JSON state examples for crypto or real E2E qualification.
 
-## Proposed deployment delta, not an executable manifest
+## Historical initial deployment sketch, superseded by exact preparation
+
+The initial single-class sketch below is historical. The current five-component
+[deployment preparation](DEPLOYMENT_PREPARATION_V1.md) and [cost model](COST_CAPACITY_MODEL_V1.md)
+supersede its inventory and64-call approximation. Neither authorizes deployment.
 
 | Item | Required reviewed delta |
 | --- | --- |
@@ -245,3 +249,14 @@ hints now survive key/transaction/composition into existing Retry-After; malform
 hints fail503, absent hints remain absent. This supersedes the preceding routed-
 hint-loss limitation only for those qualified paths. Original expiry/retry budgets
 and profile0.4.0-draft NOT_FROZEN remain unchanged. No public/timer/deploy activation.
+
+
+## Offline operational preparation continuation
+
+[Exact deployment preparation](DEPLOYMENT_PREPARATION_V1.md) pins supplying source49ecb95,
+53 source digests, existing root config/workflow and five selected private classes.
+The offline validator can only return BLOCKED_NOT_AUTHORIZED; all22 service/
+operational gates stay OPEN, artifact/account/approval null.21 consistency/negative
+tests PASS. The201-DO-call/65-HTTP-call source model replaces the old64-call sketch;
+request-only price scenarios are not account/cost/load/spend qualification.
+No runtime source/config, consumer, Cloudflare, timer or deployment change.
