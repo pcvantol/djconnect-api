@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Complete distribution notices
+
+- Include the repository licence, third-party notices and all nine bundled dependency licence texts in immutable API release archives, with an internal checksum sidecar. Runtime and deployment authorization are unchanged.
+
 ## Unreleased — Private rendezvous coordinator product build
 
 - Compile the five private Durable Object facades with fixed real verifier dependencies and public trust anchors. Expose explicit RPC methods and keep internal storage, verifier injection and software helpers inaccessible.
