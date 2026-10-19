@@ -2,11 +2,11 @@
 
 Profile `0.4.0-draft` / wire `djc-rendezvous/1` remains **NOT_FROZEN**. This
 package continues existing sole-writer PR96 from supplying source
-`083ddb2d16351b4f785e52a23aad675b0a2cf9ef`; main remains e67f402. ACK:
+`98e755091a51671b2ad7ced87fad504064f7290d`; main remains e67f402. ACK:
 https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6265985814.
 
 [Machine-readable preparation](deployment-preparation-v1.json) pins that source,
-its58 recorded source hashes, canonical schema and existing root configuration/
+its62 recorded source hashes, canonical schema and existing root configuration/
 deployment workflow/proof digests. The preparation-package commit is a later,
 separate producer pin. It is NOT an approved central operational manifest, product
 artifact, Wrangler configuration, deployment command or readiness receipt.
@@ -37,7 +37,7 @@ actual absent blob; the initial19 tests passed before this review correction.
 [Git documents these offline controls](https://git-scm.com/docs/git#Documentation/git.txt-GITNOLAZYFETCH).
 
 The original74926a4 preparation pinned49ec and53 source hashes. The previous
-b1dee17 rebind pinned86c80fa's961-case proof and56 hashes. Current supplying083ddb2
+b1dee17 rebind pinned86c80fa's961-case proof and56 hashes. The historical supplying083ddb2
 contains the independently reviewed transaction4-attempt cap,28/2/2management
 slots and controlled enrollment receipt-config503;1002local cases/58source hashes.
 The old86c80fa validator correctly rejected those changed bytes before this
@@ -213,3 +213,28 @@ Current runtime58pins still match083ddb2; the22OPEN/null/false plan is not rebou
 or promoted. Receiver numerical reviews6266032306 are received. API's four-screen
 functional target remains HOLD on measured/replayed capacity outcomes, distinct
 from provider/account/load/spend/retention and later production authorization.
+
+
+## Separate partition-source preparation rebind
+
+Old083ddb2 preparation correctly rejected changed /2 admission bytes before S1.
+Only after independently reviewed immutable supplying source **98e755091a51671b2ad7ced87fad504064f7290d**
+was committed, this separate S2 rebind pins its compact1118-case/62source proof
+SHA256337a5fa855ea370ec5cc991d8e73298e2ceb1a4999c0043ea92a1b6aa365a35e.
+The [compact proof](workerd-partition-source-proof-v1.json) is derived from final
+c execution, carrying all test cases/source pins and66hashed observation receipts,
+with full proof hash2e558c8dea4c506442d622e305fedac5369d69ab647f0e7ff7b87ac2b6644a07.
+It is not another execution. The independently reviewed full3.13MB observation
+file remains immutable S1 evidence. The offline validator reads the compact proof
+and its62source blobs; it does NOT read/reparse the full observation file. This
+preserves the existing1MiBJSON/2MiBblob guards, Git offline controls and all other
+validation control flow; only supplying/proof constants and62count change.
+All22gates stayOPEN, activationfalse and account/approval/artifact/entrypointnull.
+Policy/2 requires route partitions and two extra bounded SQL tables; old unexpired
+IP rows without partitions fail503 until originalexpiry, never reset. Terminal
+quota is no executionpriority guarantee, and current partial cost models are
+historical because SQL work and admitted IP ceilings changed. Deployment/rollback
+needs separate exact artifact and bindings authorization; no public activation.
+[Current local qualification](ADMISSION_PARTITIONS_QUALIFICATION_V1.md) is
+54/54target scenarios/126consumed, no native/public/load/SLA/contractfreeze claim.
+API retains lost-create recovery and joint exact release; timer staysoff.
