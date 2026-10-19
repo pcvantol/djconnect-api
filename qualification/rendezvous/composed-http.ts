@@ -15,7 +15,7 @@ export interface ComposedEnv extends TransactionEnv {
   COMPOSED_POLICY_ENABLED?:string;
 }
 export type TrustedIdentityResolver=(request:Request)=>Promise<BudgetIdentity>;
-const status:Record<string,number>={invalid_request:400,invalid_capability:401,invalid_sender_proof:401,operation_conflict:409,already_submitted:409,already_consumed:409,cancelled:409,not_ready:409,expired:410,rate_limited:429,service_unavailable:503};
+const status:Record<string,number>={invalid_request:400,invalid_capability:401,invalid_sender_proof:401,operation_conflict:409,already_submitted:409,already_consumed:409,cancelled:409,not_ready:409,expired:410,rate_limited:429,attestation_unavailable:503,service_unavailable:503};
 class Failure extends Error {constructor(readonly code:string,readonly retryAfter?:number){super('composition_rejected');}}
 const need:(v:unknown,code?:string)=>asserts v=(v,code='service_unavailable')=>{if(!v)throw new Failure(code);};
 function success(value:unknown,kind?:string):WireObject {

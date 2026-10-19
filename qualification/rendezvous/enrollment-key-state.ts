@@ -89,7 +89,9 @@ export class EnrollmentKeyState extends AssertionKeyState {
       const policy=this.enrollmentPolicy(Date.now()),op=this.enrollmentOperation();need(op&&op.id===input.challengeId&&op.keyAddress===address&&Date.now()>=op.createdAt&&Date.now()<op.expiresAt&&op.policyRevision===policy.revision&&op.policyExpiresAt===policy.expiresAt);
       if(op.status==='registered')return this.ctx.storage.transactionSync(()=>this.registered(op.id,address,digest));
       need(op.nonce);this.#intent={id:op.id,keyId:input.keyId,keyAddress:address,nonce:op.nonce,requestDigest:digest,policyRevision:policy.revision,policyExpiresAt:policy.expiresAt};
-      const verified=await this.verifyEnrollment(input);need(verified.ok);
+      const verified=await this.verifyEnrollment(input);
+      if(verified.ok===false&&verified.error==='attestation_unavailable'){closed(verified,['ok','error']);return {ok:false as const,error:'attestation_unavailable' as const};}
+      need(verified.ok);
       const e:EnrollmentEvidence={...verified.evidence,initialReceipt:Uint8Array.from(verified.evidence.initialReceipt),publicPoint:Uint8Array.from(verified.evidence.publicPoint)};
       need(e.publicPoint.length===65&&e.publicPoint[0]===4&&e.initialReceipt.length>0&&e.initialReceipt.length<=16384);
       need(b64(new Uint8Array(await crypto.subtle.digest('SHA-256',e.publicPoint)))===input.keyId);

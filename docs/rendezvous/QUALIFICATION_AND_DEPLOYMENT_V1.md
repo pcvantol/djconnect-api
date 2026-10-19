@@ -260,3 +260,14 @@ operational gates stay OPEN, artifact/account/approval null.21 consistency/negat
 tests PASS. The201-DO-call/65-HTTP-call source model replaces the old64-call sketch;
 request-only price scenarios are not account/cost/load/spend qualification.
 No runtime source/config, consumer, Cloudflare, timer or deployment change.
+
+
+## Controlled unqualified-status correction
+
+[Provider status qualification](WORKER_PROVIDER_UNAVAILABLE_QUALIFICATION_V1.md) records961 actual localworkerd
+cases+strict types:21 new,87 existing verifier and853 prior regressions. Only the
+exact controlled unqualified-status negative becomes existingattestation_unavailable503;
+no key/receipt commit, original nonce/expiry/attempt budget retained. This is not
+proof of an Apple outage or a complete provider/internal-error taxonomy. A separate
+source-qualified deployment-preparation rebind preserves22OPEN/null/activationfalse.
+No public, consumer, Cloudflare, timer or deployment activation.
