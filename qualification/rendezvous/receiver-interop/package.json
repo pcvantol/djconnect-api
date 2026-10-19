@@ -1,0 +1,9 @@
+{
+  "name": "djc-private-receiver-interop-fixture",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "jose": "6.2.12",
+    "qrcode-generator": "2.0.4"
+  }
+}
