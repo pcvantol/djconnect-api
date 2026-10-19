@@ -4,11 +4,11 @@ import {createIngress,matchesWireSchema,parseWireJson,type WireObject,type Ingre
 import {INDEX_NAME,IndexedTransactionRouter,type AllocationIndex} from './allocation-index';
 import {BUDGET_NAME,type BudgetIdentity,type BudgetResult,type AllocationBudget} from './allocation-budget';
 import {KeyRpcRouter,keyRoutedAuthorizer} from './key-routing';
-import {TransactionCoordinator,type TransactionEnv} from './transaction-state';
+import {TransactionCoordinator,type TransactionDependencies} from './transaction-state';
 import {qualifyBrowserPublicJwk,type BrowserPublicJwk} from './jwe-framing';
 export const COMPOSED_POLICY='djc-http-composition-qualification/1';
 const V='djc-rendezvous/1';
-export interface ComposedEnv extends TransactionEnv {
+export interface ComposedEnv extends TransactionDependencies {
   COMPOSED_TRANSACTIONS:DurableObjectNamespace<TransactionCoordinator>;
   ALLOCATION_INDEX:DurableObjectNamespace<AllocationIndex>;
   ADMISSION_STATE:DurableObjectNamespace<AllocationBudget>;

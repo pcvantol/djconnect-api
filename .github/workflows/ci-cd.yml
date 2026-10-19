@@ -71,6 +71,9 @@ jobs:
       - name: Compiled rendezvous product and private RPC boundaries
         run: npm run test:rendezvous-product
 
+      - name: Internal rendezvous product composition
+        run: npm run test:rendezvous-composition
+
       - name: Generate post-merge coverage evidence
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |

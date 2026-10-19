@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {"types": ["node"]},
+  "include": [
+    "../../worker-configuration.d.ts",
+    "../../node_modules/@cloudflare/vitest-pool-workers/types/cloudflare-test.d.ts",
+    "../../src/rendezvous/composition.ts",
+    "product-composition.check.ts"
+  ],
+  "exclude": []
+}
