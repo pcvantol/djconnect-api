@@ -205,3 +205,11 @@ fallback. Receiver adapter stays contract-gated; timer stays stopped.
 All22 gates remain OPEN. Account, migration collision, exact product bundle,
 full edge/provider/native proof, approved spend/retention and rollback/live smoke
 remain actual missing evidence; no deployment permission is requested by this check.
+
+## Subsequent capacity evidence, same runtime pin
+
+[Shared-NAT qualification](CAPACITY_QUALIFICATION_V1.md) adds test/evidence only.
+Current runtime58pins still match083ddb2; the22OPEN/null/false plan is not rebound
+or promoted. Receiver numerical reviews6266032306 are received. API's four-screen
+functional target remains HOLD on measured/replayed capacity outcomes, distinct
+from provider/account/load/spend/retention and later production authorization.

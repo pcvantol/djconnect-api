@@ -481,3 +481,13 @@ Separate preparation rebind now pins immutable supplying source083ddb2d16351b4f7
 its1002-case proof and58source hashes. Previous86c80fa baseline correctly rejected
 changed bytes first.21offline checks retain22OPEN/null/false; no deployment
 authorization, public activation or consumer contract release is inferred.
+
+[Shared-NAT capacity decision](docs/rendezvous/CAPACITY_QUALIFICATION_V1.md): receiver's
+independent reviews6266032306 received; API owns the evidence/release decision.
+1068localchecks pass (1002regressions+66individuallyboundcapacitycases), yet the
+four-TV target is HOLD:54handoffcases/126TVflows yield80consumed/46expired.
+Real localChromium/WebKitCORS traces are separate from fixed offered-script replay,
+synthetic sustained schedules, native/edge/load/physical proof. Runtime58pins and
+083ddb2supplying source remain unchanged; no opsrebind/threshold/hint/receiverchange.
+API must qualify corrected admission/terminal headroom or an explicit narrower
+target before exact contract release. No unchanged consumerACK/capture requested.

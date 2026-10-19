@@ -65,13 +65,31 @@ Exact implementation/tests and failure history:
 [challenge/management qualification](WORKER_CHALLENGE_BUDGET_QUALIFICATION_V1.md).
 These fixes do not silently select a new poll hint or expand candidate caps.
 
+## Capacity review received; API release decision remains HOLD
+
+[Receiver6266032306](https://github.com/pcvantol/djconnect-api/pull/96#issuecomment-6266032306)
+delivers the two independent numerical-policy reviews and concrete qualification
+questions. This is RECEIVED review, not a generic unreturned receiver ACK. The
+old retry-hint defect is CLOSED. [API capacity evidence](CAPACITY_QUALIFICATION_V1.md)
+now records actual local Chromium/WebKit CORS measurements separately from fixed
+script replay and synthetic sustained Worker schedules.1068checks pass, but the
+four-screen target does not:54handoff cases/126TVflows include80consumed and46expired.
+Late two-screen cases also lose terminal headroom. No released supported concurrency
+is inferred; the machine decision is HOLD_CURRENT_POLICY_FAILS_TARGET.
+
+API must revise/qualify the admission/polling/terminal policy or obtain an explicit
+jointly accepted narrower target before exact release. No substitute threshold,
+new receiver workaround or unchanged capture/crossrun is requested by this record.
+The measured/replay/no-browser-feedback limitations and separate native/live gates
+remain explicit. Production receiver source stays clean/gated and timer off.
+
 ## Concrete contract decisions still required
 
 | ID | Exact open decision/evidence | Owner/action |
 | --- | --- | --- |
 | CREATE-RECOVERY | Lost create response without transaction ID/original deadline has no selected safe recovery exit. No cancel/poll is possible without that context; neither guessed expiry nor immediate new QR is authorized. | API proposes and independently reviews one exact recovery contract with receiver; receiver ACK before freeze. No idempotency field, lost-response exception or retry authority is selected here. |
-| POLL-NAT | Select actual cadence, jitter, preflight policy and headroom under120total/20native recognized requests/IP/UTC minute. Current server minimum/hint remains2000ms. | Receiver ACK exact schedule, serialized polling/reconnect and remaining60-poll/original120s limits; API reviews cap interaction. Three seconds below is only an arithmetic example. |
-| APP-RECOVERY | Confirm same-key serial assertions for two TVs,500 registration attempts/day,50k routed key calls/day,4issuance attempts/transaction,28/2/2 slots, bounded identical retries,24h/two-handle recovery and finite day27/30 key policy. | Existing Apple owner ACK exact behavior; API resolves incompatibilities. No new capture/key-generation loop requested. Supported signed-iOS execution remains separate proof. |
+| POLL-NAT | Current120total/20native-IP policy fails the four-screen target and some late two-screen schedules; the server minimum/hint remains2000ms. | Receiver reviews received6266032306. API must correct/qualify terminal headroom/cadence or bind an explicitly accepted narrower target, then release exact evidence jointly. Three seconds below is historical arithmetic only. |
+| APP-RECOVERY | API must qualify the capacity effect of same-key serial assertions for two TVs,500 registration attempts/day,50k routed key calls/day,4issuance attempts/transaction,28/2/2 slots, bounded identical retries,24h/two-handle recovery and finite day27/30 key policy. | API supplies qualified normal/repair budget behavior to the existing Apple owner and resolves incompatibilities; owning native composition remains separate. No unchanged ACK/capture/key-generation loop requested. |
 | EXACT-RELEASE | Bind agreed corrected contract/schemas/vectors, producer/consumer ACKs and independent protocol/security/UX review to exact source. | API release owner plus existing Core/Apple/receiver owners and independent reviewers. Current HOLD is not that release. |
 
 Core retains raw HTTPS-route/context/selected-install checks and the separate
