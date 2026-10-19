@@ -79,15 +79,20 @@ async function readBody(request:Request,limit:number):Promise<Uint8Array>{
     need(total>0&&(length===null||Number(length)===total));const result=new Uint8Array(total);let offset=0;for(const chunk of chunks){result.set(chunk,offset);offset+=chunk.length;}return result;
   }finally{void reader.cancel().catch(()=>{});reader.releaseLock();}
 }
-export interface IngressDependencies {enabled:()=>boolean;admit:(route:IngressRoute,body:WireObject)=>Promise<BudgetResult>;dispatch:(route:IngressRoute,body:WireObject)=>Promise<{status:number;body:unknown}>}
+export interface IngressDependencies {beforeBody?:(route:IngressRoute)=>Promise<BudgetResult>;enabled:()=>boolean;admit:(route:IngressRoute,body:WireObject)=>Promise<BudgetResult>;dispatch:(route:IngressRoute,body:WireObject)=>Promise<{status:number;body:unknown}>}
 const statuses:Record<string,number>={invalid_request:400,unsupported_version:400,invalid_capability:401,invalid_sender_proof:401,attestation_required:401,app_not_supported:403,origin_denied:403,operation_conflict:409,already_submitted:409,already_consumed:409,cancelled:409,not_ready:409,expired:410,payload_too_large:413,unsupported_content_type:415,rate_limited:429,attestation_unavailable:503,service_unavailable:503};
 export function createIngress(dependencies?:IngressDependencies){
   return async(request:Request):Promise<Response>=>{
     const origin=request.headers.get('Origin'),headers=new Headers({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Vary':'Origin'});if(origin===ORIGIN)headers.set('Access-Control-Allow-Origin',ORIGIN);
     const json=(body:unknown,status:number)=>{headers.set('Content-Type','application/json; charset=utf-8');return new Response(JSON.stringify(body),{status,headers});};
     const ready=()=>need(dependencies?.enabled(),'service_unavailable',503);
+    const admitted=(admission:BudgetResult):Response|undefined=>{
+      need(admission&&typeof admission==='object','service_unavailable',503);if(admission.ok===false){const code=admission.error;need(code==='rate_limited'||code==='service_unavailable','service_unavailable',503);const error={v:V,error:code,...(admission.retry_after_ms!==undefined?{retry_after_ms:admission.retry_after_ms}:{})};need(matchesWireSchema('error',error),'service_unavailable',503);if(error.retry_after_ms)headers.set('Retry-After',String(Math.ceil(error.retry_after_ms/1000)));return json(error,statuses[code]);}need(admission.ok===true&&Object.keys(admission).join(',')==='ok','service_unavailable',503);
+      return undefined;
+    };
     try{
       ready();const url=new URL(request.url),path=url.pathname.slice('/v1/rendezvous'.length);need(Object.hasOwn(routes,path)&&url.href===SERVICE+'/v1/rendezvous'+path);const route=path as IngressRoute,definition=routes[route];
+      if(dependencies!.beforeBody){const response=admitted(await dependencies!.beforeBody(route));ready();if(response)return response;}
       need(origin===null||origin===ORIGIN,'origin_denied',403);need(!request.headers.has('Cookie')&&!request.headers.has('Authorization'),'invalid_request');
       if(request.method==='OPTIONS'){
         need(origin===ORIGIN&&request.headers.get('Access-Control-Request-Method')==='POST','origin_denied',403);const requested=request.headers.get('Access-Control-Request-Headers');need(requested===null||requested.trim().toLowerCase()==='content-type','origin_denied',403);
@@ -96,7 +101,7 @@ export function createIngress(dependencies?:IngressDependencies){
       need(request.method==='POST');need(!definition.browser||origin===ORIGIN,'origin_denied',403);
       const contentType=request.headers.get('Content-Type')??'',match=/^application\/json(?:[ \t]*;[ \t]*charset=utf-8)?$/i.exec(contentType);need(match&&match[0].length===contentType.length,'unsupported_content_type',415);need(!request.headers.has('Content-Encoding'),'unsupported_content_type',415);
       const body=parseWireJson(await readBody(request,definition.limit));need(typeof body.v==='string');need(body.v===V,'unsupported_version');need(matchesWireSchema(definition.schema,body));canonicalInputs(body);ready();
-      const admission=await dependencies!.admit(route,body);ready();need(admission&&typeof admission==='object','service_unavailable',503);if(admission.ok===false){const code=admission.error;need(code==='rate_limited'||code==='service_unavailable','service_unavailable',503);const error={v:V,error:code,...(admission.retry_after_ms!==undefined?{retry_after_ms:admission.retry_after_ms}:{})};need(matchesWireSchema('error',error),'service_unavailable',503);if(error.retry_after_ms)headers.set('Retry-After',String(Math.ceil(error.retry_after_ms/1000)));return json(error,statuses[code]);}need(admission.ok===true&&Object.keys(admission).join(',')==='ok','service_unavailable',503);
+      const admissionResponse=admitted(await dependencies!.admit(route,body));ready();if(admissionResponse)return admissionResponse;
       const result=await dependencies!.dispatch(route,body);ready();const output=structuredClone(result.body);
       if(result.status===definition.status){let response:string=definition.response;if(route==='/attestation/challenge')response=body.action==='register'?'attestation_register_challenge_response':'attestation_delete_challenge_response';need(matchesWireSchema(response,output),'service_unavailable',503);return json(output,definition.status);}
       need(matchesWireSchema('error',output),'service_unavailable',503);const error=output as {error:string;retry_after_ms?:number};need(statuses[error.error]===result.status,'service_unavailable',503);if(error.retry_after_ms)headers.set('Retry-After',String(Math.ceil(error.retry_after_ms/1000)));return json(output,result.status);

@@ -330,3 +330,14 @@ factory; software initial enrollment plus real P256/JOSE one-time delivery is
 proved locally. Default harness remains503. Profile0.4.0-draft remains NOT_FROZEN;
 public edge/abuse/operations, genuine native and real HA/TV acceptance stay OPEN.
 No product binding or deployment is enabled.
+
+
+## Local pre-body request admission continuation
+
+[Request admission qualification](WORKER_REQUEST_ADMISSION_QUALIFICATION_V1.md) records815 actual local workerd
+cases+strict types,69 new cases and746 regressions. Exact recognized routes pass
+finite minute-HMAC/global admission before Origin/method/body/backend work; malformed
+requests and preflights count. Proposed120total/20native perIP/minute includes
+polling/sharedNAT effects requiring joint review. New gate Retry-After is qualified;
+existing routed-backend hint loss remains an explicit follow-up. Public edge,
+provider/cost/native/HA/physical and contract freeze remain OPEN. No activation.

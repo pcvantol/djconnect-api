@@ -1,7 +1,7 @@
 // LOCAL QUALIFICATION ONLY. This factory is not a product route or deployment.
 import {createIngress,matchesWireSchema,parseWireJson,type WireObject,type IngressRoute} from './http-ingress';
 import {INDEX_NAME,IndexedTransactionRouter,type AllocationIndex} from './allocation-index';
-import {BUDGET_NAME,type BudgetIdentity,type AllocationBudget} from './allocation-budget';
+import {BUDGET_NAME,type BudgetIdentity,type BudgetResult,type AllocationBudget} from './allocation-budget';
 import {KeyRpcRouter,keyRoutedAuthorizer} from './key-routing';
 import {TransactionCoordinator,type TransactionEnv} from './transaction-state';
 import {qualifyBrowserPublicJwk,type BrowserPublicJwk} from './jwe-framing';
@@ -34,12 +34,12 @@ export class BudgetedTransactionCoordinator extends TransactionCoordinator {
     super(ctx,env,namespace,keys,keyRoutedAuthorizer(router));
   }
 }
-export function createComposedHandler(env?:ComposedEnv,resolveIdentity?:TrustedIdentityResolver){
-  const enabled=()=>env?.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY&&typeof resolveIdentity==='function';
+export function createComposedHandler(env?:ComposedEnv,resolveIdentity?:TrustedIdentityResolver,beforeBody?:(route:IngressRoute)=>Promise<BudgetResult>,requestEnabled?:()=>boolean){
+  const enabled=()=>env?.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY&&typeof resolveIdentity==='function'&&(!requestEnabled||requestEnabled());
   return async(request:Request):Promise<Response>=>{
     // Identity belongs to this invocation, never a shared handler/DO context.
     let identity:BudgetIdentity|undefined;
-    return createIngress({enabled,
+    return createIngress({enabled,beforeBody,
       admit:async route=>{
         if(route==='/create'||route==='/attestation/register')identity=structuredClone(await resolveIdentity!(request));
         return {ok:true}; // Allocation/key adapters own the single actual charge point.
