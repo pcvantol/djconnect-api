@@ -48,9 +48,9 @@ or internal SDK loopback communication. The inspector remains disabled.
 
 ## Measured boundary
 
-Eight independent corruption cases must reject: changed receiver source, missing
+Nine independent corruption cases must reject: changed receiver source, missing
 schema, unexpected root file, changed package module, extra package file, source
-symlink, source hardlink and package-directory symlink. They use private copied
+symlink, source hardlink, package-directory symlink and node_modules-root symlink. They use private copied
 fixtures and are separate from the following seven actual interop checks:
 
 1. Receiver's actual generated RSA public key/claim request receives API201.

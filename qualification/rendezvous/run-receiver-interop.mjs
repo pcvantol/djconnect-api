@@ -20,6 +20,7 @@ async function inputGuards(original){
   async p=>{await unlink(join(p,'wire.mjs'));await symlink('rendezvous.mjs',join(p,'wire.mjs'));},
   async p=>{await unlink(join(p,'wire.mjs'));await link(join(p,'rendezvous.mjs'),join(p,'wire.mjs'));},
   async p=>{await rm(join(p,'node_modules/jose'),{recursive:true});await symlink(join(original.path,'node_modules/jose'),join(p,'node_modules/jose'));},
+  async p=>{await rm(join(p,'node_modules'),{recursive:true});await symlink(join(original.path,'node_modules'),join(p,'node_modules'));},
  ];
  for(const corrupt of cases){
   const path=await mkdtemp(join(tmpdir(),'djc-interop-negative-'));await chmod(path,0o700);

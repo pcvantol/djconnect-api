@@ -3,7 +3,7 @@
 ## Unreleased — Actual receiver/API source interoperability
 
 - Add immutable public receiver and isolated test-dependency pins plus private preparation and actual receiver-to-Worker create/QR/cancel qualification. Preserve exact request bytes and reject drift before importing consumer code.
-- Exercise eight input corruption guards and seven interop checks in existing read-only qualification CI. No runtime/contract/consumer/deployment change or native/browser/HA acceptance claim.
+- Exercise nine input corruption guards and seven interop checks in existing read-only qualification CI. No runtime/contract/consumer/deployment change or native/browser/HA acceptance claim.
 
 ## Unreleased — Prepared local native experiment
 

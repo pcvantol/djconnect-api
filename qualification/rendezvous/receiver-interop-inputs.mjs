@@ -15,6 +15,7 @@ need(Object.keys(manifest).sort().join(',')==='dependency_integrity,fixture_hash
 need(Object.keys(manifest.receiver_sources).length===3&&Object.keys(manifest.installed_hashes).length===110);
 export async function emptyDirectory(dir){await checkDirectory(dir);need((await readdir(dir.path)).length===0);}
 async function tree(root,prefix=''){
+ const directory=await lstat(join(root,prefix));need(directory.isDirectory()&&!directory.isSymbolicLink()&&directory.uid===process.getuid());
  const result=[];
  for(const name of (await readdir(join(root,prefix))).sort()){
   const relative=prefix?prefix+'/'+name:name,s=await lstat(join(root,relative));
