@@ -476,3 +476,8 @@ reserved proof-operation groups and controlled missing receipt-config503.
 source/test/evidence reviews and exact-head CI receipts belong on API90/PR96.
 Shared-NAT/poll/retry ACK and lost-create-without-ID/deadline recovery remain
 concrete contract decisions. No new polling policy/consumerACK/native/live claim.
+
+Separate preparation rebind now pins immutable supplying source083ddb2d16351b4f785e52a23aad675b0a2cf9ef,
+its1002-case proof and58source hashes. Previous86c80fa baseline correctly rejected
+changed bytes first.21offline checks retain22OPEN/null/false; no deployment
+authorization, public activation or consumer contract release is inferred.

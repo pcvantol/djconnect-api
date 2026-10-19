@@ -2,11 +2,11 @@
 
 Profile `0.4.0-draft` / wire `djc-rendezvous/1` remains **NOT_FROZEN**. This
 package continues existing sole-writer PR96 from supplying source
-`86c80faebfaf98da02ebc5b3e4f832da00021d33`; main remains e67f402. ACK:
-https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6261756971.
+`083ddb2d16351b4f785e52a23aad675b0a2cf9ef`; main remains e67f402. ACK:
+https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6265985814.
 
 [Machine-readable preparation](deployment-preparation-v1.json) pins that source,
-its56 recorded source hashes, canonical schema and existing root configuration/
+its58 recorded source hashes, canonical schema and existing root configuration/
 deployment workflow/proof digests. The preparation-package commit is a later,
 separate producer pin. It is NOT an approved central operational manifest, product
 artifact, Wrangler configuration, deployment command or readiness receipt.
@@ -36,17 +36,22 @@ closed on missing local blobs. Two additional tests cover these controls and an
 actual absent blob; the initial19 tests passed before this review correction.
 [Git documents these offline controls](https://git-scm.com/docs/git#Documentation/git.txt-GITNOLAZYFETCH).
 
-The original74926a4 preparation pinned49ec and53 source hashes. The separate
-86c80fa runtime increment invalidated that baseline as intended. This preparation
-rebind pins its new961-case observations (SHA256
-055d7a6e843de2e08bf17abdb3c943c43535bcf7450a20bb5caa7e75665059ea)
-and56 source hashes against immutable86c80fa Git blobs and current bytes.
-Only the supplying SHA/proof/hash/count and regenerated plan pins changed; no
-validator control flow or gate policy changed. The original853 evidence and dated
-provider readback remain historical; this rebind does not repeat provider or runtime
-execution or change the source-derived cost assumptions. Independent source/security
-and actual-file UX/evidence review and exact-head CI receipts belong on API90/PR96.
-Neither offline consistency nor CI closes an operational gate.
+The original74926a4 preparation pinned49ec and53 source hashes. The previous
+b1dee17 rebind pinned86c80fa's961-case proof and56 hashes. Current supplying083ddb2
+contains the independently reviewed transaction4-attempt cap,28/2/2management
+slots and controlled enrollment receipt-config503;1002local cases/58source hashes.
+The old86c80fa validator correctly rejected those changed bytes before this
+separate rebind. Its new proof SHA256 is
+28c978c070d77b5c7dae726935b562e1aa048c26948dbb8d96112370a46df3b6.
+Only validator constants/count and generated plan pins change; Git offline controls,
+validation control flow and22OPEN/null/false gates remain unchanged. Old961 and
+provider/cost receipts remain historical, not rerun or relabeled by this package.
+The request RPC graph is unchanged; charged submit-challenge reservation adds one
+SQL write, not an extra RPC, and is not included in the old partial cost estimate.
+[Exact contract readiness](CONTRACT_READINESS_V1.md) distinguishes concrete
+CREATE-RECOVERY/POLL-NAT/APP-RECOVERY/EXACT-RELEASE HOLDs from operational/live gates.
+Independent source/security and actual-file UX/evidence review and exact-head CI
+receipts belong on API90/PR96. Neither offline consistency nor CI closes an operational gate.
 
 ## Read-only existing-service readback, 2026-10-19
 

@@ -2,6 +2,10 @@
 
 **MODELED_ONLY / NOT_ACCOUNT_QUALIFIED / NOT_SPEND_AUTHORIZED.** Price/limit
 references read2026-10-19; supplying source49ecb9512fe3b894e6dc420a682920dde9204a9c.
+Current083ddb2 qualification replaces the challenge-context inspect with a quota
+reservation: same RPC count, one additional SQL write per charged challenge
+attempt. The historical partial request/gate-write model below does not include
+that write or claim a complete bill. No price/provider readback is repeated here.
 No provider billing/account-plan qualification, load measurement or deployment occurred.
 Separate read-only existing-service/binding metadata does not qualify these prices
 or assumptions.
