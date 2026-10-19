@@ -1,4 +1,4 @@
-// ISOLATED LOCAL QUALIFICATION ONLY. Trusted fixture enrollment, not complete AppAttest/CMS/status admission.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {ReceiptKeyStore,type StoreEnv,type StoreMaterial} from './receipt-key-store';
 import {qualifyAssertionCore} from 'djc-qualified-assertion';
 import {base64Decode,base64Url} from 'djc-existing-crypto';

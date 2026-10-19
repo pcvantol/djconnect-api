@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. Counts admitted allocations, not total provider traffic/cost.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {DurableObject} from 'cloudflare:workers';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
 export const BUDGET_NAME='djc-rendezvous-budget/1';

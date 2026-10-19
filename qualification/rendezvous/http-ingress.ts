@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. Transport validation does not supply sender/HA authority.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import contract from 'djc-wire-schema';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
 import {type BudgetResult} from './allocation-budget';

@@ -6,6 +6,12 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "djconnect-api",
 	"main": "src/index.ts",
+	"alias": {
+	  "djc-existing-crypto": "./src/crypto.ts",
+	  "djc-qualified-assertion": "./qualification/rendezvous/app-attest-core-candidate.mjs",
+	  "djc-wire-schema": "./docs/rendezvous/wire-request-schemas-v1.json",
+	  "djc-enrollment-trust": "./src/rendezvous/trust.ts"
+	},
 	"compatibility_date": "2026-06-20",
 	"send_metrics": false,
 	"observability": {

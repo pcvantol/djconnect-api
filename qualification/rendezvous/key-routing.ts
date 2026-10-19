@@ -1,5 +1,5 @@
 import {readRetryHint,hintFields} from './retry-hint';
-// LOCAL QUALIFICATION ONLY. Global admission bounds private key RPC, not HA authority.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {base64Decode,base64Url} from 'djc-existing-crypto';
 import {type BudgetResult,type BudgetIdentity} from './allocation-budget';
 import {type EnrollmentCoordinator,type RegisterInput} from './enrollment-key-state';

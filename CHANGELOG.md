@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Private rendezvous coordinator product build
+
+- Compile the five private Durable Object facades with fixed real verifier dependencies and public trust anchors. Expose explicit RPC methods and keep internal storage, verifier injection and software helpers inaccessible.
+- Add actual product-bundle/RPC qualification to existing validation. Public rendezvous transport remains unconditionally disabled; no deployed bindings, migration or service activation.
+
 ## Unreleased — VibeCast disabled product perimeter
 
 - Reserve the rendezvous namespace with a fixed versioned503 response before body, storage, diagnostics or auth processing. No setting enables the service.

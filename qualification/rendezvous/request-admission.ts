@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. Limits downstream work, not all edge traffic/cost.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {DurableObject} from 'cloudflare:workers';
 import {type BudgetIdentity,type BudgetResult} from './allocation-budget';
 import {base64Url} from 'djc-existing-crypto';

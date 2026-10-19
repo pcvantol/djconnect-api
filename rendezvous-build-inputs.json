@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "scope": "PRIVATE_COORDINATOR_BUILD_COMPILED_PUBLIC_UNAVAILABLE",
+  "aliases": {
+    "djc-existing-crypto": "./src/crypto.ts",
+    "djc-qualified-assertion": "./qualification/rendezvous/app-attest-core-candidate.mjs",
+    "djc-wire-schema": "./docs/rendezvous/wire-request-schemas-v1.json",
+    "djc-enrollment-trust": "./src/rendezvous/trust.ts"
+  },
+  "dependencies": {
+    "cbor": "10.0.12",
+    "asn1js": "3.1.0",
+    "pkijs": "3.4.1"
+  },
+  "root_exports": [
+    "AllocationBudget",
+    "AllocationIndex",
+    "BudgetedTransactionCoordinator",
+    "EnrollmentCoordinator",
+    "RequestAdmission",
+    "default",
+    "tokenHashForTest"
+  ],
+  "rpc_allowlists": {
+    "RequestAdmission": [
+      "admit",
+      "alarm"
+    ],
+    "AllocationBudget": [
+      "admit",
+      "admitKeyCall",
+      "alarm"
+    ],
+    "AllocationIndex": [
+      "allocate",
+      "lookup",
+      "alarm"
+    ],
+    "EnrollmentCoordinator": [
+      "issueEnrollment",
+      "enroll",
+      "issueAction",
+      "authorize",
+      "alarm"
+    ],
+    "BudgetedTransactionCoordinator": [
+      "create",
+      "inspect",
+      "reserveSubmitChallenge",
+      "submit",
+      "poll",
+      "consume",
+      "cancel",
+      "alarm"
+    ]
+  },
+  "anchor_der_sha256": {
+    "attestationRoot": "1cb9823ba28ba6ad2d33a006941de2ae4f513ef1d4e831b9f7e0fa7b6242c932",
+    "receiptRoot": "63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179"
+  },
+  "public_activation_allowed": false,
+  "base_main_sha": "aab76f7efc3e56faed186369ff7419bea2c96aa2",
+  "base_wrangle_config_sha256": "9e9e83c881d7675329b033000a9f1c08cd59f3a911ea8a7005401a9ab3c5ef18",
+  "local_test_bindings": {
+    "REQUEST_ADMISSION": "RequestAdmission",
+    "ADMISSION_STATE": "AllocationBudget",
+    "ALLOCATION_INDEX": "AllocationIndex",
+    "ENROLLMENT_COORDINATOR": "EnrollmentCoordinator",
+    "COMPOSED_TRANSACTIONS": "BudgetedTransactionCoordinator"
+  },
+  "shared_scope": "REVIEWED_CANDIDATE_INTERNALS_NO_PUBLIC_AUTH_ACCEPTANCE"
+}

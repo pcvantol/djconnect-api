@@ -133,3 +133,5 @@ function routePathFor(method: string, pathname: string): string {
 export async function tokenHashForTest(token: string): Promise<string> {
 	return sha256Hex(token);
 }
+
+export { RequestAdmission, AllocationBudget, AllocationIndex, EnrollmentCoordinator, BudgetedTransactionCoordinator } from "./rendezvous/coordinators";
