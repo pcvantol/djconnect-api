@@ -66,7 +66,7 @@ export class AllocationIndex extends DurableObject<IndexEnv> {
   alarm(){return this.#state.alarm();}
 }
 export interface AllocateTransaction {identity:BudgetIdentity;generation:number;browserPublicKey:BrowserPublicJwk;claimCommitment:string}
-type Operation='inspect'|'submit'|'poll'|'consume'|'cancel';
+type Operation='inspect'|'reserveSubmitChallenge'|'submit'|'poll'|'consume'|'cancel';
 export class IndexedTransactionRouter {
   #index:IndexPort;#namespace:DurableObjectNamespace<TransactionCoordinator>;#enabled:()=>boolean;
   constructor(index:IndexPort,namespace:DurableObjectNamespace<TransactionCoordinator>,enabled:()=>boolean){this.#index=index;this.#namespace=namespace;this.#enabled=enabled;}
@@ -83,14 +83,14 @@ export class IndexedTransactionRouter {
     const reply=await child.create({descriptor:d,generation:input.generation,browserPublicKey:pub.jwk,claimCommitment:input.claimCommitment});this.#ready();descriptor(d);return reply;
   }catch(e){return result(e);}}
   async route(operation:Operation,input:ScanInput|BrowserInput|SubmitInput){try{
-    this.#ready();need(['inspect','submit','poll','consume','cancel'].includes(operation));
-    const scanner=operation==='inspect'||operation==='submit',fields=scanner?['transactionId','generation','qrCapability']:['transactionId','generation','claimSecret'];
+    this.#ready();need(['inspect','reserveSubmitChallenge','submit','poll','consume','cancel'].includes(operation));
+    const scanner=operation==='inspect'||operation==='reserveSubmitChallenge'||operation==='submit',fields=scanner?['transactionId','generation','qrCapability']:['transactionId','generation','claimSecret'];
     if(operation==='submit')fields.push('keyId','challengeId','clientData','assertion','destinationEnvelope');closed(input,fields);input={...input};uuid(input.transactionId);need(Number.isInteger(input.generation)&&input.generation>=1&&input.generation<=2147483647);
     if(scanner)opaque((input as ScanInput).qrCapability);else opaque((input as BrowserInput).claimSecret);
     if(operation==='submit'){const s=input as SubmitInput;opaque(s.challengeId);for(const [key,max] of [['keyId',44],['clientData',2731],['assertion',5462],['destinationEnvelope',8192]] as const)need(typeof s[key]==='string'&&s[key].length>0&&s[key].length<=max);}
     const lookup=await this.#index.lookup({transactionId:input.transactionId});this.#ready();const d=this.#resolved(lookup,input.transactionId);descriptor(d);
     const child=this.#namespace.get(this.#namespace.idFromName(d.id));
-    const reply=operation==='inspect'?await child.inspect(input as ScanInput):operation==='submit'?await child.submit(input as SubmitInput):operation==='poll'?await child.poll(input as BrowserInput):operation==='consume'?await child.consume(input as BrowserInput):await child.cancel(input as BrowserInput);
+    const reply=operation==='reserveSubmitChallenge'?await child.reserveSubmitChallenge(input as ScanInput):operation==='inspect'?await child.inspect(input as ScanInput):operation==='submit'?await child.submit(input as SubmitInput):operation==='poll'?await child.poll(input as BrowserInput):operation==='consume'?await child.consume(input as BrowserInput):await child.cancel(input as BrowserInput);
     this.#ready();descriptor(d);return reply;
   }catch(e){return result(e);}}
 }

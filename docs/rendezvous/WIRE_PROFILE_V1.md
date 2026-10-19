@@ -1,7 +1,8 @@
 # Code-free A wire and crypto profile — review candidate 0.4.0
 
 **NOT_FROZEN / NO_RUNTIME_GO.** Proposed wire `djc-rendezvous/1`.
-Read [KEY-STATE](KEY_STATE_V1.md) and [the contract](CONTRACT_REVIEW_V1.md).
+Read [KEY-STATE](KEY_STATE_V1.md), [the contract](CONTRACT_REVIEW_V1.md) and
+the current [contract-readiness decision](CONTRACT_READINESS_V1.md).
 This specifies a profile for independent review, not a new cryptographic primitive.
 
 ## Exact producer/consumer boundary

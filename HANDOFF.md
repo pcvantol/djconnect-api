@@ -467,3 +467,12 @@ new provider-unavailable961-case proof and56 source hashes. Previous49ec baselin
 correctly rejected the changed runtime before this rebind. All22 gates remain OPEN,
 activation false and account/approval/artifact/public entrypoint null. This is
 preparation consistency only, not contract freeze, Finalization or deployment.
+
+Full-protocol review continuation: [exact contract HOLD](docs/rendezvous/CONTRACT_READINESS_V1.md)
+and [local challenge/management qualification](docs/rendezvous/WORKER_CHALLENGE_BUDGET_QUALIFICATION_V1.md).
+Three source P2s corrected: atomic4issuance attempts per transaction,28/2/2
+reserved proof-operation groups and controlled missing receipt-config503.
+1002/1002 local workerd+strict types PASS; full
+source/test/evidence reviews and exact-head CI receipts belong on API90/PR96.
+Shared-NAT/poll/retry ACK and lost-create-without-ID/deadline recovery remain
+concrete contract decisions. No new polling policy/consumerACK/native/live claim.

@@ -32,7 +32,7 @@ export type Authorizer=(key:string,proof:ProofInput)=>Promise<unknown>;
 export function coordinatorAuthorizer(namespace:DurableObjectNamespace<EnrollmentCoordinator>):Authorizer {
   return async(key,proof)=>{keyId(key);const address=hex(await jsonHash(['development',POLICY,key]));return namespace.get(namespace.idFromName('djc-rendezvous-key/1/'+address)).authorize(proof);};
 }
-interface Row extends Descriptor {generation:number;thumbprint:string;claimCommitment:string;qrCommitment:string;state:'pending'|'ready'|'consumed'|'cancelled';browserPublicKey?:BrowserPublicJwk;envelope?:string;operationId?:string;requestDigest?:string;polls:number;lastPoll?:number}
+interface Row extends Descriptor {generation:number;thumbprint:string;claimCommitment:string;qrCommitment:string;state:'pending'|'ready'|'consumed'|'cancelled';browserPublicKey?:BrowserPublicJwk;envelope?:string;operationId?:string;requestDigest?:string;polls:number;submitChallengeAttempts:number;lastPoll?:number}
 interface Authorization {ok:true;kind:'submit-authorization';operationId:string;requestDigest:string;admittedAt:number;keyExpiresAt:number;authorizationExpiresAt:number;counter:number;binding:SubmitBinding}
 export class TransactionState {
   #ctx:DurableObjectState;#namespace:DurableObjectNamespace;#authorize:Authorizer;#busy=false;#creating=false;
@@ -55,12 +55,14 @@ export class TransactionState {
       const alarm=await this.#ctx.storage.getAlarm();await this.#ctx.storage.setAlarm(Math.min(alarm??d.expiresAt,d.expiresAt));
       return this.#ctx.storage.transactionSync(()=>{
         this.#route(d.id);need(Date.now()>=d.createdAt&&Date.now()<d.expiresAt,'expired');need(!this.#load(),'operation_conflict');
-        const r:Row={...d,generation:input.generation,thumbprint:pub.thumbprint,browserPublicKey:pub.jwk,claimCommitment:input.claimCommitment,qrCommitment,state:'pending',polls:0};this.#save(r);
+        const r:Row={...d,generation:input.generation,thumbprint:pub.thumbprint,browserPublicKey:pub.jwk,claimCommitment:input.claimCommitment,qrCommitment,state:'pending',polls:0,submitChallengeAttempts:0};this.#save(r);
         return {ok:true as const,v:V,transaction_id:r.id,generation:r.generation,created_at:r.createdAt,expires_at:r.expiresAt,qr_payload:JSON.stringify({type:'djc-rendezvous-qr',v:V,service_origin:'https://api.djconnect.dev',transaction_id:r.id,generation:r.generation,expires_at:r.expiresAt,browser_key_thumbprint:r.thumbprint,qr_capability:qr})};
       });
     }catch(e){return this.#result(e);}finally{this.#creating=false;}
   }
-  async inspect(input:ScanInput){try{closed(input,['transactionId','generation','qrCapability']);input={...input};const commitment=base64Url((await sha(opaque(input.qrCapability))).buffer);return this.#ctx.storage.transactionSync(()=>{const r=this.#row(input.transactionId,input.generation,commitment,'qrCommitment');need(r.state==='pending',r.state==='cancelled'?'cancelled':r.state==='consumed'?'already_consumed':'already_submitted');need(r.browserPublicKey);return {ok:true as const,v:V,browser_public_key:r.browserPublicKey,browser_key_thumbprint:r.thumbprint,generation:r.generation,expires_at:r.expiresAt};});}catch(e){return this.#result(e);}}
+  async #scanContext(input:ScanInput,reserve:boolean){try{closed(input,['transactionId','generation','qrCapability']);input={...input};const commitment=base64Url((await sha(opaque(input.qrCapability))).buffer);return this.#ctx.storage.transactionSync(()=>{const r=this.#row(input.transactionId,input.generation,commitment,'qrCommitment');need(r.state==='pending',r.state==='cancelled'?'cancelled':r.state==='consumed'?'already_consumed':'already_submitted');need(r.browserPublicKey);if(reserve){need(integer(r.submitChallengeAttempts)&&r.submitChallengeAttempts<=4,'service_unavailable');need(r.submitChallengeAttempts<4,'rate_limited');r.submitChallengeAttempts++;this.#save(r);}return {ok:true as const,v:V,browser_public_key:r.browserPublicKey,browser_key_thumbprint:r.thumbprint,generation:r.generation,expires_at:r.expiresAt};});}catch(e){return this.#result(e);}}
+  inspect(input:ScanInput){return this.#scanContext(input,false);}
+  reserveSubmitChallenge(input:ScanInput){return this.#scanContext(input,true);}
   async browser(input:BrowserInput,action:'poll'|'consume'|'cancel'){
     try{
       closed(input,['transactionId','generation','claimSecret']);input={...input};const commitment=base64Url((await sha(opaque(input.claimSecret))).buffer);
@@ -107,6 +109,7 @@ export class TransactionCoordinator extends DurableObject<TransactionEnv> {
   constructor(ctx:DurableObjectState,env:TransactionEnv,namespace=env.TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize);}
   create(input:CreateTransaction){return this.#state.create(input);}
   inspect(input:ScanInput){return this.#state.inspect(input);}
+  reserveSubmitChallenge(input:ScanInput){return this.#state.reserveSubmitChallenge(input);}
   submit(input:SubmitInput){return this.#state.submit(input);}
   poll(input:BrowserInput){return this.#state.browser(input,'poll');}
   consume(input:BrowserInput){return this.#state.browser(input,'consume');}

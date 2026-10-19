@@ -1,7 +1,7 @@
 // LOCAL QUALIFICATION ONLY. Internal state engine; export only the containment facade as a DO.
 import {DurableObject} from 'cloudflare:workers';
 import {AssertionKeyState,type CoordinatorEnv,type IssueInput,type ProofInput} from './assertion-key-state';
-import {type StoreMaterial} from './receipt-key-store';
+import {validReceiptActiveKey,type StoreMaterial} from './receipt-key-store';
 import {createEnrollmentEvidenceVerifier,type EnrollmentVerifier,type EnrollmentEvidence,type SavedEnrollmentState} from './enrollment-evidence-candidate.mjs';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
 
@@ -9,6 +9,7 @@ export interface EnrollmentEnv extends CoordinatorEnv {ENROLLMENT_POLICY_REVISIO
 export interface RegisterInput {challengeId:string;keyId:string;attestation:Uint8Array}
 interface EnrollmentOperation {id:string;internalId:string;keyAddress:string;createdAt:number;expiresAt:number;policyRevision:string;policyExpiresAt:number;status:'challenge'|'registered';nonce?:string;requestDigest?:string;keyExpiresAt?:number}
 interface Intent {id:string;keyId:string;keyAddress:string;nonce:string;requestDigest:string;evidence?:EnrollmentEvidence;materialSnapshot?:string;encryptionKey?:string;policyRevision:string;policyExpiresAt:number}
+class EnrollmentConfigUnavailable extends Error {}
 const POLICY='ios-dev-qualification/1',VERSION='djc-rendezvous/1';
 const need:(value:unknown)=>asserts value=value=>{if(!value)throw new Error('registration_rejected');};
 const integer=(v:number)=>Number.isSafeInteger(v)&&v>=0;
@@ -28,6 +29,7 @@ export class EnrollmentKeyState extends AssertionKeyState {
     super(ctx,env);
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS enrollment_operation (id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, value TEXT NOT NULL)');
   }
+  #configuration(){if(!validReceiptActiveKey(this.env))throw new EnrollmentConfigUnavailable();}
   protected enrollmentPolicy(now:number){
     const env=this.env as EnrollmentEnv,until=Number(env.ASSERTION_POLICY_EXPIRES_AT),revision=env.ENROLLMENT_POLICY_REVISION;
     need(env.ASSERTION_POLICY_ENABLED===POLICY&&integer(until)&&now<until&&typeof revision==='string'&&revision.length>0&&revision.length<=128);
@@ -49,9 +51,10 @@ export class EnrollmentKeyState extends AssertionKeyState {
     const intent=this.#intent,op=this.enrollmentOperation(),policy=this.enrollmentPolicy(now),e=intent?.evidence;
     need(intent&&e&&op?.status==='challenge'&&op.id===intent.id&&op.keyAddress===intent.keyAddress&&op.internalId===m.operationId&&now>=op.createdAt&&now<op.expiresAt);
     need(op.nonce===intent.nonce&&op.policyRevision===intent.policyRevision&&op.policyExpiresAt===intent.policyExpiresAt);
-    need(this.load()===undefined&&intent.materialSnapshot===JSON.stringify(m)&&intent.encryptionKey===this.env.RECEIPT_ACTIVE_KEY);
+    need(this.load()===undefined&&intent.materialSnapshot===JSON.stringify(m));
     need(policy.revision===intent.policyRevision&&policy.expiresAt===intent.policyExpiresAt&&e.scope===this.allowedEvidenceScope()&&e.policy===POLICY&&e.policyRevision===policy.revision);
     need(e.challengeId===op.id&&e.keyId===intent.keyId&&e.challengeCreatedAt===op.createdAt&&e.challengeExpiresAt===op.expiresAt&&integer(e.verifiedAt)&&e.verifiedAt>=op.createdAt&&e.verifiedAt<=now&&integer(e.validUntil)&&now<e.validUntil&&e.validUntil<=op.expiresAt&&e.validUntil<=policy.expiresAt);
+    this.#configuration();need(intent.encryptionKey===this.env.RECEIPT_ACTIVE_KEY);
     need(m.keyAddress===op.keyAddress&&m.requestDigest===intent.requestDigest&&m.receiptCreatedAt===e.receiptCreatedAt&&m.receipt===b64(e.initialReceipt)&&m.publicPoint===b64(e.publicPoint));
   }
   protected override didInstallCommit(m:StoreMaterial,expiresAt:number){
@@ -67,39 +70,41 @@ export class EnrollmentKeyState extends AssertionKeyState {
   }
   async issueEnrollment(input:{keyId:string}){
     try{
-      input={...input};closed(input,['keyId']);keyId(input.keyId);
+      this.#configuration();input={...input};closed(input,['keyId']);keyId(input.keyId);
       const address=hex(await hash(['development',POLICY,input.keyId])),now=Date.now(),policy=this.enrollmentPolicy(now);
       const op:EnrollmentOperation={id:random(),internalId:crypto.randomUUID(),nonce:random(),keyAddress:address,createdAt:now,expiresAt:Math.min(now+120000,policy.expiresAt),policyRevision:policy.revision,policyExpiresAt:policy.expiresAt,status:'challenge'};
       return await this.locked(async()=>{
         const alarm=await this.ctx.storage.getAlarm();await this.ctx.storage.setAlarm(Math.min(alarm??op.expiresAt,op.expiresAt));
         return this.ctx.storage.transactionSync(()=>{
-          const at=Date.now(),currentPolicy=this.enrollmentPolicy(at);need(currentPolicy.revision===policy.revision&&currentPolicy.expiresAt===policy.expiresAt);this.cleanupEnrollment(at);const row=this.expire(at),existing=this.enrollmentOperation();need(at>=now&&at<op.expiresAt);if(row)need(row.keyAddress===address);
+          const at=Date.now(),currentPolicy=this.enrollmentPolicy(at);this.#configuration();need(currentPolicy.revision===policy.revision&&currentPolicy.expiresAt===policy.expiresAt);this.cleanupEnrollment(at);const row=this.expire(at),existing=this.enrollmentOperation();need(at>=now&&at<op.expiresAt);if(row)need(row.keyAddress===address);
           if(existing){need(existing.keyAddress===address&&existing.status==='challenge'&&existing.policyRevision===policy.revision&&existing.policyExpiresAt===policy.expiresAt);return {ok:true as const,v:VERSION,challenge_id:existing.id,challenge:existing.nonce!,expires_at:existing.expiresAt};}
           this.saveEnrollment(op);return {ok:true as const,v:VERSION,challenge_id:op.id,challenge:op.nonce!,expires_at:op.expiresAt};
         });
       });
-    }catch{return {ok:false as const,error:'registration_rejected' as const};}
+    }catch(error){return {ok:false as const,error:error instanceof EnrollmentConfigUnavailable?'service_unavailable' as const:'registration_rejected' as const};}
   }
   async enroll(input:RegisterInput){
     if(this.#busy)return {ok:false as const,error:'registration_rejected' as const};this.#busy=true;
     try{
-      closed(input,['keyId','challengeId','attestation']);keyId(input.keyId);opaque(input.challengeId);need(input.attestation instanceof Uint8Array&&input.attestation.length>0&&input.attestation.length<=32768);
+      this.#configuration();closed(input,['keyId','challengeId','attestation']);keyId(input.keyId);opaque(input.challengeId);need(input.attestation instanceof Uint8Array&&input.attestation.length>0&&input.attestation.length<=32768);
       input={keyId:input.keyId,challengeId:input.challengeId,attestation:Uint8Array.from(input.attestation)};
       const address=hex(await hash(['development',POLICY,input.keyId])),digest=hex(await hash([VERSION,'register',input.challengeId,input.keyId,b64(input.attestation)]));
       const policy=this.enrollmentPolicy(Date.now()),op=this.enrollmentOperation();need(op&&op.id===input.challengeId&&op.keyAddress===address&&Date.now()>=op.createdAt&&Date.now()<op.expiresAt&&op.policyRevision===policy.revision&&op.policyExpiresAt===policy.expiresAt);
       if(op.status==='registered')return this.ctx.storage.transactionSync(()=>this.registered(op.id,address,digest));
-      need(op.nonce);this.#intent={id:op.id,keyId:input.keyId,keyAddress:address,nonce:op.nonce,requestDigest:digest,policyRevision:policy.revision,policyExpiresAt:policy.expiresAt};
+      this.#configuration();need(op.nonce);this.#intent={id:op.id,keyId:input.keyId,keyAddress:address,nonce:op.nonce,requestDigest:digest,policyRevision:policy.revision,policyExpiresAt:policy.expiresAt};
       const verified=await this.verifyEnrollment(input);
+      need(Date.now()>=op.createdAt&&Date.now()<op.expiresAt);this.enrollmentSnapshot();this.#configuration();
       if(verified.ok===false&&verified.error==='attestation_unavailable'){closed(verified,['ok','error']);return {ok:false as const,error:'attestation_unavailable' as const};}
       need(verified.ok);
       const e:EnrollmentEvidence={...verified.evidence,initialReceipt:Uint8Array.from(verified.evidence.initialReceipt),publicPoint:Uint8Array.from(verified.evidence.publicPoint)};
       need(e.publicPoint.length===65&&e.publicPoint[0]===4&&e.initialReceipt.length>0&&e.initialReceipt.length<=16384);
       need(b64(new Uint8Array(await crypto.subtle.digest('SHA-256',e.publicPoint)))===input.keyId);
+      need(Date.now()>=op.createdAt&&Date.now()<op.expiresAt);this.enrollmentSnapshot();this.#configuration();
       const m:StoreMaterial={keyAddress:address,appPolicy:POLICY,environment:'development',publicPoint:b64(e.publicPoint),receipt:b64(e.initialReceipt),receiptCreatedAt:e.receiptCreatedAt,challengeCreatedAt:op.createdAt,challengeExpiresAt:op.expiresAt,operationId:op.internalId,requestDigest:digest};
       this.#intent.evidence=e;this.#intent.materialSnapshot=JSON.stringify(m);this.#intent.encryptionKey=this.env.RECEIPT_ACTIVE_KEY;
       await this.installInternal(m);
       return this.ctx.storage.transactionSync(()=>this.registered(op.id,address,digest));
-    }catch{return {ok:false as const,error:'registration_rejected' as const};}finally{this.#intent=undefined;this.#busy=false;}
+    }catch(error){return {ok:false as const,error:error instanceof EnrollmentConfigUnavailable?'service_unavailable' as const:'registration_rejected' as const};}finally{this.#intent=undefined;this.#busy=false;}
   }
   override async alarm(){try{this.ctx.storage.transactionSync(()=>this.cleanupEnrollment(Date.now()));await super.alarm();}catch{throw new Error('qualification_cleanup_failed');}}
 }

@@ -171,9 +171,19 @@ No Profile/HA authority is inferred from a successful counter transition.
 
 ## Bounds and monitoring for review
 
-Proposed admission ceilings:500 new keys/day,10,000 new transactions/day,
-32 unexpired challenge/receipt records per key,4 submit-challenges per transaction,
-one active crypto verification per key, and per-IP edge budgets. Enforce aggregate
+Proposed admission ceilings:500 registration ATTEMPTS/day (failed and identical
+retries included, not500 new installations),10,000 new transactions/day,
+32 unexpired proof_operations per key (challenges and receipts), plus at most
+1 separate enrollment_operation row. Proof operations are partitioned into at most28submit,
+2recover-key and2delete-key operations (both challenges and receipts count;
+pending same-action management challenges coalesce before quota),4 submit-challenge issuance
+ATTEMPTS per transaction across all key IDs/digests,
+one active crypto verification per key, and per-IP edge budgets. The transaction
+owner atomically charges a challenge attempt only after valid QR/generation/live
+pending/original-expiry checks, before key admission/issuance. Downstream refusal,
+outage or lost response still costs an attempt; no refunds or renewal. A fifth
+attempt returns429 without a key RPC. Read-only inspect costs no challenge attempt.
+Enforce aggregate
 allocations in a dedicated private budget coordinator before persistent allocation;
 Worker isolate memory counters or regional limits alone are not global proof.
 Reject overload503/429 before certificate crypto. Native unsupported/Apple outage

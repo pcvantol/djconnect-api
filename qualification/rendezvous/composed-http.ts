@@ -64,7 +64,7 @@ export function createComposedHandler(env?:ComposedEnv,resolveIdentity?:TrustedI
             result=success(await tx.route('inspect',scan()));current(result.expires_at);
             body={v:V,transaction_id:b.transaction_id,generation:result.generation,expires_at:result.expires_at,browser_public_key:result.browser_public_key,browser_key_thumbprint:result.browser_key_thumbprint};
           }else if(route==='/submit-challenge'){
-            const inspected=success(await tx.route('inspect',scan()));current(inspected.expires_at);need(inspected.generation===b.generation);
+            const inspected=success(await tx.route('reserveSubmitChallenge',scan()));current(inspected.expires_at);need(inspected.generation===b.generation);
             result=success(await keys.route({operation:'issueAction',keyId:b.key_id as string,action:'submit',binding:{transactionId:b.transaction_id as string,generation:b.generation as number,browserThumbprint:inspected.browser_key_thumbprint as string,envelopeDigest:b.envelope_digest as string,expiresAt:inspected.expires_at as number}}));
             need(enabled());current(inspected.expires_at);need(result.expires_at===inspected.expires_at);
             body={v:V,challenge_id:result.challenge_id,challenge:result.challenge,client_data:result.client_data,expires_at:result.expires_at};
