@@ -6,6 +6,9 @@
 > [Separate product-preparation Finalization](docs/rendezvous/PRODUCT_PREPARATION_FINALIZATION_V1.md)
 > is a docs-only candidate until its own protected main and explicit receipt;
 > full assignment and native/edge/service acceptance remainOPEN.
+> New [actual receiver/API source interoperability](docs/rendezvous/RECEIVER_API_INTEROP_V1.md)
+> qualifies receiverPR30 against the real local API for create/QR/cancel only;
+> fixture transport is not browser/native/HA/live acceptance.
 >
 > Implementation source/wire **djc-rendezvous/1-implementation.1 RELEASED**:
 > source2dade83 and [separate Finalization661e577 receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272559764).
