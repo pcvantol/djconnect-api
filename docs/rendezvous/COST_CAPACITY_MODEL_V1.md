@@ -1,5 +1,10 @@
 # Rendezvous cost and capacity scenarios
 
+Current source overlay: [a780 operations preparation](CURRENT_OPERATIONS_PREPARATION_V1.md).
+It accounts for the current partitioned gate counter writes and preserves the
+distinction between conditional components and actual account/bill approval.
+The historical arithmetic and supplying source below remain historical.
+
 **MODELED_ONLY / NOT_ACCOUNT_QUALIFIED / NOT_SPEND_AUTHORIZED.** Price/limit
 references read2026-10-19; supplying source49ecb9512fe3b894e6dc420a682920dde9204a9c.
 Current083ddb2 qualification replaces the challenge-context inspect with a quota

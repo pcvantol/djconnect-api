@@ -8,10 +8,34 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPPLYING_SHA = 'cf749619c9d3d101e7f7bc5fb7ae48ec71512f8a'
-PROOF = 'docs/rendezvous/workerd-shared-key-source-proof-v1.json'
-PROOF_HASH = '571165023527302d5fdbb3873a02c3614992a44a20d6fc8866631a2d92da4106'
-REFERENCES = ('wrangler.jsonc', '.github/workflows/deploy-api-worker.yml', PROOF)
+SUPPLYING_SHA = 'a7806a9c65b7b1971c558eee238ad26fbc536a08'
+PROOFS = (
+    ('docs/rendezvous/product-composition-shared-source-proof-v1.json',
+     '5dcd1ed6fa448a8ac234a1267d9254a13cc587a9ebea83e15e94b00f672361e1',
+     'source_sha256', 66, 'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
+    ('docs/rendezvous/product-composition-observations-v1.json',
+     'bcec592f4d3d4eb3d532217d1d9f069877550bd467abc87b8bdc3516db25e53d',
+     'source_sha256', 15, 'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'),
+    ('docs/rendezvous/product-composition-root-build-observations-v1.json',
+     'bbe92f38dada976142d85c9abef4a5eb6c54f57862cb8d21f2d9a978c83f1964',
+     'source_hashes', 83, 'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
+)
+REFERENCES = ('wrangler.jsonc', '.github/workflows/deploy-api-worker.yml',
+              '.github/workflows/api-release-artifact.yml',
+              'docs/rendezvous/implementation-contract-release-v1.json',
+              'LICENSE', 'THIRD_PARTY_NOTICES.md',
+              'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md',
+              *(proof[0] for proof in PROOFS))
+PROPOSED_CONFIGURATION = {
+    'COMPOSED_POLICY_ENABLED': 'djc-http-composition-qualification/1',
+    'REQUEST_POLICY_ENABLED': 'djc-request-admission-qualification/2',
+    'ALLOCATION_POLICY_ENABLED': 'djc-allocation-qualification/1',
+    'INDEX_POLICY_ENABLED': 'djc-index-qualification/1',
+    'ASSERTION_POLICY_ENABLED': 'ios-dev-qualification/1',
+    'ASSERTION_POLICY_EXPIRES_AT': None,
+    'ENROLLMENT_POLICY_REVISION': None,
+    'RENDEZVOUS_EDGE_POLICY': 'djc-direct-edge-identity/1-candidate',
+}
 BINDINGS = {
     'REQUEST_ADMISSION': 'RequestAdmission',
     'ADMISSION_STATE': 'AllocationBudget',
@@ -81,16 +105,39 @@ def safe_path(name):
     return current
 
 
-def baseline():
-    proof = blob(PROOF)
-    require(digest(proof) == PROOF_HASH)
-    recorded = decode(proof)['source_sha256']
-    require(isinstance(recorded, dict) and len(recorded) == 66)
+def merge_sources(shared, module, root):
+    """Only immutable proof maps define inputs; never discover mutable Git state."""
     sources = {}
-    for name, expected in recorded.items():
-        path = name if name.startswith(('docs/', 'src/')) else 'qualification/rendezvous/' + name
+    excluded = set()
+    for index, recorded in enumerate((shared, module, root)):
+        require(isinstance(recorded, dict) and len(recorded) == (66, 15, 83)[index])
+        for name, expected in recorded.items():
+            require(isinstance(name, str) and isinstance(expected, str)
+                    and len(expected) == 64 and all(c in '0123456789abcdef' for c in expected))
+            path = (name if name.startswith(('docs/', 'src/'))
+                    else 'qualification/rendezvous/' + name) if index == 0 else name
+            if index == 2 and path.startswith('node_modules/'):
+                require('\\' not in path and all(p not in ('', '.', '..') for p in path.split('/')))
+                excluded.add(path)
+                continue  # Installed package bytes are not immutable Git blobs.
+            safe_path(path)
+            require(path not in sources or sources[path] == expected)
+            sources[path] = expected
+    require(len(excluded) == 32 and len(sources) == 102)
+    return sources
+
+
+def baseline():
+    maps = []
+    for name, pin, field, count, scope in PROOFS:
+        raw = blob(name)
+        require(digest(raw) == pin)
+        proof = decode(raw)
+        require(proof['scope'] == scope and isinstance(proof[field], dict) and len(proof[field]) == count)
+        maps.append(proof[field])
+    sources = merge_sources(*maps)
+    for path, expected in sources.items():
         require(digest(blob(path)) == expected)
-        sources[path] = expected
     return sources, {name: digest(blob(name)) for name in REFERENCES}
 
 
@@ -100,7 +147,7 @@ def validate(plan):
                 'compatibility_date', 'activation_allowed', 'public_entrypoint',
                 'central_manifest_id', 'artifact_id', 'artifact_sha256', 'approval',
                 'account_id', 'account_plan', 'bindings', 'migration', 'secret_names',
-                'gates', 'source_hashes', 'reference_hashes'}
+                'gates', 'source_hashes', 'reference_hashes', 'proposed_configuration'}
     require(isinstance(plan, dict) and set(plan) == expected)
     constants = {'schema_version': 1, 'kind': 'rendezvous_deployment_preparation',
                  'status': 'NOT_AUTHORIZED', 'supplying_source_sha': SUPPLYING_SHA,
@@ -119,6 +166,7 @@ def validate(plan):
                                  'new_sqlite_classes': sorted(BINDINGS.values())})
     require(plan['secret_names'] == ['RENDEZVOUS_IP_HASH_KEY', 'RECEIPT_ACTIVE_KEY',
                                      'RECEIPT_PREVIOUS_KEY'])
+    require(plan['proposed_configuration'] == PROPOSED_CONFIGURATION)
     require(plan['gates'] == {name: 'OPEN' for name in GATES})
     sources, references = baseline()
     require(plan['source_hashes'] == sources and plan['reference_hashes'] == references)
