@@ -17,7 +17,7 @@
     "worker_test_environment_tests": 78,
     "existing_api_regressions": 40,
     "new_root_boundary_tests": 38,
-    "doc_links": 46,
+    "doc_links": 47,
     "diff_check": "PASS",
     "new_secret_pattern_values": "ONLY_BEARER_EXAMPLE_SENSITIVE_TEST_PLACEHOLDER"
   },
@@ -39,5 +39,6 @@
   "production_ready": false,
   "deployment_authorized": false,
   "cloudflare_mutation_performed": false,
-  "timer_enabled": false
+  "timer_enabled": false,
+  "source_commit_sha": "442e4a42bc173a375f47156eff1f0c36e18b9304"
 }
