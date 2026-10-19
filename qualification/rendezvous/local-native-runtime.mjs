@@ -12,11 +12,16 @@ import {statusOnlyOutbound,allowedStatusRequest} from './local-native-egress.mjs
 export const repo=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
 const sha=v=>createHash('sha256').update(v).digest('hex');
 const toolFiles=['qualification/rendezvous/local-native-files.mjs','qualification/rendezvous/local-native-egress.mjs','qualification/rendezvous/local-native-runtime.mjs','qualification/rendezvous/run-local-native.mjs'];
+export function gitRead(args){
+ const env=Object.fromEntries(Object.entries(process.env).filter(([name])=>!name.startsWith('GIT_')));
+ Object.assign(env,{GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0',GIT_OPTIONAL_LOCKS:'0',GIT_NO_REPLACE_OBJECTS:'1'});
+ return spawnSync('git',args,{cwd:repo,env,encoding:'utf8',timeout:10000});
+}
 export async function checkSourcePins(pins,base){
  for(const [p,h] of Object.entries(pins)){need(!p.includes('..')&&!p.startsWith('/'));need(sha(await readFile(join(base,p)))===h);}
 }
 export async function sourceSnapshot(){
- const status=spawnSync('git',['status','--porcelain','--untracked-files=normal'],{cwd:repo,encoding:'utf8',timeout:10000});need(status.status===0&&status.stdout==='');
+ const status=gitRead(['status','--porcelain','--untracked-files=normal']);need(status.status===0&&status.stdout==='');
  const checked=spawnSync('python3',['scripts/validate_rendezvous_deployment_plan.py'],{cwd:repo,encoding:'utf8',timeout:30000});
  need(checked.status===0&&JSON.parse(checked.stdout).activation_allowed===false);
  const plan=JSON.parse(await readFile(join(repo,'docs/rendezvous/deployment-preparation-v1.json')));
@@ -25,7 +30,7 @@ export async function sourceSnapshot(){
  const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===32);
  await checkSourcePins(pins,repo);
  for(const p of toolFiles)pins[p]=sha(await readFile(join(repo,p)));
- const head=spawnSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8',timeout:10000});need(head.status===0&&/^[0-9a-f]{40}\n$/.test(head.stdout));
+ const head=gitRead(['rev-parse','HEAD']);need(head.status===0&&/^[0-9a-f]{40}\n$/.test(head.stdout));
  return {head:head.stdout.trim(),pins};
 }
 export async function startLocalRuntime(){

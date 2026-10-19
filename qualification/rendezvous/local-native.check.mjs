@@ -7,7 +7,7 @@ import {tmpdir} from 'node:os';
 import {createHash} from 'node:crypto';
 import {privateDirectory,readPrivate,writePrivate,parseRequest,decode64,CommandBudget} from './local-native-files.mjs';
 import {allowedStatusRequest,statusOnlyOutbound} from './local-native-egress.mjs';
-import {startLocalRuntime,checkSourcePins,repo} from './local-native-runtime.mjs';
+import {startLocalRuntime,checkSourcePins,gitRead,repo} from './local-native-runtime.mjs';
 import {processRequest} from './run-local-native.mjs';
 
 const V='djc-rendezvous/1';
@@ -49,6 +49,14 @@ test('source fingerprint guard rejects changed or missing bytes and escaping pat
  await writePrivate(dir,'source.mjs','original');const pins={'source.mjs':createHash('sha256').update('original').digest('hex')};
  await checkSourcePins(pins,dir.path);await writeFile(join(dir.path,'source.mjs'),'changed');await assert.rejects(checkSourcePins(pins,dir.path));
  await rm(join(dir.path,'source.mjs'));await assert.rejects(checkSourcePins(pins,dir.path));await assert.rejects(checkSourcePins({'../escape':'x'},dir.path));
+}));
+test('Git readback ignores inherited repository/config overrides and stays offline',async()=>privateTest(async dir=>{
+ const baseline=gitRead(['rev-parse','HEAD']);assert.equal(baseline.status,0);
+ assert.equal(spawnSync('git',['init','--quiet',dir.path]).status,0);
+ const values={GIT_DIR:join(dir.path,'.git'),GIT_WORK_TREE:dir.path,GIT_CONFIG_COUNT:'1',GIT_CONFIG_KEY_0:'core.bare',GIT_CONFIG_VALUE_0:'true',GIT_NO_LAZY_FETCH:'0',GIT_TERMINAL_PROMPT:'1',GIT_OPTIONAL_LOCKS:'1',GIT_NO_REPLACE_OBJECTS:'0'};
+ const original=Object.fromEntries(Object.keys(values).map(k=>[k,process.env[k]]));
+ try{Object.assign(process.env,values);const actual=gitRead(['rev-parse','HEAD']);assert.equal(actual.status,0);assert.equal(actual.stdout,baseline.stdout);assert.equal(gitRead(['rev-parse','--show-toplevel']).stdout.trim(),repo);}
+ finally{for(const [k,v]of Object.entries(original)){if(v===undefined)delete process.env[k];else process.env[k]=v;}}
 }));
 test('status-only guard permits exact common-certificate tuples, rejects credential/HA/redirect URLs',async()=>{
  const crl=new Request('http://crl.apple.com/applerootcag3.crl',{headers:{accept:'application/pkix-crl'}});assert.equal(allowedStatusRequest(crl),true);

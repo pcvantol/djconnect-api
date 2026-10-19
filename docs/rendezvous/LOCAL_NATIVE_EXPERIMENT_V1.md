@@ -94,6 +94,8 @@ Record the bounded failure and coordinate the next explicit experiment.
 Before startup and each request, the tool verifies the existing102 tracked
 preparation inputs/references and the32 installed dependency bytes deliberately
 excluded from Gitblob validation, plus its four tool files and currentHEAD.
+Git readback strips all inherited `GIT_*` overrides and disables lazy fetch,
+prompts, optional locks and replacement objects, matching the offline validator.
 The build import graph must remain within those pinned inputs and its own generated
 driver. All existing22 deployment gates remainOPEN/null/false. No replacement
 deployment manifest or authorization is produced.
@@ -131,9 +133,10 @@ results are fixed scope/status/sequence messages or a finite generic failure.
 
 ## Verification and remaining acceptance
 
-Run `node --test qualification/rendezvous/local-native.check.mjs`. Nine host/local
+Run `node --test qualification/rendezvous/local-native.check.mjs`. Ten host/local
 integration groups cover descriptor/mode/link/FIFO/size/traversal/replaced-directory
-guards, canonical byte preservation, source fingerprint drift, finite command budget, status tuple guards,
+guards, canonical byte preservation, source fingerprint drift, inherited Git overrides,
+finite command budget, status tuple guards,
 actual compiled genuine-verifier negative with original SQL operation/zero keys,
 exact output nonce, real120s expiry and isolated restart. A separately labeled host
 I/O fixture tests exact action-byte output; it is no native/Worker positive.
