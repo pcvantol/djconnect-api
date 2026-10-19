@@ -41,6 +41,14 @@ jobs:
           mkdir release
           cp -R bundle migrations release/
           cp package.json package-lock.json wrangler.jsonc release/
+          cp LICENSE THIRD_PARTY_NOTICES.md release/
+          mkdir -p release/docs/rendezvous
+          cp docs/rendezvous/THIRD_PARTY_LICENSES_V1.md release/docs/rendezvous/
+          (
+            cd release
+            sha256sum LICENSE THIRD_PARTY_NOTICES.md docs/rendezvous/THIRD_PARTY_LICENSES_V1.md > LICENSES.sha256
+            sha256sum --check LICENSES.sha256
+          )
           tar -czf djconnect-api-release.tar.gz release
           sha256sum djconnect-api-release.tar.gz | awk '{print $1}' > djconnect-api-release.sha256
       - id: upload

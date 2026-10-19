@@ -2,9 +2,11 @@
 > source2dade83 and [separate Finalization661e577 receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272559764).
 > Existing Core/Apple/receiver owners received definitive handoffs. The
 > [always-disabled product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md) was
-> protected-delivered through PR98/main aab76f7. Current API candidate:
-> [five private product DOs](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md), pending
-> its own independent review/protected delivery. Auth/edge integration and
+> protected-delivered through PR98/main aab76f7. The
+> [five private product DOs](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md) were
+> protected-delivered through PR99/main1463b32 with actual bundle readback. Current
+> [distribution notices correction](docs/rendezvous/DISTRIBUTION_NOTICES_V1.md)
+> is pending its own review/delivery. Auth/edge integration and
 > native/receiver/HA/physical/operational/deployment gates remain OPEN; timer OFF.
 > Historical statuses below do not override the limited released source interface.
 
