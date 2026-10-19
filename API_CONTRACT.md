@@ -554,3 +554,13 @@ The response is aggregate-only. It never includes raw request or response
 bodies, Authorization headers, IP addresses, raw install IDs, raw device IDs,
 APNs tokens, encrypted APNs token material, relay secrets, Home Assistant
 tokens, Spotify tokens, prompts, responses or chat history.
+
+
+## VibeCast rendezvous source/wire implementation contract
+
+The [versioned implementation record](docs/rendezvous/IMPLEMENTATION_CONTRACT_RELEASE_V1.md)
+and [hash manifest](docs/rendezvous/implementation-contract-release-v1.json) pin
+djc-rendezvous/1-implementation.1. It is candidate until protected main delivery
+and exact producerreceipt, then permits consumer implementation only. It does
+not enable a public rendezvous API at the existing base URL, change APNs/pairing/
+D1/auth contracts, authorize deployment or prove actual native/HA/TV operation.

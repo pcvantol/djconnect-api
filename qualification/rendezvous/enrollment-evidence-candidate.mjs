@@ -5,6 +5,7 @@ import {CommonStatusClient} from './receipt-status-client.mjs';
 import {attestationRoot,receiptRoot} from 'djc-enrollment-trust';
 
 const POLICY='ios-dev-qualification/1';
+class StatusUnavailable extends Error {}
 const need=v=>{if(!v)throw new Error('enrollment_rejected');};
 const integer=v=>Number.isSafeInteger(v)&&v>=0;
 // Buffer.slice() is a view. Always own a plain Uint8Array before asynchronous work.
@@ -36,7 +37,10 @@ function statusTime(status,kind,now){
   need(['checkedAt','cacheUntil','thisUpdate','nextUpdate'].every(k=>integer(status[k]))&&status.thisUpdate<=status.checkedAt&&status.checkedAt<=now&&now<status.cacheUntil&&status.cacheUntil<=status.nextUpdate&&status.cacheUntil<=status.checkedAt+3600000);
   if(kind==='ocsp')need(now-status.thisUpdate<=86400000&&status.cacheUntil<=status.thisUpdate+86400000);
 }
-const savedStatus=value=>value&&Object.fromEntries(['ok','scope','checkedAt','cacheUntil','thisUpdate','nextUpdate'].map(k=>[k,value[k]]));
+const savedStatus=value=>{
+  if(value?.ok===false&&value.error==='status_unavailable'){closed(value,['ok','error']);throw new StatusUnavailable();}
+  return value&&Object.fromEntries(['ok','scope','checkedAt','cacheUntil','thisUpdate','nextUpdate'].map(k=>[k,value[k]]));
+};
 function engine(readState,components,scope,nonceOnly){
   // Private closure; one active call per instance. Not an aggregate ingress or CPU budget.
   let busy=false;
@@ -59,13 +63,13 @@ function engine(readState,components,scope,nonceOnly){
       const cms={fresh:result.fresh,created:result.created,expires:result.expires,certificateExpiresAt:result.certificateExpiresAt};receiptTime(cms,now);need(integer(cms.certificateExpiresAt));cryptoDeadline=Math.min(cryptoDeadline,cms.certificateExpiresAt);check();
       const certs={signer:copy(result.signer,8192),issuer:copy(result.issuer,8192),root:copy(result.root,8192)};need(same(certs.root,roots.receipt));
       // Only common CMS-authenticated certificates go to the fixed status client. Never the private leaf/receipt/nonce/key.
-      const issuer=savedStatus(await components.status.check('crl',certs.issuer.slice(),certs.root.slice(),certs.root.slice()));now=check();receiptTime(cms,now);statusTime(issuer,'crl',now);
-      const signer=savedStatus(await components.status.check('ocsp',certs.signer.slice(),certs.issuer.slice(),certs.root.slice()));now=check();
-      receiptTime(cms,now);statusTime(issuer,'crl',now);statusTime(signer,'ocsp',now);need(now<attestationExpiresAt&&now<cms.certificateExpiresAt);
+      const issuerResult=await components.status.check('crl',certs.issuer.slice(),certs.root.slice(),certs.root.slice());now=check();receiptTime(cms,now);const issuer=savedStatus(issuerResult);statusTime(issuer,'crl',now);
+      const signerResult=await components.status.check('ocsp',certs.signer.slice(),certs.issuer.slice(),certs.root.slice());now=check();
+      receiptTime(cms,now);statusTime(issuer,'crl',now);const signer=savedStatus(signerResult);statusTime(signer,'ocsp',now);need(now<attestationExpiresAt&&now<cms.certificateExpiresAt);
       return {ok:true,evidence:{scope,keyId:key,challengeId:id,challengeCreatedAt:initial.challenge.createdAt,challengeExpiresAt:initial.challenge.expiresAt,
         policy:POLICY,policyRevision:initial.policy.revision,verifiedAt:now,validUntil:Math.min(initial.challenge.expiresAt,initial.policy.expiresAt,cms.created+300001,cms.expires,attestationExpiresAt,cms.certificateExpiresAt,issuer.cacheUntil,signer.cacheUntil),
         publicPoint:point,initialReceipt:receipt,receiptCreatedAt:cms.created}};
-    }catch{return {ok:false,error:'enrollment_rejected'};}finally{busy=false;}
+    }catch(error){return {ok:false,error:error instanceof StatusUnavailable?'attestation_unavailable':'enrollment_rejected'};}finally{busy=false;}
   }});
 }
 export function createEnrollmentEvidenceVerifier(readState){

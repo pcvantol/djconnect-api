@@ -1,7 +1,15 @@
+> Current status/precedence: [implementation release record](IMPLEMENTATION_CONTRACT_RELEASE_V1.md).
+> NEWreceiverexceptionACK6270491529/6270497278 is RECEIVED/CLOSED; do not repeat
+> that review. Exact source/wire release is candidate outside protected main and
+> effective for consumerIMPLEMENTATION only after protected delivery+receipt.
+> Old draft/HOLD/openACK labels below are historical for that scope; ALL public,
+> native, operational, receiver-adoption and deployment gates remain separate.
+
 # Code-free A wire and crypto profile — review candidate 0.4.0
 
 **NOT_FROZEN / NO_RUNTIME_GO.** Proposed wire `djc-rendezvous/1`.
-Read [KEY-STATE](KEY_STATE_V1.md) and [the contract](CONTRACT_REVIEW_V1.md).
+Read [KEY-STATE](KEY_STATE_V1.md), [the contract](CONTRACT_REVIEW_V1.md) and
+the current [contract-readiness decision](CONTRACT_READINESS_V1.md).
 This specifies a profile for independent review, not a new cryptographic primitive.
 
 ## Exact producer/consumer boundary
@@ -141,7 +149,7 @@ request validation does not implement runtime authorization or cryptography.
 
 | POST route under `/v1/rendezvous` | Success | Maximum raw request body |
 | --- | --- | --- |
-| `/create` |201 transaction/generation/created_at/expires_at/qr_payload |4KiB |
+| `/create` |201 transaction/generation/created_at/expires_at/browser_key_thumbprint/qr_payload |4KiB |
 | `/inspect` |200 browser_public_key/browser_key_thumbprint/generation/expires_at |1KiB |
 | `/attestation/challenge` |200 challenge_id/challenge/expires_at; delete-key also client_data |1KiB |
 | `/attestation/register` |201 key_expires_at, no user/HA association |64KiB |
@@ -214,9 +222,18 @@ unavailable cancellation requires waiting until the original deadline.
 
 The [transaction qualification design](TRANSACTION_QUALIFICATION_DESIGN_V1.md)
 records scoped independent design review and required race/fault tests. There is
-no qualified reusable server JWE parser yet. Structural envelope validation and
+no transaction-integrated server JWE parser yet. [Local framing qualification](WORKER_FRAMING_QUALIFICATION_V1.md)
+adds92 workerd cases+types for a structural candidate, not AEAD acceptance.
+Structural envelope validation and
 the state implementation require their own source/test/review evidence; a trusted
 QA seam cannot establish parser or public runtime acceptance.
+
+[Local transaction composition](WORKER_TRANSACTION_QUALIFICATION_V1.md) now adds
+322 actual workerd cases+types for private coordinator leases and SQLite
+winner/consume/cancel, including93 transaction cases. Initial enrollment is
+software; typed internal digests are not raw HTTP JSON canonicalization. Public
+immutable allocation/controller/global admission and genuine native chain remain
+separate gates. No public endpoint/schema or HA authority changes.
 
 Fixed error shape `{v,error,retry_after_ms?}`. Codes: invalid_request400,
 unsupported_version400, invalid_capability401, invalid_sender_proof401,
@@ -276,3 +293,98 @@ Sources checked17October: [Apple server validation](https://developer.apple.com/
 [isSupported](https://developer.apple.com/documentation/devicecheck/dcappattestservice/issupported),
 [JOSESwift3.0.0](https://github.com/airsidemobile/JOSESwift/tree/c2664a902e75c0426a1d43132bd4babc6fd173d3),
 [jose6.2.12](https://github.com/panva/jose/tree/505a55b8f73536082367b2614cb77e927ba96ec1).
+
+## Isolated HTTP/allocation qualification continuation
+
+[Ingress qualification](WORKER_INGRESS_QUALIFICATION_V1.md) records265 actual local
+workerd cases and strict types for closed transport and a private atomic
+allocation-budget candidate. Public dispatch, immutable allocator/unknown-ID
+coverage, trusted edge identity and provider-wide cost containment remain open.
+Its additional raw JSON syntax restrictions and numerical allocation policies
+require joint review before contract freeze; unchanged schemas alone do not
+prove those consumer promises. Default harness is disabled; no production
+binding, migration, secret or deployment is introduced.
+
+## Private transaction index continuation
+
+[Allocation/index qualification](WORKER_INDEX_QUALIFICATION_V1.md) records436
+actual local workerd cases+strict types, including existing322 transaction and46
+budget cases. Unknown/expired transaction IDs fail before child stub access via
+the private router. One original-window budget charge precedes immutable server
+allocation. No automatic fresh QR/retry after an unknown create outcome. This
+does not freeze public wire, qualify key namespaces or enable a public service.
+The fixed index adds RPC/bottleneck costs absent from the earlier64-call volume
+model; complete numerical operating costs and capacity remain unqualified.
+
+## Private global key-RPC admission continuation
+
+[Key routing qualification](WORKER_KEY_ROUTING_QUALIFICATION_V1.md) records490
+actual local workerd cases+strict types and265 HTTP/budget regressions. The
+proposed50,000/day global call gate precedes every selected key child access;
+the500/day ceiling counts registration ATTEMPTS, including failed/identical
+retries, not500 new installations. That capacity policy needs joint review
+before freeze. No long-lived key journal or changed recovery/key lifetime was
+implemented. Unknown-key challenges/coalescing remain; their child creation is
+bounded by routed-call admission, not forbidden. Public coverage/edge costs,
+operations, native and physical functional acceptance remain OPEN.
+
+
+## Local HTTP-to-state composition continuation
+
+[HTTP composition qualification](WORKER_HTTP_COMPOSITION_QUALIFICATION_V1.md) adds746 actual local workerd cases
+with strict types, including37 new composed HTTP cases and709 unique regressions.
+Eleven routes now join private state and budgeted key adapters in an isolated
+factory; software initial enrollment plus real P256/JOSE one-time delivery is
+proved locally. Default harness remains503. Profile0.4.0-draft remains NOT_FROZEN;
+public edge/abuse/operations, genuine native and real HA/TV acceptance stay OPEN.
+No product binding or deployment is enabled.
+
+
+## Local pre-body request admission continuation
+
+[Request admission qualification](WORKER_REQUEST_ADMISSION_QUALIFICATION_V1.md) records815 actual local workerd
+cases+strict types,69 new cases and746 regressions. Exact recognized routes pass
+finite minute-HMAC/global admission before Origin/method/body/backend work; malformed
+requests and preflights count. Proposed120total/20native perIP/minute includes
+polling/sharedNAT effects requiring joint review. New gate Retry-After is qualified;
+existing routed-backend hint loss remains an explicit follow-up. Public edge,
+provider/cost/native/HA/physical and contract freeze remain OPEN. No activation.
+
+
+## Routed budget hint correction
+
+[Routed backoff qualification](WORKER_RETRY_HINT_QUALIFICATION_V1.md) records853 actual local workerd
+cases+strict types:38 new cases and815 regressions. Selected trusted429/503 budget
+hints now survive key/transaction/composition into existing Retry-After; malformed
+hints fail503, absent hints remain absent. This supersedes the preceding routed-
+hint-loss limitation only for those qualified paths. Original expiry/retry budgets
+and profile0.4.0-draft NOT_FROZEN remain unchanged. No public/timer/deploy activation.
+
+
+## Partitioned admission continuation (current candidate)
+
+The historical120total/20native-IP paragraph above is superseded for the current
+private candidate by [partitioned admission](ADMISSION_PARTITIONS_QUALIFICATION_V1.md):
+policy/2, poll256/create16/native64/terminal16 attempts perIP/UTCminute, total352.
+Canonical route alone selects lane for all methods inclOPTIONS. Global caps remain
+10000/minute/1000000/day, with nonterminal9000/900000. No new wire fields, TTL,
+poll hint or consumer workaround. Local1118checks/54handofftargets/126consumes
+qualify only the disclosed matrix. Busy503/abuse/provider/native/public/load/cost
+and lost-create recovery/joint exact release remain separate; NOT_FROZEN.
+
+
+New pre-QR recovery proposal/reference: [qualification](CREATE_RECOVERY_QUALIFICATION_V1.md),
+policy djc-pre-qr-replacement/1-draft, NOT_RELEASED.1184local checks/65pins and6new
+Worker scenarios qualify the bounded reference only. No new endpoint/schema,
+server runtime, guessed expiry, cancellation or idempotency claim. Known non201
+headers terminate even at deadline; one fresh-authority replacement is proposed
+only before anyQR exposure. Existing receiver owner must ACK this NEW exception
+and adoption before freeze; prior reviews remain received, timer stays off.
+
+
+Shared app-key API qualification: [evidence](SHARED_APP_KEY_QUALIFICATION_V1.md).
+1208local checks/66pins,24new samekey cases:22delivery scenarios/58consumes plus
+2expected expiryrefusals. Actual counter/receipt/budget/originalkeyexpiry checked;
+software fixture serialorder is NOT a nativequeue/24h/twohandle/day27policyPASS.
+No endpoint/schema/runtime/consumer/policy change or extra ACK. Existing NEWpreQR
+receiverexception review6269829702 remainsopen, no repeatedask; timer staysOFF.

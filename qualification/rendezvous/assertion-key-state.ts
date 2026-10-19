@@ -44,13 +44,13 @@ export class AssertionKeyState extends ReceiptKeyStore {
     const at=Date.now();this.policy(at);const row=this.cleanup(at);need(at>=now&&at<expiresAt);if(row)need(row.keyAddress===keyAddress);
     const ops=this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations').toArray().map(r=>JSON.parse(r.value) as Operation);
     if(input.action!=='submit'){const existing=ops.find(v=>v.status==='challenge'&&v.action===input.action&&v.keyAddress===keyAddress);if(existing)return {ok:true as const,...this.response(existing)};}
-    need(ops.length<32&&!this.operation(op.id));this.saveOperation(op);return {ok:true as const,...this.response(op)};
+    need(ops.length<32&&ops.filter(v=>v.action===input.action).length<(input.action==='submit'?28:2)&&!this.operation(op.id));this.saveOperation(op);return {ok:true as const,...this.response(op)};
    });
   });
  }
  private disposition(op:Operation,requestDigest:string,now:number){
   const row=this.active(now),policyUntil=this.policy(now);need(op.status==='authorized'&&op.requestDigest===requestDigest&&op.keyAddress===row.keyAddress&&now>=op.admittedAt!&&now<op.expiresAt);
-  if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
+  if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,admittedAt:op.admittedAt!,keyExpiresAt:op.keyExpiresAt!,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
   need(op.action==='recover-key');return {kind:'recovery-receipt' as const,keyExpiresAt:op.keyExpiresAt!,counter:op.counter!};
  }
  private async authorizeInternal(input:ProofInput){

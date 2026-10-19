@@ -16,6 +16,7 @@ const need:(v:unknown)=>asserts v=(v)=>{if(!v)throw new Error('qualification_sto
 const integer=(v:number)=>Number.isSafeInteger(v)&&v>=0;
 const context=(r:Active|Context):Context=>({objectId:r.objectId,keyAddress:r.keyAddress,appPolicy:r.appPolicy,environment:r.environment,createdAt:r.createdAt,expiresAt:r.expiresAt,receiptCreatedAt:r.receiptCreatedAt,keyVersion:r.keyVersion,publicPoint:r.publicPoint});
 function canonicalBase64(s:string,max:number,exact?:number){need(typeof s==='string'&&s.length>0&&s.length<=Math.ceil(max/3)*4);const b=base64Decode(s);need(b.length<=max&&(exact===undefined||b.length===exact)&&btoa(String.fromCharCode(...b))===s);return b;}
+export function validReceiptActiveKey(env:StoreEnv):boolean{try{canonicalBase64(env.RECEIPT_ACTIVE_KEY!,32,32);return true;}catch{return false;}}
 async function keyVersion(key:string){canonicalBase64(key,32,32);return base64Url(await crypto.subtle.digest('SHA-256',base64Decode(key))).slice(0,16);}
 export class ReceiptKeyStore extends DurableObject<StoreEnv> {
   constructor(ctx:DurableObjectState,env:StoreEnv){super(ctx,env);ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS key_state (id INTEGER PRIMARY KEY CHECK(id=1), value TEXT NOT NULL)');}
@@ -45,16 +46,16 @@ export class ReceiptKeyStore extends DurableObject<StoreEnv> {
   }
   // Trusted internal material only. This method does NOT validate App Attest/CMS/status/wire admission.
   protected async installInternal(m:StoreMaterial){
-    const now=Date.now();this.material(m,now);need(this.env.RECEIPT_ACTIVE_KEY);const version=await keyVersion(this.env.RECEIPT_ACTIVE_KEY);
+    const now=Date.now();this.material(m,now);const activeKey=this.env.RECEIPT_ACTIVE_KEY;need(activeKey);const version=await keyVersion(activeKey);
     const row:Active={version:1,status:'active',objectId:this.ctx.id.toString(),keyAddress:m.keyAddress,appPolicy:m.appPolicy,environment:m.environment,createdAt:now,expiresAt:now+30*DAY,receiptCreatedAt:m.receiptCreatedAt,keyVersion:version,revision:1,publicPoint:m.publicPoint,counter:0,ciphertext:'',nonce:'',operationId:m.operationId,requestDigest:m.requestDigest,challengeExpiresAt:m.challengeExpiresAt};
-    const encrypted=await encryptSecret(JSON.stringify({context:context(row),receipt:m.receipt}),this.env.RECEIPT_ACTIVE_KEY);
+    const encrypted=await encryptSecret(JSON.stringify({context:context(row),receipt:m.receipt}),activeKey);
     need(encrypted.keyVersion===version);row.ciphertext=encrypted.ciphertext;row.nonce=encrypted.nonce;
     const result=await this.locked(async()=>{
       const prior=await this.ctx.storage.getAlarm();
       await this.ctx.storage.setAlarm(Math.min(prior??row.expiresAt,row.expiresAt,m.challengeExpiresAt));
       // Durable cleanup trigger is acknowledged BEFORE any sensitive SQL commit.
       return this.ctx.storage.transactionSync(()=>{
-      const at=Date.now();this.material(m,at);this.beforeInstallCommit(m,at);const old=this.expire(at);
+      const at=Date.now();this.material(m,at);this.beforeInstallCommit(m,at);need(activeKey===this.env.RECEIPT_ACTIVE_KEY);const old=this.expire(at);
       if(old){need(old.status==='active'&&old.objectId===this.ctx.id.toString()&&old.keyAddress===m.keyAddress&&old.operationId===m.operationId&&old.requestDigest===m.requestDigest&&old.challengeExpiresAt!==undefined&&at<old.challengeExpiresAt);return {scope:'STORE_ONLY_NO_ENROLLMENT',expiresAt:old.expiresAt,duplicate:true};}
       need(at<row.expiresAt);this.save(row);this.didInstallCommit(m,row.expiresAt);return {scope:'STORE_ONLY_NO_ENROLLMENT',expiresAt:row.expiresAt,duplicate:false};
       });

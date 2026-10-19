@@ -45,7 +45,9 @@ Add action `recover-key` to POST `/v1/rendezvous/attestation/challenge` (1KiB).
 Issue a fresh32-byte challenge with120s lifetime, original key ID and exact saved
 clientData, regardless of whether that key is present. Apply aggregate/per-IP
 admission **before allocation**, at most one outstanding management challenge
-per key address/action and32 total unexpired challenge/receipt records per key
+per key address/action and32 total unexpired proof_operations per key
+(28submit/2recover-key/2delete-key, challenges and receipts), plus at most1 separate
+enrollment_operation row
 address including unknown keys. This bounds allocation; it is not installation
 identity or a timing-side-channel guarantee. Do not allocate a new key record.
 

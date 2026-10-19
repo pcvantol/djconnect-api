@@ -1,3 +1,10 @@
+> Current status/precedence: [implementation release record](IMPLEMENTATION_CONTRACT_RELEASE_V1.md).
+> NEWreceiverexceptionACK6270491529/6270497278 is RECEIVED/CLOSED; do not repeat
+> that review. Exact source/wire release is candidate outside protected main and
+> effective for consumerIMPLEMENTATION only after protected delivery+receipt.
+> Old draft/HOLD/openACK labels below are historical for that scope; ALL public,
+> native, operational, receiver-adoption and deployment gates remain separate.
+
 # Rendezvous qualification and deployment preparation
 
 Status: preparation only; see [contract review](CONTRACT_REVIEW_V1.md).
@@ -118,7 +125,11 @@ wrong signature/issuer/installation, ciphertext/tag/nonce mutation, expired and
 replayed records. Record library versions, standards sections and vector hashes.
 Do not substitute JSON state examples for crypto or real E2E qualification.
 
-## Proposed deployment delta, not an executable manifest
+## Historical initial deployment sketch, superseded by exact preparation
+
+The initial single-class sketch below is historical. The current five-component
+[deployment preparation](DEPLOYMENT_PREPARATION_V1.md) and [cost model](COST_CAPACITY_MODEL_V1.md)
+supersede its inventory and64-call approximation. Neither authorizes deployment.
 
 | Item | Required reviewed delta |
 | --- | --- |
@@ -179,3 +190,146 @@ were read on 2026-10-16. Account plan, included/shared usage, measured duration,
 write amplification, traffic estimate and acceptable spend remain unverified.
 OPS-1 must produce a numerical budget and hard admission strategy before live
 enablement. No claimed free-tier fit, production SLA or funding approval.
+
+## Isolated HTTP/allocation qualification continuation
+
+[Ingress qualification](WORKER_INGRESS_QUALIFICATION_V1.md) records265 actual local
+workerd cases and strict types for closed transport and a private atomic
+allocation-budget candidate. Public dispatch, immutable allocator/unknown-ID
+coverage, trusted edge identity and provider-wide cost containment remain open.
+Its additional raw JSON syntax restrictions and numerical allocation policies
+require joint review before contract freeze; unchanged schemas alone do not
+prove those consumer promises. Default harness is disabled; no production
+binding, migration, secret or deployment is introduced.
+
+## Private transaction index continuation
+
+[Allocation/index qualification](WORKER_INDEX_QUALIFICATION_V1.md) records436
+actual local workerd cases+strict types, including existing322 transaction and46
+budget cases. Unknown/expired transaction IDs fail before child stub access via
+the private router. One original-window budget charge precedes immutable server
+allocation. No automatic fresh QR/retry after an unknown create outcome. This
+does not freeze public wire, qualify key namespaces or enable a public service.
+The fixed index adds RPC/bottleneck costs absent from the earlier64-call volume
+model; complete numerical operating costs and capacity remain unqualified.
+
+## Private global key-RPC admission continuation
+
+[Key routing qualification](WORKER_KEY_ROUTING_QUALIFICATION_V1.md) records490
+actual local workerd cases+strict types and265 HTTP/budget regressions. The
+proposed50,000/day global call gate precedes every selected key child access;
+the500/day ceiling counts registration ATTEMPTS, including failed/identical
+retries, not500 new installations. That capacity policy needs joint review
+before freeze. No long-lived key journal or changed recovery/key lifetime was
+implemented. Unknown-key challenges/coalescing remain; their child creation is
+bounded by routed-call admission, not forbidden. Public coverage/edge costs,
+operations, native and physical functional acceptance remain OPEN.
+
+
+## Local HTTP-to-state composition continuation
+
+[HTTP composition qualification](WORKER_HTTP_COMPOSITION_QUALIFICATION_V1.md) adds746 actual local workerd cases
+with strict types, including37 new composed HTTP cases and709 unique regressions.
+Eleven routes now join private state and budgeted key adapters in an isolated
+factory; software initial enrollment plus real P256/JOSE one-time delivery is
+proved locally. Default harness remains503. Profile0.4.0-draft remains NOT_FROZEN;
+public edge/abuse/operations, genuine native and real HA/TV acceptance stay OPEN.
+No product binding or deployment is enabled.
+
+
+## Local pre-body request admission continuation
+
+[Request admission qualification](WORKER_REQUEST_ADMISSION_QUALIFICATION_V1.md) records815 actual local workerd
+cases+strict types,69 new cases and746 regressions. Exact recognized routes pass
+finite minute-HMAC/global admission before Origin/method/body/backend work; malformed
+requests and preflights count. Proposed120total/20native perIP/minute includes
+polling/sharedNAT effects requiring joint review. New gate Retry-After is qualified;
+existing routed-backend hint loss remains an explicit follow-up. Public edge,
+provider/cost/native/HA/physical and contract freeze remain OPEN. No activation.
+
+
+## Routed budget hint correction
+
+[Routed backoff qualification](WORKER_RETRY_HINT_QUALIFICATION_V1.md) records853 actual local workerd
+cases+strict types:38 new cases and815 regressions. Selected trusted429/503 budget
+hints now survive key/transaction/composition into existing Retry-After; malformed
+hints fail503, absent hints remain absent. This supersedes the preceding routed-
+hint-loss limitation only for those qualified paths. Original expiry/retry budgets
+and profile0.4.0-draft NOT_FROZEN remain unchanged. No public/timer/deploy activation.
+
+
+## Offline operational preparation continuation
+
+[Exact deployment preparation](DEPLOYMENT_PREPARATION_V1.md) pins supplying source49ecb95,
+53 source digests, existing root config/workflow and five selected private classes.
+The offline validator can only return BLOCKED_NOT_AUTHORIZED; all22 service/
+operational gates stay OPEN, artifact/account/approval null.21 consistency/negative
+tests PASS. The201-DO-call/65-HTTP-call source model replaces the old64-call sketch;
+request-only price scenarios are not account/cost/load/spend qualification.
+No runtime source/config, consumer, Cloudflare, timer or deployment change.
+
+
+## Controlled unqualified-status correction
+
+[Provider status qualification](WORKER_PROVIDER_UNAVAILABLE_QUALIFICATION_V1.md) records961 actual localworkerd
+cases+strict types:21 new,87 existing verifier and853 prior regressions. Only the
+exact controlled unqualified-status negative becomes existingattestation_unavailable503;
+no key/receipt commit, original nonce/expiry/attempt budget retained. This is not
+proof of an Apple outage or a complete provider/internal-error taxonomy. A separate
+source-qualified deployment-preparation rebind preserves22OPEN/null/activationfalse.
+No public, consumer, Cloudflare, timer or deployment activation.
+
+Separate offline preparation rebind: supplying source `86c80faebfaf98da02ebc5b3e4f832da00021d33`,
+new provider-unavailable961-case proof and56 source hashes. Previous49ec baseline
+correctly rejected the changed runtime before this rebind. All22 gates remain OPEN,
+activation false and account/approval/artifact/public entrypoint null. This is
+preparation consistency only, not contract freeze, Finalization or deployment.
+
+Full-protocol review continuation: [exact contract HOLD](CONTRACT_READINESS_V1.md)
+and [local challenge/management qualification](WORKER_CHALLENGE_BUDGET_QUALIFICATION_V1.md).
+Three source P2s corrected: atomic4issuance attempts per transaction,28/2/2
+reserved proof-operation groups and controlled missing receipt-config503.
+1002/1002 local workerd+strict types PASS; full
+source/test/evidence reviews and exact-head CI receipts belong on API90/PR96.
+Shared-NAT/poll/retry ACK and lost-create-without-ID/deadline recovery remain
+concrete contract decisions. No new polling policy/consumerACK/native/live claim.
+
+Separate preparation rebind now pins immutable supplying source083ddb2d16351b4f785e52a23aad675b0a2cf9ef,
+its1002-case proof and58source hashes. Previous86c80fa baseline correctly rejected
+changed bytes first.21offline checks retain22OPEN/null/false; no deployment
+authorization, public activation or consumer contract release is inferred.
+
+[Shared-NAT capacity decision](CAPACITY_QUALIFICATION_V1.md): receiver's
+independent reviews6266032306 received; API owns the evidence/release decision.
+1068localchecks pass (1002regressions+66individuallyboundcapacitycases), yet the
+four-TV target is HOLD:54handoffcases/126TVflows yield80consumed/46expired.
+Real localChromium/WebKitCORS traces are separate from fixed offered-script replay,
+synthetic sustained schedules, native/edge/load/physical proof. Runtime58pins and
+083ddb2supplying source remain unchanged; no opsrebind/threshold/hint/receiverchange.
+API must qualify corrected admission/terminal headroom or an explicit narrower
+target before exact contract release. No unchanged consumerACK/capture requested.
+
+
+Current local admission correction: [partition qualification](ADMISSION_PARTITIONS_QUALIFICATION_V1.md). Policy/2 partitions IP attempts
+256poll/16create/64native/16terminal; global hard limits unchanged with terminal
+reserve.1118checks,54/54handofftargets,126/126consumed locally. Historical80/46
+remains unchanged oldpolicy evidence. No live/native/load/SLA or contractfreeze
+claim; API retains lost-create recovery and exact release, receiverreviewsreceived,
+consumer sources clean and timer off. Offline preparation rebind is separate.
+
+
+New pre-QR recovery proposal/reference: [qualification](CREATE_RECOVERY_QUALIFICATION_V1.md),
+policy djc-pre-qr-replacement/1-draft, NOT_RELEASED.1184local checks/65pins and6new
+Worker scenarios qualify the bounded reference only. No new endpoint/schema,
+server runtime, guessed expiry, cancellation or idempotency claim. Known non201
+headers terminate even at deadline; one fresh-authority replacement is proposed
+only before anyQR exposure. Existing receiver owner must ACK this NEW exception
+and adoption before freeze; prior reviews remain received, timer stays off.
+
+
+Shared app-key API qualification: [evidence](SHARED_APP_KEY_QUALIFICATION_V1.md).
+1208local checks/66pins,24new samekey cases:22delivery scenarios/58consumes plus
+2expected expiryrefusals. Actual counter/receipt/budget/originalkeyexpiry checked;
+software fixture serialorder is NOT a nativequeue/24h/twohandle/day27policyPASS.
+No endpoint/schema/runtime/consumer/policy change or extra ACK. Existing NEWpreQR
+receiverexception review6269829702 remainsopen, no repeatedask; timer staysOFF.

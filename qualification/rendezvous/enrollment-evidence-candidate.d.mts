@@ -11,7 +11,7 @@ export interface EnrollmentEvidence {
 }
 export interface EnrollmentVerifier {
   verify(request:{challengeId:string;keyId:string;attestation:Uint8Array}):Promise<
-    {ok:true;evidence:EnrollmentEvidence}|{ok:false;error:'enrollment_rejected'}>;
+    {ok:true;evidence:EnrollmentEvidence}|{ok:false;error:'enrollment_rejected'|'attestation_unavailable'}>;
 }
 export function createEnrollmentEvidenceVerifier(readState:()=>SavedEnrollmentState):EnrollmentVerifier;
 /** Dependency injection is restricted to explicit software orchestration fixtures. Never a request parameter. */

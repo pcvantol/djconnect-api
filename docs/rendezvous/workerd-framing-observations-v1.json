@@ -1,0 +1,399 @@
+{
+  "scope": "LOCAL_JWE_FRAMING_PUBLIC_JWK_ONLY_NOT_AEAD_SENDER_PLAINTEXT_OR_RUNTIME_GO",
+  "tests_passed": 92,
+  "typecheck": "PASS",
+  "jose": "6.2.12",
+  "node": "v26.12.0",
+  "typescript": "7.0.2",
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "compatibility_date": "2026-06-20",
+  "source_sha256": {
+    "jwe-framing.ts": "b2df3263ef7008b0a660786fc754389137210cc997685a65975a20de18bfdd4f",
+    "jwe-framing.check.mjs": "30505b709adff172104c19a6c2dbb4c9d1dde05d9e61fdb1b4e69375a357facd",
+    "jwe-framing-harness.ts": "b498089af7d192aefa75bb55b469cfb4f9078a68b9a8b9a9158285a65310de26",
+    "run_framing_workerd.mjs": "d254d53a6afd00faa7d2e38304e7ee82b15f95b2f8444e6f5df28728d36a3694",
+    "generate_destination_vector.mjs": "15533bbd9e74c6557508ac11bbda26c4d851c3a62172c0790733b4b0c4891001",
+    "jwe-dependency-provenance-v1.json": "81f4cd24e597028127776e6e3cc632ac84c9d5302103e68bfa1589e0dc3fdae3"
+  },
+  "oracle": "pinned generator; JOSE decrypt matches public synthetic plaintext; altered tag rejected by JOSE, deliberately framing-accepted",
+  "private_material": "ephemeral software RSA private key process-memory only; never exported or persisted",
+  "cases": [
+    {
+      "name": "no public HTTP rendezvous endpoint",
+      "status": "passed"
+    },
+    {
+      "name": "actual pinned-generator envelope has accepted framing and independent exact-byte digest",
+      "status": "passed"
+    },
+    {
+      "name": "RFC7638 browser JWK thumbprint matches pinned JOSE and separate Node hash",
+      "status": "passed"
+    },
+    {
+      "name": "caller JWK mutation during digest cannot change copied output/context",
+      "status": "passed"
+    },
+    {
+      "name": "JSON header order and allowed whitespace need no canonicalization",
+      "status": "passed"
+    },
+    {
+      "name": "escaped equivalent strings are structurally valid but retain exact different bytes",
+      "status": "passed"
+    },
+    {
+      "name": "shaped corrupted encrypted segment accepted ONLY structurally: 1",
+      "status": "passed"
+    },
+    {
+      "name": "shaped corrupted encrypted segment accepted ONLY structurally: 2",
+      "status": "passed"
+    },
+    {
+      "name": "shaped corrupted encrypted segment accepted ONLY structurally: 3",
+      "status": "passed"
+    },
+    {
+      "name": "shaped corrupted encrypted segment accepted ONLY structurally: 4",
+      "status": "passed"
+    },
+    {
+      "name": "ciphertext byte bound structurally accepts 1",
+      "status": "passed"
+    },
+    {
+      "name": "ciphertext byte bound structurally accepts 2048",
+      "status": "passed"
+    },
+    {
+      "name": "fixed header rejects alg=RSA1_5",
+      "status": "passed"
+    },
+    {
+      "name": "fixed header rejects alg=RSA-OAEP",
+      "status": "passed"
+    },
+    {
+      "name": "fixed header rejects enc=A128GCM",
+      "status": "passed"
+    },
+    {
+      "name": "fixed header rejects typ=JWT",
+      "status": "passed"
+    },
+    {
+      "name": "fixed header rejects kid=AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra zip",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra crit",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra jwk",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra jku",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra x5u",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra x5c",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra cty",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra __proto__",
+      "status": "passed"
+    },
+    {
+      "name": "closed header rejects extra constructor",
+      "status": "passed"
+    },
+    {
+      "name": "missing header field alg",
+      "status": "passed"
+    },
+    {
+      "name": "missing header field enc",
+      "status": "passed"
+    },
+    {
+      "name": "missing header field typ",
+      "status": "passed"
+    },
+    {
+      "name": "missing header field kid",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate decoded key rejects alg",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate decoded key rejects \\u0061lg",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies BOM",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies NBSP",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies VT",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies trailing-object",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies trailing-comma",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies array",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies number",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies nested",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies null",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies raw-control",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies invalid-escape",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies truncated-string",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies comment",
+      "status": "passed"
+    },
+    {
+      "name": "strict header JSON denies empty",
+      "status": "passed"
+    },
+    {
+      "name": "invalid UTF8 header denied without replacement",
+      "status": "passed"
+    },
+    {
+      "name": "empty segment denied 0",
+      "status": "passed"
+    },
+    {
+      "name": "padded segment denied 0",
+      "status": "passed"
+    },
+    {
+      "name": "empty segment denied 1",
+      "status": "passed"
+    },
+    {
+      "name": "padded segment denied 1",
+      "status": "passed"
+    },
+    {
+      "name": "empty segment denied 2",
+      "status": "passed"
+    },
+    {
+      "name": "padded segment denied 2",
+      "status": "passed"
+    },
+    {
+      "name": "empty segment denied 3",
+      "status": "passed"
+    },
+    {
+      "name": "padded segment denied 3",
+      "status": "passed"
+    },
+    {
+      "name": "empty segment denied 4",
+      "status": "passed"
+    },
+    {
+      "name": "padded segment denied 4",
+      "status": "passed"
+    },
+    {
+      "name": "segment byte length denied 1:255",
+      "status": "passed"
+    },
+    {
+      "name": "segment byte length denied 1:257",
+      "status": "passed"
+    },
+    {
+      "name": "segment byte length denied 2:11",
+      "status": "passed"
+    },
+    {
+      "name": "segment byte length denied 2:13",
+      "status": "passed"
+    },
+    {
+      "name": "segment byte length denied 3:2049",
+      "status": "passed"
+    },
+    {
+      "name": "segment byte length denied 4:15",
+      "status": "passed"
+    },
+    {
+      "name": "segment byte length denied 4:17",
+      "status": "passed"
+    },
+    {
+      "name": "noncanonical base64url trailing bits denied",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies too-many",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies too-few",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies LF",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies CR",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies space",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies unicode",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies oversize",
+      "status": "passed"
+    },
+    {
+      "name": "compact framing denies wrong-type",
+      "status": "passed"
+    },
+    {
+      "name": "expected kid must be canonical32 and match 4",
+      "status": "passed"
+    },
+    {
+      "name": "expected kid must be canonical32 and match 0",
+      "status": "passed"
+    },
+    {
+      "name": "expected kid must be canonical32 and match 44",
+      "status": "passed"
+    },
+    {
+      "name": "expected kid must be canonical32 and match 44",
+      "status": "passed"
+    },
+    {
+      "name": "expected kid must be canonical32 and match 42",
+      "status": "passed"
+    },
+    {
+      "name": "expected kid must be canonical32 and match 43",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied extra-field",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied private-field",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied wrong-kty",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied wrong-exponent",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied padded",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied short",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied leading-zero",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied high-bit",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied even",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied null",
+      "status": "passed"
+    },
+    {
+      "name": "browser JWK denied array",
+      "status": "passed"
+    },
+    {
+      "name": "SHA256 outage returns fixed redacted error for both operations",
+      "status": "passed"
+    },
+    {
+      "name": "framing and thumbprint perform no fetch or application logging",
+      "status": "passed"
+    }
+  ],
+  "not_run": [
+    "public HTTP JSON/Origin/payload/admission validation",
+    "transaction DO and real coordinator composition",
+    "fresh native enrollment/action binding",
+    "destination plaintext/expiry/HA reachability",
+    "provider deployment and HA/iPhone/TV chain"
+  ]
+}

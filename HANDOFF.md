@@ -1,3 +1,10 @@
+> Current status/precedence: [implementation release record](docs/rendezvous/IMPLEMENTATION_CONTRACT_RELEASE_V1.md).
+> NEWreceiverexceptionACK6270491529/6270497278 is RECEIVED/CLOSED; do not repeat
+> that review. Exact source/wire release is candidate outside protected main and
+> effective for consumerIMPLEMENTATION only after protected delivery+receipt.
+> Old draft/HOLD/openACK labels below are historical for that scope; ALL public,
+> native, operational, receiver-adoption and deployment gates remain separate.
+
 # DJConnect API Handoff
 
 ## Active assignment — VibeCast rendezvous (2026-10-18)
@@ -32,7 +39,57 @@ not an implemented transaction DO. Review corrected terminal recovery: a consume
 transaction may start a fresh QR after authenticated status without impossible
 cancel-after-consume. Live pending/ready rotation still requires confirmed cancel;
 unknown outcome waits for original expiry. No qualified reusable server JWE parser
-is claimed. Public runtime remains behind the joint exact contract/security gate.
+is claimed by that design. Public runtime remains behind the joint exact contract/security gate.
+
+Protected source PR94 merged to `e67f402b5f9d1a3099850dd2f6d9edd42a004aa0`;
+candidate/main tree equality and all six post-merge workflows were verified,
+including artifact and POST_MERGE_RELEASE_EVIDENCE_QUALIFIED. That closes the
+source increment, not the assignment or separate Finalization/deployment.
+[Local framing qualification](docs/rendezvous/WORKER_FRAMING_QUALIFICATION_V1.md)
+adds92 actual workerd cases+isolated TypeScript for closed JWE/header/JWK shapes,
+exact-byte digest and copied thumbprint input. Structurally accepted ciphertext
+can still be cryptographically invalid; no AEAD/plaintext/sender or transaction
+acceptance is inferred. API retains state/controller/admission implementation.
+
+[Local transaction composition](docs/rendezvous/WORKER_TRANSACTION_QUALIFICATION_V1.md)
+now adds322 actual workerd cases+strict types:93 transaction,92 framing and137
+public registration/storage/assertion cases. Actual software assertions/counters,
+private coordinator lease and SQLite winner/consume/cancel compose with standard
+JOSE encryption/decryption; initial enrollment remains explicitly software.
+Immutable120s allocator descriptors/object binding, purge/restart replay, races,
+counter burns and historical retries are tested. Public immutable allocator/
+controller/global admission and genuine native/fullservice proof remain open;
+this does not make the deployment/service ready. Product bindings/config unchanged.
+
+[Local HTTP and allocation-budget qualification](docs/rendezvous/WORKER_INGRESS_QUALIFICATION_V1.md)
+adds265 actual workerd cases+strict types: eleven bounded/versioned POST routes,
+closed requests/responses, exact Origin/CORS, streamed limits and a private atomic
+10,000/day transaction /500/day key /5-per-IP-minute allocation policy candidate.
+Default harness remains disabled; enabled dispatcher responses are transport QA.
+Additional raw JSON syntax restrictions are proposed, not frozen consumer wire.
+This does not qualify full public controller/unknown-ID allocation coverage,
+trusted edge IP provenance, complete abuse/cost containment or production.
+API retains that integration and operational work; consumer boundaries remain.
+
+[Private allocation/index routing qualification](docs/rendezvous/WORKER_INDEX_QUALIFICATION_V1.md)
+adds436 actual workerd cases+strict types:68 index/router,46 budget and322
+transaction/registration/framing regressions. Server immutable120s descriptors
+follow one budget charge; original admission minute is rechecked across awaits.
+Unknown/expired IDs fail before child namespace access. Index metadata is routing
+only, not capability/HA authority; lost create never auto-retries or renews.
+Public controller/key-namespace coverage, edge provenance, costs and full chain
+remain separate. No product binding/config or public runtime enablement.
+
+[Private key-RPC admission/routing](docs/rendezvous/WORKER_KEY_ROUTING_QUALIFICATION_V1.md)
+adds490 actual workerd cases+strict types (54 new+436 regressions), plus265
+HTTP/budget regressions against the new source. Every selected key RPC is globally
+charged before child namespace access; registration additionally counts toward500
+attempts/day, including failures/identical retries.50,000calls/day is a proposed
+application cap, not production capacity. No long-lived key journal was built;
+known/unknown management challenges and same-key recovery remain unchanged.
+Trusted budget outages/rate failures retain their own transaction error codes.
+Full public gated composition, per-IP/edge/cost controls and native/physical
+acceptance remain OPEN; source delivery does not close the function.
 
 The0.3.0 supplied-text technical/privacy and UX design reviews returned GO after
 twoP2 corrections; these do not constitute implementation or live qualification.
@@ -357,3 +414,112 @@ Before every release:
 - Keep GitHub Actions `DJCONNECT_RELAY_SECRET` configured so the staging-safe
   smoke E2E job can cover proof issuance, token exchange, push register/event
   and unregister using only `example-smoke-...` values.
+
+
+## Local HTTP-to-state composition continuation
+
+[HTTP composition qualification](docs/rendezvous/WORKER_HTTP_COMPOSITION_QUALIFICATION_V1.md) adds746 actual local workerd cases
+with strict types, including37 new composed HTTP cases and709 unique regressions.
+Eleven routes now join private state and budgeted key adapters in an isolated
+factory; software initial enrollment plus real P256/JOSE one-time delivery is
+proved locally. Default harness remains503. Profile0.4.0-draft remains NOT_FROZEN;
+public edge/abuse/operations, genuine native and real HA/TV acceptance stay OPEN.
+No product binding or deployment is enabled.
+
+
+## Local pre-body request admission continuation
+
+[Request admission qualification](docs/rendezvous/WORKER_REQUEST_ADMISSION_QUALIFICATION_V1.md) records815 actual local workerd
+cases+strict types,69 new cases and746 regressions. Exact recognized routes pass
+finite minute-HMAC/global admission before Origin/method/body/backend work; malformed
+requests and preflights count. Proposed120total/20native perIP/minute includes
+polling/sharedNAT effects requiring joint review. New gate Retry-After is qualified;
+existing routed-backend hint loss remains an explicit follow-up. Public edge,
+provider/cost/native/HA/physical and contract freeze remain OPEN. No activation.
+
+
+## Routed budget hint correction
+
+[Routed backoff qualification](docs/rendezvous/WORKER_RETRY_HINT_QUALIFICATION_V1.md) records853 actual local workerd
+cases+strict types:38 new cases and815 regressions. Selected trusted429/503 budget
+hints now survive key/transaction/composition into existing Retry-After; malformed
+hints fail503, absent hints remain absent. This supersedes the preceding routed-
+hint-loss limitation only for those qualified paths. Original expiry/retry budgets
+and profile0.4.0-draft NOT_FROZEN remain unchanged. No public/timer/deploy activation.
+
+
+## Offline operational preparation continuation
+
+[Exact deployment preparation](docs/rendezvous/DEPLOYMENT_PREPARATION_V1.md) pins supplying source49ecb95,
+53 source digests, existing root config/workflow and five selected private classes.
+The offline validator can only return BLOCKED_NOT_AUTHORIZED; all22 service/
+operational gates stay OPEN, artifact/account/approval null.21 consistency/negative
+tests PASS. The201-DO-call/65-HTTP-call source model replaces the old64-call sketch;
+request-only price scenarios are not account/cost/load/spend qualification.
+No runtime source/config, consumer, Cloudflare, timer or deployment change.
+
+
+## Controlled unqualified-status correction
+
+[Provider status qualification](docs/rendezvous/WORKER_PROVIDER_UNAVAILABLE_QUALIFICATION_V1.md) records961 actual localworkerd
+cases+strict types:21 new,87 existing verifier and853 prior regressions. Only the
+exact controlled unqualified-status negative becomes existingattestation_unavailable503;
+no key/receipt commit, original nonce/expiry/attempt budget retained. This is not
+proof of an Apple outage or a complete provider/internal-error taxonomy. A separate
+source-qualified deployment-preparation rebind preserves22OPEN/null/activationfalse.
+No public, consumer, Cloudflare, timer or deployment activation.
+
+Separate offline preparation rebind: supplying source `86c80faebfaf98da02ebc5b3e4f832da00021d33`,
+new provider-unavailable961-case proof and56 source hashes. Previous49ec baseline
+correctly rejected the changed runtime before this rebind. All22 gates remain OPEN,
+activation false and account/approval/artifact/public entrypoint null. This is
+preparation consistency only, not contract freeze, Finalization or deployment.
+
+Full-protocol review continuation: [exact contract HOLD](docs/rendezvous/CONTRACT_READINESS_V1.md)
+and [local challenge/management qualification](docs/rendezvous/WORKER_CHALLENGE_BUDGET_QUALIFICATION_V1.md).
+Three source P2s corrected: atomic4issuance attempts per transaction,28/2/2
+reserved proof-operation groups and controlled missing receipt-config503.
+1002/1002 local workerd+strict types PASS; full
+source/test/evidence reviews and exact-head CI receipts belong on API90/PR96.
+Shared-NAT/poll/retry ACK and lost-create-without-ID/deadline recovery remain
+concrete contract decisions. No new polling policy/consumerACK/native/live claim.
+
+Separate preparation rebind now pins immutable supplying source083ddb2d16351b4f785e52a23aad675b0a2cf9ef,
+its1002-case proof and58source hashes. Previous86c80fa baseline correctly rejected
+changed bytes first.21offline checks retain22OPEN/null/false; no deployment
+authorization, public activation or consumer contract release is inferred.
+
+[Shared-NAT capacity decision](docs/rendezvous/CAPACITY_QUALIFICATION_V1.md): receiver's
+independent reviews6266032306 received; API owns the evidence/release decision.
+1068localchecks pass (1002regressions+66individuallyboundcapacitycases), yet the
+four-TV target is HOLD:54handoffcases/126TVflows yield80consumed/46expired.
+Real localChromium/WebKitCORS traces are separate from fixed offered-script replay,
+synthetic sustained schedules, native/edge/load/physical proof. Runtime58pins and
+083ddb2supplying source remain unchanged; no opsrebind/threshold/hint/receiverchange.
+API must qualify corrected admission/terminal headroom or an explicit narrower
+target before exact contract release. No unchanged consumerACK/capture requested.
+
+
+Current local admission correction: [partition qualification](docs/rendezvous/ADMISSION_PARTITIONS_QUALIFICATION_V1.md). Policy/2 partitions IP attempts
+256poll/16create/64native/16terminal; global hard limits unchanged with terminal
+reserve.1118checks,54/54handofftargets,126/126consumed locally. Historical80/46
+remains unchanged oldpolicy evidence. No live/native/load/SLA or contractfreeze
+claim; API retains lost-create recovery and exact release, receiverreviewsreceived,
+consumer sources clean and timer off. Offline preparation rebind is separate.
+
+
+New pre-QR recovery proposal/reference: [qualification](docs/rendezvous/CREATE_RECOVERY_QUALIFICATION_V1.md),
+policy djc-pre-qr-replacement/1-draft, NOT_RELEASED.1184local checks/65pins and6new
+Worker scenarios qualify the bounded reference only. No new endpoint/schema,
+server runtime, guessed expiry, cancellation or idempotency claim. Known non201
+headers terminate even at deadline; one fresh-authority replacement is proposed
+only before anyQR exposure. Existing receiver owner must ACK this NEW exception
+and adoption before freeze; prior reviews remain received, timer stays off.
+
+
+Shared app-key API qualification: [evidence](docs/rendezvous/SHARED_APP_KEY_QUALIFICATION_V1.md).
+1208local checks/66pins,24new samekey cases:22delivery scenarios/58consumes plus
+2expected expiryrefusals. Actual counter/receipt/budget/originalkeyexpiry checked;
+software fixture serialorder is NOT a nativequeue/24h/twohandle/day27policyPASS.
+No endpoint/schema/runtime/consumer/policy change or extra ACK. Existing NEWpreQR
+receiverexception review6269829702 remainsopen, no repeatedask; timer staysOFF.
