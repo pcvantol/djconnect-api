@@ -1,9 +1,10 @@
-> Current status/precedence: [implementation release record](docs/rendezvous/IMPLEMENTATION_CONTRACT_RELEASE_V1.md).
-> NEWreceiverexceptionACK6270491529/6270497278 is RECEIVED/CLOSED; do not repeat
-> that review. Exact source/wire release is candidate outside protected main and
-> effective for consumerIMPLEMENTATION only after protected delivery+receipt.
-> Old draft/HOLD/openACK labels below are historical for that scope; ALL public,
-> native, operational, receiver-adoption and deployment gates remain separate.
+> Current implementation contract: **djc-rendezvous/1-implementation.1 RELEASED** on
+> protected main2dade83, effective through [exact producerreceipt6272409413](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272409413).
+> [Separate source Finalization](docs/rendezvous/SOURCE_FINALIZATION_V1.md) is a
+> candidate until its own protected delivery+receipt. The assignment remains OPEN;
+> product integration, native/receiver adoption, operations and deployment remain
+> unqualified. Closed consumer ACKs stay closed. Historical statuses below do not
+> override this limited source/wire release or imply public/runtime activation.
 
 # DJConnect API Handoff
 
