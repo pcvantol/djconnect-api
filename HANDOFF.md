@@ -6,7 +6,9 @@
 > [five private product DOs](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md) were
 > protected-delivered through PR99/main1463b32 with actual bundle readback. Current
 > [distribution notices correction](docs/rendezvous/DISTRIBUTION_NOTICES_V1.md)
-> is pending its own review/delivery. Auth/edge integration and
+> was protected-delivered through PR100/main5f08e05; actual archive checks passed.
+> Current candidate: [internal product composition](docs/rendezvous/PRODUCT_COMPOSITION_V1.md).
+> Real edge provenance/public auth enablement and
 > native/receiver/HA/physical/operational/deployment gates remain OPEN; timer OFF.
 > Historical statuses below do not override the limited released source interface.
 

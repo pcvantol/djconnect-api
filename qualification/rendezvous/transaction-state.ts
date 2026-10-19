@@ -27,7 +27,8 @@ export interface CreateTransaction {descriptor:Descriptor;generation:number;brow
 export interface BrowserInput {transactionId:string;generation:number;claimSecret:string}
 export interface ScanInput {transactionId:string;generation:number;qrCapability:string}
 export interface SubmitInput extends ScanInput {keyId:string;challengeId:string;clientData:string;assertion:string;destinationEnvelope:string}
-export interface TransactionEnv {TRANSACTION_STATE:DurableObjectNamespace;ENROLLMENT_COORDINATOR:DurableObjectNamespace<EnrollmentCoordinator>}
+export interface TransactionDependencies {ENROLLMENT_COORDINATOR:DurableObjectNamespace<EnrollmentCoordinator>}
+export interface TransactionEnv extends TransactionDependencies {TRANSACTION_STATE:DurableObjectNamespace}
 export type Authorizer=(key:string,proof:ProofInput)=>Promise<unknown>;
 export function coordinatorAuthorizer(namespace:DurableObjectNamespace<EnrollmentCoordinator>):Authorizer {
   return async(key,proof)=>{keyId(key);const address=hex(await jsonHash(['development',POLICY,key]));return namespace.get(namespace.idFromName('djc-rendezvous-key/1/'+address)).authorize(proof);};
@@ -103,10 +104,12 @@ export class TransactionState {
   }
   async alarm(){try{const r=this.#ctx.storage.transactionSync(()=>{this.#ctx.storage.sql.exec('DELETE FROM rendezvous_state WHERE expires_at<=?',Date.now());return this.#load();});if(r)await this.#ctx.storage.setAlarm(r.expiresAt);}catch{throw new Error('qualification_cleanup_failed');}}
 }
-export class TransactionCoordinator extends DurableObject<TransactionEnv> {
+export class TransactionCoordinator extends DurableObject<TransactionDependencies> {
   #state:TransactionState;
   // Namespace choices are trusted constructor-only seams, never RPC input selectors.
-  constructor(ctx:DurableObjectState,env:TransactionEnv,namespace=env.TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize);}
+  constructor(ctx:DurableObjectState,env:TransactionEnv,namespace?:DurableObjectNamespace,keys?:TransactionDependencies['ENROLLMENT_COORDINATOR'],authorize?:Authorizer);
+  constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace:DurableObjectNamespace,keys?:TransactionDependencies['ENROLLMENT_COORDINATOR'],authorize?:Authorizer);
+  constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace=(env as TransactionEnv).TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize);}
   create(input:CreateTransaction){return this.#state.create(input);}
   inspect(input:ScanInput){return this.#state.inspect(input);}
   reserveSubmitChallenge(input:ScanInput){return this.#state.reserveSubmitChallenge(input);}

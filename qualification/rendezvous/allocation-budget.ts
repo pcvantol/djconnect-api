@@ -11,12 +11,16 @@ export type BudgetResult={ok:true}|{ok:false;error:'rate_limited'|'service_unava
 const need:(v:unknown)=>asserts v=v=>{if(!v)throw new Error('admission_rejected');};
 const closed=(v:object,names:string[])=>need(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===[...names].sort().join(','));
 function opaque(v:string){need(typeof v==='string'&&v.length===43&&/^[A-Za-z0-9_-]+$/.test(v));const b=Uint8Array.from(atob(v.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));need(b.length===32&&base64Url(b.buffer)===v);}
-export async function deriveBudgetIdentity(trustedEdgeIp:string,secret:string):Promise<BudgetIdentity> {
-  try{
+export function normalizeBudgetIp(trustedEdgeIp:string):string {
   need(typeof trustedEdgeIp==='string'&&trustedEdgeIp.length>0&&trustedEdgeIp.length<=64);
   let ip:string;
   if(trustedEdgeIp.includes(':')){need(/^[a-fA-F0-9:.]+$/.test(trustedEdgeIp));ip=new URL('https://['+trustedEdgeIp+']/').hostname.slice(1,-1);}
   else{const parts=trustedEdgeIp.split('.');need(parts.length===4&&parts.every(v=>/^(0|[1-9][0-9]{0,2})$/.test(v)&&Number(v)<=255));ip=parts.join('.');}
+  return ip;
+}
+export async function deriveBudgetIdentity(trustedEdgeIp:string,secret:string):Promise<BudgetIdentity> {
+  try{
+  const ip=normalizeBudgetIp(trustedEdgeIp);
   need(typeof secret==='string'&&secret.length===44);const raw=base64Decode(secret);need(raw.length===32&&btoa(String.fromCharCode(...raw))===secret);
   const minute=Math.floor(Date.now()/60000),key=await crypto.subtle.importKey('raw',raw,{name:'HMAC',hash:'SHA-256'},false,['sign']);
   const bytes=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(JSON.stringify(['djc-rendezvous-edge-ip/1',minute,ip])));

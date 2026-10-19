@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "scope": "INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE",
+  "base_main_sha": "5f08e05de7e0d8e4e100ba289bc9c5d71437e973",
+  "tests_passed": 49,
+  "typecheck": "PASS",
+  "source_sha256": {
+    "src/rendezvous/composition.ts": "d78fdc0a92794dd0399f3ca618babbf011d3a186a4f6d83f780775c23e2e8325",
+    "qualification/rendezvous/product-composition.check.ts": "9f0459d1d825413936086974f63e22d8b164cc0ff9c8a194aa97872546f93b93",
+    "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
+    "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
+    "qualification/rendezvous/allocation-budget.ts": "c5cb28a0178f1b7e97d9303b66248f3d735fafb813ce122dc184cb2c13ecda4e",
+    "qualification/rendezvous/composed-http.ts": "21fad11bb8c0317084950f68bb3462fb737d31fdcbfbd82e054ab3a74eebde02",
+    "qualification/rendezvous/transaction-state.ts": "40d84abd12043f00da12b50a14bd178e85228662815b894aea6618227ea4423b",
+    "src/index.ts": "dfb4183efc4da87a7bf4eada8941d6044348800c87e3f7b3ab6dd8c33f59ae62",
+    "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
+    "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
+    "rendezvous-build-inputs.json": "c0dff3c47cf35122813b2a728df1759c14cc20e3b28f76118f1572f61d644d79",
+    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+    "package.json": "7ea809d8f6fde96882d7897c4dbc0b9f26e2b0d54b5a5e9297a28d7fae59dfce",
+    "package-lock.json": "7b3088c7a885e1c02b03a6080540a70b97b3635fa70ce45497791c861caf0059",
+    ".github/workflows/ci-cd.yml": "546ad4495db1fbf8f83489c16cf7e32919525c3fa4e58e69e4e62b61ce5ab82b"
+  },
+  "cases": [
+    {
+      "name": "internal product configuration and fixed identity local egress guard intercepts an explicit QA-only positive control",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing RENDEZVOUS_EDGE_POLICY rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing RENDEZVOUS_IP_HASH_KEY rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing RECEIPT_ACTIVE_KEY rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing COMPOSED_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing REQUEST_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ALLOCATION_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing INDEX_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ASSERTION_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ASSERTION_POLICY_EXPIRES_AT rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ENROLLMENT_POLICY_REVISION rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 0",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 1",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 2",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 3",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 4",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 5",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 6",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 7",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 8",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 9",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 10",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 11",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 12",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 13",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 14",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 15",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 16",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 17",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity factory does not cache a prior valid configuration",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rejects caller-selected extra factory parameters",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rechecks configuration after HMAC before namespace or body access",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rejects backward clock or minute crossing after HMAC: -1",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rejects backward clock or minute crossing after HMAC: 60000",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity normalizes equivalent IPv6 identities and does not expose raw IP",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module creates a temporary QR, inspects, reconnects, rejects wrong browser and cancels without native authority",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module default genuine verifier rejects malformed registration; original challenge persists and no key is installed",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module wrong Origin retains existing wire403 and safe CORS",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module unknown route preserves cheap invalid_request without namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: http://api.djconnect.dev/v1/rendezvous/create",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://other.example/v1/rendezvous/create",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://api.djconnect.dev:444/v1/rendezvous/create",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://api.djconnect.dev/v1/rendezvous/create?extra=1",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://api.djconnect.dev/v1/rendezvous/create#fragment",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module proper preflight uses existing policy and credentials stay denied",
+      "status": "passed"
+    }
+  ],
+  "full_result_sha256": "61c1f061239c3fa866f9af7e1e92d09e730983dd52087cd398490fe342eda06a",
+  "product_outbound_calls": 0,
+  "local_egress_guard_positive_control": "PASS_SEPARATE_QA_CALL_CLEARED_BEFORE_PRODUCT_ASSERTIONS",
+  "real_default_malformed_enrollment": "REJECTED_ORIGINAL_CHALLENGE_RETAINED_ZERO_KEY_ROWS",
+  "real_browser_flow": "CREATE_INSPECT_POLL_NOT_READY_WRONG_BROWSER_CANCEL_TERMINAL",
+  "identity_provenance": "FIXTURE_ONLY_NOT_CLOUDFLARE_PROOF",
+  "root_http_activation": false,
+  "native_positive_accepted": false,
+  "cloudflare_mutations": false,
+  "timer_enabled": false
+}

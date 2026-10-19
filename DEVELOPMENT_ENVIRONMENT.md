@@ -45,6 +45,7 @@ npx wrangler types
 npx tsc --noEmit
 npm test
 npm run test:rendezvous-product
+npm run test:rendezvous-composition
 npx wrangler d1 migrations apply djconnect_api --local
 git diff --check
 ```
@@ -58,6 +59,12 @@ QA driver, synthetic local configuration and host-side storage inspection never
 enter the product graph. It performs no upload or Cloudflare mutation. The root
 configuration has no rendezvous bindings/migrations and the public entrypoint
 always returns503. See [product build](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md).
+
+The separate composition command runs strict module/test types and local workerd
+tests using five test-only bindings and synthetic server secrets. It exercises
+the ordinary internal source module with real private product DOs. Fixture
+`request.cf` values are not proof of Cloudflare ingress provenance. This command
+adds no product root export or reachable endpoint.
 
 ## Local Development Server
 
