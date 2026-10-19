@@ -1,5 +1,9 @@
 # DJConnect API Technical Design Decisions
 
+## Rendezvous unavailable transport boundary
+
+Integrate the [compiled-disabled namespace perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md) ahead of existing D1 diagnostics. A fixed versioned503 response needs no proof parsing or verifier dependency. Existing root routes retain their behavior. Product state/coordinator and real-auth promotion are separate reviewed source steps; no env switch may activate this boundary.
+
 This document records code-level design decisions, implementation patterns,
 runtime dependencies and public-repo constraints for the DJConnect API Worker.
 

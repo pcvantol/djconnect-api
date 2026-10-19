@@ -1,5 +1,9 @@
 # API Contract
 
+## Disabled rendezvous product boundary
+
+The root Worker now reserves the literal `/v1/rendezvous` namespace and slash descendants with fixed `503 {"v":"djc-rendezvous/1","error":"service_unavailable"}` before body, environment or diagnostic work. No setting enables it. Exact approved Origin alone receives ACAO; OPTIONS remains503. Sibling/encoded-separator aliases retain existing unknown-route behavior. See [product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md); the fixed implementation contract is distinct from service activation.
+
 Base URL: `https://api.djconnect.dev`
 
 Postman collection:

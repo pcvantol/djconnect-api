@@ -1,5 +1,9 @@
 # Security and Privacy
 
+## Compiled-disabled rendezvous perimeter
+
+The [product boundary](docs/rendezvous/PRODUCT_PERIMETER_V1.md) returns a fixed503 before body/environment/DB/context/provider work and does not log proofs, query values or destinations. It has no activation toggle or software verifier path. This is not an authenticated/available service or platform-retention qualification; real auth, edge budgets and deployment remain gated.
+
 ## Secrets
 
 Never commit or return:

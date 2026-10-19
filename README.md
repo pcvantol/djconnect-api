@@ -1,5 +1,7 @@
 # DJConnect API
 
+Rendezvous source integration begins with an [always-disabled product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md). Reserved requests receive the versioned unavailable503 response; no live rendezvous service or activation is supplied by this source change.
+
 Central Cloudflare Workers backend for DJConnect APNs push relay.
 
 The Worker keeps the APNs `.p8` key server-side as a Cloudflare secret. Home Assistant and HACS integrations call this API with privacy-safe wake/sync events and never receive APNs provider credentials.
