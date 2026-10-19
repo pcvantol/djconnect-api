@@ -1,3 +1,4 @@
+import {readRetryHint,hintFields} from './retry-hint';
 // LOCAL QUALIFICATION ONLY. No public router/allocation or genuine enrollment approval.
 import {DurableObject} from 'cloudflare:workers';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
@@ -7,7 +8,7 @@ import {type EnrollmentCoordinator} from './enrollment-key-state';
 const V='djc-rendezvous/1',POLICY='ios-dev-qualification/1';
 type ErrorCode='invalid_request'|'invalid_capability'|'expired'|'cancelled'|'already_consumed'|'already_submitted'|'not_ready'|'operation_conflict'|'invalid_sender_proof'|'service_unavailable'|'rate_limited';
 const fail=(code:ErrorCode):never=>{throw new Failure(code);};
-class Failure extends Error {constructor(readonly code:ErrorCode){super(code);}}
+class Failure extends Error {constructor(readonly code:ErrorCode,readonly retryAfter?:number){super(code);}}
 const need:(v:unknown,code?:ErrorCode)=>asserts v=(v,code='invalid_request')=>{if(!v)fail(code);};
 const closed=(v:object,keys:string[])=>need(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===[...keys].sort().join(','));
 const integer=(v:number)=>Number.isSafeInteger(v)&&v>=0;
@@ -42,7 +43,7 @@ export class TransactionState {
   #row(id:string,generation:number,commitment:string,kind:'claimCommitment'|'qrCommitment'){
     this.#route(id);const r=this.#load();need(r&&r.id===id&&r.generation===generation&&same(r[kind],commitment),'invalid_capability');const now=Date.now();need(now>=r.createdAt&&now<r.expiresAt,'expired');return r;
   }
-  #result(error:unknown){return {ok:false as const,v:V,error:error instanceof Failure?error.code:'service_unavailable' as ErrorCode};}
+  #result(error:unknown){return {ok:false as const,v:V,error:error instanceof Failure?error.code:'service_unavailable' as ErrorCode,...hintFields(error instanceof Failure?error.retryAfter:undefined)};}
   #accepted(r:Row){return {ok:true as const,v:V,accepted:true as const,operation_id:r.operationId!};}
   async create(input:CreateTransaction){
     if(this.#creating)return this.#result(new Failure('service_unavailable'));this.#creating=true;
@@ -83,8 +84,8 @@ export class TransactionState {
       need(snapshot.state==='pending',snapshot.state==='cancelled'?'cancelled':'already_submitted');
       const envelope=await qualifyCompactJwe(input.destinationEnvelope,snapshot.thumbprint);need(envelope.ok);
       const address=hex(await jsonHash(['development',POLICY,input.keyId])),proofDigest=hex(await jsonHash(['submit',input.challengeId,address,input.clientData,input.assertion]));
-      const result=await this.#authorize(input.keyId,{operationId:input.challengeId,action:'submit',clientData:input.clientData,assertion:input.assertion}) as Authorization|{ok:false;error:string};
-      if(result?.ok===false&&(result.error==='rate_limited'||result.error==='service_unavailable'))fail(result.error);
+      const result=await this.#authorize(input.keyId,{operationId:input.challengeId,action:'submit',clientData:input.clientData,assertion:input.assertion}) as Authorization|{ok:false;error:string;retry_after_ms?:unknown};
+      if(result?.ok===false&&(result.error==='rate_limited'||result.error==='service_unavailable')){let hint:number|undefined;try{hint=readRetryHint(result);}catch{fail('service_unavailable');}throw new Failure(result.error,hint);}
       need(result?.ok&&result.kind==='submit-authorization','invalid_sender_proof');const auth=structuredClone(result);
       return this.#ctx.storage.transactionSync(()=>{
         const r=this.#row(input.transactionId,input.generation,qrCommitment,'qrCommitment'),now=Date.now();

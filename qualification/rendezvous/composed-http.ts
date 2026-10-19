@@ -1,3 +1,4 @@
+import {readRetryHint,hintFields} from './retry-hint';
 // LOCAL QUALIFICATION ONLY. This factory is not a product route or deployment.
 import {createIngress,matchesWireSchema,parseWireJson,type WireObject,type IngressRoute} from './http-ingress';
 import {INDEX_NAME,IndexedTransactionRouter,type AllocationIndex} from './allocation-index';
@@ -15,11 +16,11 @@ export interface ComposedEnv extends TransactionEnv {
 }
 export type TrustedIdentityResolver=(request:Request)=>Promise<BudgetIdentity>;
 const status:Record<string,number>={invalid_request:400,invalid_capability:401,invalid_sender_proof:401,operation_conflict:409,already_submitted:409,already_consumed:409,cancelled:409,not_ready:409,expired:410,rate_limited:429,service_unavailable:503};
-class Failure extends Error {constructor(readonly code:string){super('composition_rejected');}}
+class Failure extends Error {constructor(readonly code:string,readonly retryAfter?:number){super('composition_rejected');}}
 const need:(v:unknown,code?:string)=>asserts v=(v,code='service_unavailable')=>{if(!v)throw new Failure(code);};
 function success(value:unknown,kind?:string):WireObject {
   need(value&&typeof value==='object'&&!Array.isArray(value));const r=value as WireObject;
-  if(r.ok===false){const code=r.error==='registration_rejected'||r.error==='proof_rejected'?'invalid_sender_proof':r.error;throw new Failure(typeof code==='string'&&Object.hasOwn(status,code)?code:'service_unavailable');}
+  if(r.ok===false){const code=r.error==='registration_rejected'||r.error==='proof_rejected'?'invalid_sender_proof':r.error;if(code==='rate_limited'||code==='service_unavailable'){let hint:number|undefined;try{hint=readRetryHint(r);}catch{throw new Failure('service_unavailable');}throw new Failure(code,hint);}throw new Failure(typeof code==='string'&&Object.hasOwn(status,code)?code:'service_unavailable');}
   need(r.ok===true&&(r.v===undefined||r.v===V));need(kind===undefined?!Object.hasOwn(r,'kind'):r.kind===kind);return r;
 }
 function current(expiry:unknown){
@@ -86,7 +87,7 @@ export function createComposedHandler(env?:ComposedEnv,resolveIdentity?:TrustedI
             body=deleting?{v:V,state:'revoked',purge_at:result.purgeAt}:{v:V,key_expires_at:result.keyExpiresAt};
           }
           need(enabled());return {status:code,body};
-        }catch(error){const code=error instanceof Failure&&Object.hasOwn(status,error.code)?error.code:'service_unavailable';return {status:status[code],body:{v:V,error:code}};}
+        }catch(error){const code=error instanceof Failure&&Object.hasOwn(status,error.code)?error.code:'service_unavailable';return {status:status[code],body:{v:V,error:code,...hintFields(error instanceof Failure?error.retryAfter:undefined)}};}
       },
     })(request);
   };

@@ -14,7 +14,7 @@ class SoftwareEnrollmentKeyState extends EnrollmentKeyState {
     const components={
       core:async()=>{if(data.nonce!==base64Url(read().challenge.clientData.buffer as ArrayBuffer))return null;return {scope:'ATTESTATION_CORE_ONLY_RECEIPT_UNVERIFIED_NO_ENROLLMENT',point:base64Decode(data.point),receipt:base64Decode(data.receipt),attestedLeaf:new Uint8Array([1]),certificateExpiresAt:data.deadline};},
       cms:async()=>({scope:'CMS_SIGNATURE_PATH_FIELDS_ONLY_REVOCATION_UNCHECKED_NO_ENROLLMENT',fresh:true,created:data.created,expires:data.deadline,certificateExpiresAt:data.deadline,signer:new Uint8Array([2]),issuer:new Uint8Array([3]),root:receiptRoot}),
-      status:{check:async(...args:unknown[])=>({ok:true,scope:args[0]==='crl'?'COMMON_RECEIPT_ISSUER_CRL_NOT_LISTED_ONLY_NO_ENROLLMENT':'COMMON_RECEIPT_OCSP_GOOD_ONLY_NO_ENROLLMENT',checkedAt:Date.now(),cacheUntil:data.deadline,thisUpdate:Date.now(),nextUpdate:data.deadline})},
+      status:{check:async(...args:unknown[])=>{const checkedAt=Date.now();return {ok:true,scope:args[0]==='crl'?'COMMON_RECEIPT_ISSUER_CRL_NOT_LISTED_ONLY_NO_ENROLLMENT':'COMMON_RECEIPT_OCSP_GOOD_ONLY_NO_ENROLLMENT',checkedAt,cacheUntil:data.deadline,thisUpdate:checkedAt,nextUpdate:data.deadline};}},
     };
     return createSoftwareStubEnrollmentVerifier(read,components).verify(request);
   }

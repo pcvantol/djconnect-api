@@ -235,3 +235,13 @@ requests and preflights count. Proposed120total/20native perIP/minute includes
 polling/sharedNAT effects requiring joint review. New gate Retry-After is qualified;
 existing routed-backend hint loss remains an explicit follow-up. Public edge,
 provider/cost/native/HA/physical and contract freeze remain OPEN. No activation.
+
+
+## Routed budget hint correction
+
+[Routed backoff qualification](WORKER_RETRY_HINT_QUALIFICATION_V1.md) records853 actual local workerd
+cases+strict types:38 new cases and815 regressions. Selected trusted429/503 budget
+hints now survive key/transaction/composition into existing Retry-After; malformed
+hints fail503, absent hints remain absent. This supersedes the preceding routed-
+hint-loss limitation only for those qualified paths. Original expiry/retry budgets
+and profile0.4.0-draft NOT_FROZEN remain unchanged. No public/timer/deploy activation.

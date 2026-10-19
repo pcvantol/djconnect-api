@@ -1,3 +1,4 @@
+import {readRetryHint,hintFields} from './retry-hint';
 // LOCAL QUALIFICATION ONLY. Global admission bounds private key RPC, not HA authority.
 import {base64Decode,base64Url} from 'djc-existing-crypto';
 import {type BudgetResult,type BudgetIdentity} from './allocation-budget';
@@ -6,7 +7,7 @@ import {type IssueInput,type ProofInput,type SubmitBinding} from './assertion-ke
 import {type Authorizer} from './transaction-state';
 export interface KeyCallBudget {admitKeyCall():Promise<BudgetResult>;admit(input:{kind:'key';identity:BudgetIdentity}):Promise<BudgetResult>}
 type FailureCode='invalid_request'|'service_unavailable'|'rate_limited';
-class Failure extends Error {constructor(readonly code:FailureCode){super('key_route_rejected');}}
+class Failure extends Error {constructor(readonly code:FailureCode,readonly retryAfter?:number){super('key_route_rejected');}}
 const need:(v:unknown,code?:FailureCode)=>asserts v=(v,code='invalid_request')=>{if(!v)throw new Failure(code);};
 const closed=(v:object,keys:string[])=>need(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===[...keys].sort().join(','));
 const opaque=(v:unknown)=>{need(typeof v==='string'&&v.length===43&&/^[A-Za-z0-9_-]+$/.test(v));const b=Uint8Array.from(atob(v.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));need(base64Url(b.buffer)===v);};
@@ -17,7 +18,7 @@ function admitted(value:BudgetResult){
   try{need(value&&typeof value==='object');if(value.ok===true){closed(value,['ok']);return;}
     need(value.ok===false&&(value.error==='rate_limited'||value.error==='service_unavailable'));closed(value,value.retry_after_ms===undefined?['ok','error']:['ok','error','retry_after_ms']);if(value.retry_after_ms!==undefined)need(Number.isSafeInteger(value.retry_after_ms)&&value.retry_after_ms>=1&&value.retry_after_ms<=60000);
   }catch{throw new Failure('service_unavailable');}
-  throw new Failure(value.error);
+  throw new Failure(value.error,readRetryHint(value));
 }
 export type KeyRequest=
  |{operation:'issueEnrollment';keyId:string}
@@ -46,7 +47,7 @@ export class KeyRpcRouter {
     const child=this.#namespace.get(this.#namespace.idFromName('djc-rendezvous-key/1/'+address));
     const reply=input.operation==='issueEnrollment'?await child.issueEnrollment({keyId:input.keyId}):input.operation==='enroll'?await child.enroll({keyId:input.keyId,challengeId:input.challengeId,attestation:input.attestation} satisfies RegisterInput):input.operation==='issueAction'?await child.issueAction({action:input.action,keyId:input.keyId,...(input.binding?{binding:input.binding}:{})}):await child.authorize({operationId:input.operationId,action:input.action,clientData:input.clientData,assertion:input.assertion});
     this.#ready();return reply;
-  }catch(error){return {ok:false as const,error:error instanceof Failure?error.code:'service_unavailable' as FailureCode};}}
+  }catch(error){return {ok:false as const,error:error instanceof Failure?error.code:'service_unavailable' as FailureCode,...hintFields(error instanceof Failure?error.retryAfter:undefined)};}}
 }
 // Constructor-only server adapter: never accept a caller-provided grant or budget selector.
 export function keyRoutedAuthorizer(router:KeyRpcRouter):Authorizer {
