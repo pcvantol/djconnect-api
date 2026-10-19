@@ -2,11 +2,11 @@
 
 Profile `0.4.0-draft` / wire `djc-rendezvous/1` remains **NOT_FROZEN**. This
 package continues existing sole-writer PR96 from supplying source
-`ff9ff5778f698fc206d7953b9f407752d7dde840`; current main a4322fe is normally merged. ACK:
+`cf749619c9d3d101e7f7bc5fb7ae48ec71512f8a`; current main a4322fe is normally merged. ACK:
 https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6265985814.
 
 [Machine-readable preparation](deployment-preparation-v1.json) pins that source,
-its65 recorded source hashes, canonical schema and existing root configuration/
+its66 recorded source hashes, canonical schema and existing root configuration/
 deployment workflow/proof digests. The preparation-package commit is a later,
 separate producer pin. It is NOT an approved central operational manifest, product
 artifact, Wrangler configuration, deployment command or readiness receipt.
@@ -240,9 +240,9 @@ needs separate exact artifact and bindings authorization; no public activation.
 API retains lost-create recovery and joint exact release; timer staysoff.
 
 
-## Separate pre-QR reference proof rebind
+## Historical separate pre-QR reference proof rebind
 
-Current supplying source **ff9ff5778f698fc206d7953b9f407752d7dde840** includes
+The historical supplying source **ff9ff5778f698fc206d7953b9f407752d7dde840** includes
 the reviewed proposed recovery contract/reference, current-main tools and65source
 pins/1184local checks. No APIserverruntime/endpoint/schema/crypto/binding changes.
 Old98preparation remained valid for its older unmodified runtime scope; no false
@@ -260,3 +260,22 @@ All22gates OPEN, activationfalse and account/approval/artifact/entrypointnull.
 The proposed preQR exception requires NEW exact receiverACK/adoption before
 freeze; this package activates no receiver, timer, public router or deployment.
 Existing true Apple/HA/physicalTV/provider/load/cost/retention/security gates remain.
+
+
+## Separate shared app-key evidence rebind
+
+Current supplying source **cf749619c9d3d101e7f7bc5fb7ae48ec71512f8a** adds only
+shared-key tests/runner/evidence/docs, no server/consumer runtime/schema/policy.
+Oldff9ff57preparation remains valid for its older unchangedruntime scope; no false
+rejection is claimed. This separate S2 selects66source/1208case compact proof
+SHA256571165023527302d5fdbb3873a02c3614992a44a20d6fc8866631a2d92da4106.
+[Shared-key qualification](SHARED_APP_KEY_QUALIFICATION_V1.md) separates24assertion
+targets from22deliverycases/58consumes and2expected expiryrefusals. The96hashed
+observations/1208case metadata are derived from final c, NOT another execution.
+Full3.20MB proof hash1710c49918c66ff3c7302cf422f00fd37477ebb9f8505122e31d0b398919bc83
+is independently reviewed immutable evidence, not parsed/read by this validator.
+Only supplying/proof/count constants/generatedplan change; existing offlineGit,
+1MiBJSON/2MiBblob limits/control flow and22OPEN/null/false gates are unchanged.
+No nativequeue/24h/twohandle/day27replacement policy or per-installation identity
+is qualified; NEWpreQR exception acceptance6269829702 is still required before
+freeze. No repeatedrequest/newwriter/publicactivation/deployment; timer staysOFF.
