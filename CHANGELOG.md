@@ -2,7 +2,7 @@
 
 ## Unreleased — Internal rendezvous product composition
 
-- Compose the existing eleven routes with fixed real private adapters and one normalized-IP minute-HMAC identity per invocation. Reject missing/changed config, ambiguous/missing IP, Worker subrequests and pseudo-IP/sentinel forms before body or namespace calls.
+- Compose the existing eleven routes with fixed real private adapters and one normalized-IP minute-HMAC identity per invocation. Reject missing/changed config, ambiguous/missing IP, requests carrying CF-Worker and known pseudo-IP/sentinel forms before body or namespace calls.
 - Add separately scoped local module/type qualification. Keep public root503, seven exports, configuration and deployment unchanged; no live edge or fresh native acceptance is inferred.
 
 ## Unreleased — Complete distribution notices
