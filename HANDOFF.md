@@ -1,7 +1,7 @@
 > API-owned [local native experiment](docs/rendezvous/LOCAL_NATIVE_EXPERIMENT_V1.md)
 > prepares a private file bridge to the actual five-DO/default-genuine module.
 > This is NOT a reachable native target or positive Apple qualification. Current
-> Apple rawData intake and received40374 versus40227/28/30 profile choice remain
+> Apple rawData intake and received40375 versus40227/28/30 profile choice remain
 > concrete owner dependencies. No deployment/consumer changes; timerOFF.
 > [Separate product-preparation Finalization](docs/rendezvous/PRODUCT_PREPARATION_FINALIZATION_V1.md)
 > is delivered at main4c66154 with its [exact receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6274677042);
@@ -9,6 +9,9 @@
 > New [actual receiver/API source interoperability](docs/rendezvous/RECEIVER_API_INTEROP_V1.md)
 > qualifies receiverPR30 against the real local API for create/QR/cancel only;
 > fixture transport is not browser/native/HA/live acceptance.
+> [Real-engine browser qualification](docs/rendezvous/BROWSER_API_INTEROP_V1.md)
+> tests default receiver crypto/QR/pending/cancel against actual API responses;
+> route interception still proves no HTTP preflight/CORS/TLS/edge/native/HA/TV acceptance.
 >
 > Implementation source/wire **djc-rendezvous/1-implementation.1 RELEASED**:
 > source2dade83 and [separate Finalization661e577 receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272559764).

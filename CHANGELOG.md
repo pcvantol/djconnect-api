@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Actual browser/receiver/API qualification
+
+- Execute Chromium and WebKit against actual local API state with the default receiver, independent QR decode and real pending-poll/cancel cases. Keep route-fixture results distinct from HTTP/CORS/TLS/native/HA/TV acceptance.
+- Pin192 isolated browser-tool files, reuse closed package verification and add finite private test contexts in supplemental read-only CI. Product runtime, dependencies, source contract and deployment authorization stay unchanged.
+
 ## Unreleased — Actual receiver/API source interoperability
 
 - Add immutable public receiver and isolated test-dependency pins plus private preparation and actual receiver-to-Worker create/QR/cancel qualification. Preserve exact request bytes and reject drift before importing consumer code.
