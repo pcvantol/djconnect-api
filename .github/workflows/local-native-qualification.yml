@@ -28,3 +28,26 @@ jobs:
           node qualification/rendezvous/prepare-receiver-interop.mjs "$DJC_INTEROP_INPUTS"
           npm ci --prefix "$DJC_INTEROP_INPUTS" --ignore-scripts --no-audit --no-fund
           node qualification/rendezvous/run-receiver-interop.mjs "$DJC_INTEROP_INPUTS"
+  actual-browser-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - name: Real Chromium and WebKit crypto, QR and cancel against actual API
+        run: |
+          DJC_BROWSER_RECEIVER_INPUTS="$(mktemp -d)"
+          DJC_BROWSER_TOOL_INPUTS="$(mktemp -d)"
+          chmod 700 "$DJC_BROWSER_RECEIVER_INPUTS" "$DJC_BROWSER_TOOL_INPUTS"
+          node qualification/rendezvous/prepare-receiver-interop.mjs "$DJC_BROWSER_RECEIVER_INPUTS"
+          npm ci --prefix "$DJC_BROWSER_RECEIVER_INPUTS" --ignore-scripts --no-audit --no-fund
+          node qualification/rendezvous/prepare-browser-interop.mjs "$DJC_BROWSER_TOOL_INPUTS"
+          npm ci --prefix "$DJC_BROWSER_TOOL_INPUTS" --ignore-scripts --no-audit --no-fund
+          node "$DJC_BROWSER_TOOL_INPUTS/node_modules/playwright/cli.js" install --with-deps chromium webkit
+          node qualification/rendezvous/run-browser-interop.mjs "$DJC_BROWSER_RECEIVER_INPUTS" "$DJC_BROWSER_TOOL_INPUTS"
