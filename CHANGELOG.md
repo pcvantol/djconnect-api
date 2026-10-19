@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Prepared local native experiment
+
+- Add a private file-driven local workerd experiment using the five product DOs and unchanged genuine verifier. Preserve exact binary server/action bytes, original120s expiry and finite explicit operator commands; no public target or native-positive claim.
+- Add host filesystem, loopback, egress, fingerprint and real-clock negative qualification in a supplemental read-only workflow. Existing product/runtime/configuration/source-wire/deployment authorization is unchanged.
+
 ## Unreleased — Current offline deployment preparation
 
 - Rebind existing preparation to protected a780 source with102 tracked input pins from three immutable proofs. Preserve all22 full-service authorization/operational gates OPEN and activation false; proposed config selects no secrets, deadline or revision.

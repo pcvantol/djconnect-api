@@ -1,3 +1,9 @@
+> API-owned [local native experiment](docs/rendezvous/LOCAL_NATIVE_EXPERIMENT_V1.md)
+> prepares a private file bridge to the actual five-DO/default-genuine module.
+> This is NOT a reachable native target or positive Apple qualification. Current
+> Apple rawData intake and exact40371 versus40227/28/30 profile choice remain
+> concrete owner dependencies. No deployment/consumer changes; timerOFF.
+>
 > Implementation source/wire **djc-rendezvous/1-implementation.1 RELEASED**:
 > source2dade83 and [separate Finalization661e577 receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272559764).
 > Existing Core/Apple/receiver owners received definitive handoffs. The
