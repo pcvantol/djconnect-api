@@ -271,3 +271,9 @@ no key/receipt commit, original nonce/expiry/attempt budget retained. This is no
 proof of an Apple outage or a complete provider/internal-error taxonomy. A separate
 source-qualified deployment-preparation rebind preserves22OPEN/null/activationfalse.
 No public, consumer, Cloudflare, timer or deployment activation.
+
+Separate offline preparation rebind: supplying source `86c80faebfaf98da02ebc5b3e4f832da00021d33`,
+new provider-unavailable961-case proof and56 source hashes. Previous49ec baseline
+correctly rejected the changed runtime before this rebind. All22 gates remain OPEN,
+activation false and account/approval/artifact/public entrypoint null. This is
+preparation consistency only, not contract freeze, Finalization or deployment.

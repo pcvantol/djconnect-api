@@ -2,11 +2,11 @@
 
 Profile `0.4.0-draft` / wire `djc-rendezvous/1` remains **NOT_FROZEN**. This
 package continues existing sole-writer PR96 from supplying source
-`49ecb9512fe3b894e6dc420a682920dde9204a9c`; main remains e67f402. ACK:
+`86c80faebfaf98da02ebc5b3e4f832da00021d33`; main remains e67f402. ACK:
 https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6261756971.
 
 [Machine-readable preparation](deployment-preparation-v1.json) pins that source,
-its53 recorded source hashes, canonical schema and existing root configuration/
+its56 recorded source hashes, canonical schema and existing root configuration/
 deployment workflow/proof digests. The preparation-package commit is a later,
 separate producer pin. It is NOT an approved central operational manifest, product
 artifact, Wrangler configuration, deployment command or readiness receipt.
@@ -36,8 +36,15 @@ closed on missing local blobs. Two additional tests cover these controls and an
 actual absent blob; the initial19 tests passed before this review correction.
 [Git documents these offline controls](https://git-scm.com/docs/git#Documentation/git.txt-GITNOLAZYFETCH).
 
-No runtime code changed or new853-case execution is claimed by this package.
-The53 previously qualified source hashes still match. Independent source/security
+The original74926a4 preparation pinned49ec and53 source hashes. The separate
+86c80fa runtime increment invalidated that baseline as intended. This preparation
+rebind pins its new961-case observations (SHA256
+055d7a6e843de2e08bf17abdb3c943c43535bcf7450a20bb5caa7e75665059ea)
+and56 source hashes against immutable86c80fa Git blobs and current bytes.
+Only the supplying SHA/proof/hash/count and regenerated plan pins changed; no
+validator control flow or gate policy changed. The original853 evidence and dated
+provider readback remain historical; this rebind does not repeat provider or runtime
+execution or change the source-derived cost assumptions. Independent source/security
 and actual-file UX/evidence review and exact-head CI receipts belong on API90/PR96.
 Neither offline consistency nor CI closes an operational gate.
 

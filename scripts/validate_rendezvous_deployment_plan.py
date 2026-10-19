@@ -8,9 +8,9 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPPLYING_SHA = '49ecb9512fe3b894e6dc420a682920dde9204a9c'
-PROOF = 'docs/rendezvous/workerd-retry-hint-observations-v1.json'
-PROOF_HASH = '86289f45b551ddcfd30ac5b74349b41d9c61e2fc69857dcac089f04674ab01e4'
+SUPPLYING_SHA = '86c80faebfaf98da02ebc5b3e4f832da00021d33'
+PROOF = 'docs/rendezvous/workerd-provider-unavailable-observations-v1.json'
+PROOF_HASH = '055d7a6e843de2e08bf17abdb3c943c43535bcf7450a20bb5caa7e75665059ea'
 REFERENCES = ('wrangler.jsonc', '.github/workflows/deploy-api-worker.yml', PROOF)
 BINDINGS = {
     'REQUEST_ADMISSION': 'RequestAdmission',
@@ -85,7 +85,7 @@ def baseline():
     proof = blob(PROOF)
     require(digest(proof) == PROOF_HASH)
     recorded = decode(proof)['source_sha256']
-    require(isinstance(recorded, dict) and len(recorded) == 53)
+    require(isinstance(recorded, dict) and len(recorded) == 56)
     sources = {}
     for name, expected in recorded.items():
         path = name if name.startswith(('docs/', 'src/')) else 'qualification/rendezvous/' + name
