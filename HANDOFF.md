@@ -499,3 +499,12 @@ reserve.1118checks,54/54handofftargets,126/126consumed locally. Historical80/46
 remains unchanged oldpolicy evidence. No live/native/load/SLA or contractfreeze
 claim; API retains lost-create recovery and exact release, receiverreviewsreceived,
 consumer sources clean and timer off. Offline preparation rebind is separate.
+
+
+New pre-QR recovery proposal/reference: [qualification](docs/rendezvous/CREATE_RECOVERY_QUALIFICATION_V1.md),
+policy djc-pre-qr-replacement/1-draft, NOT_RELEASED.1184local checks/65pins and6new
+Worker scenarios qualify the bounded reference only. No new endpoint/schema,
+server runtime, guessed expiry, cancellation or idempotency claim. Known non201
+headers terminate even at deadline; one fresh-authority replacement is proposed
+only before anyQR exposure. Existing receiver owner must ACK this NEW exception
+and adoption before freeze; prior reviews remain received, timer stays off.

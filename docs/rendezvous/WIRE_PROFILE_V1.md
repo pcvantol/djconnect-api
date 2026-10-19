@@ -364,3 +364,12 @@ Canonical route alone selects lane for all methods inclOPTIONS. Global caps rema
 poll hint or consumer workaround. Local1118checks/54handofftargets/126consumes
 qualify only the disclosed matrix. Busy503/abuse/provider/native/public/load/cost
 and lost-create recovery/joint exact release remain separate; NOT_FROZEN.
+
+
+New pre-QR recovery proposal/reference: [qualification](CREATE_RECOVERY_QUALIFICATION_V1.md),
+policy djc-pre-qr-replacement/1-draft, NOT_RELEASED.1184local checks/65pins and6new
+Worker scenarios qualify the bounded reference only. No new endpoint/schema,
+server runtime, guessed expiry, cancellation or idempotency claim. Known non201
+headers terminate even at deadline; one fresh-authority replacement is proposed
+only before anyQR exposure. Existing receiver owner must ACK this NEW exception
+and adoption before freeze; prior reviews remain received, timer stays off.

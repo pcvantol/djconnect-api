@@ -91,7 +91,7 @@ no unchanged capture/crossrun or generic ACK is requested. Timer stays off.
 
 | ID | Exact open decision/evidence | Owner/action |
 | --- | --- | --- |
-| CREATE-RECOVERY | Lost create response without transaction ID/original deadline has no selected safe recovery exit. No cancel/poll is possible without that context; neither guessed expiry nor immediate new QR is authorized. | API proposes and independently reviews one exact recovery contract with receiver; receiver ACK before freeze. No idempotency field, lost-response exception or retry authority is selected here. |
+| CREATE-RECOVERY | [New preQR proposal/reference](CREATE_RECOVERY_QUALIFICATION_V1.md) now has1184local checks/65pins: one fresh-authority replacement before anyQR, strict late-response/status/deadline fences and no serverexpiry/cancellation claim. | API proposal and bounded reference are qualified; existing receiver owner must ACK only this NEW exception/adoption before exact freeze. No current consumer activation or implicit override of existing rotation restrictions. |
 | POLL-NAT | Private policy/2 closes the demonstrated local starvation cases:54/54targets,126/126consumed. Full native/coupled browserfeedback/publicedge/load/cost and joint exact release remain open. Server minimum/hint stays2000ms. | API supplies exact reviewed correction and proof to existing owners for contract release. No general new receiver ACK or consumer workaround requested. Three seconds below is historical arithmetic only. |
 | APP-RECOVERY | API must qualify the capacity effect of same-key serial assertions for two TVs,500 registration attempts/day,50k routed key calls/day,4issuance attempts/transaction,28/2/2 slots, bounded identical retries,24h/two-handle recovery and finite day27/30 key policy. | API supplies qualified normal/repair budget behavior to the existing Apple owner and resolves incompatibilities; owning native composition remains separate. No unchanged ACK/capture/key-generation loop requested. |
 | EXACT-RELEASE | Bind agreed corrected contract/schemas/vectors, producer/consumer ACKs and independent protocol/security/UX review to exact source. | API release owner plus existing Core/Apple/receiver owners and independent reviewers. Current HOLD is not that release. |
@@ -155,3 +155,12 @@ production authorization precede any Cloudflare mutation. Actual live smoke is
 later evidence. Apple/HA onboarding and physical HA/iPhone/TV are joint gates;
 public service health alone grants no HA display/session access. Receiver adapter
 remains gated; timer off. No full-function closure or production-readiness claim.
+
+
+Current CREATE-RECOVERY producer package is the independently reviewed
+[pre-QR replacement proposal](CREATE_RECOVERY_PROPOSAL_V1.md) and
+[reference qualification](CREATE_RECOVERY_QUALIFICATION_V1.md). It changes no
+API endpoint/schema/server runtime. Existing receiver reviews remain received;
+one NEW exception/adoption ACK is required, not an unchanged generic review.
+Current main a4322fe was normally merged; historical source/tool receipts retain
+their own exact pins.1184current-tool checks/126capacityconsumes are local only.
