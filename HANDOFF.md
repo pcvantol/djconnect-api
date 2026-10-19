@@ -1,8 +1,10 @@
 > Implementation source/wire **djc-rendezvous/1-implementation.1 RELEASED**:
 > source2dade83 and [separate Finalization661e577 receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272559764).
-> Existing Core/Apple/receiver owners received definitive handoffs. Current API work:
-> [always-disabled product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md), candidate
-> until its own review/protected delivery. Product five-DO/auth/edge integration and
+> Existing Core/Apple/receiver owners received definitive handoffs. The
+> [always-disabled product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md) was
+> protected-delivered through PR98/main aab76f7. Current API candidate:
+> [five private product DOs](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md), pending
+> its own independent review/protected delivery. Auth/edge integration and
 > native/receiver/HA/physical/operational/deployment gates remain OPEN; timer OFF.
 > Historical statuses below do not override the limited released source interface.
 

@@ -1,4 +1,4 @@
-// Qualification-only candidate. Not imported by src/, not a complete verifier.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import * as asn1js from 'asn1js';
 import * as pki from 'pkijs';
 
@@ -117,7 +117,7 @@ export async function qualifyApplePath(leaf, intermediate, root) {
 }
 
 // Deliberately TEST-ONLY: synthetic PKI anchors and controlled-time negative cases.
-// Never import this qualification module as a production auth implementation.
+// Never select this synthetic helper in the product import/export graph.
 export async function qualifySyntheticPath(fixture) {
   try {
     requireValue(fixture.scope === 'synthetic-qualification-only');

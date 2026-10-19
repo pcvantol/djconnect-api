@@ -2,6 +2,11 @@
 
 ## Disabled rendezvous product boundary
 
+The [private coordinator product build](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md)
+adds five compiled DO exports. These exports do not activate an HTTP endpoint or
+grant HA-owner/screen authority. Wire `djc-rendezvous/1` and the separately released
+implementation contract remain unchanged.
+
 The root Worker now reserves the literal `/v1/rendezvous` namespace and slash descendants with fixed `503 {"v":"djc-rendezvous/1","error":"service_unavailable"}` before body, environment or diagnostic work. No setting enables it. Exact approved Origin alone receives ACAO; OPTIONS remains503. Sibling/encoded-separator aliases retain existing unknown-route behavior. See [product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md); the fixed implementation contract is distinct from service activation.
 
 Base URL: `https://api.djconnect.dev`

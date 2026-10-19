@@ -1,5 +1,5 @@
 import {readRetryHint,hintFields} from './retry-hint';
-// LOCAL QUALIFICATION ONLY. No public router/allocation or genuine enrollment approval.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {DurableObject} from 'cloudflare:workers';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
 import {qualifyBrowserPublicJwk,qualifyCompactJwe,type BrowserPublicJwk} from './jwe-framing';

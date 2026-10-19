@@ -1,4 +1,4 @@
-// Isolated egress qualification. No public API, product imports or provider deployment.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {CommonStatusCache,prepareCommonStatusRequest} from './receipt-status-candidate.mjs';
 const MAX_BYTES=65536,TIMEOUT_MS=4000;
 const unavailable=()=>({ok:false,error:'status_unavailable'});

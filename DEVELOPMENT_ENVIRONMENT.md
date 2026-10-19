@@ -44,12 +44,20 @@ Run these before release or non-trivial code changes:
 npx wrangler types
 npx tsc --noEmit
 npm test
+npm run test:rendezvous-product
 npx wrangler d1 migrations apply djconnect_api --local
 git diff --check
 ```
 
 The Worker test runner may need permission to write Wrangler logs under
 `~/.wrangler` and start a local runtime listener.
+
+The rendezvous product check builds the actual root Worker and probes its five
+private Durable Object facades in isolated local SQLite storage. Its temporary
+QA driver, synthetic local configuration and host-side storage inspection never
+enter the product graph. It performs no upload or Cloudflare mutation. The root
+configuration has no rendezvous bindings/migrations and the public entrypoint
+always returns503. See [product build](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md).
 
 ## Local Development Server
 

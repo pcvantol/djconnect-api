@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. Internal state engine; export only the containment facade as a DO.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {DurableObject} from 'cloudflare:workers';
 import {AssertionKeyState,type CoordinatorEnv,type IssueInput,type ProofInput} from './assertion-key-state';
 import {validReceiptActiveKey,type StoreMaterial} from './receipt-key-store';

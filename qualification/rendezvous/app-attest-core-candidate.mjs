@@ -1,4 +1,4 @@
-// ISOLATED QUALIFICATION ONLY. Receipt/CMS, wire challenge lifecycle and DO state are NOT VERIFIED here.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import cbor from 'cbor';
 import * as asn1js from 'asn1js';
 import * as pki from 'pkijs';

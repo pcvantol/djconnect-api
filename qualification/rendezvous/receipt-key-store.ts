@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. Internal storage component, never proof verification or public admission.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import { DurableObject } from 'cloudflare:workers';
 import { encryptSecret, decryptSecret, base64Decode, base64Url } from 'djc-existing-crypto';
 export interface StoreEnv { RECEIPT_ACTIVE_KEY?: string; RECEIPT_PREVIOUS_KEY?: string }

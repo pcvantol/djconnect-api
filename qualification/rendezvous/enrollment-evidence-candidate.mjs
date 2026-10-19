@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. No key persistence, public endpoint, native-wire or enrollment GO.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {qualifyAttestationCore} from './app-attest-core-candidate.mjs';
 import {qualifyFreshReceiptEvidence} from './receipt-cms-candidate.mjs';
 import {CommonStatusClient} from './receipt-status-client.mjs';

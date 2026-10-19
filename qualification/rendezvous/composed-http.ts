@@ -1,5 +1,5 @@
 import {readRetryHint,hintFields} from './retry-hint';
-// LOCAL QUALIFICATION ONLY. This factory is not a product route or deployment.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {createIngress,matchesWireSchema,parseWireJson,type WireObject,type IngressRoute} from './http-ingress';
 import {INDEX_NAME,IndexedTransactionRouter,type AllocationIndex} from './allocation-index';
 import {BUDGET_NAME,type BudgetIdentity,type BudgetResult,type AllocationBudget} from './allocation-budget';

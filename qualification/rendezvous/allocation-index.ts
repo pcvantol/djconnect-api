@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. Private transaction routing, never owner/screen authority.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {DurableObject} from 'cloudflare:workers';
 import {base64Url} from 'djc-existing-crypto';
 import {BUDGET_NAME,type BudgetIdentity,type BudgetResult,type AllocationBudget} from './allocation-budget';

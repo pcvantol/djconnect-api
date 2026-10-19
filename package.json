@@ -10,6 +10,7 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage.enabled true --coverage.provider istanbul --coverage.reporter cobertura --coverage.reportsDirectory coverage",
     "test:e2e": "vitest run test/index.spec.ts -t \"privacy-safe E2E contract smoke flow\"",
+    "test:rendezvous-product": "node scripts/qualify_rendezvous_product_build.mjs",
     "test:smoke": "scripts/smoke_e2e.sh",
     "cf-typegen": "wrangler types",
     "postman:test": "npx --yes newman run postman/djconnect-api.postman_collection.json --env-var baseUrl=https://api.djconnect.dev --bail",
@@ -34,5 +35,10 @@
     "workerd@1.20260815.1": true,
     "workerd@1.20260921.1": true,
     "fsevents": false
+  },
+  "dependencies": {
+    "asn1js": "3.1.0",
+    "cbor": "10.0.12",
+    "pkijs": "3.4.1"
   }
 }

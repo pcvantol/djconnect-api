@@ -1,4 +1,4 @@
-// ISOLATED RECEIPT EVIDENCE ONLY. NO REVOCATION STATUS, ENROLLMENT OR PRODUCT IMPORT.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import * as asn from 'asn1js';
 import * as pki from 'pkijs';
 const ROOT = '63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179';

@@ -1,4 +1,4 @@
-// LOCAL QUALIFICATION ONLY. Structural checks do not authenticate ciphertext or its sender.
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 export interface BrowserPublicJwk {kty:'RSA';e:'AQAB';n:string}
 const need:(value:unknown)=>asserts value=value=>{if(!value)throw new Error('framing_rejected');};
 const encode=(bytes:Uint8Array)=>btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
