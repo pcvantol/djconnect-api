@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "scope": "COMPILED_DISABLED_ROOT_PRODUCT_PERIMETER_ONLY",
+  "base_main_sha": "661e5770eb5249b1b02bbdc2426ba7e575fc8881",
+  "source_hashes": {
+    "src/index.ts": "b4f27e5516b74d9dc412c3de8b604801123f59641aa727b3b6296963e38c205e",
+    "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
+    "test/rendezvous-perimeter.spec.ts": "00d241eadd44e5260b92d16fb6bc1f020909957571701a3b3164693fbb3de414",
+    "wrangler.jsonc": "9e9e83c881d7675329b033000a9f1c08cd59f3a911ea8a7005401a9ab3c5ef18",
+    "package.json": "836ec3f140921ea12b1469ca04024b6cb6b6aa0114b9dc12faef09841508c44f",
+    "package-lock.json": "3905bf7995ac0f28dbd398e1513fcc46414ba86f5730efa0bc0a4777e5de62bb",
+    "src/messages.ts": "980ab421315143a27ca1e3605310fd043779fe0e175ef0e0d9f7844f5eeadb79",
+    "src/repositories/apiDiagnostics.ts": "cbc357a51c1b140b32de601fb66a9bf5bcaed39369daa84cbdb0fc7f117c950f"
+  },
+  "local_validation": {
+    "typecheck": "PASS",
+    "worker_test_environment_tests": 78,
+    "existing_api_regressions": 40,
+    "new_root_boundary_tests": 38,
+    "doc_links": 46,
+    "diff_check": "PASS",
+    "new_secret_pattern_values": "ONLY_BEARER_EXAMPLE_SENSITIVE_TEST_PLACEHOLDER"
+  },
+  "dry_run_bundle": {
+    "wrangler_version": "4.151.0",
+    "sha256": "89215770e01cfa7e95295433cf60144b46667e30df271751af7c072c9190f5ae",
+    "bytes": 68716,
+    "actual_perimeter_function_present": true,
+    "qualification_software_or_fixture_import_markers_present": false,
+    "source_release_metadata": "existing_local_metadata_not_CI_stamped_main_artifact"
+  },
+  "no_new_bindings_migrations_dependencies_or_workflows": true,
+  "request_body_env_context_and_console_guard_tests": "PASS",
+  "public_activation_allowed": false,
+  "enabled_service_implemented": false,
+  "five_do_product_promotion_completed": false,
+  "native_accepted": false,
+  "receiver_adoption_accepted": false,
+  "production_ready": false,
+  "deployment_authorized": false,
+  "cloudflare_mutation_performed": false,
+  "timer_enabled": false
+}

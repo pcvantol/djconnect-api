@@ -1,10 +1,10 @@
-> Current implementation contract: **djc-rendezvous/1-implementation.1 RELEASED** on
-> protected main2dade83, effective through [exact producerreceipt6272409413](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272409413).
-> [Separate source Finalization](docs/rendezvous/SOURCE_FINALIZATION_V1.md) is a
-> candidate until its own protected delivery+receipt. The assignment remains OPEN;
-> product integration, native/receiver adoption, operations and deployment remain
-> unqualified. Closed consumer ACKs stay closed. Historical statuses below do not
-> override this limited source/wire release or imply public/runtime activation.
+> Implementation source/wire **djc-rendezvous/1-implementation.1 RELEASED**:
+> source2dade83 and [separate Finalization661e577 receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272559764).
+> Existing Core/Apple/receiver owners received definitive handoffs. Current API work:
+> [always-disabled product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md), candidate
+> until its own review/protected delivery. Product five-DO/auth/edge integration and
+> native/receiver/HA/physical/operational/deployment gates remain OPEN; timer OFF.
+> Historical statuses below do not override the limited released source interface.
 
 # DJConnect API Handoff
 

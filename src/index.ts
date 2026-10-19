@@ -6,6 +6,7 @@ import { errorJson, HttpError, json } from "./http";
 import { recordApiDiagnostic } from "./repository";
 import { RELEASE_SOURCE_SHA, RELEASE_VERSION } from "./releaseMetadata";
 import type { AppEnv } from "./types";
+import { unavailableRendezvousResponse } from "./rendezvous/perimeter";
 
 type RouteHandler = (request: Request, env: AppEnv, ctx: ExecutionContext, url: URL) => Promise<Response>;
 
@@ -64,6 +65,8 @@ const routes: Array<{ method: string; path: string; handler: RouteHandler }> = [
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
+		const rendezvousUnavailable = unavailableRendezvousResponse(request);
+		if (rendezvousUnavailable) return rendezvousUnavailable;
 		const appEnv = env as AppEnv;
 		const url = new URL(request.url);
 		let routePath = url.pathname;

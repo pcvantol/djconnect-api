@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — VibeCast disabled product perimeter
+
+- Reserve the rendezvous namespace with a fixed versioned503 response before body, storage, diagnostics or auth processing. No setting enables the service.
+- Preserve existing API routes; add root integration/privacy/namespace-boundary tests. No bindings, migrations or deployment changes.
+
 ## 4.0.0-rc.2 - 2026-08-06
 
 - Prepared the central API for the DJConnect Platform 4.0 release candidate
