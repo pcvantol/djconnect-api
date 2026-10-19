@@ -55,7 +55,7 @@
   "public_entrypoint": null,
   "reference_hashes": {
     ".github/workflows/deploy-api-worker.yml": "8fbfb0ec6d0291af560f353baa9e982c6059c87d948f1e5225201113ae1745db",
-    "docs/rendezvous/workerd-partition-source-proof-v1.json": "337a5fa855ea370ec5cc991d8e73298e2ceb1a4999c0043ea92a1b6aa365a35e",
+    "docs/rendezvous/workerd-create-recovery-source-proof-v1.json": "23404d85009af067941fe7b6621f66aa9beb623946feddfea5ae3bf63903a6db",
     "wrangler.jsonc": "9e9e83c881d7675329b033000a9f1c08cd59f3a911ea8a7005401a9ab3c5ef18"
   },
   "schema_version": 1,
@@ -83,6 +83,7 @@
     "qualification/rendezvous/composed-http-harness.ts": "230a41bbaf335fda0c0f7cb092337510231a4573ac06d549f958535243210a2f",
     "qualification/rendezvous/composed-http.check.mjs": "44490d470c16bca8401d87b5634484abfb96bb00e4f9131f18a205944dfc6f3a",
     "qualification/rendezvous/composed-http.ts": "b87f9976949551e20bd893dac8e5987fea0ca5131fe357d5b6c321a1c7f45414",
+    "qualification/rendezvous/create-recovery.check.mjs": "85fab93f52f8d865009d2868bf61721c299f58b3811fb722138c4309e7e3b02f",
     "qualification/rendezvous/enrollment-evidence-candidate.d.mts": "8b8419c66fd10cb274942e972362b99269c8dbe5bae68d53bde3340390578e89",
     "qualification/rendezvous/enrollment-evidence-candidate.mjs": "d018bfb770ad6beff9396074bd730e8ca7594a0ba42f095f4079349fd5e3b3e2",
     "qualification/rendezvous/enrollment-evidence.check.mjs": "f34b335ecc7f0c713d56293a3b823308b22873c1b60facd387af5ee4255808dd",
@@ -102,6 +103,8 @@
     "qualification/rendezvous/key-routing.check.mjs": "cec00414b00d260f1ffe15abab7bbb8ccb70d77bb3d6694cc68a8481c6b55c0a",
     "qualification/rendezvous/key-routing.ts": "81be00798d5a85e38f275439ecc2d13c22cf2a19056479997ab9b263b6b4fbcc",
     "qualification/rendezvous/partition-capacity.check.mjs": "c686ad7cc4f9c78d5d1508880b87ff49bc41b0bef687e6150a54a82429856ce4",
+    "qualification/rendezvous/pre-qr-replacement-reference.ts": "a5dffaa7f29d88b6746acfcacb2d39a3283e1feb74dde9835f123d9c8ad0fc59",
+    "qualification/rendezvous/pre-qr-replacement.check.mjs": "c12f5370ab9afe65b5b032972d9905e466b7ff68a75fa9ccf527f13a27b79353",
     "qualification/rendezvous/provider-unavailable.check.mjs": "f1a5161f870132b066f88c9356db614856198328892183aee9fff76ba912f00d",
     "qualification/rendezvous/receipt-cms-candidate.mjs": "5c780e9404e95075a286f86feea7a0f8549cc8788b1ce55124decd08526e1e7f",
     "qualification/rendezvous/receipt-key-store.check.ts": "6a2acc17becb471b35ca200b93a5ad064bdb91d43fb300944b8dbf85670bec82",
@@ -115,9 +118,9 @@
     "qualification/rendezvous/retry-hint.ts": "422b97fb81c63c52129f36d6d6c5948e8987e3f7797d3cdda35b2992a8f13f33",
     "qualification/rendezvous/run_challenge_budget_workerd.mjs": "da97ee84cb04663f5ed2df1ce859e51a80f43d9edcc864659be13f36a89fc2a7",
     "qualification/rendezvous/run_composed_http_workerd.mjs": "39937feef03cd2bbae0ee60504b31a7bb52ae03b4d495017189446171eb9634b",
+    "qualification/rendezvous/run_create_recovery_workerd.mjs": "ce939a1cbbf4171b5c5bd3dfb62e7e4c9a5399ac11477acb100fb4e02408b354",
     "qualification/rendezvous/run_index_workerd.mjs": "d3d886a3a976727637c2c317fea1cb8bbd13079bca6632d2d86c4f1178e23804",
     "qualification/rendezvous/run_key_routing_workerd.mjs": "9795d2a211813cc98de3cd17786df716be0e76b394fc5842fc77942824c7451e",
-    "qualification/rendezvous/run_partition_capacity_workerd.mjs": "0dae079f285bdfd44650cc70626cd13b999da74c0c3a122f5a1817be732f0fc4",
     "qualification/rendezvous/run_provider_unavailable_workerd.mjs": "2b1161ed65db3a30ccffb3a541e4de6d72b23a0dc8029b83a93bdcc2135bf98a",
     "qualification/rendezvous/run_registration_workerd.mjs": "bd9af9a5a63e3682a9a58303df1f6d81a2b3f190b421d1aeda4f93af7f423bc7",
     "qualification/rendezvous/run_request_admission_workerd.mjs": "7a7ec0b7acc7b08b398f87f7cad1e2a4d171fa45e5876b37479758c554aaaf7c",
@@ -130,7 +133,7 @@
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881"
   },
   "status": "NOT_AUTHORIZED",
-  "supplying_source_sha": "98e755091a51671b2ad7ced87fad504064f7290d",
+  "supplying_source_sha": "ff9ff5778f698fc206d7953b9f407752d7dde840",
   "wire": "djc-rendezvous/1",
   "worker": "djconnect-api"
 }

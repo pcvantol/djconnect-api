@@ -2,11 +2,11 @@
 
 Profile `0.4.0-draft` / wire `djc-rendezvous/1` remains **NOT_FROZEN**. This
 package continues existing sole-writer PR96 from supplying source
-`98e755091a51671b2ad7ced87fad504064f7290d`; main remains e67f402. ACK:
+`ff9ff5778f698fc206d7953b9f407752d7dde840`; current main a4322fe is normally merged. ACK:
 https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6265985814.
 
 [Machine-readable preparation](deployment-preparation-v1.json) pins that source,
-its62 recorded source hashes, canonical schema and existing root configuration/
+its65 recorded source hashes, canonical schema and existing root configuration/
 deployment workflow/proof digests. The preparation-package commit is a later,
 separate producer pin. It is NOT an approved central operational manifest, product
 artifact, Wrangler configuration, deployment command or readiness receipt.
@@ -215,7 +215,7 @@ functional target remains HOLD on measured/replayed capacity outcomes, distinct
 from provider/account/load/spend/retention and later production authorization.
 
 
-## Separate partition-source preparation rebind
+## Historical separate partition-source preparation rebind
 
 Old083ddb2 preparation correctly rejected changed /2 admission bytes before S1.
 Only after independently reviewed immutable supplying source **98e755091a51671b2ad7ced87fad504064f7290d**
@@ -238,3 +238,25 @@ needs separate exact artifact and bindings authorization; no public activation.
 [Current local qualification](ADMISSION_PARTITIONS_QUALIFICATION_V1.md) is
 54/54target scenarios/126consumed, no native/public/load/SLA/contractfreeze claim.
 API retains lost-create recovery and joint exact release; timer staysoff.
+
+
+## Separate pre-QR reference proof rebind
+
+Current supplying source **ff9ff5778f698fc206d7953b9f407752d7dde840** includes
+the reviewed proposed recovery contract/reference, current-main tools and65source
+pins/1184local checks. No APIserverruntime/endpoint/schema/crypto/binding changes.
+Old98preparation remained valid for its older unmodified runtime scope; no false
+rejection is claimed. This separate S2 selects the new compact proof
+SHA25623404d85009af067941fe7b6621f66aa9beb623946feddfea5ae3bf63903a6db.
+[Qualification](CREATE_RECOVERY_QUALIFICATION_V1.md) explains final b evidence and
+the known-non201 deadline race independently found and fixed before acceptance.
+The compact is derived metadata/testreceipts/65pins/72observationhashes, NOT a
+new execution; full3.14MB proof hash
+c754a344ecfa4a23467d402feffca33bed52d73be52568810fa4617b5ca05e97
+is immutable independently reviewed evidence, not read/parsed by this validator.
+Only supplying/proof/count constants and generatedplan change:1MiBJSON/2MiBblob
+limits, Git offline controls and all validation control flow remain unchanged.
+All22gates OPEN, activationfalse and account/approval/artifact/entrypointnull.
+The proposed preQR exception requires NEW exact receiverACK/adoption before
+freeze; this package activates no receiver, timer, public router or deployment.
+Existing true Apple/HA/physicalTV/provider/load/cost/retention/security gates remain.
