@@ -491,3 +491,11 @@ synthetic sustained schedules, native/edge/load/physical proof. Runtime58pins an
 083ddb2supplying source remain unchanged; no opsrebind/threshold/hint/receiverchange.
 API must qualify corrected admission/terminal headroom or an explicit narrower
 target before exact contract release. No unchanged consumerACK/capture requested.
+
+
+Current local admission correction: [partition qualification](docs/rendezvous/ADMISSION_PARTITIONS_QUALIFICATION_V1.md). Policy/2 partitions IP attempts
+256poll/16create/64native/16terminal; global hard limits unchanged with terminal
+reserve.1118checks,54/54handofftargets,126/126consumed locally. Historical80/46
+remains unchanged oldpolicy evidence. No live/native/load/SLA or contractfreeze
+claim; API retains lost-create recovery and exact release, receiverreviewsreceived,
+consumer sources clean and timer off. Offline preparation rebind is separate.

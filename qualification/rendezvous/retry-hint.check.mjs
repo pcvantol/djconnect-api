@@ -9,7 +9,7 @@ import {COMPOSED_POLICY} from './composed-http';
 import {deriveBudgetIdentity,BUDGET_NAME,BUDGET_POLICY} from './allocation-budget';
 import {INDEX_NAME,INDEX_POLICY} from './allocation-index';
 import {RequestAdmissionState,createRequestBudgetedHandler,REQUEST_NAME,REQUEST_POLICY} from './request-admission';
-const gate=()=>env.REQUEST_ADMISSION.get(env.REQUEST_ADMISSION.idFromName(REQUEST_NAME)),tables=['request_days','request_minutes','request_ips'];
+const gate=()=>env.REQUEST_ADMISSION.get(env.REQUEST_ADMISSION.idFromName(REQUEST_NAME)),tables=['request_days','request_minutes','request_ips','request_ip_partitions','request_terminal_totals'];
 const gateRows=table=>runInDurableObject(gate(),(_i,c)=>c.storage.sql.exec('SELECT * FROM '+table).toArray());
 const V='djc-rendezvous/1',BASE='https://api.djconnect.dev/v1/rendezvous',ORIGIN='https://vibecast.tv',u=v=>Buffer.from(v).toString('base64url'),b64=v=>Buffer.from(v).toString('base64'),text=v=>new TextEncoder().encode(v),sha=async v=>new Uint8Array(await crypto.subtle.digest('SHA-256',v));
 const fixed=Math.floor(Date.now()/86400000)*86400000+86400000+12*3600000+34*60000,budget=()=>env.ADMISSION_STATE.get(env.ADMISSION_STATE.idFromName(BUDGET_NAME)),index=()=>env.ALLOCATION_INDEX.get(env.ALLOCATION_INDEX.idFromName(INDEX_NAME));

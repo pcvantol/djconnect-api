@@ -352,3 +352,15 @@ hints now survive key/transaction/composition into existing Retry-After; malform
 hints fail503, absent hints remain absent. This supersedes the preceding routed-
 hint-loss limitation only for those qualified paths. Original expiry/retry budgets
 and profile0.4.0-draft NOT_FROZEN remain unchanged. No public/timer/deploy activation.
+
+
+## Partitioned admission continuation (current candidate)
+
+The historical120total/20native-IP paragraph above is superseded for the current
+private candidate by [partitioned admission](ADMISSION_PARTITIONS_QUALIFICATION_V1.md):
+policy/2, poll256/create16/native64/terminal16 attempts perIP/UTCminute, total352.
+Canonical route alone selects lane for all methods inclOPTIONS. Global caps remain
+10000/minute/1000000/day, with nonterminal9000/900000. No new wire fields, TTL,
+poll hint or consumer workaround. Local1118checks/54handofftargets/126consumes
+qualify only the disclosed matrix. Busy503/abuse/provider/native/public/load/cost
+and lost-create recovery/joint exact release remain separate; NOT_FROZEN.
