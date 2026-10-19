@@ -3,6 +3,9 @@
 > This is NOT a reachable native target or positive Apple qualification. Current
 > Apple rawData intake and exact40371 versus40227/28/30 profile choice remain
 > concrete owner dependencies. No deployment/consumer changes; timerOFF.
+> [Separate product-preparation Finalization](docs/rendezvous/PRODUCT_PREPARATION_FINALIZATION_V1.md)
+> is a docs-only candidate until its own protected main and explicit receipt;
+> full assignment and native/edge/service acceptance remainOPEN.
 >
 > Implementation source/wire **djc-rendezvous/1-implementation.1 RELEASED**:
 > source2dade83 and [separate Finalization661e577 receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272559764).
