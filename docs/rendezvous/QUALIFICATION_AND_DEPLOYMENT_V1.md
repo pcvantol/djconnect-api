@@ -318,3 +318,11 @@ server runtime, guessed expiry, cancellation or idempotency claim. Known non201
 headers terminate even at deadline; one fresh-authority replacement is proposed
 only before anyQR exposure. Existing receiver owner must ACK this NEW exception
 and adoption before freeze; prior reviews remain received, timer stays off.
+
+
+Shared app-key API qualification: [evidence](SHARED_APP_KEY_QUALIFICATION_V1.md).
+1208local checks/66pins,24new samekey cases:22delivery scenarios/58consumes plus
+2expected expiryrefusals. Actual counter/receipt/budget/originalkeyexpiry checked;
+software fixture serialorder is NOT a nativequeue/24h/twohandle/day27policyPASS.
+No endpoint/schema/runtime/consumer/policy change or extra ACK. Existing NEWpreQR
+receiverexception review6269829702 remainsopen, no repeatedask; timer staysOFF.
