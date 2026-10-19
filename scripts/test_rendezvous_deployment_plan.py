@@ -78,6 +78,55 @@ class PreparationTests(unittest.TestCase):
         self.plan['reference_hashes']['wrangler.jsonc'] = 'b' * 64
         self.rejects(self.plan)
 
+    def proof_maps(self):
+        return [v.decode(v.blob(name))[field] for name, _pin, field, _count, _scope in v.PROOFS]
+
+    def test_all_three_immutable_proof_pins_enforced(self):
+        original = v.blob
+        for name, _pin, _field, _count, _scope in v.PROOFS:
+            with self.subTest(proof=name), patch.object(v, 'blob', side_effect=lambda path: b'{}' if path == name else original(path)):
+                self.rejects(self.plan)
+
+    def test_cross_proof_hash_collision_rejected(self):
+        maps = self.proof_maps()
+        maps[1]['src/index.ts'] = 'f' * 64
+        with self.assertRaises(ValueError):
+            v.merge_sources(*maps)
+
+    def test_exact_102_tracked_sources_and_32_explicit_dependency_inputs(self):
+        maps = self.proof_maps()
+        self.assertEqual(len(v.merge_sources(*maps)), 102)
+        excluded = [path for path in maps[2] if path.startswith('node_modules/')]
+        self.assertEqual(len(excluded), 32)
+        value = maps[2].pop(excluded[0])
+        maps[2]['untracked/dependency.js'] = value
+        with self.assertRaises(ValueError):
+            v.merge_sources(*maps)
+
+    def test_excluded_dependency_path_cannot_escape(self):
+        maps = self.proof_maps()
+        name = next(path for path in maps[2] if path.startswith('node_modules/'))
+        maps[2]['node_modules/../outside.js'] = maps[2].pop(name)
+        with self.assertRaises(ValueError):
+            v.merge_sources(*maps)
+
+    def test_new_product_module_current_bytes_checked(self):
+        original = Path.read_bytes
+        def changed(path):
+            return b'module drift' if path == v.ROOT / 'src/rendezvous/composition.ts' else original(path)
+        with patch.object(Path, 'read_bytes', changed):
+            self.rejects(self.plan)
+
+    def test_proposed_configuration_cannot_select_deadline_or_revision(self):
+        for name, value in [('ASSERTION_POLICY_EXPIRES_AT', 9999999999999),
+                            ('ENROLLMENT_POLICY_REVISION', 'self-approved'),
+                            ('REQUEST_POLICY_ENABLED', 'caller-selected'),
+                            ('RECEIPT_ACTIVE_KEY', 'synthetic-test-value')]:
+            with self.subTest(field=name):
+                plan = copy.deepcopy(self.plan)
+                plan['proposed_configuration'][name] = value
+                self.rejects(plan)
+
     def test_current_checkout_drift(self):
         with patch.object(Path, 'read_bytes', return_value=b'changed working bytes'):
             self.rejects(self.plan)

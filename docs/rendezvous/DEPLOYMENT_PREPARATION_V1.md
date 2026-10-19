@@ -1,18 +1,32 @@
 # Rendezvous deployment preparation, not authorization
 
-Profile `0.4.0-draft` / wire `djc-rendezvous/1` remains **NOT_FROZEN**. This
-package continues existing sole-writer PR96 from supplying source
-`cf749619c9d3d101e7f7bc5fb7ae48ec71512f8a`; current main a4322fe is normally merged. ACK:
-https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6265985814.
+Current preparation is rebound to protected supplying source
+`a7806a9c65b7b1971c558eee238ad26fbc536a08` (PR101). The released SOURCE/WIRE
+interface remains **djc-rendezvous/1-implementation.1**; no consumer ACK reopens.
+Operational profile `0.4.0-draft` is not production/activation approval. The current
+[preparation manifest](deployment-preparation-v1.json) merges three independently
+reviewed immutable proofs:66 shared,15 module and83 root-build input records,
+producing exactly102 unique tracked source pins after canonical overlap checks.
+Only32 explicitly prefixed node_modules inputs are excluded from Gitblob checks;
+package/lock/provenance remain pinned. This does not verify installed packagebytes
+or prove reproducible dependency source builds.
 
-[Machine-readable preparation](deployment-preparation-v1.json) pins that source,
-its66 recorded source hashes, canonical schema and existing root configuration/
-deployment workflow/proof digests. The preparation-package commit is a later,
-separate producer pin. It is NOT an approved central operational manifest, product
-artifact, Wrangler configuration, deployment command or readiness receipt.
-Approval/account/artifact/public entrypoint are null, activation false,22 gates
-OPEN. Existing component evidence remains delivered; these gates represent the
-unclosed full service/operational claims, not a retraction of prior scoped reviews.
+The same existing validator preserves offline Git/no lazy fetch/prompts/replacements,
+closed JSON, size and symlink/path controls. Supplying SHA and all three proof
+digests are independently hardcoded; mutable preparation cannot define its own
+truth. Additional references pin current workflows, released contract and complete
+licence documents. [Source/module context](PRODUCT_COMPOSITION_V1.md) and
+[current operational procedure](CURRENT_OPERATIONS_PREPARATION_V1.md) distinguish
+source delivery from real edge/native/HA/TV and authorization evidence.
+
+All22 full-service operational gates remain OPEN and account/plan/artifact/approval/
+central manifest/public entrypoint remain null; activation false. In particular,
+`joint_contract_freeze` here means full-service/profile/activation acceptance,
+**not** another source-wire implementation HOLD. Proposed fiveDO bindings,
+SQLite tag and closed policy configuration are preparation only; deadline/revision
+remain null, secret values absent. No proposed flags can activate the current root503.
+[Known version50 inventory](known-worker-version50-readonly-v1.json) is readonly,
+not current-deployment-split/routing/WAF/billing/migration collision proof.
 
 Run offline checks:
 
@@ -23,7 +37,7 @@ python3 scripts/test_rendezvous_deployment_plan.py
 
 The first reports only `PREPARATION_CONSISTENT_BLOCKED_NOT_AUTHORIZED`; exit0
 means preparation consistency, never deployment readiness. There is no execute,
-approve, fetch, upload or dispatch mode.21 negative/consistency tests cover false
+approve, fetch, upload or dispatch mode.27 negative/consistency tests cover false
 authorization/artifact/gate promotion, source/hash/config drift, unknown fields,
 software/legacy bindings, duplicate JSON/nonfinite values, oversize, lexical and
 actual symlink escape, and --execute refusal. Immutable Git blobs and a separately
@@ -35,6 +49,10 @@ optional locks and replacement objects, clears inherited Git overrides, and fail
 closed on missing local blobs. Two additional tests cover these controls and an
 actual absent blob; the initial19 tests passed before this review correction.
 [Git documents these offline controls](https://git-scm.com/docs/git#Documentation/git.txt-GITNOLAZYFETCH).
+
+## Historical preparation receipts
+
+The source history below does not override the current102-pin preparation.
 
 The original74926a4 preparation pinned49ec and53 source hashes. The previous
 b1dee17 rebind pinned86c80fa's961-case proof and56 hashes. The historical supplying083ddb2

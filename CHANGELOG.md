@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Current offline deployment preparation
+
+- Rebind existing preparation to protected a780 source with102 tracked input pins from three immutable proofs. Preserve all22 full-service authorization/operational gates OPEN and activation false; proposed config selects no secrets, deadline or revision.
+- Record known-version-only Worker metadata, conditional current cost components and compatibility limits for rollback. No runtime or Cloudflare mutation.
+
 ## Unreleased — Internal rendezvous product composition
 
 - Compose the existing eleven routes with fixed real private adapters and one normalized-IP minute-HMAC identity per invocation. Reject missing/changed config, ambiguous/missing IP, requests carrying CF-Worker and known pseudo-IP/sentinel forms before body or namespace calls.

@@ -7,7 +7,9 @@
 > protected-delivered through PR99/main1463b32 with actual bundle readback. Current
 > [distribution notices correction](docs/rendezvous/DISTRIBUTION_NOTICES_V1.md)
 > was protected-delivered through PR100/main5f08e05; actual archive checks passed.
-> Current candidate: [internal product composition](docs/rendezvous/PRODUCT_COMPOSITION_V1.md).
+> [Internal product composition](docs/rendezvous/PRODUCT_COMPOSITION_V1.md) was
+> protected-delivered through PR101/maina7806a9 with main/artifact readback. Current
+> candidate: [102-pin offline operational preparation](docs/rendezvous/CURRENT_OPERATIONS_PREPARATION_V1.md).
 > Real edge provenance/public auth enablement and
 > native/receiver/HA/physical/operational/deployment gates remain OPEN; timer OFF.
 > Historical statuses below do not override the limited released source interface.
