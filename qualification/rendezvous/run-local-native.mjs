@@ -19,10 +19,10 @@ export async function processRequest(dir,runtime,sequence){
   if(result.client_data)await writePrivate(dir,prefix+'-client-data.bin',decode64(result.client_data,8192));
  }
  // Fixed, sanitized receipt only; no raw wire, proof, key handle or destination.
- await writePrivate(dir,prefix+'-receipt.json',JSON.stringify({scope:'PREPARED_LOCAL_EXPERIMENT_NOT_REACHABLE_NATIVE_TARGET',source:runtime.snapshot.head,source_hashes:runtime.snapshot.pins,bundle_sha256:runtime.bundle_sha256,route:request.route,status:response.status,started_at:started,finished_at:Date.now()}));
+ await writePrivate(dir,prefix+'-receipt.json',JSON.stringify({scope:'PREPARED_LOCAL_EXPERIMENT_NOT_REACHABLE_NATIVE_TARGET',source:runtime.snapshot.head,source_hashes:runtime.snapshot.pins,bundle_sha256:runtime.bundle_sha256,...(runtime.private_profile?{private_profile:runtime.private_profile}:{}),route:request.route,status:response.status,started_at:started,finished_at:Date.now()}));
  return response.status;
 }
-async function main(){
+export async function runFileExperiment(startRuntime=startLocalRuntime){
  need(process.argv.length===3);process.umask(0o077);
  const dir=await privateDirectory(process.argv[2],repo),budget=new CommandBudget();
  // Reserve the directory once per experiment; a restart cannot resume old state.
@@ -32,7 +32,7 @@ async function main(){
  const finish=async()=>{lines.close();if(runtime){const current=runtime;runtime=undefined;await current.stop();}};
  const signal=()=>{void finish().finally(()=>process.exit(1));};process.once('SIGTERM',signal);process.once('SIGINT',signal);
  try{
-  runtime=await startLocalRuntime();console.log('PREPARED_LOCAL_EXPERIMENT_NOT_REACHABLE_NATIVE_TARGET; process | stop');
+  runtime=await startRuntime();console.log('PREPARED_LOCAL_EXPERIMENT_NOT_REACHABLE_NATIVE_TARGET; process | stop');
   for await(const line of lines){
    if(line==='stop')break;
    need(line==='process');const sequence=budget.take();
@@ -40,4 +40,4 @@ async function main(){
   }
  }finally{await finish();process.removeListener('SIGTERM',signal);process.removeListener('SIGINT',signal);}
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)main().catch(()=>{console.error('LOCAL_EXPERIMENT_STOPPED; private files retained; no automatic retry');process.exitCode=1;});
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)runFileExperiment().catch(()=>{console.error('LOCAL_EXPERIMENT_STOPPED; private files retained; no automatic retry');process.exitCode=1;});

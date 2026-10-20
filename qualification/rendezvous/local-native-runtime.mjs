@@ -8,10 +8,11 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {need,ROUTES} from './local-native-files.mjs';
 import {statusOnlyOutbound,allowedStatusRequest} from './local-native-egress.mjs';
+import {stage40381,check40381Graph,registrationRecoverController} from './private-profile-40381.mjs';
 
 export const repo=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
 const sha=v=>createHash('sha256').update(v).digest('hex');
-const toolFiles=['qualification/rendezvous/local-native-files.mjs','qualification/rendezvous/local-native-egress.mjs','qualification/rendezvous/local-native-runtime.mjs','qualification/rendezvous/run-local-native.mjs'];
+const toolFiles=['qualification/rendezvous/local-native-files.mjs','qualification/rendezvous/local-native-egress.mjs','qualification/rendezvous/local-native-runtime.mjs','qualification/rendezvous/run-local-native.mjs','qualification/rendezvous/private-profile-40381.mjs','qualification/rendezvous/run-local-native-40381.mjs'];
 export function gitRead(args){
  const env=Object.fromEntries(Object.entries(process.env).filter(([name])=>!name.startsWith('GIT_')));
  Object.assign(env,{GIT_NO_LAZY_FETCH:'1',GIT_TERMINAL_PROMPT:'0',GIT_OPTIONAL_LOCKS:'0',GIT_NO_REPLACE_OBJECTS:'1'});
@@ -34,13 +35,21 @@ export async function sourceSnapshot(){
  return {head:head.stdout.trim(),pins};
 }
 export async function startLocalRuntime(){
+ return startRuntime(false);
+}
+export async function startLocal40381Runtime(){
+ return startRuntime(true);
+}
+async function startRuntime(private40381){
  const snapshot=await sourceSnapshot(),scratch=await mkdtemp(join(tmpdir(),'djc-native-local-'));await chmod(scratch,0o700);
  let runtime;
  try{
   const inputs=JSON.parse(await readFile(join(repo,'rendezvous-build-inputs.json')));
+  const stage=private40381?await stage40381(snapshot,repo,scratch):undefined;
+  const source=stage?.root??repo;
   const bridge=randomBytes(32).toString('base64url');
-  const driver=`import {createProductRendezvousHandler} from ${JSON.stringify(join(repo,'src/rendezvous/composition.ts'))};
-export {RequestAdmission,AllocationBudget,AllocationIndex,EnrollmentCoordinator,BudgetedTransactionCoordinator} from ${JSON.stringify(join(repo,'src/index.ts'))};
+  const driver=`import {createProductRendezvousHandler} from ${JSON.stringify(join(source,'src/rendezvous/composition.ts'))};
+export {RequestAdmission,AllocationBudget,AllocationIndex,EnrollmentCoordinator,BudgetedTransactionCoordinator} from ${JSON.stringify(join(source,'src/index.ts'))};
 export default {async fetch(request,env){
  if(request.headers.get('X-Local-Bridge')!==env.LOCAL_BRIDGE)return new Response(null,{status:503});
  const path=new URL(request.url).pathname;
@@ -51,7 +60,9 @@ export default {async fetch(request,env){
  return createProductRendezvousHandler(env)(incoming);
 }};`;
   await writeFile(join(scratch,'driver.ts'),driver,{mode:0o600});
-  const config={name:'djc-private-native-local',main:join(scratch,'driver.ts'),compatibility_date:'2026-06-20',compatibility_flags:['nodejs_compat'],workers_dev:false,send_metrics:false,alias:Object.fromEntries(Object.entries(inputs.aliases).map(([k,v])=>[k,resolve(repo,v)]))};
+  const aliases=Object.fromEntries(Object.entries(inputs.aliases).map(([k,v])=>[k,resolve(source,v)]));
+  if(stage)Object.assign(aliases,{cbor:join(repo,'node_modules/cbor/lib/cbor.js'),asn1js:join(repo,'node_modules/asn1js/build/index.es.js'),pkijs:join(repo,'node_modules/pkijs/build/index.es.js')});
+  const config={name:'djc-private-native-local',main:join(scratch,'driver.ts'),compatibility_date:'2026-06-20',compatibility_flags:['nodejs_compat'],workers_dev:false,send_metrics:false,alias:aliases};
   await writeFile(join(scratch,'wrangler.json'),JSON.stringify(config),{mode:0o600});
   const built=spawnSync(process.execPath,[join(repo,'node_modules/wrangler/bin/wrangler.js'),'deploy','--dry-run','--config',join(scratch,'wrangler.json'),'--outdir',join(scratch,'build'),'--metafile',join(scratch,'meta.json')],{cwd:repo,encoding:'utf8',timeout:120000,env:{...process.env,WRANGLER_SEND_METRICS:'false'}});
   need(built.status===0); // Build output is deliberately never logged (paths/contents may be private).
@@ -59,16 +70,17 @@ export default {async fetch(request,env){
   need(!bundle.includes('SoftwareEnrollment')&&!bundle.includes('SOFTWARE_STUB_COMPOSITION'));
   const metadata=JSON.parse(await readFile(join(scratch,'meta.json')));
   const entry=Object.values(metadata.outputs).find(o=>o.entryPoint);need(entry&&entry.exports.length===6&&entry.exports.includes('default'));
+  if(stage){await stage.verify();check40381Graph(metadata,stage,snapshot,repo,scratch);}
   for(const p of Object.keys(metadata.inputs)){
    need(!/(?:-harness|\.check\.|fixtures|pre-qr-replacement-reference)/i.test(p));
    if(p.startsWith('node-built-in-modules:'))continue;
    const absolute=resolve(scratch,p);
-   need(absolute===join(scratch,'driver.ts')||Object.hasOwn(snapshot.pins,absolute.slice(repo.length+1))&&absolute.startsWith(repo+'/'));
+   need(absolute===join(scratch,'driver.ts')||Object.hasOwn(snapshot.pins,absolute.slice(repo.length+1))&&absolute.startsWith(repo+'/')||stage&&absolute.startsWith(stage.root+'/')&&Object.hasOwn(stage.pins,absolute.slice(stage.root.length+1)));
   }
   const require=createRequire(import.meta.resolve('wrangler'));
   const {Miniflare,Log,LogLevel,convertV4MiniflareOptions}=require('miniflare');
   const until=Date.now()+900000;
-  const bindings={LOCAL_BRIDGE:bridge,RENDEZVOUS_EDGE_POLICY:'djc-direct-edge-identity/1-candidate',RENDEZVOUS_IP_HASH_KEY:randomBytes(32).toString('base64'),RECEIPT_ACTIVE_KEY:randomBytes(32).toString('base64'),COMPOSED_POLICY_ENABLED:'djc-http-composition-qualification/1',REQUEST_POLICY_ENABLED:'djc-request-admission-qualification/2',ALLOCATION_POLICY_ENABLED:'djc-allocation-qualification/1',INDEX_POLICY_ENABLED:'djc-index-qualification/1',ASSERTION_POLICY_ENABLED:'ios-dev-qualification/1',ASSERTION_POLICY_EXPIRES_AT:String(until),ENROLLMENT_POLICY_REVISION:'local-native-file-experiment/1'};
+  const bindings={LOCAL_BRIDGE:bridge,RENDEZVOUS_EDGE_POLICY:'djc-direct-edge-identity/1-candidate',RENDEZVOUS_IP_HASH_KEY:randomBytes(32).toString('base64'),RECEIPT_ACTIVE_KEY:randomBytes(32).toString('base64'),COMPOSED_POLICY_ENABLED:'djc-http-composition-qualification/1',REQUEST_POLICY_ENABLED:'djc-request-admission-qualification/2',ALLOCATION_POLICY_ENABLED:'djc-allocation-qualification/1',INDEX_POLICY_ENABLED:'djc-index-qualification/1',ASSERTION_POLICY_ENABLED:'ios-dev-qualification/1',ASSERTION_POLICY_EXPIRES_AT:String(until),ENROLLMENT_POLICY_REVISION:stage?'private-40381-registration-recover/1':'local-native-file-experiment/1'};
   const egress={allowed:0,denied:0};
   const outbound=async request=>{egress[allowedStatusRequest(request)?'allowed':'denied']++;return statusOnlyOutbound(request);};
   runtime=new Miniflare(convertV4MiniflareOptions({host:'127.0.0.1',inspectorHost:'127.0.0.1',durableObjectsPersist:false,unsafeInspectDurableObjects:true,log:new Log(LogLevel.NONE),workers:[{name:'local-native',compatibilityDate:'2026-06-20',compatibilityFlags:['nodejs_compat'],modulesRoot:join(scratch,'build'),modules:[{type:'ESModule',path:join(scratch,'build/driver.mjs'),contents:bundle}],bindings,durableObjects:Object.fromEntries(Object.entries(inputs.local_test_bindings).map(([k,className])=>[k,{className,useSQLite:true}])),outboundService:outbound},
@@ -81,11 +93,14 @@ export default {async fetch(request,env){
   const worker=await runtime.getWorker('local-native');
   need((await worker.fetch('https://local.invalid/attestation/challenge',{method:'POST',body:'{}'})).status===503);
   need((await fetch(new URL('/attestation/challenge',url),{method:'POST',body:'{}',redirect:'manual'})).status===503);
+  const send=(route,body)=>worker.fetch('https://local.invalid'+route,{method:'POST',headers:{'X-Local-Bridge':bridge},body});
+  const request=stage?registrationRecoverController(send):send;
   return {
    snapshot,bundle_sha256:sha(bundle),
+   ...(stage?{private_profile:{...stage.receipt,metafile_sha256:sha(JSON.stringify(metadata))}}:{}),
    egressObservation(){return {...egress};},
-   async verifySources(){need(JSON.stringify(await sourceSnapshot())===JSON.stringify(snapshot));need(Date.now()<until);},
-   async request(route,body){need(ROUTES.includes(route)&&body instanceof Uint8Array);return worker.fetch('https://local.invalid'+route,{method:'POST',headers:{'X-Local-Bridge':bridge},body});},
+   async verifySources(){need(JSON.stringify(await sourceSnapshot())===JSON.stringify(snapshot));if(stage)await stage.verify();need(Date.now()<until);},
+   async request(route,body){need(ROUTES.includes(route)&&body instanceof Uint8Array);if(stage){need(Date.now()<until);await stage.verify();}return request(route,body);},
    // Host-only observations, never RPC or wire parameters. Used by negative CI tests.
    async enrollmentObservation(keyId){
     const address=sha(JSON.stringify(['development','ios-dev-qualification/1',keyId]));
