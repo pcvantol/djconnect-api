@@ -43,10 +43,112 @@ class PreparationTests(unittest.TestCase):
                                       '81df44c6dbc00f58bb3ca5772cd6836fd9f41c10'],
                                      cwd=checkout, capture_output=True)
             self.assertNotEqual(missing.returncode, 0)
+            canonical = v.ROOT
+            # An old protected checkout alone must NOT validate the new source.
+            with patch.object(v, 'ROOT', checkout):
+                self.rejects(self.plan)
+            # Install only fixed, verified delta inputs; no fetching PR objects.
+            additions = (*v.DELTA_SOURCES, v.DELTA_PATH,
+                         *(record[0] for record in v.DELTA_PROOFS))
+            for path in additions:
+                raw = (canonical / path).read_bytes()
+                expected = {**self.plan['source_hashes'],
+                            **self.plan['reference_hashes']}[path]
+                self.assertEqual(v.digest(raw), expected)
+                destination = checkout / path
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(raw)
             with patch.object(v, 'ROOT', checkout):
                 out = v.validate(self.plan)
             self.assertFalse(out['activation_allowed'])
             self.assertEqual(out['open_gate_count'], 22)
+
+    def test_baseline_source_is_machine_distinguished_from_effective_source(self):
+        self.assertEqual(self.plan['source_provenance'], v.SOURCE_PROVENANCE)
+        self.assertEqual(v.validate(self.plan)['source_provenance'], v.SOURCE_PROVENANCE)
+        for field, value in [('kind', 'CURRENT_MAIN'), ('baseline_sha', 'f' * 40),
+                             ('delta_sha256', 'f' * 64),
+                             ('effective_source_map_sha256', 'f' * 64)]:
+            plan = copy.deepcopy(self.plan)
+            plan['source_provenance'][field] = value
+            self.rejects(plan)
+        del self.plan['source_provenance']
+        self.rejects(self.plan)
+
+    def delta(self):
+        return v.decode((v.ROOT / v.DELTA_PATH).read_bytes())
+
+    def rejects_changed_proof(self, path, changed):
+        original = v.pinned_working_proof
+        with patch.object(v, 'pinned_working_proof', side_effect=lambda name, pin:
+                          changed if name == path else original(name, pin)):
+            self.rejects(self.plan)
+
+    def test_delta_missing_extra_noop_and_foreign_source_rejected(self):
+        for mutation in ('missing', 'extra', 'noop', 'before', 'after', 'map',
+                         'baseline-map', 'baseline-sha', 'unknown-field', 'proof-path'):
+            with self.subTest(mutation=mutation):
+                delta = self.delta()
+                name = next(iter(delta['changes']))
+                if mutation == 'missing':
+                    del delta['changes'][name]
+                elif mutation == 'extra':
+                    delta['changes']['src/index.ts'] = delta['changes'][name]
+                elif mutation == 'noop':
+                    delta['changes'][name]['after'] = delta['changes'][name]['before']
+                elif mutation == 'before':
+                    delta['changes'][name]['before'] = 'f' * 64
+                elif mutation == 'after':
+                    delta['changes'][name]['after'] = 'f' * 64
+                elif mutation == 'map':
+                    delta['effective_source_map_sha256'] = 'f' * 64
+                elif mutation == 'baseline-map':
+                    delta['baseline_source_map_sha256'] = 'f' * 64
+                elif mutation == 'baseline-sha':
+                    delta['baseline_source_sha'] = 'f' * 40
+                elif mutation == 'unknown-field':
+                    delta['changes'][name]['grant'] = True
+                else:
+                    delta['proofs']['shared']['path'] = 'src/index.ts'
+                self.rejects_changed_proof(v.DELTA_PATH, delta)
+
+    def test_each_new_proof_and_delta_raw_hash_is_mandatory(self):
+        original = Path.read_bytes
+        for name in (v.DELTA_PATH, *(record[0] for record in v.DELTA_PROOFS)):
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'{}' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
+
+    def test_new_complete_proofs_cannot_conflict_with_exact_effective_map(self):
+        for name, _pin, field, _count, _scope in v.DELTA_PROOFS:
+            proof = v.decode((v.ROOT / name).read_bytes())
+            path = next(iter(proof[field]))
+            proof[field][path] = 'f' * 64
+            self.rejects_changed_proof(name, proof)
+
+    def test_new_root_installed_dependency_set_and_hashes_stay_exact(self):
+        name, _pin, field, _count, _scope = v.DELTA_PROOFS[1]
+        for mutation in ('hash', 'path', 'escape'):
+            with self.subTest(mutation=mutation):
+                proof = v.decode((v.ROOT / name).read_bytes())
+                key = next(key for key in proof[field] if key.startswith('node_modules/'))
+                if mutation == 'hash':
+                    proof[field][key] = 'f' * 64
+                else:
+                    new = 'node_modules/other.js' if mutation == 'path' else 'node_modules/../escape'
+                    proof[field][new] = proof[field].pop(key)
+                self.rejects_changed_proof(name, proof)
+
+    def test_each_current_delta_source_byte_is_verified(self):
+        original = Path.read_bytes
+        for name in v.DELTA_SOURCES:
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed source' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
 
     def test_git_cannot_lazy_fetch_or_prompt(self):
         with patch.object(v.subprocess, 'run') as run:
