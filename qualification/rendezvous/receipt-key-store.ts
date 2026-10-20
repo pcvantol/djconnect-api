@@ -11,8 +11,9 @@ interface Context { objectId:string; keyAddress:string; appPolicy:string; enviro
 interface Active extends Context { status:'active'; version:1; revision:number; publicPoint:string; counter:number; ciphertext:string; nonce:string; operationId?:string; requestDigest?:string; challengeExpiresAt?:number }
 interface Tombstone { status:'revoked'; version:1; keyAddress:string; expiresAt:number; purgeAt:number }
 type RecordState=Active|Tombstone;
+export class StoreRejected extends Error {}
 const DAY=86400000;
-const need:(v:unknown)=>asserts v=(v)=>{if(!v)throw new Error('qualification_store_rejected');};
+const need:(v:unknown)=>asserts v=(v)=>{if(!v)throw new StoreRejected();};
 const integer=(v:number)=>Number.isSafeInteger(v)&&v>=0;
 const context=(r:Active|Context):Context=>({objectId:r.objectId,keyAddress:r.keyAddress,appPolicy:r.appPolicy,environment:r.environment,createdAt:r.createdAt,expiresAt:r.expiresAt,receiptCreatedAt:r.receiptCreatedAt,keyVersion:r.keyVersion,publicPoint:r.publicPoint});
 function canonicalBase64(s:string,max:number,exact?:number){need(typeof s==='string'&&s.length>0&&s.length<=Math.ceil(max/3)*4);const b=base64Decode(s);need(b.length<=max&&(exact===undefined||b.length===exact)&&btoa(String.fromCharCode(...b))===s);return b;}

@@ -1,14 +1,16 @@
 # Rendezvous deployment preparation, not authorization
 
-Current preparation is rebound to immutable supplying source
-`6d730476e378ba62c77de8213564c683343a3e43` (source-disabled root integration;
-protected delivery and separate Finalization require their own exact evidence).
-The supplying SHA is protected main, not an intermediate PR commit: main-only
-checkouts must retain the proof after squash and automatic branch cleanup. All
-proof and runtime hashes are unchanged by this provenance-only correction. The
-new regression executes the validator in a depth-one checkout with the old
-intermediate object absent; there is no lazy fetch, fallback or weaker check.
-Historical PR101/102 proofs and prior supplying source remain unchanged.
+Current immutable supplier is protected main
+`379d70b558508f747d578d7b7d90a665bad7ffc8` (PR111, separately finalized).
+Its exact shared/root proofs and unchanged module proof define the 106-source
+baseline. The current internal-registration-failure slice adds a fixed six-input
+delta and separately hashed shared/root observations; no mutable path list,
+HEAD fallback, chained delta evaluation or PR object fetch defines authority.
+The machine `source_provenance` names the baseline, exact delta hash and effective
+source-map digest. The depth-one regression retains only that protected supplier;
+its old working files fail until all fixed new delta inputs are installed.
+Earlier proofs remain unchanged historical evidence. See
+[internal failure qualification](REGISTRATION_INTERNAL_FAILURES_V1.md).
 The released SOURCE/WIRE
 interface remains **djc-rendezvous/1-implementation.1**; no consumer ACK reopens.
 Operational profile `0.4.0-draft` is not production/activation approval. The current
@@ -50,12 +52,12 @@ python3 scripts/test_rendezvous_deployment_plan.py
 
 The first reports only `PREPARATION_CONSISTENT_BLOCKED_NOT_AUTHORIZED`; exit0
 means preparation consistency, never deployment readiness. There is no execute,
-approve, fetch, upload or dispatch mode.27 negative/consistency tests cover false
+approve, fetch, upload or dispatch mode.34 negative/consistency tests cover false
 authorization/artifact/gate promotion, source/hash/config drift, unknown fields,
 software/legacy bindings, duplicate JSON/nonfinite values, oversize, lexical and
 actual symlink escape, and --execute refusal. Immutable Git blobs and a separately
 hardcoded supplying SHA/proof hash prevent a modified plan defining its own truth.
-Current working bytes must match that baseline. Error output is fixed/redacted.
+Current working bytes must match the exact effective baseline-plus-delta map. Error output is fixed/redacted.
 Independent security review found that Git could lazily fetch missing objects in
 a partial clone. The validator now forces GIT_NO_LAZY_FETCH=1, disables prompts,
 optional locks and replacement objects, clears inherited Git overrides, and fails
