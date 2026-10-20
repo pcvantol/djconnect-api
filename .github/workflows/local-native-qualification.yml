@@ -19,6 +19,8 @@ jobs:
           node-version: 26
           cache: npm
       - run: npm ci
+      - name: Offline preparation and squash-safe source history
+        run: python3 -m unittest scripts/test_rendezvous_deployment_plan.py
       - name: Private files and actual default-genuine workerd negatives
         run: node --test qualification/rendezvous/local-native.check.mjs
       - name: Fixed private40381 source/profile/software-policy and actual genuine negatives
