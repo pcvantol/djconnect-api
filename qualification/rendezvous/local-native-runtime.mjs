@@ -26,7 +26,7 @@ export async function sourceSnapshot(){
  const checked=spawnSync('python3',['scripts/validate_rendezvous_deployment_plan.py'],{cwd:repo,encoding:'utf8',timeout:30000});
  need(checked.status===0&&JSON.parse(checked.stdout).activation_allowed===false);
  const plan=JSON.parse(await readFile(join(repo,'docs/rendezvous/deployment-preparation-v1.json')));
- const root=JSON.parse(await readFile(join(repo,'docs/rendezvous/product-composition-root-build-observations-v1.json')));
+ const root=JSON.parse(await readFile(join(repo,'docs/rendezvous/root-dispatch-build-observations-v1.json')));
  const pins={...plan.source_hashes,...plan.reference_hashes,...root.source_hashes};
  const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===32);
  await checkSourcePins(pins,repo);

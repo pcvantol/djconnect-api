@@ -93,9 +93,9 @@ class PreparationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             v.merge_sources(*maps)
 
-    def test_exact_102_tracked_sources_and_32_explicit_dependency_inputs(self):
+    def test_exact_106_tracked_sources_and_32_explicit_dependency_inputs(self):
         maps = self.proof_maps()
-        self.assertEqual(len(v.merge_sources(*maps)), 102)
+        self.assertEqual(len(v.merge_sources(*maps)), 106)
         excluded = [path for path in maps[2] if path.startswith('node_modules/')]
         self.assertEqual(len(excluded), 32)
         value = maps[2].pop(excluded[0])

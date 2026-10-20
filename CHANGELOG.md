@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Source-disabled root HTTP integration
+
+- Connect the real eleven-route rendezvous composition to the existing Worker behind a fixed compiled-OFF sourceguard; configuration cannot activate it. Preserve APNs/pairing/D1/operator behavior.
+- Qualify a strictly derived local root through actual cross-origin Chromium/WebKit HTTP preflights and POST flows with the unchanged genuine verifier. Keep simulator authentication, Cloudflare ingress, public TLS, HA admission and full-chain acceptance separate.
+- Rebind offline preparation to distinct immutable current root/module proofs, preserving all22 OPEN operational gates and historical evidence.
+
 ## Unreleased — Fixed private40381 profile preparation
 
 - Prepare a distinct host-only40381 verifier variant from exact pinned source copies, preserving the published40227/28/30 core and both real enrollment/assertion paths. Bind the corrected signed Apple161 proposal as operator provenance.

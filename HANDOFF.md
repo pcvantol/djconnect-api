@@ -1,3 +1,10 @@
+> Selected [root HTTP integration](docs/rendezvous/ROOT_HTTP_INTEGRATION_V1.md)
+> connects the real dispatcher behind a fixed compiled-OFF sourceguard. The local
+> one-line derivative exercises actual two-origin HTTP/OPTIONS/POST with the same
+> genuine verifier and five DOs; it grants no simulator/native authentication.
+> New preparation pins106 tracked inputs plus32 installed dependencies; historical
+> 102-input evidence remains unchanged. Public activation remains source-disabled.
+>
 > API-owned [local native experiment](docs/rendezvous/LOCAL_NATIVE_EXPERIMENT_V1.md)
 > prepares a private file bridge to the actual five-DO/default-genuine module.
 > This is NOT a reachable native target or positive Apple qualification. Current
