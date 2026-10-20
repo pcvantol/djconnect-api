@@ -1,8 +1,11 @@
 > API-owned [local native experiment](docs/rendezvous/LOCAL_NATIVE_EXPERIMENT_V1.md)
 > prepares a private file bridge to the actual five-DO/default-genuine module.
 > This is NOT a reachable native target or positive Apple qualification. Current
-> Apple rawData intake and received40375 versus40227/28/30 profile choice remain
-> concrete owner dependencies. No deployment/consumer changes; timerOFF.
+> Apple161 delivered corrected binary intake and signed diagnostic40381.
+> [Fixed private40381 preparation](docs/rendezvous/PRIVATE_PROFILE_40381_V1.md)
+> pins that proposal separately; it is NOT native/operator admission. Published
+> verifier remains40227/28/30. Device/transfer readiness and genuine proof remain
+> open; no deployment/consumer changes, public serviceOFF.
 > [Separate product-preparation Finalization](docs/rendezvous/PRODUCT_PREPARATION_FINALIZATION_V1.md)
 > is delivered at main4c66154 with its [exact receipt](https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6274677042);
 > full assignment and native/edge/service acceptance remainOPEN.

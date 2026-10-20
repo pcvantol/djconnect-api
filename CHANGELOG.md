@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Fixed private40381 profile preparation
+
+- Prepare a distinct host-only40381 verifier variant from exact pinned source copies, preserving the published40227/28/30 core and both real enrollment/assertion paths. Bind the corrected signed Apple161 proposal as operator provenance.
+- Restrict its file experiment to one same-key registration and recovery action, without retries after failure. Add closed-copy/graph, signed P256 software-policy and actual genuine-negative qualification; native/device/transfer/service admission remains separate.
+
 ## Unreleased — Actual browser/receiver/API qualification
 
 - Execute Chromium and WebKit against actual local API state with the default receiver, independent QR decode and real pending-poll/cancel cases. Keep route-fixture results distinct from HTTP/CORS/TLS/native/HA/TV acceptance.
