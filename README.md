@@ -1,5 +1,10 @@
 # DJConnect API
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/pcvantol/djconnect/7e14e5970b3f68d33d243ae6bab2b281fad59bb2/assets/djconnect/brand-v2/wordmark-primary-dark.png">
+  <img src="https://raw.githubusercontent.com/pcvantol/djconnect/7e14e5970b3f68d33d243ae6bab2b281fad59bb2/assets/djconnect/brand-v2/wordmark-primary-light.png" alt="DJConnect" width="640">
+</picture>
+
 Rendezvous source integration begins with an [always-disabled product perimeter](docs/rendezvous/PRODUCT_PERIMETER_V1.md). Reserved requests receive the versioned unavailable503 response; no live rendezvous service or activation is supplied by this source change.
 
 Central Cloudflare Workers backend for DJConnect APNs push relay.
