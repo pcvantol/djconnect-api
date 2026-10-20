@@ -9,6 +9,12 @@ export interface IssueInput {action:Action;keyId:string;binding?:SubmitBinding}
 export interface ProofInput {operationId:string;action:Action;clientData:string;assertion:string}
 interface Operation {id:string;action:Action;keyAddress:string;createdAt:number;expiresAt:number;status:'challenge'|'authorized';clientData?:string;nonce?:string;binding?:SubmitBinding;requestDigest?:string;counter?:number;admittedAt?:number;authorizationExpiresAt?:number;keyExpiresAt?:number}
 class ProofRejected extends Error {}
+type RecordWindow=(...bounds:ReadonlyArray<readonly[number|undefined,number|undefined]>)=>void;
+function proofFailureContext(){
+ let lower:number|undefined,upper:number|undefined;
+ const recordWindow:RecordWindow=(...bounds)=>{for(const [from,until] of bounds){if(typeof from==='number'&&typeof until==='number'&&Number.isSafeInteger(from)&&Number.isSafeInteger(until)&&from>=0&&until>from){lower=Math.max(lower??from,from);upper=Math.min(upper??until,until);}}};
+ return {recordWindow,failure:(error:unknown)=>({ok:false as const,error:error instanceof ProofRejected||error instanceof StoreRejected||(lower!==undefined&&upper!==undefined&&(Date.now()<lower||Date.now()>=upper))?'proof_rejected' as const:'service_unavailable' as const})};
+}
 const POLICY='ios-dev-qualification/1',ORIGIN='https://api.djconnect.dev',VERSION='djc-rendezvous/1';
 const need:(v:unknown)=>asserts v=v=>{if(!v)throw new ProofRejected();};
 const closed=(v:object,names:string[])=>need(v!==null&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===names.sort().join(','));
@@ -50,34 +56,36 @@ export class AssertionKeyState extends ReceiptKeyStore {
    });
   });}catch(error){need(Date.now()>=now&&Date.now()<expiresAt);throw error;}
  }
- private disposition(op:Operation,requestDigest:string,now:number){
+ private disposition(op:Operation,requestDigest:string,now:number,recordWindow:RecordWindow){
   const row=this.active(now),policyUntil=this.policy(now);need(op.status==='authorized'&&op.requestDigest===requestDigest&&op.keyAddress===row.keyAddress&&now>=op.admittedAt!&&now<op.expiresAt);
-  if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,admittedAt:op.admittedAt!,keyExpiresAt:op.keyExpiresAt!,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
-  need(op.action==='recover-key');return {kind:'recovery-receipt' as const,keyExpiresAt:op.keyExpiresAt!,counter:op.counter!};
+  if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);recordWindow([op.createdAt,op.expiresAt],[row.createdAt,row.expiresAt],[op.admittedAt,op.authorizationExpiresAt]);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,admittedAt:op.admittedAt!,keyExpiresAt:op.keyExpiresAt!,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
+  need(op.action==='recover-key');recordWindow([op.createdAt,op.expiresAt],[row.createdAt,row.expiresAt],[op.admittedAt,op.expiresAt]);return {kind:'recovery-receipt' as const,keyExpiresAt:op.keyExpiresAt!,counter:op.counter!};
  }
- private async authorizeInternal(input:ProofInput){
+ private async authorizeInternal(input:ProofInput,recordWindow:RecordWindow){
   input={...input};closed(input,['operationId','action','clientData','assertion']);opaque(input.operationId);need(['recover-key','delete-key','submit'].includes(input.action));
   const client=b64url(input.clientData,2048),proof=b64url(input.assertion,4096),now=Date.now();
   const snapshot=this.ctx.storage.transactionSync(()=>{const row=this.active(now),op=this.operation(input.operationId);need(op&&op.action===input.action&&op.keyAddress===row.keyAddress&&now>=op.createdAt&&now<op.expiresAt);return {row,op};});
   const requestDigest=await digest([input.action,input.operationId,snapshot.row.keyAddress,input.clientData,input.assertion]);
-  if(snapshot.op.status==='authorized')return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now());});
-  need(snapshot.op.clientData===input.clientData);
+  if(snapshot.op.status==='authorized')return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now(),recordWindow);});
+  need(snapshot.op.clientData===input.clientData);recordWindow([snapshot.op.createdAt,snapshot.op.expiresAt],[snapshot.row.createdAt,snapshot.row.expiresAt]);
   const verified=await qualifyAssertionCore(proof,client,base64Decode(snapshot.row.publicPoint),snapshot.row.counter);need(verified);
+  let committedBounds:ReadonlyArray<readonly[number|undefined,number|undefined]>=[];
   const result=this.ctx.storage.transactionSync(()=>{
    const at=Date.now(),row=this.active(at),op=this.operation(input.operationId);need(op&&op.status==='challenge'&&op.action===input.action&&op.keyAddress===row.keyAddress&&op.clientData===input.clientData&&at>=op.createdAt&&at<op.expiresAt);
    need(row.publicPoint===snapshot.row.publicPoint&&row.createdAt===snapshot.row.createdAt&&row.expiresAt===snapshot.row.expiresAt&&verified.counter>row.counter&&verified.counter<=0xffffffff);
    if(input.action==='delete-key'){const tombstone=this.tombstone(row);this.save(tombstone);return {kind:'deleted' as const,purgeAt:tombstone.purgeAt};}
    row.counter=verified.counter;row.revision++;this.save(row);
    const receipt:Operation={id:op.id,action:op.action,keyAddress:op.keyAddress,createdAt:op.createdAt,expiresAt:Math.min(op.expiresAt,row.expiresAt),status:'authorized',requestDigest,counter:verified.counter,admittedAt:at,keyExpiresAt:row.expiresAt,...(op.binding?{binding:op.binding,authorizationExpiresAt:Math.min(at+5000,op.expiresAt,row.expiresAt,this.policy(at))}:{})};
-   this.saveOperation(receipt);return this.disposition(receipt,requestDigest,at);
+   this.saveOperation(receipt);return this.disposition(receipt,requestDigest,at,(...bounds)=>{committedBounds=bounds;});
   });
+  recordWindow(...committedBounds);
   await this.arm();if(result.kind==='deleted')return result;
-  return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now());});
+  return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now(),recordWindow);});
  }
  // Single active verification per key. No queue of unbounded crypto requests.
- async authorize(input:ProofInput){if(this.verifying)return {ok:false as const,error:'proof_rejected' as const};this.verifying=true;try{return {ok:true as const,...await this.authorizeInternal(input)};}catch{return {ok:false as const,error:'proof_rejected' as const};}finally{this.verifying=false;}}
+ async authorize(input:ProofInput){if(this.verifying)return {ok:false as const,error:'proof_rejected' as const};const {recordWindow,failure}=proofFailureContext();this.verifying=true;try{return {ok:true as const,...await this.authorizeInternal(input,recordWindow)};}catch(error){return failure(error);}finally{this.verifying=false;}}
  async issue(input:IssueInput){try{return await this.issueInternal(input);}catch(error){return {ok:false as const,error:error instanceof ProofRejected||error instanceof StoreRejected?'proof_rejected' as const:'service_unavailable' as const};}}
- async lookupSubmit(operationId:string,requestDigest:string){try{opaque(operationId);need(/^[a-f0-9]{64}$/.test(requestDigest));const result=this.ctx.storage.transactionSync(()=>{const op=this.operation(operationId);need(op?.action==='submit');return this.disposition(op,requestDigest,Date.now());});return {ok:true as const,...result};}catch{return {ok:false as const,error:'proof_rejected' as const};}}
+ async lookupSubmit(operationId:string,requestDigest:string){const {recordWindow,failure}=proofFailureContext();try{opaque(operationId);need(/^[a-f0-9]{64}$/.test(requestDigest));const result=this.ctx.storage.transactionSync(()=>{const op=this.operation(operationId);need(op?.action==='submit');return this.disposition(op,requestDigest,Date.now(),recordWindow);});return {ok:true as const,...result};}catch(error){return failure(error);}}
  // Direct fixture APIs disabled. Inherited QA helpers/protected hooks are NOT a hardened untrusted RPC boundary.
  override async install(_m:StoreMaterial){return {ok:false as const,error:'store_rejected' as const};}
  override async advance(_counter:number){return {ok:false as const,error:'store_rejected' as const};}
