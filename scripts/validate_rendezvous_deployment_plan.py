@@ -8,17 +8,17 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPPLYING_SHA = 'a7806a9c65b7b1971c558eee238ad26fbc536a08'
+SUPPLYING_SHA = '81df44c6dbc00f58bb3ca5772cd6836fd9f41c10'
 PROOFS = (
     ('docs/rendezvous/product-composition-shared-source-proof-v1.json',
      '5dcd1ed6fa448a8ac234a1267d9254a13cc587a9ebea83e15e94b00f672361e1',
      'source_sha256', 66, 'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
-    ('docs/rendezvous/product-composition-observations-v1.json',
-     'bcec592f4d3d4eb3d532217d1d9f069877550bd467abc87b8bdc3516db25e53d',
-     'source_sha256', 15, 'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'),
-    ('docs/rendezvous/product-composition-root-build-observations-v1.json',
-     'bbe92f38dada976142d85c9abef4a5eb6c54f57862cb8d21f2d9a978c83f1964',
-     'source_hashes', 83, 'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
+    ('docs/rendezvous/root-dispatch-module-observations-v1.json',
+     'f8f1ed7a9a6ddbb2665e4e9de0c9d67046c142924f33b7baacd25bf206b2bb77',
+     'source_sha256', 19, 'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'),
+    ('docs/rendezvous/root-dispatch-build-observations-v1.json',
+     'ee13ba79c11a1243f69a7471bbedc5401957fe23d0a532b1f61f40ae9c92a800',
+     'source_hashes', 85, 'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
 )
 REFERENCES = ('wrangler.jsonc', '.github/workflows/deploy-api-worker.yml',
               '.github/workflows/api-release-artifact.yml',
@@ -110,7 +110,7 @@ def merge_sources(shared, module, root):
     sources = {}
     excluded = set()
     for index, recorded in enumerate((shared, module, root)):
-        require(isinstance(recorded, dict) and len(recorded) == (66, 15, 83)[index])
+        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 85)[index])
         for name, expected in recorded.items():
             require(isinstance(name, str) and isinstance(expected, str)
                     and len(expected) == 64 and all(c in '0123456789abcdef' for c in expected))
@@ -123,7 +123,7 @@ def merge_sources(shared, module, root):
             safe_path(path)
             require(path not in sources or sources[path] == expected)
             sources[path] = expected
-    require(len(excluded) == 32 and len(sources) == 102)
+    require(len(excluded) == 32 and len(sources) == 106)
     return sources
 
 

@@ -1,12 +1,20 @@
 # Rendezvous deployment preparation, not authorization
 
-Current preparation is rebound to protected supplying source
-`a7806a9c65b7b1971c558eee238ad26fbc536a08` (PR101). The released SOURCE/WIRE
+Current preparation is rebound to immutable supplying source
+`81df44c6dbc00f58bb3ca5772cd6836fd9f41c10` (source-disabled root integration;
+protected delivery and separate Finalization require their own exact evidence).
+Historical PR101/102 proofs and prior supplying source remain unchanged.
+The released SOURCE/WIRE
 interface remains **djc-rendezvous/1-implementation.1**; no consumer ACK reopens.
 Operational profile `0.4.0-draft` is not production/activation approval. The current
 [preparation manifest](deployment-preparation-v1.json) merges three independently
-reviewed immutable proofs:66 shared,15 module and83 root-build input records,
-producing exactly102 unique tracked source pins after canonical overlap checks.
+reviewed immutable proofs:66 shared,19 current module/qualification and85
+current root-build input records, producing exactly106 unique tracked source
+pins after canonical overlap checks. The new root/module proof files are distinct
+from the historical product-composition observations; changed root/dispatcher
+bytes do not rewrite earlier evidence. The four new unique pins are the dispatcher
+and three local qualification files. The private native host reads this current
+root proof so it cannot silently overwrite the new index pin with an older hash.
 Only32 explicitly prefixed node_modules inputs are excluded from Gitblob checks;
 package/lock/provenance remain pinned. This does not verify installed packagebytes
 or prove reproducible dependency source builds.
