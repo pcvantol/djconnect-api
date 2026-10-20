@@ -1,3 +1,8 @@
+> Selected [assertion server-policy availability](docs/rendezvous/ASSERTION_POLICY_AVAILABILITY_V1.md)
+> classifies unusable server-owned policy as existing503 without changing the
+> accepted predicate, original leases, counters or acknowledged delete result.
+> Full taxonomy and all22 service gates remain OPEN; delivery/Finalization required.
+>
 > Selected [authorization internal failures](docs/rendezvous/AUTHORIZATION_INTERNAL_FAILURES_V1.md)
 > separates typed proof401 from unexpected storage503 while preserving original
 > receipt leases, counters and deletion unknown outcomes. Full taxonomy and all22

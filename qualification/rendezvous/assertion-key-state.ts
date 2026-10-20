@@ -9,6 +9,7 @@ export interface IssueInput {action:Action;keyId:string;binding?:SubmitBinding}
 export interface ProofInput {operationId:string;action:Action;clientData:string;assertion:string}
 interface Operation {id:string;action:Action;keyAddress:string;createdAt:number;expiresAt:number;status:'challenge'|'authorized';clientData?:string;nonce?:string;binding?:SubmitBinding;requestDigest?:string;counter?:number;admittedAt?:number;authorizationExpiresAt?:number;keyExpiresAt?:number}
 class ProofRejected extends Error {}
+class AssertionConfigUnavailable extends Error {}
 type RecordWindow=(...bounds:ReadonlyArray<readonly[number|undefined,number|undefined]>)=>void;
 function proofFailureContext(){
  let lower:number|undefined,upper:number|undefined;
@@ -29,7 +30,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
  protected override removingKeyEvidence(){this.ctx.storage.sql.exec('DELETE FROM proof_operations');}
  protected override nextCleanupAt(){return this.ctx.storage.sql.exec<{at:number|null}>('SELECT MIN(expires_at) AS at FROM proof_operations').toArray()[0]?.at??undefined;}
  private cleanup(now:number){this.ctx.storage.sql.exec('DELETE FROM proof_operations WHERE expires_at<=?',now);return this.expire(now);}
- private policy(now:number){const e=this.env as CoordinatorEnv,until=Number(e.ASSERTION_POLICY_EXPIRES_AT);need(e.ASSERTION_POLICY_ENABLED===POLICY&&integer(until)&&now<until);return until;}
+ private policy(now:number){const e=this.env as CoordinatorEnv,until=Number(e.ASSERTION_POLICY_EXPIRES_AT);if(!(e.ASSERTION_POLICY_ENABLED===POLICY&&integer(until)&&now<until))throw new AssertionConfigUnavailable();return until;}
  private active(now:number){this.policy(now);const r=this.cleanup(now);need(r?.status==='active'&&r.objectId===this.ctx.id.toString()&&r.appPolicy===POLICY&&r.environment==='development'&&now>=r.createdAt&&now<r.expiresAt);return r;}
  private operation(id:string){return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations WHERE id=?',id).toArray().map(r=>JSON.parse(r.value) as Operation)[0];}
  private saveOperation(op:Operation){this.ctx.storage.sql.exec('INSERT INTO proof_operations(id,expires_at,value) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',op.id,op.expiresAt,JSON.stringify(op));}

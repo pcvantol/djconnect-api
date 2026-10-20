@@ -116,3 +116,17 @@ for(const action of ['recover-key','delete-key','submit'])for(const phase of ['s
  if(b){expect((await txRow(b)).state).toBe('ready');expect(await attempts(b)).toBe(1);const after=await storedOps(stub);expect(after).toHaveLength(1);expect(after[0].counter).toBe(1);if(postcommit){expect(after[0].authorizationExpiresAt).toBe(saved[0].authorizationExpiresAt);expect(after).toEqual(saved);}}
  if(action==='delete-key')expect((await receiptRows(stub)).keys.map(v=>JSON.parse(v.value).status)).toEqual(['revoked']);
 });
+
+for(const stage of ['challenge','authorize'])for(const action of ['recover-key','delete-key','submit'])for(const mode of ['disabled','expired'])test('HTTP assertion server-policy503 charges finite calls and explicit original repair: '+stage+'/'+action+'/'+mode,async()=>{
+ const r=rig(),a=await app(r),b=action==='submit'?await browser(r):undefined,stub=await enrolledStub(a);let path,body;
+ if(stage==='challenge'){path=action==='submit'?'/submit-challenge':'/attestation/challenge';body=action==='submit'?{...b.scan,key_id:a.keyId,envelope_digest:fixture.digest}:{key_id:a.keyId,action};}
+ else if(action==='submit'){body=await submission(r,b,a);path='/submit';}
+ else{const ch=await post(r,'/attestation/challenge',{key_id:a.keyId,action},{native:true});expect(ch.status).toBe(200);body={key_id:a.keyId,challenge_id:ch.body.challenge_id,client_data:ch.body.client_data,assertion:await assertion(a,ch.body)};path=action==='recover-key'?'/attestation/recover':'/attestation/delete';}
+ const before=await storedOps(stub),beforeKey=await receiptRows(stub),calls=await keyCalls(),requests=(await gateRows('request_days'))[0].count,settings=await runInDurableObject(stub,i=>({enabled:i.env.ASSERTION_POLICY_ENABLED,until:i.env.ASSERTION_POLICY_EXPIRES_AT}));
+ await runInDurableObject(stub,i=>{if(mode==='disabled')i.env.ASSERTION_POLICY_ENABLED='disabled';else i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now());});
+ try{const out=await reject(post(r,path,body,{native:true}),'service_unavailable',503);expect(out.headers.has('Retry-After')).toBe(false);expect(await keyCalls()).toBe(calls+1);expect((await gateRows('request_days'))[0].count).toBe(requests+1);expect(await storedOps(stub)).toEqual(before);expect(await receiptRows(stub)).toEqual(beforeKey);if(b){expect((await txRow(b)).state).toBe('pending');expect(await attempts(b)).toBe(1);}}
+ finally{await runInDurableObject(stub,i=>{i.env.ASSERTION_POLICY_ENABLED=settings.enabled;i.env.ASSERTION_POLICY_EXPIRES_AT=settings.until;});}
+ const repaired=await post(r,path,body,{native:true});expect(repaired.status).toBe(stage==='challenge'?200:action==='submit'?202:200);expect(await keyCalls()).toBe(calls+2);expect((await gateRows('request_days'))[0].count).toBe(requests+2);
+ if(stage==='authorize'&&action!=='delete-key'){const after=await storedOps(stub);expect(after).toHaveLength(1);expect(after[0].id).toBe(before[0].id);expect(after[0].expiresAt).toBe(before[0].expiresAt);expect(JSON.parse((await receiptRows(stub)).keys[0].value).counter).toBe(1);}
+ if(b){expect(await attempts(b)).toBe(stage==='challenge'?2:1);expect((await txRow(b)).state).toBe(stage==='challenge'?'pending':'ready');expect((await txRow(b)).expiresAt).toBe(b.created.expires_at);}
+});
