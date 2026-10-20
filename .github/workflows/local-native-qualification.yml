@@ -23,6 +23,8 @@ jobs:
         run: node --test qualification/rendezvous/local-native.check.mjs
       - name: Fixed private40381 source/profile/software-policy and actual genuine negatives
         run: node --test qualification/rendezvous/private-profile-40381.check.mjs
+      - name: Fixed root sourceguard derivation refuses drift
+        run: node --test qualification/rendezvous/root-integration-derivation.check.mjs
       - name: Immutable public receiver to actual local API interoperability
         run: |
           DJC_INTEROP_INPUTS="$(mktemp -d)"
@@ -53,3 +55,4 @@ jobs:
           npm ci --prefix "$DJC_BROWSER_TOOL_INPUTS" --ignore-scripts --no-audit --no-fund
           node "$DJC_BROWSER_TOOL_INPUTS/node_modules/playwright/cli.js" install --with-deps chromium webkit
           node qualification/rendezvous/run-browser-interop.mjs "$DJC_BROWSER_RECEIVER_INPUTS" "$DJC_BROWSER_TOOL_INPUTS"
+          node qualification/rendezvous/root-integration.check.mjs "$DJC_BROWSER_TOOL_INPUTS"
