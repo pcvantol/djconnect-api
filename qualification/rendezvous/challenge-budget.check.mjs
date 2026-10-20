@@ -8,7 +8,7 @@ import cbor from 'cbor';
 import * as pki from 'pkijs';
 import {CompactEncrypt,compactDecrypt,calculateJwkThumbprint} from 'djc-qualified-jose';
 import fixture from './public-envelope.json';
-import {COMPOSED_POLICY} from './composed-http';
+import {COMPOSED_POLICY,BudgetedTransactionCoordinator} from './composed-http';
 import {deriveBudgetIdentity,BUDGET_NAME,BUDGET_POLICY} from './allocation-budget';
 import {INDEX_NAME,INDEX_POLICY} from './allocation-index';
 import {RequestAdmissionState,createRequestBudgetedHandler,REQUEST_NAME,REQUEST_POLICY} from './request-admission';
@@ -95,4 +95,24 @@ for(const action of ['recover-key','delete-key','submit'])for(const phase of ['r
  const path=action==='submit'?'/submit-challenge':'/attestation/challenge',body=action==='submit'?{...b.scan,key_id:keyId,envelope_digest:fixture.digest}:{key_id:keyId,action},beforeRequests=(await gateRows('request_days'))[0]?.count??0,out=await reject(post(r,path,body,{native:true}),'service_unavailable',503);expect(hits).toBe(1);expect(out.headers.has('Retry-After')).toBe(false);expect(await keyCalls()).toBe(1);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+1);if(b)expect(await attempts(b)).toBe(1);
  const state=await storedOps(stub);expect(state).toHaveLength(phase==='after-commit'?1:0);const repaired=await post(base,path,body,{native:true});expect(repaired.status).toBe(200);expect(await keyCalls()).toBe(2);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+2);if(b){expect(await attempts(b)).toBe(2);expect(repaired.body.expires_at).toBe(b.created.expires_at);}
  const after=await storedOps(stub);expect(after).toHaveLength(phase==='after-commit'&&action==='submit'?2:1);if(phase==='after-commit'){expect(after.find(v=>v.id===state[0].id)).toEqual(state[0]);if(action!=='submit'){expect(repaired.body.challenge_id).toBe(state[0].id);expect(repaired.body.challenge).toBe(state[0].nonce);expect(repaired.body.expires_at).toBe(state[0].expiresAt);}}
+});
+
+for(const action of ['recover-key','delete-key','submit'])for(const phase of ['snapshot-read','receipt-write','set-alarm','after-commit'])test('HTTP authorize internal failure is finite closed503 with charged explicit repair: '+action+'/'+phase,async()=>{
+ const base=rig(),a=await app(base),b=action==='submit'?await browser(base):undefined,stub=await enrolledStub(a),ns=env.SOFTWARE_ENROLLMENT;
+ let body,path;if(action==='submit'){body=await submission(base,b,a);path='/submit';}else{const ch=await post(base,'/attestation/challenge',{key_id:a.keyId,action},{native:true});expect(ch.status).toBe(200);body={key_id:a.keyId,challenge_id:ch.body.challenge_id,client_data:ch.body.client_data,assertion:await assertion(a,ch.body,1)};path=action==='recover-key'?'/attestation/recover':'/attestation/delete';}
+ const before=await storedOps(stub),initialCalls=await keyCalls(),initialRequests=(await gateRows('request_days'))[0].count;let hits=0;
+ const faultKeys={idFromName:ns.idFromName.bind(ns),get(id){const real=ns.get(id);return {authorize:input=>runInDurableObject(real,async(i,c)=>{let transactions=0;
+ const target=phase==='set-alarm'||phase==='after-commit'?c.storage:c.storage.sql,method=phase==='set-alarm'?'setAlarm':phase==='after-commit'?'transactionSync':'exec',original=target[method].bind(target),spy=vi.spyOn(target,method).mockImplementation((...args)=>{
+  if(phase==='after-commit'){if(++transactions===2){original(...args);hits++;throw new Error('PRIVATE proof_rejected');}return original(...args);}
+  const sql=String(args[0]),selected=phase==='set-alarm'||phase==='snapshot-read'&&sql.startsWith('SELECT value FROM proof_operations WHERE')||phase==='receipt-write'&&(action==='delete-key'?sql==='DELETE FROM proof_operations':sql.startsWith('INSERT INTO proof_operations'));
+  if(selected){hits++;throw new Error('PRIVATE proof_rejected');}return original(...args);
+ });try{return await i.authorize(input);}finally{spy.mockRestore();}})};}};
+ const txns=env.SOFTWARE_COMPOSED_TRANSACTIONS,r=rig({ENROLLMENT_COORDINATOR:faultKeys,...(b?{COMPOSED_TRANSACTIONS:{idFromName:txns.idFromName.bind(txns),get(id){const real=txns.get(id);return {submit:input=>runInDurableObject(real,(i,c)=>new BudgetedTransactionCoordinator(c,i.env,txns,faultKeys).submit(input))};}}}:{})});
+ const out=await reject(post(r,path,body,{native:true}),'service_unavailable',503);expect(hits).toBe(1);expect(out.headers.has('Retry-After')).toBe(false);expect(await keyCalls()).toBe(initialCalls+1);expect((await gateRows('request_days'))[0].count).toBe(initialRequests+1);
+ const postcommit=phase==='set-alarm'||phase==='after-commit',saved=await storedOps(stub),state=JSON.parse((await receiptRows(stub)).keys[0].value);
+ if(postcommit&&action==='delete-key'){expect(state.status).toBe('revoked');expect(saved).toEqual([]);}else{expect(state.counter).toBe(postcommit?1:0);if(postcommit){expect(saved[0].status).toBe('authorized');expect(saved[0].expiresAt).toBe(before[0].expiresAt);}else expect(saved).toEqual(before);}
+ if(b){expect((await txRow(b)).state).toBe('pending');expect(await attempts(b)).toBe(1);}
+ const repaired=await post(base,path,body,{native:true});expect(repaired.status).toBe(action==='delete-key'&&postcommit?401:action==='submit'?202:200);expect(await keyCalls()).toBe(initialCalls+2);expect((await gateRows('request_days'))[0].count).toBe(initialRequests+2);
+ if(b){expect((await txRow(b)).state).toBe('ready');expect(await attempts(b)).toBe(1);const after=await storedOps(stub);expect(after).toHaveLength(1);expect(after[0].counter).toBe(1);if(postcommit){expect(after[0].authorizationExpiresAt).toBe(saved[0].authorizationExpiresAt);expect(after).toEqual(saved);}}
+ if(action==='delete-key')expect((await receiptRows(stub)).keys.map(v=>JSON.parse(v.value).status)).toEqual(['revoked']);
 });

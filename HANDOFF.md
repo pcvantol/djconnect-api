@@ -1,3 +1,8 @@
+> Selected [authorization internal failures](docs/rendezvous/AUTHORIZATION_INTERNAL_FAILURES_V1.md)
+> separates typed proof401 from unexpected storage503 while preserving original
+> receipt leases, counters and deletion unknown outcomes. Full taxonomy and all22
+> service gates remain OPEN; protected delivery and separate Finalization required.
+>
 > Current selected [enrollment-policy availability](docs/rendezvous/ENROLLMENT_POLICY_AVAILABILITY_V1.md)
 > corrects server-owned unavailable enrollment settings to the existing503, with
 > strict original-context401 and unknown postcommit outcome retained. New source
