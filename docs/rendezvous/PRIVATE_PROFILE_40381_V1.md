@@ -100,9 +100,10 @@ provider positive is fabricated. CI also retains the original ten host/native
 negative groups, nine receiver guards/seven Node checks and four browser cases.
 
 The runtime uses the existing fixed common-certificate CRL/OCSP-only outbound
-guard, independent interception controls, RAM-only DO state, loopback bridge,
+guard, independent interception controls, isolated nonpersistent local DO storage, loopback bridge,
 disabled inspector, source drift checks and cleanup. No secret or native input
-is logged; diagnostics are fixed codes and public provenance only. Private
+is logged; diagnostics are fixed codes and public provenance only. OS/SDK temporary
+behavior is not an exclusively-RAM storage or physical-erasure guarantee. Private
 proof files are retained; cleanup is not physical erasure. Rollback: stop this
 owned local process and retain its evidence; use the original default tool for
 separately admitted default-profile work. No product migration/deployment or
