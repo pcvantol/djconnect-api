@@ -58,7 +58,7 @@ test('controller refuses other routes, key changes, proof retries and concurrent
 test('signed P256 assertion software fixtures distinguish both build policies and preserve crypto denials',async()=>scratch(async p=>{
  const snapshot=await sourceSnapshot(),stage=await stage40381(snapshot,repo,p);
  // Node software-fixture loader: bind imports to the SAME installed modules as
- // the original core. Bundling CJS stream packages changes their Node behavior.
+ // the original core. This is a software fixture, not the runtime bundle.
  // Only import addresses change here; the runtime's actual graph is tested below.
  let code=await readFile(join(stage.root,CORE),'utf8');
  for(const name of ['cbor','asn1js','pkijs'])code=code.replace("from '"+name+"'","from "+JSON.stringify(pathToFileURL(require.resolve(name)).href));
@@ -72,9 +72,10 @@ test('signed P256 assertion software fixtures distinguish both build policies an
   const point=new Uint8Array(await crypto.subtle.exportKey('raw',keys.publicKey)),client=Buffer.from('synthetic saved client data');
   const auth=new Uint8Array(37);auth.set(await hash(Buffer.from('ZEML4LPXH4.dev.djconnect.ios')));auth[32]=0xc0;new DataView(auth.buffer).setUint32(33,1,false);
   const ext=new Map([['apple_bundle_version_01',build],['apple_validation_category_01',Buffer.from([3,0,0,0])]]);change(auth,ext);
-  const data=combine(auth,cbor.encode(ext)),nonce=await hash(combine(data,await hash(client)));
+  // Wait for the Node26 encoder stream; synchronous encode can return just its header.
+  const data=combine(auth,await cbor.encodeAsync(ext)),nonce=await hash(combine(data,await hash(client)));
   const sig=pki.createCMSECDSASignature(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},keys.privateKey,nonce));
-  return {proof:cbor.encode(new Map([['signature',Buffer.from(sig)],['authenticatorData',Buffer.from(data)]])),point,client};
+  return {proof:await cbor.encodeAsync(new Map([['signature',Buffer.from(sig)],['authenticatorData',Buffer.from(data)]])),point,client};
  }
  const check=(fn,f,previous=0)=>fn(f.proof,f.client,f.point,previous);
  const fresh=await sign('40381');assert.equal((await check(variant.qualifyAssertionCore,fresh))?.counter,1);assert.equal(await check(baseline.qualifyAssertionCore,fresh),null);
@@ -83,7 +84,7 @@ test('signed P256 assertion software fixtures distinguish both build policies an
  for(const previous of [1,2,-1,0xffffffff])assert.equal(await check(variant.qualifyAssertionCore,fresh,previous),null);
  assert.equal(await check(variant.qualifyAssertionCore,{...fresh,client:Buffer.from('different')}),null);
  const decoded=cbor.decodeFirstSync(fresh.proof,{preferMap:true});decoded.get('signature')[10]^=1;
- assert.equal(await check(variant.qualifyAssertionCore,{...fresh,proof:cbor.encode(decoded)}),null);
+ assert.equal(await check(variant.qualifyAssertionCore,{...fresh,proof:await cbor.encodeAsync(decoded)}),null);
 }));
 
 test('actual fixed40381 private workerd keeps120s/default-genuine negatives/zero keys and terminates failed experiment', {timeout:60000},async()=>{
