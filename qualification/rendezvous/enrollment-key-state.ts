@@ -32,7 +32,7 @@ export class EnrollmentKeyState extends AssertionKeyState {
   #configuration(){if(!validReceiptActiveKey(this.env))throw new EnrollmentConfigUnavailable();}
   protected enrollmentPolicy(now:number){
     const env=this.env as EnrollmentEnv,until=Number(env.ASSERTION_POLICY_EXPIRES_AT),revision=env.ENROLLMENT_POLICY_REVISION;
-    need(env.ASSERTION_POLICY_ENABLED===POLICY&&integer(until)&&now<until&&typeof revision==='string'&&revision.length>0&&revision.length<=128);
+    if(!(env.ASSERTION_POLICY_ENABLED===POLICY&&integer(until)&&now<until&&typeof revision==='string'&&revision.length>0&&revision.length<=128))throw new EnrollmentConfigUnavailable();
     return {id:POLICY as typeof POLICY,revision,enabled:true,expiresAt:until};
   }
   protected enrollmentOperation(){return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM enrollment_operation WHERE id=1').toArray().map(r=>JSON.parse(r.value) as EnrollmentOperation)[0];}

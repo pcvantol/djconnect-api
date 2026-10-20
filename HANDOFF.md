@@ -1,3 +1,10 @@
+> Current selected [enrollment-policy availability](docs/rendezvous/ENROLLMENT_POLICY_AVAILABILITY_V1.md)
+> corrects server-owned unavailable enrollment settings to the existing503, with
+> strict original-context401 and unknown postcommit outcome retained. New source
+> qualification is a fixed106-input protected baseline plus explicit pinned delta;
+> all22full-service gates stay OPEN and public root stays compiled OFF.
+> Protected source/CI/artifact/Finalization readbacks remain required for delivery.
+>
 > Selected [root HTTP integration](docs/rendezvous/ROOT_HTTP_INTEGRATION_V1.md)
 > connects the real dispatcher behind a fixed compiled-OFF sourceguard. The local
 > one-line derivative exercises actual two-origin HTTP/OPTIONS/POST with the same

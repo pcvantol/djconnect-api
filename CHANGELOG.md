@@ -1,3 +1,8 @@
+## Unreleased — enrollment server-policy availability
+
+- Distinguish unusable server enrollment policy from invalid sender proof with the existing service-unavailable response; preserve original deadlines, budgets and uncertain postcommit outcomes.
+- Qualify precise configuration/commit races and retain squash-safe exact-source preparation through a closed pinned delta; no public activation.
+
 # Changelog
 
 ## Unreleased — Source-disabled root HTTP integration
