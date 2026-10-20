@@ -1,16 +1,16 @@
 # Rendezvous deployment preparation, not authorization
 
 Current immutable supplier is protected main
-`379d70b558508f747d578d7b7d90a665bad7ffc8` (PR111, separately finalized).
+`86eda61c561b10775d167401c7b743b0f8177fc7` (PR112, separately finalized).
 Its exact shared/root proofs and unchanged module proof define the 106-source
-baseline. The current internal-registration-failure slice adds a fixed six-input
+baseline. The current action-challenge-issuance slice adds a fixed three-input
 delta and separately hashed shared/root observations; no mutable path list,
 HEAD fallback, chained delta evaluation or PR object fetch defines authority.
 The machine `source_provenance` names the baseline, exact delta hash and effective
 source-map digest. The depth-one regression retains only that protected supplier;
 its old working files fail until all fixed new delta inputs are installed.
 Earlier proofs remain unchanged historical evidence. See
-[internal failure qualification](REGISTRATION_INTERNAL_FAILURES_V1.md).
+[action challenge failure qualification](ACTION_CHALLENGE_FAILURES_V1.md).
 The released SOURCE/WIRE
 interface remains **djc-rendezvous/1-implementation.1**; no consumer ACK reopens.
 Operational profile `0.4.0-draft` is not production/activation approval. The current

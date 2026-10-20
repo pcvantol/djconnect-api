@@ -1,5 +1,5 @@
 // SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
-import {ReceiptKeyStore,type StoreEnv,type StoreMaterial} from './receipt-key-store';
+import {ReceiptKeyStore,StoreRejected,type StoreEnv,type StoreMaterial} from './receipt-key-store';
 import {qualifyAssertionCore} from 'djc-qualified-assertion';
 import {base64Decode,base64Url} from 'djc-existing-crypto';
 export interface CoordinatorEnv extends StoreEnv { ASSERTION_POLICY_ENABLED?:string; ASSERTION_POLICY_EXPIRES_AT?:string }
@@ -8,11 +8,12 @@ export interface SubmitBinding {transactionId:string;generation:number;browserTh
 export interface IssueInput {action:Action;keyId:string;binding?:SubmitBinding}
 export interface ProofInput {operationId:string;action:Action;clientData:string;assertion:string}
 interface Operation {id:string;action:Action;keyAddress:string;createdAt:number;expiresAt:number;status:'challenge'|'authorized';clientData?:string;nonce?:string;binding?:SubmitBinding;requestDigest?:string;counter?:number;admittedAt?:number;authorizationExpiresAt?:number;keyExpiresAt?:number}
+class ProofRejected extends Error {}
 const POLICY='ios-dev-qualification/1',ORIGIN='https://api.djconnect.dev',VERSION='djc-rendezvous/1';
-const need:(v:unknown)=>asserts v=v=>{if(!v)throw new Error('proof_rejected');};
+const need:(v:unknown)=>asserts v=v=>{if(!v)throw new ProofRejected();};
 const closed=(v:object,names:string[])=>need(v!==null&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===names.sort().join(','));
 const integer=(v:number)=>Number.isSafeInteger(v)&&v>=0;
-function b64url(s:string,max:number,exact?:number){need(typeof s==='string'&&s.length>0&&s.length<=Math.ceil(max*4/3));const bytes=Uint8Array.from(atob(s.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));need(bytes.length<=max&&(exact===undefined||bytes.length===exact)&&base64Url(bytes.buffer)===s);return bytes;}
+function b64url(s:string,max:number,exact?:number){need(typeof s==='string'&&s.length>0&&s.length<=Math.ceil(max*4/3));let bytes:Uint8Array<ArrayBuffer>;try{bytes=Uint8Array.from(atob(s.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));}catch{throw new ProofRejected();}need(bytes.length<=max&&(exact===undefined||bytes.length===exact)&&base64Url(bytes.buffer)===s);return bytes;}
 const opaque=(s:string)=>b64url(s,32,32);
 const random=()=>base64Url(crypto.getRandomValues(new Uint8Array(32)).buffer);
 async function digest(value:unknown){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(value)))),v=>v.toString(16).padStart(2,'0')).join('');}
@@ -28,8 +29,9 @@ export class AssertionKeyState extends ReceiptKeyStore {
  private saveOperation(op:Operation){this.ctx.storage.sql.exec('INSERT INTO proof_operations(id,expires_at,value) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',op.id,op.expiresAt,JSON.stringify(op));}
  private response(op:Operation){need(op.status==='challenge'&&op.clientData&&op.nonce);return {v:VERSION,challenge_id:op.id,challenge:op.nonce,expires_at:op.expiresAt,client_data:op.clientData};}
  private async issueInternal(input:IssueInput){
+  need(input&&typeof input==='object'&&!Array.isArray(input));if(input.binding!==undefined&&input.binding!==null)need(typeof input.binding==='object'&&!Array.isArray(input.binding));
   input={...input,...(input.binding?{binding:{...input.binding}}:{})};closed(input,input.action==='submit'?['action','keyId','binding']:['action','keyId']);need(['recover-key','delete-key','submit'].includes(input.action));
-  need(typeof input.keyId==='string'&&input.keyId.length===44);const keyBytes=base64Decode(input.keyId);need(keyBytes.length===32&&btoa(String.fromCharCode(...keyBytes))===input.keyId);
+  need(typeof input.keyId==='string'&&input.keyId.length===44);let keyBytes:Uint8Array;try{keyBytes=base64Decode(input.keyId);}catch{throw new ProofRejected();}need(keyBytes.length===32&&btoa(String.fromCharCode(...keyBytes))===input.keyId);
   const keyAddress=await digest(['development',POLICY,input.keyId]);let binding:SubmitBinding|undefined;
   if(input.action==='submit'){
    need(input.binding);closed(input.binding,['transactionId','generation','browserThumbprint','envelopeDigest','expiresAt']);binding={...input.binding};
@@ -38,7 +40,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
   const now=Date.now();this.policy(now);const expiresAt=binding?.expiresAt??now+120000;need(integer(expiresAt)&&expiresAt>now&&expiresAt-now<=120000);
   const id=random(),nonce=random(),body=binding?{v:VERSION,action:input.action,service_origin:ORIGIN,transaction_id:binding.transactionId,generation:binding.generation,browser_key_thumbprint:binding.browserThumbprint,expires_at:expiresAt,key_id:input.keyId,challenge_id:id,challenge:nonce,envelope_digest:binding.envelopeDigest}:{v:VERSION,action:input.action,service_origin:ORIGIN,key_id:input.keyId,challenge_id:id,challenge:nonce,expires_at:expiresAt};
   const op:Operation={id,nonce,action:input.action,keyAddress,createdAt:now,expiresAt,status:'challenge',clientData:base64Url(JSON.stringify(body)),...(binding?{binding}:{})};
-  return this.locked(async()=>{
+  try{return await this.locked(async()=>{
    const alarm=await this.ctx.storage.getAlarm();await this.ctx.storage.setAlarm(Math.min(alarm??expiresAt,expiresAt));
    return this.ctx.storage.transactionSync(()=>{
     const at=Date.now();this.policy(at);const row=this.cleanup(at);need(at>=now&&at<expiresAt);if(row)need(row.keyAddress===keyAddress);
@@ -46,7 +48,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
     if(input.action!=='submit'){const existing=ops.find(v=>v.status==='challenge'&&v.action===input.action&&v.keyAddress===keyAddress);if(existing)return {ok:true as const,...this.response(existing)};}
     need(ops.length<32&&ops.filter(v=>v.action===input.action).length<(input.action==='submit'?28:2)&&!this.operation(op.id));this.saveOperation(op);return {ok:true as const,...this.response(op)};
    });
-  });
+  });}catch(error){need(Date.now()>=now&&Date.now()<expiresAt);throw error;}
  }
  private disposition(op:Operation,requestDigest:string,now:number){
   const row=this.active(now),policyUntil=this.policy(now);need(op.status==='authorized'&&op.requestDigest===requestDigest&&op.keyAddress===row.keyAddress&&now>=op.admittedAt!&&now<op.expiresAt);
@@ -74,7 +76,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
  }
  // Single active verification per key. No queue of unbounded crypto requests.
  async authorize(input:ProofInput){if(this.verifying)return {ok:false as const,error:'proof_rejected' as const};this.verifying=true;try{return {ok:true as const,...await this.authorizeInternal(input)};}catch{return {ok:false as const,error:'proof_rejected' as const};}finally{this.verifying=false;}}
- async issue(input:IssueInput){try{return await this.issueInternal(input);}catch{return {ok:false as const,error:'proof_rejected' as const};}}
+ async issue(input:IssueInput){try{return await this.issueInternal(input);}catch(error){return {ok:false as const,error:error instanceof ProofRejected||error instanceof StoreRejected?'proof_rejected' as const:'service_unavailable' as const};}}
  async lookupSubmit(operationId:string,requestDigest:string){try{opaque(operationId);need(/^[a-f0-9]{64}$/.test(requestDigest));const result=this.ctx.storage.transactionSync(()=>{const op=this.operation(operationId);need(op?.action==='submit');return this.disposition(op,requestDigest,Date.now());});return {ok:true as const,...result};}catch{return {ok:false as const,error:'proof_rejected' as const};}}
  // Direct fixture APIs disabled. Inherited QA helpers/protected hooks are NOT a hardened untrusted RPC boundary.
  override async install(_m:StoreMaterial){return {ok:false as const,error:'store_rejected' as const};}
