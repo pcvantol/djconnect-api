@@ -115,3 +115,57 @@ for(const value of [null,[],{},{name:'RegistrationRejected',message:'registratio
 for(const value of [{ok:false,error:'enrollment_rejected'},{ok:false,error:'attestation_unavailable'}])test('exact closed verifier denial keeps domain classification: '+value.error,async()=>{const f=await software(),s=await setup(),{input}=await request(s,f),before=await op(s);await runInDurableObject(s,async(i,c)=>{class FaultState extends EnrollmentKeyState{verifyEnrollment(){return value;}}expect(await new FaultState(c,i.env).enroll(input)).toEqual({ok:false,error:value.error==='enrollment_rejected'?'registration_rejected':'attestation_unavailable'});});expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();});
 
 for(const [name,result] of [['negative-array',Object.assign([],{ok:false,error:'enrollment_rejected'})],['positive-array',Object.assign([],{ok:true,evidence:{}})],['evidence-array',{ok:true,evidence:[]}],['semantic-bad-point',{ok:true,evidence:{publicPoint:new Uint8Array([1]),initialReceipt:new Uint8Array([1])}}]])test('verifier envelope rejects arrays but retains semantic validation401: '+name,async()=>{const f=await software(),s=await setup(),{input}=await request(s,f),before=await op(s);await runInDurableObject(s,async(i,c)=>{let hits=0;class FaultState extends EnrollmentKeyState{verifyEnrollment(){hits++;return result;}}expect(await new FaultState(c,i.env).enroll(input)).toEqual({ok:false,error:name==='semantic-bad-point'?'registration_rejected':'service_unavailable'});expect(hits).toBe(1);});expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();});
+
+
+// Reached default-verifier callback faults; no software-positive or native claim.
+for(const fault of ['sqlite-read','policy-unavailable'])for(const at of [1,2,3])test('default verifier preserves transient internal snapshot fault503: '+fault+' read'+at,async()=>{
+ const f=await software(),s=await setup(real),{input}=await request(s,f),before=await op(s);
+ const result=await runInDurableObject(s,async(i,c)=>{
+  let snapshots=0,hits=0;
+  class FaultState extends EnrollmentKeyState{
+   enrollmentSnapshot(){
+    snapshots++;
+    if(snapshots===at){
+     hits++;
+     if(fault==='sqlite-read')c.storage.sql.exec('SELECT value FROM qa_missing_snapshot_table');
+     const saved=this.env.ASSERTION_POLICY_ENABLED;this.env.ASSERTION_POLICY_ENABLED='disabled';
+     try{return super.enrollmentSnapshot();}finally{this.env.ASSERTION_POLICY_ENABLED=saved;}
+    }
+    return super.enrollmentSnapshot();
+   }
+  }
+  const result=await new FaultState(c,i.env).enroll(input);
+  expect(hits).toBe(1);return result;
+ });
+ expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();
+ // Healthy invalid proof remains a sender rejection; no replacement challenge.
+ expect(await s.enroll(input)).toEqual({ok:false,error:'registration_rejected'});
+ expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();
+ expect(result).toEqual({ok:false,error:'service_unavailable'});
+});
+
+for(const mode of ['live','expiry','rollback'])test('default verifier callback failure respects known original window: '+mode,async()=>{
+ const f=await software(),s=await setup(real),{input,challenge}=await request(s,f),before=await op(s);
+ await clock(Date.now(),async()=>{
+  await runInDurableObject(s,async(i,c)=>{
+   let reads=0,hits=0,afterFault=0,faulted=false;
+   const exec=c.storage.sql.exec.bind(c.storage.sql),spy=vi.spyOn(c.storage.sql,'exec').mockImplementation((...args)=>{if(faulted)afterFault++;return exec(...args);});
+   class FaultState extends EnrollmentKeyState{
+    enrollmentSnapshot(){reads++;if(reads===3){hits++;if(mode==='expiry')vi.setSystemTime(challenge.expires_at);if(mode==='rollback')vi.setSystemTime(before.createdAt-1);faulted=true;throw new Error('registration_rejected attestation_unavailable private marker');}return super.enrollmentSnapshot();}
+   }
+   try{expect(await new FaultState(c,i.env).enroll(input)).toEqual({ok:false,error:mode==='live'?'service_unavailable':'registration_rejected'});expect(hits).toBe(1);expect(afterFault).toBe(0);}finally{spy.mockRestore();}
+  });
+ });
+ expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();
+});
+test('default verifier retains typed saved-context rejection instead of promoting to503',async()=>{
+ const f=await software(),s=await setup(real),{input}=await request(s,f),before=await op(s);
+ await runInDurableObject(s,async(i,c)=>{
+  let reads=0,hits=0;
+  class ReplacedContext extends EnrollmentKeyState{
+   enrollmentSnapshot(){reads++;if(reads===3){hits++;const saved=this.env.ENROLLMENT_POLICY_REVISION;this.env.ENROLLMENT_POLICY_REVISION='different-valid-revision';try{return super.enrollmentSnapshot();}finally{this.env.ENROLLMENT_POLICY_REVISION=saved;}}return super.enrollmentSnapshot();}
+  }
+  expect(await new ReplacedContext(c,i.env).enroll(input)).toEqual({ok:false,error:'registration_rejected'});expect(hits).toBe(1);
+ });
+ expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();
+});

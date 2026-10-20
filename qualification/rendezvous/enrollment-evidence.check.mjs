@@ -126,3 +126,12 @@ for(const f of fixtures.genuine){
     expect(await verifier.verify({challengeId:id,keyId:f.credential,attestation:decode(f.attestation)})).toEqual(denied);expect(cms).toHaveBeenCalledOnce();expect(check).not.toHaveBeenCalled();expect(network).not.toHaveBeenCalled();
   });
 }
+
+// A saved-state callback belongs to the coordinator, not to proof evaluation.
+for(const at of [1,2,3,4,5,6,7,8])for(const name of ['Error','null','string','lookalike'])test('saved-state callback fault preserves identity and releases busy: '+name+' read'+at,async()=>{
+ const f=fixture();let reads=0,hits=0;
+ const marker=name==='Error'?new Error('enrollment_rejected private marker'):name==='null'?null:name==='string'?'attestation_unavailable':{name:'RegistrationRejected',message:'enrollment_rejected'};
+ const verifier=createSoftwareStubEnrollmentVerifier(()=>{reads++;if(reads===at){hits++;throw marker;}return f.state;},f.components);
+ await expect(verifier.verify(f.request)).rejects.toBe(marker);expect(hits).toBe(1);
+ expect((await verifier.verify(f.request)).ok).toBe(true);
+});

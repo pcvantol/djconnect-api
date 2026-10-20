@@ -48,3 +48,25 @@ const enrollmentRows=stub=>runInDurableObject(stub,(_i,c)=>({keys:c.storage.sql.
 for(const denial of [{ok:false,error:'attestation_unavailable'},{ok:false,error:'attestation_unavailable',extra:'PRIVATE'},{ok:false,error:'unknown'}])test('actual SQLite enrollment denial commits no key or receipt '+JSON.stringify(denial),async()=>{const f=await pendingRegistration(),before=await enrollmentRows(f.stub),input={keyId:f.input.key_id,challengeId:f.input.challenge_id,attestation:Buffer.from(f.input.attestation,'base64url')};const out=await runInDurableObject(f.stub,(i,c)=>{class FaultState extends EnrollmentKeyState{verifyEnrollment(){return Promise.resolve(denial);}}return new FaultState(c,i.env).enroll(input);});expect(out).toEqual({ok:false,error:denial.extra===undefined&&denial.error==='attestation_unavailable'?'attestation_unavailable':'service_unavailable'});expect(await enrollmentRows(f.stub)).toEqual(before);expect((await post(f.r,'/attestation/register',f.input,{native:true})).status).toBe(201);});
 test('guarded HTTP status unavailable retains original nonce and attempts then same proof succeeds',async()=>{const f=await pendingRegistration(),before=await enrollmentRows(f.stub);let deniedCalls=0;const ns=env.SOFTWARE_ENROLLMENT,r=rig({ENROLLMENT_COORDINATOR:{idFromName:ns.idFromName.bind(ns),get(id){const real=ns.get(id);return {enroll:async input=>{deniedCalls++;return runInDurableObject(real,(i,c)=>{class UnavailableState extends EnrollmentKeyState{verifyEnrollment(){return Promise.resolve({ok:false,error:'attestation_unavailable'});}}return new UnavailableState(c,i.env).enroll(input);});}};}}});const out=await post(r,'/attestation/register',f.input,{native:true});expect(out.status).toBe(503);expect(out.body).toEqual({v:V,error:'attestation_unavailable'});expect(out.headers.has('Retry-After')).toBe(false);expect(deniedCalls).toBe(1);expect(await enrollmentRows(f.stub)).toEqual(before);expect((await counts()).days[0].keys).toBe(1);const repaired=await post(f.r,'/attestation/register',f.input,{native:true});expect(repaired.status).toBe(201);expect((await counts()).days[0].keys).toBe(2);expect((await enrollmentRows(f.stub)).keys).toHaveLength(1);});
 test('expired original enrollment context never invokes unavailable verifier',async()=>{const f=await pendingRegistration();vi.setSystemTime(f.ch.expires_at);let calls=0;const out=await runInDurableObject(f.stub,(i,c)=>{class UnavailableState extends EnrollmentKeyState{verifyEnrollment(){calls++;return Promise.resolve({ok:false,error:'attestation_unavailable'});}}return new UnavailableState(c,i.env).enroll({keyId:f.input.key_id,challengeId:f.input.challenge_id,attestation:Buffer.from(f.input.attestation,'base64url')});});expect(out).toEqual({ok:false,error:'registration_rejected'});expect(calls).toBe(0);expect((await enrollmentRows(f.stub)).keys).toEqual([]);});
+
+for(const fault of ['sqlite-read','policy-unavailable'])test('guarded HTTP default verifier snapshot fault503 preserves nonce and charges attempts: '+fault,async()=>{
+ const f=await pendingRegistration(),before=await enrollmentRows(f.stub),beforeRequests=(await gateRows('request_days'))[0].count;
+ let hits=0,inject=true;
+ const ns=env.SOFTWARE_ENROLLMENT,r=rig({ENROLLMENT_COORDINATOR:{idFromName:ns.idFromName.bind(ns),get(id){
+  const actual=ns.get(id);return {enroll:input=>runInDurableObject(actual,(i,c)=>{
+   let reads=0;
+   class FaultState extends EnrollmentKeyState{
+    enrollmentSnapshot(){reads++;if(inject&&reads===3){hits++;if(fault==='sqlite-read')c.storage.sql.exec('SELECT value FROM qa_missing_snapshot_table');const saved=this.env.ASSERTION_POLICY_ENABLED;this.env.ASSERTION_POLICY_ENABLED='disabled';try{return super.enrollmentSnapshot();}finally{this.env.ASSERTION_POLICY_ENABLED=saved;}}return super.enrollmentSnapshot();}
+   }
+   return new FaultState(c,i.env).enroll(input);
+  })};
+ }}});
+ const failed=await reject(post(r,'/attestation/register',f.input,{native:true}),'service_unavailable',503);
+ expect(failed.headers.has('Retry-After')).toBe(false);expect(hits).toBe(1);
+ expect(await enrollmentRows(f.stub)).toEqual(before);expect((await counts()).days[0].keys).toBe(1);
+ expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+1);
+ // Explicit original-request repair reaches genuine parsing and rejects the fixture proof.
+ inject=false;await reject(post(r,'/attestation/register',f.input,{native:true}),'invalid_sender_proof',401);
+ expect(hits).toBe(1);expect(await enrollmentRows(f.stub)).toEqual(before);
+ expect((await counts()).days[0].keys).toBe(2);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+2);
+});

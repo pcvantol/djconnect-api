@@ -9,6 +9,7 @@ export interface EnrollmentEvidence {
   policy:'ios-dev-qualification/1';policyRevision:string;verifiedAt:number;validUntil:number;
   publicPoint:Uint8Array;initialReceipt:Uint8Array;receiptCreatedAt:number;
 }
+/** Saved-state callback failures reject unchanged for owning-coordinator classification. */
 export interface EnrollmentVerifier {
   verify(request:{challengeId:string;keyId:string;attestation:Uint8Array}):Promise<
     {ok:true;evidence:EnrollmentEvidence}|{ok:false;error:'enrollment_rejected'|'attestation_unavailable'}>;

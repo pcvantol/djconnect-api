@@ -1,3 +1,9 @@
+> Current [enrollment callback failure correction](docs/rendezvous/ENROLLMENT_CALLBACK_FAILURES_V1.md)
+> preserves coordinator-owned saved-state exceptions instead of labelling transient
+> server faults as invalid proof. Local1485 shared cases pass; independent reviews,
+> exact protected delivery and separate Finalization remain pending. Public service
+> stays compiledOFF/all22full-service gatesOPEN.
+>
 # DJConnect API TODO Backlog
 
 ## Production Hardening
