@@ -27,6 +27,27 @@ class PreparationTests(unittest.TestCase):
         self.assertIs(out['activation_allowed'], False)
         self.assertEqual(out['open_gate_count'], 22)
 
+    def test_protected_supplier_survives_squash_and_branch_cleanup(self):
+        # Model main checkout with no PR/intermediate history or object fallback.
+        with tempfile.TemporaryDirectory() as name:
+            checkout = Path(name)
+            subprocess.run(['git', 'init', '--quiet', str(checkout)], check=True)
+            subprocess.run(['git', 'fetch', '--quiet', '--no-tags', '--depth=1',
+                            str(v.ROOT), v.SUPPLYING_SHA], cwd=checkout, check=True)
+            subprocess.run(['git', 'checkout', '--quiet', '--detach', 'FETCH_HEAD'],
+                           cwd=checkout, check=True)
+            commits = subprocess.check_output(['git', 'rev-list', 'HEAD'],
+                                              cwd=checkout, text=True).splitlines()
+            self.assertEqual(commits, [v.SUPPLYING_SHA])
+            missing = subprocess.run(['git', 'cat-file', '-e',
+                                      '81df44c6dbc00f58bb3ca5772cd6836fd9f41c10'],
+                                     cwd=checkout, capture_output=True)
+            self.assertNotEqual(missing.returncode, 0)
+            with patch.object(v, 'ROOT', checkout):
+                out = v.validate(self.plan)
+            self.assertFalse(out['activation_allowed'])
+            self.assertEqual(out['open_gate_count'], 22)
+
     def test_git_cannot_lazy_fetch_or_prompt(self):
         with patch.object(v.subprocess, 'run') as run:
             run.return_value.stdout = b'{}'

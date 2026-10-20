@@ -191,7 +191,7 @@
     "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536"
   },
   "status": "NOT_AUTHORIZED",
-  "supplying_source_sha": "81df44c6dbc00f58bb3ca5772cd6836fd9f41c10",
+  "supplying_source_sha": "6d730476e378ba62c77de8213564c683343a3e43",
   "wire": "djc-rendezvous/1",
   "worker": "djconnect-api"
 }

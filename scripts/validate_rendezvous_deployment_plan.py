@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPPLYING_SHA = '81df44c6dbc00f58bb3ca5772cd6836fd9f41c10'
+SUPPLYING_SHA = '6d730476e378ba62c77de8213564c683343a3e43'
 PROOFS = (
     ('docs/rendezvous/product-composition-shared-source-proof-v1.json',
      '5dcd1ed6fa448a8ac234a1267d9254a13cc587a9ebea83e15e94b00f672361e1',

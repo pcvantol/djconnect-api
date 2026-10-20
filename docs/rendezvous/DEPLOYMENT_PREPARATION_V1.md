@@ -1,8 +1,13 @@
 # Rendezvous deployment preparation, not authorization
 
 Current preparation is rebound to immutable supplying source
-`81df44c6dbc00f58bb3ca5772cd6836fd9f41c10` (source-disabled root integration;
+`6d730476e378ba62c77de8213564c683343a3e43` (source-disabled root integration;
 protected delivery and separate Finalization require their own exact evidence).
+The supplying SHA is protected main, not an intermediate PR commit: main-only
+checkouts must retain the proof after squash and automatic branch cleanup. All
+proof and runtime hashes are unchanged by this provenance-only correction. The
+new regression executes the validator in a depth-one checkout with the old
+intermediate object absent; there is no lazy fetch, fallback or weaker check.
 Historical PR101/102 proofs and prior supplying source remain unchanged.
 The released SOURCE/WIRE
 interface remains **djc-rendezvous/1-implementation.1**; no consumer ACK reopens.
