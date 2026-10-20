@@ -4,6 +4,7 @@ import {mkdtemp,chmod,readFile,writeFile,rm,symlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createRequire} from 'node:module';
+import {pathToFileURL} from 'node:url';
 import cbor from 'cbor';
 import * as pki from 'pkijs';
 import {sourceSnapshot,startLocal40381Runtime,repo} from './local-native-runtime.mjs';
@@ -56,12 +57,15 @@ test('controller refuses other routes, key changes, proof retries and concurrent
 
 test('signed P256 assertion software fixtures distinguish both build policies and preserve crypto denials',async()=>scratch(async p=>{
  const snapshot=await sourceSnapshot(),stage=await stage40381(snapshot,repo,p);
- const {build}=require('esbuild'),exports=[];
- for(const [label,file]of [['default',join(repo,CORE)],['40381',join(stage.root,CORE)]]){
-  const result=await build({entryPoints:[file],bundle:true,write:false,format:'cjs',platform:'node',logLevel:'silent',alias:{cbor:join(repo,'node_modules/cbor/lib/cbor.js'),asn1js:join(repo,'node_modules/asn1js/build/index.es.js'),pkijs:join(repo,'node_modules/pkijs/build/index.es.js')}});
-  const out=join(p,label+'.cjs');await writeFile(out,result.outputFiles[0].contents,{mode:0o600});exports.push(require(out));
- }
- const [baseline,variant]=exports,hash=async b=>new Uint8Array(await crypto.subtle.digest('SHA-256',b));
+ // Node software-fixture loader: bind imports to the SAME installed modules as
+ // the original core. Bundling CJS stream packages changes their Node behavior.
+ // Only import addresses change here; the runtime's actual graph is tested below.
+ let code=await readFile(join(stage.root,CORE),'utf8');
+ for(const name of ['cbor','asn1js','pkijs'])code=code.replace("from '"+name+"'","from "+JSON.stringify(pathToFileURL(require.resolve(name)).href));
+ code=code.replace("from './worker-path-candidate.mjs'","from "+JSON.stringify(pathToFileURL(join(repo,'qualification/rendezvous/worker-path-candidate.mjs')).href));
+ const out=join(p,'node-fixture-core.mjs');await writeFile(out,code,{mode:0o600});
+ const baseline=await import(pathToFileURL(join(repo,CORE)).href),variant=await import(pathToFileURL(out).href);
+ const hash=async b=>new Uint8Array(await crypto.subtle.digest('SHA-256',b));
  const combine=(a,b)=>Uint8Array.from([...a,...b]);
  async function sign(build,change=()=>{}){
   const keys=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},false,['sign','verify']);
