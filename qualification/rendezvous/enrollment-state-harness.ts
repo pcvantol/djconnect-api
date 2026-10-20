@@ -9,7 +9,8 @@ export {EnrollmentCoordinator};
 class SoftwareEnrollmentKeyState extends EnrollmentKeyState {
   protected override allowedEvidenceScope():EnrollmentEvidence['scope']{return 'SOFTWARE_STUB_COMPOSITION_ONLY_NOT_CRYPTO_OR_ENROLLMENT_PROOF';}
   protected override verifyEnrollment(request:RegisterInput){
-    const data=JSON.parse(new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(request.attestation)) as {point:string;nonce:string;receipt:string;created:number;deadline:number};
+    let data:{point:string;nonce:string;receipt:string;created:number;deadline:number};
+    try{data=JSON.parse(new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(request.attestation));}catch{return Promise.resolve({ok:false as const,error:'enrollment_rejected' as const});}
     const read=()=>this.enrollmentSnapshot();
     const components={
       core:async()=>{if(data.nonce!==base64Url(read().challenge.clientData.buffer as ArrayBuffer))return null;return {scope:'ATTESTATION_CORE_ONLY_RECEIPT_UNVERIFIED_NO_ENROLLMENT',point:base64Decode(data.point),receipt:base64Decode(data.receipt),attestedLeaf:new Uint8Array([1]),certificateExpiresAt:data.deadline};},

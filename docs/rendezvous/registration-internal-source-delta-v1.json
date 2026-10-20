@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_SOURCE_DELTA_NOT_DEPLOYMENT_AUTHORIZATION",
+  "baseline_source_sha": "379d70b558508f747d578d7b7d90a665bad7ffc8",
+  "baseline_source_map_sha256": "292a7207557f310a5d7bc4142a1719bf1a21fff8d91f1e7b28631d6f31e20021",
+  "effective_source_map_sha256": "afce6b992d00492d91eb5823ececa5406627ff52966027697dbda0c6c2cfd3f5",
+  "changes": {
+    "qualification/rendezvous/receipt-key-store.ts": {
+      "before": "0d20cb54412c4c117260ff750608d73a12e9b1ca7371c0645754b619939d5875",
+      "after": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33"
+    },
+    "qualification/rendezvous/enrollment-key-state.ts": {
+      "before": "c8f1a647ff87887bbbbfb331548048fcd64179ab3154b45bd14061d3f6da2ef9",
+      "after": "a6782474798f90f0d338bbcfd518cda6ee9338c5ce40205b1020258897c448b0"
+    },
+    "qualification/rendezvous/enrollment-key-state.check.mjs": {
+      "before": "10016426277f506f445d8f51e9b5b4621d9f76ea3d7ec4afffcc5734feb00e8a",
+      "after": "b6710349af970551e7e5b1b2dfb6b73f15eb2d1e48cb37c44cf3cba1382c653e"
+    },
+    "qualification/rendezvous/enrollment-state-harness.ts": {
+      "before": "715a8306e05ccd39aacc9434de7bc7c877458346e70b7e11b31855b7d662ba96",
+      "after": "c475ff92969df368707662a702a272721775ddae7ed0dfd73e5d3874c1253eba"
+    },
+    "qualification/rendezvous/provider-unavailable.check.mjs": {
+      "before": "f1a5161f870132b066f88c9356db614856198328892183aee9fff76ba912f00d",
+      "after": "c77f8f9862df3ac04a92b4e35328d2ecfc91f9c29570d2013f7b3ffb66d85bae"
+    },
+    "qualification/rendezvous/challenge-budget.check.mjs": {
+      "before": "151fdcc7a5840e36ac6ee0dcb9f1bd6af57cf37af7d5049d3e0bbf7a6ea73fef",
+      "after": "b6b36b6110c6d65b2631f5cd78a5ec9760c1449957d932aefd67aea98c90dbb3"
+    }
+  },
+  "proofs": {
+    "shared": {
+      "path": "docs/rendezvous/registration-internal-shared-observations-v1.json",
+      "sha256": "06ddf3a81007cb735ffbe5f10d043353d2ae203b52f373afab46deadaac42f67"
+    },
+    "root": {
+      "path": "docs/rendezvous/registration-internal-build-observations-v1.json",
+      "sha256": "c20ac93e17f11fc20137f54f2be75e4e7de48123737ef533d01561cd3615bd1d"
+    }
+  }
+}

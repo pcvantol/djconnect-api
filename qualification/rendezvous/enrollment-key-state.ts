@@ -1,7 +1,7 @@
 // SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import {DurableObject} from 'cloudflare:workers';
 import {AssertionKeyState,type CoordinatorEnv,type IssueInput,type ProofInput} from './assertion-key-state';
-import {validReceiptActiveKey,type StoreMaterial} from './receipt-key-store';
+import {StoreRejected,validReceiptActiveKey,type StoreMaterial} from './receipt-key-store';
 import {createEnrollmentEvidenceVerifier,type EnrollmentVerifier,type EnrollmentEvidence,type SavedEnrollmentState} from './enrollment-evidence-candidate.mjs';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
 
@@ -10,13 +10,14 @@ export interface RegisterInput {challengeId:string;keyId:string;attestation:Uint
 interface EnrollmentOperation {id:string;internalId:string;keyAddress:string;createdAt:number;expiresAt:number;policyRevision:string;policyExpiresAt:number;status:'challenge'|'registered';nonce?:string;requestDigest?:string;keyExpiresAt?:number}
 interface Intent {id:string;keyId:string;keyAddress:string;nonce:string;requestDigest:string;evidence?:EnrollmentEvidence;materialSnapshot?:string;encryptionKey?:string;policyRevision:string;policyExpiresAt:number}
 class EnrollmentConfigUnavailable extends Error {}
+class RegistrationRejected extends Error {}
 const POLICY='ios-dev-qualification/1',VERSION='djc-rendezvous/1';
-const need:(value:unknown)=>asserts value=value=>{if(!value)throw new Error('registration_rejected');};
+const need:(value:unknown)=>asserts value=value=>{if(!value)throw new RegistrationRejected();};
 const integer=(v:number)=>Number.isSafeInteger(v)&&v>=0;
 const closed=(v:object,keys:string[])=>need(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===keys.sort().join(','));
 const b64=(v:Uint8Array)=>btoa(String.fromCharCode(...v));
-function keyId(v:string){need(typeof v==='string'&&v.length===44);const bytes=base64Decode(v);need(bytes.length===32&&b64(bytes)===v);}
-function opaque(v:string){need(typeof v==='string'&&/^[A-Za-z0-9_-]{43}$/.test(v));const bytes=Uint8Array.from(atob(v.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));need(bytes.length===32&&base64Url(bytes.buffer)===v);}
+function keyId(v:string){need(typeof v==='string'&&v.length===44);let bytes:Uint8Array;try{bytes=base64Decode(v);}catch{throw new RegistrationRejected();}need(bytes.length===32&&b64(bytes)===v);}
+function opaque(v:string){need(typeof v==='string'&&/^[A-Za-z0-9_-]{43}$/.test(v));let bytes:Uint8Array<ArrayBuffer>;try{bytes=Uint8Array.from(atob(v.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));}catch{throw new RegistrationRejected();}need(bytes.length===32&&base64Url(bytes.buffer)===v);}
 const hash=async(v:unknown)=>new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(v))));
 const hex=(v:Uint8Array)=>Array.from(v,n=>n.toString(16).padStart(2,'0')).join('');
 const random=()=>base64Url(crypto.getRandomValues(new Uint8Array(32)).buffer);
@@ -81,21 +82,29 @@ export class EnrollmentKeyState extends AssertionKeyState {
           this.saveEnrollment(op);return {ok:true as const,v:VERSION,challenge_id:op.id,challenge:op.nonce!,expires_at:op.expiresAt};
         });
       });
-    }catch(error){return {ok:false as const,error:error instanceof EnrollmentConfigUnavailable?'service_unavailable' as const:'registration_rejected' as const};}
+    }catch(error){return {ok:false as const,error:error instanceof RegistrationRejected||error instanceof StoreRejected?'registration_rejected' as const:'service_unavailable' as const};}
   }
   async enroll(input:RegisterInput){
     if(this.#busy)return {ok:false as const,error:'registration_rejected' as const};this.#busy=true;
+    let original:Readonly<{createdAt:number;expiresAt:number}>|undefined;
     try{
       this.#configuration();closed(input,['keyId','challengeId','attestation']);keyId(input.keyId);opaque(input.challengeId);need(input.attestation instanceof Uint8Array&&input.attestation.length>0&&input.attestation.length<=32768);
       input={keyId:input.keyId,challengeId:input.challengeId,attestation:Uint8Array.from(input.attestation)};
       const address=hex(await hash(['development',POLICY,input.keyId])),digest=hex(await hash([VERSION,'register',input.challengeId,input.keyId,b64(input.attestation)]));
       const policy=this.enrollmentPolicy(Date.now()),op=this.enrollmentOperation();need(op&&op.id===input.challengeId&&op.keyAddress===address&&Date.now()>=op.createdAt&&Date.now()<op.expiresAt&&op.policyRevision===policy.revision&&op.policyExpiresAt===policy.expiresAt);
+      original={createdAt:op.createdAt,expiresAt:op.expiresAt};
       if(op.status==='registered')return this.ctx.storage.transactionSync(()=>this.registered(op.id,address,digest));
       this.#configuration();need(op.nonce);this.#intent={id:op.id,keyId:input.keyId,keyAddress:address,nonce:op.nonce,requestDigest:digest,policyRevision:policy.revision,policyExpiresAt:policy.expiresAt};
       const verified=await this.verifyEnrollment(input);
       need(Date.now()>=op.createdAt&&Date.now()<op.expiresAt);this.enrollmentSnapshot();this.#configuration();
-      if(verified.ok===false&&verified.error==='attestation_unavailable'){closed(verified,['ok','error']);return {ok:false as const,error:'attestation_unavailable' as const};}
-      need(verified.ok);
+      if(!verified||typeof verified!=='object'||Array.isArray(verified))throw new Error();
+      if(verified.ok===false){
+        if(Object.keys(verified).sort().join(',')!=='error,ok')throw new Error();
+        if(verified.error==='attestation_unavailable')return {ok:false as const,error:'attestation_unavailable' as const};
+        if(verified.error==='enrollment_rejected')throw new RegistrationRejected();
+        throw new Error();
+      }
+      if(verified.ok!==true||Object.keys(verified).sort().join(',')!=='evidence,ok'||!verified.evidence||typeof verified.evidence!=='object'||Array.isArray(verified.evidence))throw new Error();
       const e:EnrollmentEvidence={...verified.evidence,initialReceipt:Uint8Array.from(verified.evidence.initialReceipt),publicPoint:Uint8Array.from(verified.evidence.publicPoint)};
       need(e.publicPoint.length===65&&e.publicPoint[0]===4&&e.initialReceipt.length>0&&e.initialReceipt.length<=16384);
       need(b64(new Uint8Array(await crypto.subtle.digest('SHA-256',e.publicPoint)))===input.keyId);
@@ -104,7 +113,7 @@ export class EnrollmentKeyState extends AssertionKeyState {
       this.#intent.evidence=e;this.#intent.materialSnapshot=JSON.stringify(m);this.#intent.encryptionKey=this.env.RECEIPT_ACTIVE_KEY;
       await this.installInternal(m);
       return this.ctx.storage.transactionSync(()=>this.registered(op.id,address,digest));
-    }catch(error){return {ok:false as const,error:error instanceof EnrollmentConfigUnavailable?'service_unavailable' as const:'registration_rejected' as const};}finally{this.#intent=undefined;this.#busy=false;}
+    }catch(error){return {ok:false as const,error:(original&&(Date.now()<original.createdAt||Date.now()>=original.expiresAt))||error instanceof RegistrationRejected||error instanceof StoreRejected?'registration_rejected' as const:'service_unavailable' as const};}finally{this.#intent=undefined;this.#busy=false;}
   }
   override async alarm(){try{this.ctx.storage.transactionSync(()=>this.cleanupEnrollment(Date.now()));await super.alarm();}catch{throw new Error('qualification_cleanup_failed');}}
 }
