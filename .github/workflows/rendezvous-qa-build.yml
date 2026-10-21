@@ -1,0 +1,33 @@
+name: Fixed rendezvous QA build
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  fixed-closed-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Build fixed closed QA artifact and actual workerd negatives
+        id: qa
+        run: node scripts/qualify_rendezvous_qa_build.mjs
+      - name: Retain exact CLOSED QA archive and integrity
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: fixed-rendezvous-qa-${{ github.sha }}
+          path: |
+            ${{ steps.qa.outputs.output_dir }}/fixed-rendezvous-qa.tar.gz
+            ${{ steps.qa.outputs.output_dir }}/archive-integrity.json
+          if-no-files-found: error
+          retention-days: 14
