@@ -1,3 +1,6 @@
+> Selected QA Git replacement guard: real disposable A→B counterproof reproduces wrong source stamp/blob; fixed global --no-replace-objects refuses both.
+> Source patch/reviews/delivery required; earlier docs-only Finalization126 held/superseded. Runtime guard stays false, all22 gates OPEN, no effects.
+
 > Selected fixed isolated QA build: [source and qualification](docs/rendezvous/FIXED_QA_BUILD_V1.md).
 > Compiled closed; current Apple/admission null; own reviews/delivery/Finalization pending. No deployment or native effects; all22 gates OPEN.
 
