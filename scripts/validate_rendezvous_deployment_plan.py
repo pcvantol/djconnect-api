@@ -8,31 +8,33 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPPLYING_SHA = '9261af97f9452b053468b1dbfc7275774b84a5ea'
+SUPPLYING_SHA = 'ec8029dbe7e4b0f4405253a3bf265d505303866b'
 
-DELTA_PATH = 'docs/rendezvous/assertion-crypto-source-delta-v1.json'
-DELTA_SHA256 = 'd9b00538da6f3919169be0c8cb7cebb69328571021a93a59a746dd575fa846ce'
+DELTA_PATH = 'docs/rendezvous/sharp-0355-source-delta-v1.json'
+DELTA_SHA256 = '8838718cc21e5b37fb405f11b020584126310e9f0ad45a8d7b03b7ff4f2b28cc'
 DELTA_PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
   'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
- ('docs/rendezvous/assertion-crypto-build-observations-v1.json',
-  '804122ab40b1eb37edf55cdf56b77381440ad62a6a1e90380bbe6377520ec847',
+ ('docs/rendezvous/sharp-0355-build-observations-v1.json',
+  'cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089',
   'source_hashes',
   85,
-  'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'))
-DELTA_SOURCES = frozenset(('qualification/rendezvous/app-attest-core-candidate.mjs',
- 'qualification/rendezvous/assertion-key-state.check.mjs',
- 'qualification/rendezvous/assertion-verifier.d.ts',
- 'qualification/rendezvous/provider-unavailable.check.mjs'))
-SOURCE_PROVENANCE = {'baseline_sha': '9261af97f9452b053468b1dbfc7275774b84a5ea',
- 'delta_sha256': 'd9b00538da6f3919169be0c8cb7cebb69328571021a93a59a746dd575fa846ce',
- 'effective_source_map_sha256': '519740ef7c01904ac2531fcc37f243bd1677035a26d1e6761dee0fc7571dd3e3',
+  'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
+ ('docs/rendezvous/sharp-0355-composition-observations-v1.json',
+  'd0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531',
+  'source_sha256',
+  19,
+  'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
+DELTA_SOURCES = frozenset(('package.json', 'package-lock.json'))
+SOURCE_PROVENANCE = {'baseline_sha': 'ec8029dbe7e4b0f4405253a3bf265d505303866b',
+ 'delta_sha256': '8838718cc21e5b37fb405f11b020584126310e9f0ad45a8d7b03b7ff4f2b28cc',
+ 'effective_source_map_sha256': 'db164f236aa78435430266049dd145f231540e4f9ceae288c1a0827d648eba8a',
  'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
-PROOFS = (('docs/rendezvous/enrollment-callback-shared-observations-v1.json',
-  'f126bdc4f74b66ef3aec69a104482dfa9e4c7edc95678efc69c104dc3720fb82',
+PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
+  'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
@@ -41,8 +43,8 @@ PROOFS = (('docs/rendezvous/enrollment-callback-shared-observations-v1.json',
   'source_sha256',
   19,
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'),
- ('docs/rendezvous/enrollment-callback-build-observations-v1.json',
-  '9f35c273262a4a8fce06875e16cf1a01925616eba7b28eae59e3911bba84c9a9',
+ ('docs/rendezvous/assertion-crypto-build-observations-v1.json',
+  '804122ab40b1eb37edf55cdf56b77381440ad62a6a1e90380bbe6377520ec847',
   'source_hashes',
   85,
   'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'))
@@ -204,7 +206,7 @@ def baseline():
     require(delta['effective_source_map_sha256'] == source_map_digest(effective)
         == SOURCE_PROVENANCE['effective_source_map_sha256'])
     require(delta['proofs'] == {key: {'path': record[0], 'sha256': record[1]}
-        for key, record in zip(('shared', 'root'), DELTA_PROOFS)})
+        for key, record in zip(('shared', 'root', 'module'), DELTA_PROOFS)})
     fresh = []
     for name, pin, field, count, scope in DELTA_PROOFS:
         proof = pinned_working_proof(name, pin)
@@ -212,12 +214,11 @@ def baseline():
             and len(proof[field]) == count)
         fresh.append(proof[field])
         references[name] = pin
-    old_module = decode(blob(PROOFS[1][0]))[PROOFS[1][2]]
     old_root = decode(blob(PROOFS[2][0]))[PROOFS[2][2]]
     installed = lambda values: {key: value for key, value in values.items()
                               if key.startswith('node_modules/')}
     require(installed(fresh[1]) == installed(old_root))
-    require(merge_sources(fresh[0], old_module, fresh[1]) == effective)
+    require(merge_sources(fresh[0], fresh[2], fresh[1]) == effective)
     references[DELTA_PATH] = DELTA_SHA256
     return effective, references
 

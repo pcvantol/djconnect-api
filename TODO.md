@@ -1,3 +1,6 @@
+> Sharp-only maintenance: exact override/allowScripts0.35.5 and closed package-input rebind.
+> [Scope and evidence](docs/rendezvous/SHARP_0355_MAINTENANCE_V1.md). Protected delivery/reviews and separate Finalization pending; no deploy, timer PAUSED.
+
 > Assertion crypto source PR119 delivered as030d225; all7own-main workflows and actual artifact/formal/durable readbacks PASS.
 > [Separate Finalization candidate](docs/rendezvous/ASSERTION_CRYPTO_FINALIZATION_V1.md) needs fresh exact reviews and protected delivery.
 > Full assignment/22 gates OPEN; no deploy; timer PAUSED.
