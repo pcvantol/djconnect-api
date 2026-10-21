@@ -19,6 +19,8 @@ jobs:
       - run: npm ci
       - name: Typecheck
         run: npx tsc --noEmit
+      - name: Real disposable Git replacement counterproof
+        run: node scripts/test_rendezvous_qa_git_provenance.mjs
       - name: Build fixed closed QA artifact and actual workerd negatives
         id: qa
         run: node scripts/qualify_rendezvous_qa_build.mjs

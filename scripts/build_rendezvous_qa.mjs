@@ -20,7 +20,7 @@ const expected={
 };
 function gitRead(args){
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('GIT_')));
- const result=spawnSync('git',args,{cwd:repo,env,encoding:'utf8'});
+ const result=spawnSync('git',['--no-replace-objects',...args],{cwd:repo,env,encoding:'utf8'});
  assert.equal(result.status,0,'fixed repository Git read failed');return result.stdout;
 }
 export async function fixedGitIdentity(){
@@ -28,6 +28,10 @@ export async function fixedGitIdentity(){
  const sourceSha=gitRead(['rev-parse','HEAD']).trim();assert.match(sourceSha,/^[a-f0-9]{40}$/);
  assert.equal(gitRead(['status','--porcelain','--untracked-files=all']).trim(),'','QA artifact requires a clean committed worktree');
  return sourceSha;
+}
+export function verifyCommittedInput(sourceSha,name,pin){
+ assert(resolve(repo,name).startsWith(repo+'/'),'input outside fixed worktree');
+ assert.equal(hash(gitRead(['show',sourceSha+':'+name])),pin,'graph/build input differs from exact committed source');
 }
 export function deriveFixedQaSource(path,source,pin){
  assert(Object.hasOwn(expected,path),'unselected transform');
@@ -77,7 +81,7 @@ export async function buildFixedQa(){
   const path=resolve(repo,name);assert(path.startsWith(repo+'/'));assert(!/(?:-harness|\.check\.|fixtures|private-profile-40381)/i.test(name));
   (name.startsWith('node_modules/')?installed:pins)[name]=hash(await readFile(path));
  }
- for(const name of ['package.json','package-lock.json','rendezvous-build-inputs.json','qualification/rendezvous/qa-build-profile.json','qualification/rendezvous/qa-worker-config.json','scripts/build_rendezvous_qa.mjs','scripts/qualify_rendezvous_qa_build.mjs'])pins[name]=hash(await readFile(join(repo,name)));
+ for(const name of ['package.json','package-lock.json','rendezvous-build-inputs.json','qualification/rendezvous/qa-build-profile.json','qualification/rendezvous/qa-worker-config.json','scripts/build_rendezvous_qa.mjs','scripts/qualify_rendezvous_qa_build.mjs','scripts/test_rendezvous_qa_git_provenance.mjs'])pins[name]=hash(await readFile(join(repo,name)));
  const bundle=result.outputFiles[0].text;
  for(const forbidden of ['https://api.djconnect.dev','https://vibecast.tv','SoftwareEnrollment','SOFTWARE_STUB_COMPOSITION','private-40381-registration-recover','APNS_PRIVATE_KEY','DJCONNECT_RELAY_SECRET'])assert(!bundle.includes(forbidden),forbidden);
  assert(bundle.includes(profile.service_origin)&&bundle.includes(profile.browser_origin)&&bundle.includes(sourceSha));
@@ -102,7 +106,7 @@ export async function buildFixedQa(){
  const verify=async()=>{
   assert.equal(await fixedGitIdentity(),sourceSha,'Git identity changed');
   for(const [name,pin]of Object.entries({...pins,...installed}))assert.equal(hash(await readFile(join(repo,name))),pin,'source/dependency drift');
-  for(const [name,pin]of Object.entries(pins))assert.equal(hash(gitRead(['show',sourceSha+':'+name])),pin,'graph/build input differs from exact committed source');
+  for(const [name,pin]of Object.entries(pins))verifyCommittedInput(sourceSha,name,pin);
  };
  await verify();
  const receipt={scope:profile.scope,source_sha:sourceSha,source_dirty:false,committed_graph_bytes_verified:true,git_environment_overrides_ignored:true,profile,activation_allowed:false,native_positive:false,operational_admission:null,wrangler_dry_run:'PASS_EXACT_WORKER_BYTES',worker_sha256:hash(bundle),worker_bytes:Buffer.byteLength(bundle),config_sha256:hash(JSON.stringify(config,null,2)+'\n'),source_hashes:pins,installed_hashes:installed,transforms,graph:result.metafile};

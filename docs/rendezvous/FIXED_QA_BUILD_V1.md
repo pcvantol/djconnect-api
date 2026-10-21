@@ -90,3 +90,21 @@ selected HA external HTTPS/B, once-consume, physical TV or end-user success is
 claimed. All22 full-service gates remain OPEN; automation PAUSED. DNS,
 provisioning/configuration/deployment/device/key/nonce/SDK/capture/private
 transfer and HA effects require separate specific authority and are not run.
+
+
+## Exact Git object identity follow-up
+The receiver's concrete replacement-ref finding also reached the API helper.
+Sanitizing GIT_* and checking clean status alone still permits repository-local
+replacement refs to substitute another commit's tree under an approved SHA.
+All fixed Git reads now include the global --no-replace-objects flag. Every
+tracked graph/build input is still compared against exact committed bytes.
+
+Run `node scripts/test_rendezvous_qa_git_provenance.mjs`. It creates only owned
+disposable repositories and imports the actual helper. A control removes only
+the global flag: actual Git replacement A→B then reproduces both a wrong clean
+A stamp and acceptance of B bytes under A. The corrected helper refuses both.
+All four causal observations passed; no API/shared/consumer refs are modified.
+The new test itself is included among35 exact tracked build pins and runs in
+the read-only QA artifact workflow. Initial source artifacts from PR125 remain
+historical actual receipts; the separate replacement guard is a new source
+increment requiring fresh reviews, exact authorization/CI and Finalization.
