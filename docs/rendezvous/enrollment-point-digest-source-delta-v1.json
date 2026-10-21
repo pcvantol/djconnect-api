@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_SOURCE_DELTA_NOT_DEPLOYMENT_AUTHORIZATION",
+  "baseline_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
+  "baseline_source_map_sha256": "db164f236aa78435430266049dd145f231540e4f9ceae288c1a0827d648eba8a",
+  "effective_source_map_sha256": "1f35b6e34d31e8a86c8306b1bcfa8983c45ba525e72b02e5d5a9682ed48898a9",
+  "changes": {
+    "qualification/rendezvous/enrollment-key-state.check.mjs": {
+      "before": "d714d0c3f20440b51f284f8ece64d1b6e71b47621a051c2794cb9fea39427a68",
+      "after": "2d6f2a651c96e0be4e4fdc57e9577117d6b0d9eb5749390399a51e31112cd358"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.mjs": {
+      "before": "c6a022e0d191348b0a50fdd939cf4a464ba67e1dc679a2ab8c516108dce87a2d",
+      "after": "55f99c8073f10f29c834b459ac84cb4f9c9290476fa51c8741dc5db8b1781644"
+    },
+    "qualification/rendezvous/enrollment-evidence.check.mjs": {
+      "before": "8e02891faa40d848d0e28b18fde268638f352eba5742694072d1145bb570ea14",
+      "after": "162593b8bad16fc988f9f901803b1f76fffca06548fae8bacf1823df1af50c80"
+    },
+    "qualification/rendezvous/provider-unavailable.check.mjs": {
+      "before": "f68526765f7ae5f4544306eef341dbe09e851d661b4ec5d1575df4ec430912b5",
+      "after": "9102e3f587efd77e17fe19212d02cfc9e6d4e93df66e8e3eadd4f2b5b31e68b5"
+    }
+  },
+  "proofs": {
+    "shared": {
+      "path": "docs/rendezvous/enrollment-point-digest-shared-observations-v1.json",
+      "sha256": "2bfee77c019a3a70f66de10887ccccc3f00e97e75d42e357bb30660059be8dac"
+    },
+    "root": {
+      "path": "docs/rendezvous/enrollment-point-digest-build-observations-v1.json",
+      "sha256": "2725d99610f66d9724038eeb772ffa24e94d5b1b94443da0eb6bbd4b914062cc"
+    },
+    "module": {
+      "path": "docs/rendezvous/enrollment-point-digest-composition-observations-v1.json",
+      "sha256": "0e2bc1a993bc7593203fc4be09c34a063524082cbac7631193717b16907d3d46"
+    }
+  }
+}

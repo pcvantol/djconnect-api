@@ -135,3 +135,21 @@ for(const at of [1,2,3,4,5,6,7,8])for(const name of ['Error','null','string','lo
  await expect(verifier.verify(f.request)).rejects.toBe(marker);expect(hits).toBe(1);
  expect((await verifier.verify(f.request)).ok).toBe(true);
 });
+
+// Only the fixed, validated post-core public-point digest is under this fault boundary.
+for(const kind of ['Error','DOMException','lookalike','undefined'])test('fixed enrollment point digest preserves original cause and releases busy: '+kind,async()=>{
+ const f=fixture(),v=f.verifier(),cause=kind==='Error'?new Error('enrollment_rejected attestation_unavailable PRIVATE'):kind==='DOMException'?new DOMException('PRIVATE','DataError'):kind==='lookalike'?{name:'StateReadFailure',message:'enrollment_rejected'}:undefined;
+ const before=structuredClone(f.state),original=crypto.subtle.digest.bind(crypto.subtle);let hits=0,inject=true;
+ const spy=vi.spyOn(crypto.subtle,'digest').mockImplementation(async(...args)=>{if(inject&&args[0]==='SHA-256'&&Buffer.from(args[1]).equals(Buffer.from(point))){hits++;throw cause;}return original(...args);});
+ try{await expect(v.verify(f.request)).rejects.toBe(cause);expect(hits).toBe(1);expect(f.components.core).toHaveBeenCalledOnce();expect(f.components.cms).not.toHaveBeenCalled();expect(f.components.status.check).not.toHaveBeenCalled();expect(f.state).toEqual(before);
+  inject=false;const repaired=await v.verify(f.request);expect(repaired.ok).toBe(true);expect(repaired.evidence.validUntil).toBe(time+30000);expect(f.state).toEqual(before);
+ }finally{spy.mockRestore();}
+});
+test('healthy wrong enrollment point digest remains an ordinary proof rejection',async()=>{
+ const f=fixture(),spy=vi.spyOn(crypto.subtle,'digest').mockResolvedValue(new Uint8Array(32).buffer);
+ try{expect(await f.verifier().verify(f.request)).toEqual(denied);expect(spy).toHaveBeenCalledOnce();expect(f.components.cms).not.toHaveBeenCalled();}finally{spy.mockRestore();}
+});
+for(const size of [64,66])test('invalid post-core point shape rejects before fixed digest: '+size,async()=>{
+ const f=fixture();f.core.point=new Uint8Array(size);const spy=vi.spyOn(crypto.subtle,'digest');
+ try{expect(await f.verifier().verify(f.request)).toEqual(denied);expect(spy).not.toHaveBeenCalled();expect(f.components.cms).not.toHaveBeenCalled();}finally{spy.mockRestore();}
+});
