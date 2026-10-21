@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "scope": "CONTROLLED_SAME_1558_TESTS_ONLY_ENROLLMENT_ENGINE_MODULE_DIFFERS_NO_NATIVE",
+  "baseline": "896ccdc69447c231d04da3a6af4f27ea1f763697",
+  "before": {
+    "passed": 1548,
+    "failed": 10,
+    "raw_results_sha256": "0fae2e198dc9a31d650081481ea8ecacb1f5de04368305a35ff4a7915448d30a"
+  },
+  "after": {
+    "passed": 1558,
+    "failed": 0,
+    "raw_results_sha256": "85f1c8b1f0a6ef54d49fb6b4a610c6868d41164c40137a8b68dd598c2a7d0a22"
+  },
+  "same_source_inputs": 65,
+  "changed_source_inputs": {
+    "enrollment-evidence-candidate.mjs": {
+      "before": "c6a022e0d191348b0a50fdd939cf4a464ba67e1dc679a2ab8c516108dce87a2d",
+      "after": "55f99c8073f10f29c834b459ac84cb4f9c9290476fa51c8741dc5db8b1781644"
+    }
+  },
+  "causal_failures": [
+    "enrollment-evidence.check.mjs::119::fixed enrollment point digest preserves original cause and releases busy: Error",
+    "enrollment-evidence.check.mjs::120::fixed enrollment point digest preserves original cause and releases busy: DOMException",
+    "enrollment-evidence.check.mjs::121::fixed enrollment point digest preserves original cause and releases busy: lookalike",
+    "enrollment-evidence.check.mjs::122::fixed enrollment point digest preserves original cause and releases busy: undefined",
+    "enrollment-key-state.check.mjs::128::reached enrollment point digest internal503 keeps original pending state and explicit repair: Error",
+    "enrollment-key-state.check.mjs::129::reached enrollment point digest internal503 keeps original pending state and explicit repair: DOMException",
+    "enrollment-key-state.check.mjs::130::reached enrollment point digest internal503 keeps original pending state and explicit repair: lookalike",
+    "enrollment-key-state.check.mjs::131::reached enrollment point digest internal503 keeps original pending state and explicit repair: undefined",
+    "provider-unavailable.check.mjs::26::guarded HTTP enrollment point digest503 preserves nonce and exact explicit repair: Error",
+    "provider-unavailable.check.mjs::27::guarded HTTP enrollment point digest503 preserves nonce and exact explicit repair: undefined"
+  ],
+  "preliminary_before": {
+    "passed": 1548,
+    "failed": 10,
+    "reached_causal": 8,
+    "http_setup_failed_before_target": 2,
+    "disposition": "Corrected missing pre-first-charge budget-day row in both HTTP tests before final causal pair"
+  },
+  "same_case_identities_sha256": "4569904fd717ad4b7ff38059381562962e24f8df792003926800c3c44dd49e36",
+  "case_identity": "file_basename::declaration_ordinal::full_name"
+}

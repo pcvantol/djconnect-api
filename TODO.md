@@ -1,3 +1,6 @@
+> Fixed enrollment point-digest exception preservation is locally qualified: [scope/evidence](docs/rendezvous/ENROLLMENT_POINT_DIGEST_FAILURES_V1.md).
+> Protected delivery/reviews and separate Finalization remain pending. Full taxonomy/all22 gates OPEN; no deploy or native effect; timer PAUSED.
+
 > Sharp maintenance source PR121 is protected and qualified; [separate Finalization](docs/rendezvous/SHARP_0355_FINALIZATION_V1.md) is pending delivery.
 > Patched lock/archive verified; GitHub alert39/SBOM still report the old version at readback. No deploy; all22 gates OPEN; timer PAUSED.
 

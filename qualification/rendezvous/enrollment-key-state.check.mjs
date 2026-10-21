@@ -169,3 +169,26 @@ test('default verifier retains typed saved-context rejection instead of promotin
  });
  expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();
 });
+
+// The existing SOFTWARE fixture invokes the actual shared engine's post-core digest.
+for(const kind of ['Error','DOMException','lookalike','undefined'])test('reached enrollment point digest internal503 keeps original pending state and explicit repair: '+kind,async()=>{
+ const f=await software(),s=await setup(),{input,challenge}=await request(s,f),before=await op(s);
+ await runInDurableObject(s,async i=>{
+  const cause=kind==='Error'?new Error('registration_rejected attestation_unavailable PRIVATE'):kind==='DOMException'?new DOMException('PRIVATE','DataError'):kind==='lookalike'?{name:'RegistrationRejected',message:'registration_rejected'}:undefined;
+  const original=crypto.subtle.digest.bind(crypto.subtle);let hits=0;
+  const spy=vi.spyOn(crypto.subtle,'digest').mockImplementation(async(...args)=>{if(args[0]==='SHA-256'&&Buffer.from(args[1]).equals(Buffer.from(f.point))){hits++;throw cause;}return original(...args);});
+  try{expect(await i.enroll(input)).toEqual({ok:false,error:'service_unavailable'});expect(hits).toBe(1);}finally{spy.mockRestore();}
+ });
+ expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();
+ const repaired=await s.enroll(input),registered=await op(s),key=await row(s);expect(repaired.ok).toBe(true);expect(registered.status).toBe('registered');expect(registered.expiresAt).toBe(challenge.expires_at);expect(registered.createdAt).toBe(before.createdAt);expect(key.counter).toBe(0);
+});
+for(const mode of ['expiry','rollback'])test('reached enrollment point digest failure keeps original window and zero catch SQL: '+mode,async()=>{
+ const f=await software(),s=await setup(),{input,challenge}=await request(s,f),before=await op(s);
+ await clock(Date.now(),async()=>runInDurableObject(s,async(i,c)=>{
+  let hits=0,afterFault=0,faulted=false;const exec=c.storage.sql.exec.bind(c.storage.sql),original=crypto.subtle.digest.bind(crypto.subtle);
+  const sql=vi.spyOn(c.storage.sql,'exec').mockImplementation((...a)=>{if(faulted)afterFault++;return exec(...a);});
+  const digest=vi.spyOn(crypto.subtle,'digest').mockImplementation(async(...a)=>{if(a[0]==='SHA-256'&&Buffer.from(a[1]).equals(Buffer.from(f.point))){hits++;vi.setSystemTime(mode==='expiry'?challenge.expires_at:before.createdAt-1);faulted=true;throw new Error('registration_rejected PRIVATE');}return original(...a);});
+  try{expect(await i.enroll(input)).toEqual({ok:false,error:'registration_rejected'});expect(hits).toBe(1);expect(afterFault).toBe(0);}finally{digest.mockRestore();sql.mockRestore();}
+ }));
+ expect(await op(s)).toEqual(before);expect(await row(s)).toBeUndefined();
+});

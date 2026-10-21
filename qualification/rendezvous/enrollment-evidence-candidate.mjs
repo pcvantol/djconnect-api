@@ -9,6 +9,10 @@ class StatusUnavailable extends Error {}
 // Preserve the owning coordinator's typed context/config/internal classification.
 // Callback errors carry no proof verdict and must not be reduced to one here.
 class StateReadFailure extends Error {constructor(cause){super('state_read_failed',{cause});}}
+// This fixed digest receives the already shape-checked core public point.
+// A WebCrypto exception is not an enrollment-proof verdict.
+class PointDigestFailure extends Error {constructor(cause){super('point_digest_failed',{cause});}}
+async function digestPublicPoint(point){try{return await crypto.subtle.digest('SHA-256',point);}catch(cause){throw new PointDigestFailure(cause);}}
 const need=v=>{if(!v)throw new Error('enrollment_rejected');};
 const integer=v=>Number.isSafeInteger(v)&&v>=0;
 // Buffer.slice() is a view. Always own a plain Uint8Array before asynchronous work.
@@ -60,7 +64,7 @@ function engine(readState,components,scope,nonceOnly){
       need(core?.scope==='ATTESTATION_CORE_ONLY_RECEIPT_UNVERIFIED_NO_ENROLLMENT');
       const attestationExpiresAt=core.certificateExpiresAt;need(integer(attestationExpiresAt)&&now<attestationExpiresAt);cryptoDeadline=attestationExpiresAt;
       const point=copy(core.point,65),receipt=copy(core.receipt,16384),leaf=copy(core.attestedLeaf,8192);need(point.length===65&&point[0]===4);
-      const pointDigest=new Uint8Array(await crypto.subtle.digest('SHA-256',point));check();need(btoa(String.fromCharCode(...pointDigest))===key);
+      const pointDigest=new Uint8Array(await digestPublicPoint(point));check();need(btoa(String.fromCharCode(...pointDigest))===key);
       const result=await components.cms(receipt.slice(),leaf,initial.challenge.clientData.slice(),roots.receipt.slice());now=check();
       need(result?.scope==='CMS_SIGNATURE_PATH_FIELDS_ONLY_REVOCATION_UNCHECKED_NO_ENROLLMENT');
       const cms={fresh:result.fresh,created:result.created,expires:result.expires,certificateExpiresAt:result.certificateExpiresAt};receiptTime(cms,now);need(integer(cms.certificateExpiresAt));cryptoDeadline=Math.min(cryptoDeadline,cms.certificateExpiresAt);check();
@@ -72,7 +76,7 @@ function engine(readState,components,scope,nonceOnly){
       return {ok:true,evidence:{scope,keyId:key,challengeId:id,challengeCreatedAt:initial.challenge.createdAt,challengeExpiresAt:initial.challenge.expiresAt,
         policy:POLICY,policyRevision:initial.policy.revision,verifiedAt:now,validUntil:Math.min(initial.challenge.expiresAt,initial.policy.expiresAt,cms.created+300001,cms.expires,attestationExpiresAt,cms.certificateExpiresAt,issuer.cacheUntil,signer.cacheUntil),
         publicPoint:point,initialReceipt:receipt,receiptCreatedAt:cms.created}};
-    }catch(error){if(error instanceof StateReadFailure)throw error.cause;return {ok:false,error:error instanceof StatusUnavailable?'attestation_unavailable':'enrollment_rejected'};}finally{busy=false;}
+    }catch(error){if(error instanceof StateReadFailure||error instanceof PointDigestFailure)throw error.cause;return {ok:false,error:error instanceof StatusUnavailable?'attestation_unavailable':'enrollment_rejected'};}finally{busy=false;}
   }});
 }
 export function createEnrollmentEvidenceVerifier(readState){

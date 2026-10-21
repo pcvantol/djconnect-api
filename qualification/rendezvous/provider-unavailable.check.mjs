@@ -89,3 +89,18 @@ for(const stage of ['app-digest','import','verify'])test('guarded HTTP fixed ass
  const after=await assertionRows(stub);expect(JSON.parse(after.keys[0].value).counter).toBe(1);expect(JSON.parse(after.operations[0].value).expiresAt).toBe(ch.expires_at);
  expect((await counts()).calls[0].count).toBe(beforeCalls+2);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+2);
 });
+
+// Constructor-only SOFTWARE namespace seam, actual shared engine, HTTP mapper and budgets.
+for(const kind of ['Error','undefined'])test('guarded HTTP enrollment point digest503 preserves nonce and exact explicit repair: '+kind,async()=>{
+ const f=await pendingRegistration(),before=await enrollmentRows(f.stub),point=Buffer.from(JSON.parse(Buffer.from(f.input.attestation,'base64url').toString()).point,'base64'),beforeCalls=((await counts()).days[0]?.keys??0),beforeRequests=(await gateRows('request_days'))[0].count;
+ const ns=env.SOFTWARE_ENROLLMENT;let hits=0;
+ const broken=rig({ENROLLMENT_COORDINATOR:{idFromName:ns.idFromName.bind(ns),get(id){const real=ns.get(id);return {enroll:input=>runInDurableObject(real,async i=>{
+  const original=crypto.subtle.digest.bind(crypto.subtle),spy=vi.spyOn(crypto.subtle,'digest').mockImplementation(async(...a)=>{if(a[0]==='SHA-256'&&Buffer.from(a[1]).equals(point)){hits++;throw kind==='Error'?new Error('invalid_sender_proof PRIVATE_digest'):undefined;}return original(...a);});
+  try{return await i.enroll(input);}finally{spy.mockRestore();}
+ })};}}});
+ const out=await reject(post(broken,'/attestation/register',f.input,{native:true}),'service_unavailable',503);expect(out.headers.has('Retry-After')).toBe(false);expect(hits).toBe(1);expect(await enrollmentRows(f.stub)).toEqual(before);
+ expect((await counts()).days[0].keys).toBe(beforeCalls+1);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+1);
+ const repaired=await post(f.r,'/attestation/register',f.input,{native:true});expect(repaired.status).toBe(201);expect(repaired.body.v).toBe(V);
+ const after=await enrollmentRows(f.stub);expect(after.keys).toHaveLength(1);expect(JSON.parse(after.keys[0].value).counter).toBe(0);expect(JSON.parse(after.operations[0].value).expiresAt).toBe(f.ch.expires_at);expect(JSON.parse(after.operations[0].value).createdAt).toBe(JSON.parse(before.operations[0].value).createdAt);
+ expect((await counts()).days[0].keys).toBe(beforeCalls+2);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+2);
+});
