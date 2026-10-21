@@ -1,3 +1,6 @@
+> Sharp maintenance source PR121 is protected and qualified; [separate Finalization](docs/rendezvous/SHARP_0355_FINALIZATION_V1.md) is pending delivery.
+> Patched lock/archive verified; GitHub alert39/SBOM still report the old version at readback. No deploy; all22 gates OPEN; timer PAUSED.
+
 > Sharp-only maintenance: exact override/allowScripts0.35.5 and closed package-input rebind.
 > [Scope and evidence](docs/rendezvous/SHARP_0355_MAINTENANCE_V1.md). Protected delivery/reviews and separate Finalization pending; no deploy, timer PAUSED.
 
