@@ -75,6 +75,12 @@ Repeated builds of the same source yielded byte-equal Workers; TAR bytes can
 differ through file timestamps and are independently hashed, not claimed
 reproducible. Committed exact-candidate and CI receipts must retain their own
 source SHA and dirty flag, independently from the initial local WIP results.
+A security review rejected the first candidate because inherited GIT_* values
+could stamp another worktree identity. The corrected builder ignores those
+overrides, checks Git exits and real worktree identity, requires a clean commit,
+and compares every tracked graph/build input against exact git-show HEAD bytes.
+An actual forged GIT_DIR/GIT_WORK_TREE/GIT_CONFIG_* control verifies the fix.
+The earlier WIP artifacts remain historical evidence and are not promotion inputs.
 
 Source reviews, protected delivery, own-main ordinary and QA artifact readbacks
 and separate Finalization remain required. The existing product/shared/native

@@ -1,7 +1,7 @@
 // Fixed offline QA artifact builder. No upload, provider API, native or selectors.
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {readFile,writeFile,mkdtemp,chmod,copyFile} from 'node:fs/promises';
+import {readFile,writeFile,mkdtemp,chmod,copyFile,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve,dirname,join,relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -18,6 +18,17 @@ const expected={
  'qualification/rendezvous/transaction-state.ts':{'https://api.djconnect.dev':1},
  'docs/rendezvous/wire-request-schemas-v1.json':{'https://api.djconnect.dev':4,'https://vibecast.tv':1},
 };
+function gitRead(args){
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('GIT_')));
+ const result=spawnSync('git',args,{cwd:repo,env,encoding:'utf8'});
+ assert.equal(result.status,0,'fixed repository Git read failed');return result.stdout;
+}
+export async function fixedGitIdentity(){
+ assert.equal(await realpath(gitRead(['rev-parse','--show-toplevel']).trim()),await realpath(repo),'wrong Git worktree');
+ const sourceSha=gitRead(['rev-parse','HEAD']).trim();assert.match(sourceSha,/^[a-f0-9]{40}$/);
+ assert.equal(gitRead(['status','--porcelain','--untracked-files=all']).trim(),'','QA artifact requires a clean committed worktree');
+ return sourceSha;
+}
 export function deriveFixedQaSource(path,source,pin){
  assert(Object.hasOwn(expected,path),'unselected transform');
  assert.deepEqual(pin.counts,expected[path]);assert.equal(hash(source),pin.source_sha256,'pinned source drift');
@@ -40,7 +51,7 @@ export async function buildFixedQa(){
  assert.equal(entry.split('const QA_ACTIVATION_REVIEWED = false as boolean;').length,2,'closed QA guard changed');
  const lock=await load('package-lock.json');assert.equal(esbuild.version,lock.packages['node_modules/esbuild'].version);
  const inputs=await load('rendezvous-build-inputs.json');
- const head=spawnSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'});assert.equal(head.status,0);const sourceSha=head.stdout.trim();assert.match(sourceSha,/^[a-f0-9]{40}$/);
+ const sourceSha=await fixedGitIdentity();
  const output=await mkdtemp(join(tmpdir(),'djc-fixed-qa-'));await chmod(output,0o700);
  const transforms={},seen=new Set();
  const result=await esbuild.build({absWorkingDir:repo,entryPoints:['src/rendezvous/qa-entry.ts'],bundle:true,format:'esm',platform:'browser',target:'es2022',external:['cloudflare:workers','node:*','stream','buffer'],write:false,metafile:true,
@@ -88,9 +99,13 @@ export async function buildFixedQa(){
  const dry=spawnSync(process.execPath,[join(repo,'node_modules/wrangler/bin/wrangler.js'),'deploy','--dry-run','--config',join(output,'wrangler.json'),'--outdir',join(output,'dry-run')],{cwd:output,encoding:'utf8',env:{...process.env,WRANGLER_SEND_METRICS:'false'}});
  await writeFile(join(output,'private-dry-run.log'),dry.stdout+dry.stderr,{mode:0o600});assert.equal(dry.status,0,'fixed Wrangler dry-run failed');
  assert.equal(hash(await readFile(join(output,'dry-run/worker.mjs'))),hash(bundle),'dry-run Worker differs');
- const verify=async()=>{for(const [name,pin]of Object.entries({...pins,...installed}))assert.equal(hash(await readFile(join(repo,name))),pin,'source/dependency drift');};
+ const verify=async()=>{
+  assert.equal(await fixedGitIdentity(),sourceSha,'Git identity changed');
+  for(const [name,pin]of Object.entries({...pins,...installed}))assert.equal(hash(await readFile(join(repo,name))),pin,'source/dependency drift');
+  for(const [name,pin]of Object.entries(pins))assert.equal(hash(gitRead(['show',sourceSha+':'+name])),pin,'graph/build input differs from exact committed source');
+ };
  await verify();
- const receipt={scope:profile.scope,source_sha:sourceSha,source_dirty:spawnSync('git',['status','--porcelain','--untracked-files=all'],{cwd:repo,encoding:'utf8'}).stdout.trim()!=='',profile,activation_allowed:false,native_positive:false,operational_admission:null,wrangler_dry_run:'PASS_EXACT_WORKER_BYTES',worker_sha256:hash(bundle),worker_bytes:Buffer.byteLength(bundle),config_sha256:hash(JSON.stringify(config,null,2)+'\n'),source_hashes:pins,installed_hashes:installed,transforms,graph:result.metafile};
+ const receipt={scope:profile.scope,source_sha:sourceSha,source_dirty:false,committed_graph_bytes_verified:true,git_environment_overrides_ignored:true,profile,activation_allowed:false,native_positive:false,operational_admission:null,wrangler_dry_run:'PASS_EXACT_WORKER_BYTES',worker_sha256:hash(bundle),worker_bytes:Buffer.byteLength(bundle),config_sha256:hash(JSON.stringify(config,null,2)+'\n'),source_hashes:pins,installed_hashes:installed,transforms,graph:result.metafile};
  await writeFile(join(output,'build-evidence.json'),JSON.stringify(receipt,null,2)+'\n');
  return {output,bundle,receipt,config,verify};
 }

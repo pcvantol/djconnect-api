@@ -4,10 +4,14 @@ import {createRequire} from 'node:module';
 import {readFile,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {buildFixedQa,deriveFixedQaSource,repo,hash} from './build_rendezvous_qa.mjs';
+import {buildFixedQa,deriveFixedQaSource,fixedGitIdentity,repo,hash} from './build_rendezvous_qa.mjs';
 
 const built=await buildFixedQa();let runtime;
 try{
+ const gitForgery={GIT_DIR:'/nonexistent-qa-forged-git',GIT_WORK_TREE:'/nonexistent-qa-forged-tree',GIT_CONFIG_COUNT:'1',GIT_CONFIG_KEY_0:'core.worktree',GIT_CONFIG_VALUE_0:'/nonexistent-qa-forged-config'};
+ const saved=Object.fromEntries(Object.keys(gitForgery).map(key=>[key,process.env[key]]));
+ try{Object.assign(process.env,gitForgery);assert.equal(await fixedGitIdentity(),built.receipt.source_sha);}
+ finally{for(const [key,value]of Object.entries(saved))if(value===undefined)delete process.env[key];else process.env[key]=value;}
  let driftChecks=0;
  for(const [name,pin]of Object.entries(built.receipt.profile.transforms)){
   const bytes=await readFile(join(repo,name),'utf8');
@@ -71,7 +75,7 @@ export default {async fetch(request,env){
   for(const rpc of ['env','ctx','state','engine']){assert.equal((await call({rpc,binding,read:true})).rejected,true);forbiddenRpc++;}
  }
  assert.equal(forbiddenRpc,100);assert.equal(outbound,0);await built.verify();
- const evidence={scope:built.receipt.scope,result:'PASS',source_sha:built.receipt.source_sha,source_dirty:built.receipt.source_dirty,artifact_worker_sha256:built.receipt.worker_sha256,worker_bytes:built.receipt.worker_bytes,origin_drift_guards:driftChecks,transport_cases:observations,health,forbidden_rpc:forbiddenRpc,outbound_attempts:outbound,activation_allowed:false,native_positive:false,operator_admission:null};
+ const evidence={scope:built.receipt.scope,result:'PASS',source_sha:built.receipt.source_sha,source_dirty:built.receipt.source_dirty,git_environment_forgery_refused:true,artifact_worker_sha256:built.receipt.worker_sha256,worker_bytes:built.receipt.worker_bytes,origin_drift_guards:driftChecks,transport_cases:observations,health,forbidden_rpc:forbiddenRpc,outbound_attempts:outbound,activation_allowed:false,native_positive:false,operator_admission:null};
  await writeFile(join(built.output,'qualification-evidence.json'),JSON.stringify(evidence,null,2)+'\n');
  const files=['worker.mjs','wrangler.json','wire-request-schemas-qa.json','qa-origin-fixture.json','build-evidence.json','qualification-evidence.json','LICENSE','THIRD_PARTY_NOTICES.md','RENDEZVOUS_THIRD_PARTY_LICENSES.md','package.json','package-lock.json'];
  const tar=spawnSync('tar',['-czf',join(built.output,'fixed-rendezvous-qa.tar.gz'),...files],{cwd:built.output,encoding:'utf8'});assert.equal(tar.status,0);
