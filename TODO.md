@@ -1,3 +1,7 @@
+> Assertion crypto source PR119 delivered as030d225; all7own-main workflows and actual artifact/formal/durable readbacks PASS.
+> [Separate Finalization candidate](docs/rendezvous/ASSERTION_CRYPTO_FINALIZATION_V1.md) needs fresh exact reviews and protected delivery.
+> Full assignment/22 gates OPEN; no deploy; timer PAUSED.
+
 > Assertion fixed-WebCrypto failure correction: locally qualified candidate; protected delivery/reviews/Finalization pending.
 > [Bounded source and actual evidence](docs/rendezvous/ASSERTION_CRYPTO_FAILURES_V1.md); full taxonomy/22 gates OPEN, no deploy, timer PAUSED.
 
