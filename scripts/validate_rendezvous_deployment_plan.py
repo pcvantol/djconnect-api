@@ -8,32 +8,31 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPPLYING_SHA = '3458ad603350ab9481073277c7dbe561433b4453'
+SUPPLYING_SHA = '9261af97f9452b053468b1dbfc7275774b84a5ea'
 
-DELTA_PATH = 'docs/rendezvous/enrollment-callback-source-delta-v1.json'
-DELTA_SHA256 = 'dba9a3320f246be2474c56466c3c3e6907dd38daec5437cfea57edad2cef5911'
-DELTA_PROOFS = (('docs/rendezvous/enrollment-callback-shared-observations-v1.json',
-  'f126bdc4f74b66ef3aec69a104482dfa9e4c7edc95678efc69c104dc3720fb82',
+DELTA_PATH = 'docs/rendezvous/assertion-crypto-source-delta-v1.json'
+DELTA_SHA256 = 'd9b00538da6f3919169be0c8cb7cebb69328571021a93a59a746dd575fa846ce'
+DELTA_PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
+  'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
- ('docs/rendezvous/enrollment-callback-build-observations-v1.json',
-  '9f35c273262a4a8fce06875e16cf1a01925616eba7b28eae59e3911bba84c9a9',
+ ('docs/rendezvous/assertion-crypto-build-observations-v1.json',
+  '804122ab40b1eb37edf55cdf56b77381440ad62a6a1e90380bbe6377520ec847',
   'source_hashes',
   85,
   'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'))
-DELTA_SOURCES = frozenset(('qualification/rendezvous/enrollment-evidence-candidate.d.mts',
- 'qualification/rendezvous/enrollment-evidence-candidate.mjs',
- 'qualification/rendezvous/enrollment-evidence.check.mjs',
- 'qualification/rendezvous/enrollment-key-state.check.mjs',
+DELTA_SOURCES = frozenset(('qualification/rendezvous/app-attest-core-candidate.mjs',
+ 'qualification/rendezvous/assertion-key-state.check.mjs',
+ 'qualification/rendezvous/assertion-verifier.d.ts',
  'qualification/rendezvous/provider-unavailable.check.mjs'))
-SOURCE_PROVENANCE = {'baseline_sha': '3458ad603350ab9481073277c7dbe561433b4453',
- 'delta_sha256': 'dba9a3320f246be2474c56466c3c3e6907dd38daec5437cfea57edad2cef5911',
- 'effective_source_map_sha256': 'b52dd7b0793f928cadaa413ad4c04188435b89518ff9ccbb7c24de22c1f85d44',
+SOURCE_PROVENANCE = {'baseline_sha': '9261af97f9452b053468b1dbfc7275774b84a5ea',
+ 'delta_sha256': 'd9b00538da6f3919169be0c8cb7cebb69328571021a93a59a746dd575fa846ce',
+ 'effective_source_map_sha256': '519740ef7c01904ac2531fcc37f243bd1677035a26d1e6761dee0fc7571dd3e3',
  'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
-PROOFS = (('docs/rendezvous/assertion-policy-shared-observations-v1.json',
-  '18049d5b7f16397d74e2d462d791f93e8e4d69970eea91ef8c02706fb1a1c5b9',
+PROOFS = (('docs/rendezvous/enrollment-callback-shared-observations-v1.json',
+  'f126bdc4f74b66ef3aec69a104482dfa9e4c7edc95678efc69c104dc3720fb82',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
@@ -42,8 +41,8 @@ PROOFS = (('docs/rendezvous/assertion-policy-shared-observations-v1.json',
   'source_sha256',
   19,
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'),
- ('docs/rendezvous/assertion-policy-build-observations-v1.json',
-  '12c108c24b36d145840c8561c2b00ec824a51e9533694dda7ce3939a1a49ae88',
+ ('docs/rendezvous/enrollment-callback-build-observations-v1.json',
+  '9f35c273262a4a8fce06875e16cf1a01925616eba7b28eae59e3911bba84c9a9',
   'source_hashes',
   85,
   'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'))

@@ -47,7 +47,6 @@ for (const [name, previous] of [['replay', 1], ['older', 2], ['exhausted', 0xfff
 for (const [name, change] of [
   ['trailing', f => { f.proof = join(f.proof, new Uint8Array([0xa0])); }],
   ['wrong-clientData', f => { f.client = utf8('different saved challenge'); }],
-  ['invalid-point', f => { f.point.fill(0, 1); }],
   ['empty-clientData', f => { f.client = new Uint8Array(); }],
   ['oversized-clientData', f => { f.client = new Uint8Array(2049); }],
   ['changed-signature', f => { const m = decoded(f.proof); m.get('signature')[10] ^= 1; f.proof = encoded(m); }],
@@ -61,6 +60,11 @@ for (const [name, change] of [
     const f = await signed(1); change(f); expect(await qualifyAssertionCore(f.proof, f.client, f.point, 0)).toBeNull();
   });
 }
+test('invalid stored curve point preserves actual import failure for its owning coordinator', async () => {
+  const f = await signed(1); f.point.fill(0, 1);
+  // Stored public-point ownership differs from sender-controlled signature validation.
+  await expect(qualifyAssertionCore(f.proof, f.client, f.point, 0)).rejects.toBeInstanceOf(DOMException);
+});
 test('nonminimal DER rejected below payload ceiling with valid canonical control', async () => {
   let f, signature;
   for (let attempt = 0; attempt < 32; attempt++) {

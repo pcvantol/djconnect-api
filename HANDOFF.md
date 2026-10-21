@@ -1,3 +1,6 @@
+> Assertion fixed-WebCrypto failure correction: locally qualified candidate; protected delivery/reviews/Finalization pending.
+> [Bounded source and actual evidence](docs/rendezvous/ASSERTION_CRYPTO_FAILURES_V1.md); full taxonomy/22 gates OPEN, no deploy, timer PAUSED.
+
 > Enrollment callback source PR116 delivered as f88f237; own-main CI/artifact/formal/durable readbacks PASS.
 > [Separate Finalization candidate](docs/rendezvous/ENROLLMENT_CALLBACK_FINALIZATION_V1.md) requires fresh exact reviews and protected delivery.
 > Entire assignment and22 activation gates remain OPEN; no deploy; timer PAUSED.
