@@ -6,6 +6,9 @@ import {attestationRoot,receiptRoot} from 'djc-enrollment-trust';
 
 const POLICY='ios-dev-qualification/1';
 class StatusUnavailable extends Error {}
+// Preserve the owning coordinator's typed context/config/internal classification.
+// Callback errors carry no proof verdict and must not be reduced to one here.
+class StateReadFailure extends Error {constructor(cause){super('state_read_failed',{cause});}}
 const need=v=>{if(!v)throw new Error('enrollment_rejected');};
 const integer=v=>Number.isSafeInteger(v)&&v>=0;
 // Buffer.slice() is a view. Always own a plain Uint8Array before asynchronous work.
@@ -15,7 +18,7 @@ const closed=(v,keys)=>need(v&&typeof v==='object'&&!Array.isArray(v)&&Object.ke
 function opaque(v){need(typeof v==='string'&&/^[A-Za-z0-9_-]{43}$/.test(v));const b=atob(v.replaceAll('-','+').replaceAll('_','/'));need(b.length===32&&btoa(b).replaceAll('+','-').replaceAll('/','_').replaceAll('=','')===v);}
 function keyId(v){need(typeof v==='string'&&/^[A-Za-z0-9+/]{43}=$/.test(v));const b=atob(v);need(b.length===32&&btoa(b)===v);}
 function snapshot(readState,nonceOnly=false){
-  const state=readState();closed(state,['policy','challenge']);
+  let state;try{state=readState();}catch(cause){throw new StateReadFailure(cause);}closed(state,['policy','challenge']);
   closed(state.policy,['id','revision','enabled','expiresAt']);
   closed(state.challenge,['id','keyId','action','createdAt','expiresAt','clientData']);
   const policy={...state.policy},challenge={...state.challenge,clientData:copy(state.challenge.clientData,2048)};
@@ -69,7 +72,7 @@ function engine(readState,components,scope,nonceOnly){
       return {ok:true,evidence:{scope,keyId:key,challengeId:id,challengeCreatedAt:initial.challenge.createdAt,challengeExpiresAt:initial.challenge.expiresAt,
         policy:POLICY,policyRevision:initial.policy.revision,verifiedAt:now,validUntil:Math.min(initial.challenge.expiresAt,initial.policy.expiresAt,cms.created+300001,cms.expires,attestationExpiresAt,cms.certificateExpiresAt,issuer.cacheUntil,signer.cacheUntil),
         publicPoint:point,initialReceipt:receipt,receiptCreatedAt:cms.created}};
-    }catch(error){return {ok:false,error:error instanceof StatusUnavailable?'attestation_unavailable':'enrollment_rejected'};}finally{busy=false;}
+    }catch(error){if(error instanceof StateReadFailure)throw error.cause;return {ok:false,error:error instanceof StatusUnavailable?'attestation_unavailable':'enrollment_rejected'};}finally{busy=false;}
   }});
 }
 export function createEnrollmentEvidenceVerifier(readState){
