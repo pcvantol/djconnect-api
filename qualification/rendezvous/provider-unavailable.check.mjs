@@ -70,3 +70,22 @@ for(const fault of ['sqlite-read','policy-unavailable'])test('guarded HTTP defau
  expect(hits).toBe(1);expect(await enrollmentRows(f.stub)).toEqual(before);
  expect((await counts()).days[0].keys).toBe(2);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+2);
 });
+
+// Trusted constructor-only namespace seam; default assertion core and real HTTP/budget paths.
+const assertionRows=s=>runInDurableObject(s,(_i,c)=>({keys:c.storage.sql.exec('SELECT value FROM key_state').toArray(),operations:c.storage.sql.exec('SELECT value FROM proof_operations').toArray()}));
+for(const stage of ['app-digest','import','verify'])test('guarded HTTP fixed assertion crypto503 preserves budget and original explicit repair: '+stage,async()=>{
+ const r=rig(),{a,stub}=await rawRegistration(r),ch=(await post(r,'/attestation/challenge',{key_id:a.keyId,action:'recover-key'},{native:true})).body;
+ const input={key_id:a.keyId,challenge_id:ch.challenge_id,client_data:ch.client_data,assertion:await assertion(a,ch)},before=await assertionRows(stub),beforeCalls=(await counts()).calls[0].count,beforeRequests=(await gateRows('request_days'))[0].count;
+ const ns=env.SOFTWARE_ENROLLMENT;let hits=0;
+ const broken=rig({ENROLLMENT_COORDINATOR:{idFromName:ns.idFromName.bind(ns),get(id){const real=ns.get(id);return {authorize:input=>runInDurableObject(real,async i=>{
+  const name=stage==='import'?'importKey':stage==='verify'?'verify':'digest',original=crypto.subtle[name].bind(crypto.subtle),spy=vi.spyOn(crypto.subtle,name).mockImplementation(async(...args)=>{
+   const reached=name==='importKey'?args[2]?.name==='ECDSA':name==='verify'?args[0]?.name==='ECDSA':Buffer.from(args[1]).equals(Buffer.from(text('ZEML4LPXH4.dev.djconnect.ios')));
+   if(reached){hits++;throw new Error('invalid_sender_proof PRIVATE_crypto_detail');}return original(...args);
+  });try{return await i.authorize(input);}finally{spy.mockRestore();}
+ })};}}});
+ const out=await reject(post(broken,'/attestation/recover',input,{native:true}),'service_unavailable',503);expect(out.headers.has('Retry-After')).toBe(false);expect(hits).toBe(1);
+ expect(await assertionRows(stub)).toEqual(before);expect((await counts()).calls[0].count).toBe(beforeCalls+1);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+1);
+ const repaired=await post(r,'/attestation/recover',input,{native:true});expect(repaired.status).toBe(200);expect(repaired.body).toEqual({v:V,key_expires_at:JSON.parse(before.keys[0].value).expiresAt});
+ const after=await assertionRows(stub);expect(JSON.parse(after.keys[0].value).counter).toBe(1);expect(JSON.parse(after.operations[0].value).expiresAt).toBe(ch.expires_at);
+ expect((await counts()).calls[0].count).toBe(beforeCalls+2);expect((await gateRows('request_days'))[0].count).toBe(beforeRequests+2);
+});

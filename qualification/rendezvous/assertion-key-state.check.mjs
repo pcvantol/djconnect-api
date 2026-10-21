@@ -140,3 +140,64 @@ for(const mode of ['live','op-expiry','key-expiry','rollback'])test('policy lost
 for(const action of ['recover-key','submit','delete-key'])test('policy lost after acknowledged commit keeps original receipt or existing delete outcome: '+action,async()=>{const f=await software(),{s}=await setup(f),ch=await issue(s,f,action,action==='submit'?binding():undefined),request=await proof(f,ch,1,action),settings=await assertionSettings(s),before=await ops(s);await runInDurableObject(s,async(i,c)=>{let hits=0;const original=c.storage.setAlarm.bind(c.storage),spy=vi.spyOn(c.storage,'setAlarm').mockImplementation(async(...a)=>{await original(...a);hits++;i.env.ASSERTION_POLICY_ENABLED='disabled';});try{const out=await i.authorize(request);if(action==='delete-key')expect(out).toMatchObject({ok:true,kind:'deleted'});else expect(out).toEqual({ok:false,error:'service_unavailable'});expect(hits).toBe(1);}finally{spy.mockRestore();}});const saved=await ops(s),key=await row(s);await setAssertionSettings(s,settings);if(action==='delete-key'){expect(key.status).toBe('revoked');expect(saved).toEqual([]);expect(await s.authorize(request)).toEqual({ok:false,error:'proof_rejected'});}else{expect(key.counter).toBe(1);expect(saved[0].expiresAt).toBe(before[0].expiresAt);const repaired=await s.authorize(request);expect(repaired.ok).toBe(true);expect((await row(s)).counter).toBe(1);expect(await ops(s)).toEqual(saved);if(action==='submit'){expect(repaired.authorizationExpiresAt).toBe(saved[0].authorizationExpiresAt);await clock(repaired.authorizationExpiresAt,async()=>{expect(await s.authorize(request)).toEqual({ok:false,error:'proof_rejected'});});}}});
 test('healthy shorter policy refuses existing lease401 and restored original policy returns only original receipt',async()=>{const f=await software(),{s}=await setup(f),ch=await issue(s,f,'submit',binding()),request=await proof(f,ch,1,'submit'),first=await s.authorize(request),settings=await assertionSettings(s);await setAssertionSettings(s,{...settings,until:String(first.authorizationExpiresAt-1)});expect(await s.lookupSubmit(first.operationId,first.requestDigest)).toEqual({ok:false,error:'proof_rejected'});expect(await s.authorize(request)).toEqual({ok:false,error:'proof_rejected'});await setAssertionSettings(s,settings);expect(await s.authorize(request)).toEqual(first);expect((await row(s)).counter).toBe(1);});
 test('policy unavailable before saved lease read cannot guess its expired original authority',async()=>{const f=await software(),{s}=await setup(f),ch=await issue(s,f,'submit',binding()),request=await proof(f,ch,1,'submit'),first=await s.authorize(request),settings=await assertionSettings(s),before=await ops(s);await clock(first.authorizationExpiresAt,async()=>{await setAssertionSettings(s,{...settings,enabled:'disabled'});expect(await s.authorize(request)).toEqual({ok:false,error:'service_unavailable'});expect(await s.lookupSubmit(first.operationId,first.requestDigest)).toEqual({ok:false,error:'service_unavailable'});await setAssertionSettings(s,settings);expect(await s.authorize(request)).toEqual({ok:false,error:'proof_rejected'});expect(await s.lookupSubmit(first.operationId,first.requestDigest)).toEqual({ok:false,error:'proof_rejected'});expect(await ops(s)).toEqual(before);});expect((await row(s)).counter).toBe(1);});
+
+import {qualifyAssertionCore} from 'djc-qualified-assertion';
+// Trusted software storage/keys only; these controls do not qualify native enrollment.
+const cryptoStages=['app-digest','client-digest','nonce-digest','import','verify'];
+const privateCauses=[()=>new Error('qualification_rejected PRIVATE_crypto'),()=>new DOMException('PRIVATE_crypto','DataError'),()=>({name:'ProofRejected',message:'PRIVATE_crypto'}),()=>undefined];
+async function cryptoContext(request){
+ const encoded=Buffer.from(request.assertion,'base64url'),client=Buffer.from(request.clientData,'base64url'),object=cbor.decodeFirstSync(encoded,{preferMap:true}),auth=new Uint8Array(object.get('authenticatorData'));
+ return {encoded,client,inputs:{'app-digest':text('ZEML4LPXH4.dev.djconnect.ios'),'client-digest':client,'nonce-digest':join(auth,await hash(client))}};
+}
+function cryptoFault(stage,context,cause,onFault=()=>{}){
+ let hits=0;const name=stage==='import'?'importKey':stage==='verify'?'verify':'digest',real=crypto.subtle[name].bind(crypto.subtle);
+ const spy=vi.spyOn(crypto.subtle,name).mockImplementation(async(...args)=>{
+  const reached=name==='importKey'?args[2]?.name==='ECDSA':name==='verify'?args[0]?.name==='ECDSA':Buffer.from(args[1]).equals(Buffer.from(context.inputs[stage]));
+  if(reached){hits++;onFault();throw cause;}return real(...args);
+ });return {spy,hits:()=>hits};
+}
+for(const stage of cryptoStages)for(let n=0;n<privateCauses.length;n++)test('fixed assertion crypto preserves exact thrown value: '+stage+'/'+n,async()=>{
+ const f=await software(),{s}=await setup(f),ch=await issue(s,f),request=await proof(f,ch),context=await cryptoContext(request),cause=privateCauses[n]();
+ const fault=cryptoFault(stage,context,cause);let caught=false,value;
+ try{try{await qualifyAssertionCore(context.encoded,context.client,f.point,0);}catch(error){caught=true;value=error;}expect(caught).toBe(true);expect(value).toBe(cause);expect(fault.hits()).toBe(1);}finally{fault.spy.mockRestore();}
+ expect(await qualifyAssertionCore(context.encoded,context.client,f.point,0)).toMatchObject({counter:1});
+});
+for(const stage of cryptoStages)for(let n=0;n<privateCauses.length;n++)test('fixed assertion crypto coordinator unavailable preserves original repair: '+stage+'/'+n,async()=>{
+ const f=await software(),{s}=await setup(f),ch=await issue(s,f),request=await proof(f,ch),context=await cryptoContext(request),before=await row(s),beforeOps=await ops(s);
+ await runInDurableObject(s,async i=>{const fault=cryptoFault(stage,context,privateCauses[n]());try{expect(await i.authorize(request)).toEqual({ok:false,error:'service_unavailable'});expect(fault.hits()).toBe(1);}finally{fault.spy.mockRestore();}});
+ expect(await row(s)).toEqual(before);expect(await ops(s)).toEqual(beforeOps);
+ expect(await s.authorize(request)).toMatchObject({ok:true,kind:'recovery-receipt',counter:1,keyExpiresAt:before.expiresAt});
+ expect((await row(s)).counter).toBe(1);expect((await row(s)).expiresAt).toBe(before.expiresAt);expect((await ops(s))[0].expiresAt).toBe(ch.expires_at);
+});
+for(const stage of ['app-digest','import','verify'])for(const bound of ['op-expiry','key-expiry','rollback'])test('fixed assertion crypto retains original known window without catch SQL: '+stage+'/'+bound,async()=>{
+ const f=await software(),{s}=await setup(f);
+ if(bound==='key-expiry')await runInDurableObject(s,(_i,c)=>{const r=JSON.parse(c.storage.sql.exec('SELECT value FROM key_state').one().value);r.expiresAt=Date.now()+60000;c.storage.sql.exec('UPDATE key_state SET value=?',JSON.stringify(r));});
+ const ch=await issue(s,f),request=await proof(f,ch),context=await cryptoContext(request),before=await row(s),beforeOps=await ops(s);
+ await clock(Date.now(),async()=>{await runInDurableObject(s,async(i,c)=>{
+  let faulted=false,afterSQL=0;const real=c.storage.sql.exec.bind(c.storage.sql),sql=vi.spyOn(c.storage.sql,'exec').mockImplementation((...a)=>{if(faulted)afterSQL++;return real(...a);});
+  const fault=cryptoFault(stage,context,new Error('PRIVATE_crypto'),()=>{faulted=true;vi.setSystemTime(bound==='op-expiry'?ch.expires_at:bound==='key-expiry'?before.expiresAt:beforeOps[0].createdAt-1);});
+  try{expect(await i.authorize(request)).toEqual({ok:false,error:'proof_rejected'});expect(fault.hits()).toBe(1);expect(afterSQL).toBe(0);}finally{fault.spy.mockRestore();sql.mockRestore();}
+ });});
+ expect(await row(s)).toEqual(before);expect(await ops(s)).toEqual(beforeOps);expect((await s.authorize(request)).ok).toBe(true);expect((await row(s)).expiresAt).toBe(before.expiresAt);
+});
+for(const kind of ['malformed-cbor','malformed-der','invalid-signature','replayed-counter','wrong-app-prefix'])test('fixed assertion crypto keeps actual invalid proof negative: '+kind,async()=>{
+ const f=await software(),{s}=await setup(f),ch=await issue(s,f),original=await proof(f,ch),request={...original},before=await row(s),beforeOps=await ops(s);
+ if(kind==='replayed-counter')Object.assign(request,await proof(f,ch,0));
+ else if(kind==='malformed-cbor')request.assertion=u(new Uint8Array([255]));
+ else{const object=cbor.decodeFirstSync(Buffer.from(request.assertion,'base64url'),{preferMap:true});
+  if(kind==='malformed-der')object.set('signature',Buffer.from([1,2,3]));
+  if(kind==='invalid-signature'){const b=Buffer.from(object.get('signature'));b[b.length-1]^=1;object.set('signature',b);}
+  if(kind==='wrong-app-prefix'){const b=Buffer.from(object.get('authenticatorData'));b[0]^=1;object.set('authenticatorData',b);}
+  request.assertion=u(cbor.encode(object));
+ }
+ let verifyFalse=0;const real=crypto.subtle.verify.bind(crypto.subtle),spy=vi.spyOn(crypto.subtle,'verify').mockImplementation(async(...a)=>{const out=await real(...a);if(out===false)verifyFalse++;return out;});
+ try{expect(await s.authorize(request)).toEqual({ok:false,error:'proof_rejected'});if(kind==='invalid-signature')expect(verifyFalse).toBe(1);}finally{spy.mockRestore();}
+ expect(await row(s)).toEqual(before);expect(await ops(s)).toEqual(beforeOps);expect((await s.authorize(original)).ok).toBe(true);expect((await row(s)).counter).toBe(1);
+});
+
+test('actual invalid stored curve point import is internal, never a sender proof verdict',async()=>{
+ const f=await software(),{s}=await setup(f),ch=await issue(s,f),request=await proof(f,ch),context=await cryptoContext(request),point=new Uint8Array(65);point[0]=4;
+ let observed;const real=crypto.subtle.importKey.bind(crypto.subtle),spy=vi.spyOn(crypto.subtle,'importKey').mockImplementation(async(...a)=>{try{return await real(...a);}catch(error){observed=error;throw error;}});
+ let caught;try{try{await qualifyAssertionCore(context.encoded,context.client,point,0);}catch(error){caught=error;}expect(observed).toBeInstanceOf(DOMException);expect(caught).toBe(observed);}finally{spy.mockRestore();}
+ expect(await qualifyAssertionCore(context.encoded,context.client,f.point,0)).toMatchObject({counter:1});
+});

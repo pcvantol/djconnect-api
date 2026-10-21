@@ -8,6 +8,11 @@ const BUILDS = new Set(['40227', '40228', '40230']);
 const assert = value => { if (!value) throw new Error('qualification_rejected'); };
 const equal = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 const hash = async bytes => new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+// Only fixed assertion WebCrypto operations have trusted algorithm/key/input shape.
+// Their exceptions are not proof verdicts; preserve the owning coordinator's cause.
+class AssertionCryptoFailure extends Error { constructor(cause) { super('assertion_crypto_failed', {cause}); } }
+async function assertionCrypto(operation) { try { return await operation(); } catch (cause) { throw new AssertionCryptoFailure(cause); } }
+const assertionHash = bytes => assertionCrypto(() => hash(bytes));
 const concat = (a, b) => { const bytes = new Uint8Array(a.length + b.length); bytes.set(a); bytes.set(b, a.length); return bytes; };
 const uint32 = (bytes, at) => new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(at, false);
 function buffer(value, min, max) { assert(value instanceof Uint8Array && value.length >= min && value.length <= max); return value; }
@@ -28,9 +33,9 @@ function properties(bytes) {
   assert(BUILDS.has(map.get('apple_bundle_version_01')));
   assert(equal(buffer(map.get('apple_validation_category_01'), 4, 4), new Uint8Array([3, 0, 0, 0])));
 }
-async function prefix(auth) {
+async function prefix(auth, digest = hash) {
   assert(auth[32] === 0xc0); // Measured iOS development distribution; not a generic WebAuthn flag parser.
-  assert(equal(auth.subarray(0, 32), await hash(new TextEncoder().encode(APP))));
+  assert(equal(auth.subarray(0, 32), await digest(new TextEncoder().encode(APP))));
 }
 function signedInput(bytes) { return buffer(bytes, 1, 2048); }
 function keyId(text) {
@@ -105,12 +110,13 @@ export async function qualifyAssertionCore(encoded, savedClientData, storedPoint
     assert(storedPoint[0] === 4 && Number.isInteger(previousCounter) && previousCounter >= 0 && previousCounter <= 0xffffffff);
     const object = closed(decode(encoded, 4096), ['signature', 'authenticatorData']);
     const auth = buffer(object.get('authenticatorData'), 38, 2048);
-    await prefix(auth); properties(auth.subarray(37));
+    await prefix(auth, assertionHash); properties(auth.subarray(37));
     const counter = uint32(auth, 33); assert(counter > previousCounter);
-    const key = await crypto.subtle.importKey('raw', storedPoint, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
-    const nonce = await hash(concat(auth, await hash(savedClientData)));
+    const key = await assertionCrypto(() => crypto.subtle.importKey('raw', storedPoint, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']));
+    const nonce = await assertionHash(concat(auth, await assertionHash(savedClientData)));
     // Apple signatures cover nonce using ECDSA-with-SHA256, as proven by actual device fixtures.
-    assert(await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, assertionSignature(object.get('signature')), nonce));
+    const signature = assertionSignature(object.get('signature'));
+    assert(await assertionCrypto(() => crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, signature, nonce)));
     return { scope: 'ASSERTION_CRYPTO_ONLY_NO_ATOMIC_COUNTER_OR_WIRE_ADMISSION', counter };
-  } catch { return null; }
+  } catch (error) { if (error instanceof AssertionCryptoFailure) throw error.cause; return null; }
 }
