@@ -27,12 +27,12 @@
     "wrangler": "^4.151.0"
   },
   "overrides": {
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "undici": "7.29.1"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
-    "sharp@0.35.4": true,
+    "sharp@0.35.5": true,
     "workerd@1.20260815.1": true,
     "workerd@1.20260921.1": true,
     "fsevents": false
