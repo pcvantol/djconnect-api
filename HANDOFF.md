@@ -1,3 +1,6 @@
+> Fixed closed QA source125 and Git-replacement correction127 protected; latest main3daeb9a has eight complete own-main SUCCESS workflows and actual ordinary+QA readbacks.
+> [Cumulative separate Finalization](docs/rendezvous/FIXED_QA_BUILD_FINALIZATION_V1.md) awaits own delivery; old docs126 closed unmerged. QAguardfalse/all22gatesOPEN/no effects.
+
 > Selected QA Git replacement guard: real disposable A→B counterproof reproduces wrong source stamp/blob; fixed global --no-replace-objects refuses both.
 > Source patch/reviews/delivery required; earlier docs-only Finalization126 held/superseded. Runtime guard stays false, all22 gates OPEN, no effects.
 

@@ -1,0 +1,628 @@
+{
+  "main": "3daeb9ae099fd498631745e416c292650cccfc7d",
+  "artifacts": {
+    "12352172350": {
+      "name": "api-release-artifact-evidence",
+      "provider_zip_sha256": "a9279c92327e16b16f2e80f5bb3662db54016175c24e77cbb7f98aea41b87d4b",
+      "files": {
+        "api-release-artifact-evidence.json": "be538396a62ccf0e5de6d822c88cfb0b1b9a3632d994845542ecc348034dac77"
+      }
+    },
+    "12351613233": {
+      "name": "djconnect-api-release-3daeb9ae099fd498631745e416c292650cccfc7d",
+      "provider_zip_sha256": "0bb3b111de00b4c53058d6766b66068d1bfa0ec07d5fb1ffb526d9fac09a7c23",
+      "files": {
+        "djconnect-api-release.tar.gz": "0c7642bceac0c5aa578a2f4f41d91abade190ff4f84478b9f59d2f18ad7b8aed"
+      }
+    },
+    "12351173756": {
+      "name": "post-merge-release-evidence",
+      "provider_zip_sha256": "6915ad142d16a72e1a7d855f337266d7da04acc6ed8e538b1dd0de4413d465cb",
+      "files": {
+        "post-merge-release-evidence.json": "6665477219df89720f42f98c6686d54dbb608fbf37bd86a26debe517f3046acb"
+      }
+    }
+  },
+  "runs": {
+    "artifact": 39614385295,
+    "formal": 39614386842
+  },
+  "archive_package_lock_config_equal_source": true,
+  "archive_sha256": "0c7642bceac0c5aa578a2f4f41d91abade190ff4f84478b9f59d2f18ad7b8aed",
+  "worker_sha256": "d3ef47e9b621138ff125abba3b8d3d7b644b66c00c4468885b2c9817dd42b669",
+  "worker_bytes": 1259544,
+  "release_main_stamp": true,
+  "license_sidecars_equal_source": true,
+  "artifact_evidence": {
+    "artifact_id": "12351613233",
+    "artifact_sha256": "0c7642bceac0c5aa578a2f4f41d91abade190ff4f84478b9f59d2f18ad7b8aed",
+    "candidate_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+    "kind": "api_worker_release_artifact",
+    "repository": "pcvantol/djconnect-api",
+    "schema_version": 1,
+    "timestamp": "2026-10-21T14:09:54Z"
+  },
+  "formal": {
+    "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "evidence_digest": "20ffc3ea7f44eb2a0ec7e73d0992ff357517590d5d7bdb1cc57b14d9635b74fe",
+    "findings": [],
+    "kind": "post_merge_release_evidence",
+    "main_parents": [
+      "b16a0cca64ada8657b55641b8c1374ddace6ad99"
+    ],
+    "main_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+    "merge_actor": "pcvantol",
+    "merge_strategy": "SQUASH",
+    "originating_pr": {
+      "base_ref": "main",
+      "changed_files": [
+        ".github/workflows/rendezvous-qa-build.yml",
+        "HANDOFF.md",
+        "TODO.md",
+        "docs/rendezvous/FIXED_QA_BUILD_V1.md",
+        "scripts/build_rendezvous_qa.mjs",
+        "scripts/test_rendezvous_qa_git_provenance.mjs"
+      ],
+      "head_sha": "cff4a531797290e8151f7397e7b9798fd78711fa",
+      "main_changed_files": [
+        ".github/workflows/rendezvous-qa-build.yml",
+        "HANDOFF.md",
+        "TODO.md",
+        "docs/rendezvous/FIXED_QA_BUILD_V1.md",
+        "scripts/build_rendezvous_qa.mjs",
+        "scripts/test_rendezvous_qa_git_provenance.mjs"
+      ],
+      "merge_actor": "pcvantol",
+      "merge_commit_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+      "merge_strategy": "SQUASH",
+      "merged_at": "2026-10-21T14:08:05Z",
+      "number": 127,
+      "state": "MERGED"
+    },
+    "post_merge": {
+      "build_validation": "PASS",
+      "ci": "PASS",
+      "coverage": "PASS",
+      "coverage_artifact_sha": "sha256:438c708ed9687178124bd02bf27b23956ecc413ef3f8117bc473bb0162b30520",
+      "coverage_report_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+      "governance": "PASS",
+      "lint": "PASS",
+      "sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+      "static_analysis": "PASS",
+      "tests": "PASS",
+      "workflow_run_ids": [
+        "39614167096"
+      ]
+    },
+    "pre_merge": {
+      "candidate_sha": "cff4a531797290e8151f7397e7b9798fd78711fa",
+      "owner_authorization": "PASS",
+      "required_checks": "PASS",
+      "risk_classification": "HIGH_RISK",
+      "software_assurance": "PASS",
+      "trusted_delivery": "PASS",
+      "verification": "PASS",
+      "workflow_integrity": "PASS"
+    },
+    "provenance_result": "PASS",
+    "repository": "pcvantol/djconnect-api",
+    "repository_role": "active_source",
+    "schema_version": 1,
+    "source_qualified_pr_sha": "cff4a531797290e8151f7397e7b9798fd78711fa",
+    "timestamp": "2026-10-21T14:09:47.759Z"
+  },
+  "durable": {
+    "asset_id": 662721188,
+    "sha256": "0a35d7e050dce32374f25868f0ca09542232fab69fba5f9c252d830c672e343b",
+    "receipt": {
+      "commit_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+      "integrity": {
+        "algorithm": "sha256-canonical-json",
+        "digest": "ce56434c36e9e0d809dd69fcb06e61f6c8402fa1b91bb50ac83dc4e21a814a03"
+      },
+      "kind": "durable_qualification_evidence",
+      "published_at": "2026-10-21T14:09:47Z",
+      "qualification": {
+        "outcome": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+        "profile": "post_merge_release_evidence",
+        "required_checks": {
+          "post_merge_build_validation": "PASS",
+          "post_merge_ci": "PASS",
+          "post_merge_coverage": "PASS",
+          "post_merge_governance": "PASS",
+          "post_merge_lint": "PASS",
+          "post_merge_static_analysis": "PASS",
+          "post_merge_tests": "PASS",
+          "required_checks": "PASS",
+          "software_assurance": "PASS",
+          "trusted_delivery": "PASS",
+          "verification": "PASS",
+          "workflow_integrity": "PASS"
+        }
+      },
+      "record_id": "pcvantol/djconnect-api@3daeb9ae099fd498631745e416c292650cccfc7d:post-merge-release-evidence",
+      "redaction": {
+        "included_data": "formal allowlisted decision fields only",
+        "policy_version": 1,
+        "status": "REDACTED"
+      },
+      "release_identifier": "internal-api-3daeb9ae099fd498631745e416c292650cccfc7d",
+      "repository": "pcvantol/djconnect-api",
+      "repository_role": "active_source",
+      "retention_class": "LONG_TERM",
+      "revision": 1,
+      "schema_version": 1,
+      "source_evidence_digest": "20ffc3ea7f44eb2a0ec7e73d0992ff357517590d5d7bdb1cc57b14d9635b74fe",
+      "source_revision": "733ecc2836d40611b2b7472308a7175a6130c91a",
+      "supplemental_evidence": [
+        {
+          "kind": "coverage_artifact_digest",
+          "sha256": "438c708ed9687178124bd02bf27b23956ecc413ef3f8117bc473bb0162b30520"
+        }
+      ],
+      "workflow_references": {
+        "post_merge_run_ids": [
+          "39614167096"
+        ],
+        "producer_run_id": "39614386842"
+      }
+    }
+  },
+  "production_runtime_equal_initial_qa_source_except_release_sha": true,
+  "ordinary_comparison_mode": "ACTUAL_RETAINED_DOWNLOADED_WORKER_BYTES",
+  "scope": "FIXED_CLOSED_QA_BUILD_WITH_EXACT_GIT_OBJECT_PROVENANCE",
+  "initial_source_pr": 125,
+  "source_pr": 127,
+  "reviewed_candidate": "cff4a531797290e8151f7397e7b9798fd78711fa",
+  "tested_ci_merge": "3043e2017636c49befc129f172229f6af1a12aa3",
+  "reviewed_and_tested_tree": "8789b4a922e6c9712d95d321e12b6800b0d3c630",
+  "source_main_workflows": {
+    "Validate": 39614167096,
+    "CodeQL": 39614167862,
+    "AI-development projection": 39614166311,
+    "TDE observe": 39614166348,
+    "Local native experiment qualification": 39614166273,
+    "Fixed rendezvous QA build": 39614166303,
+    "API release artifact": 39614385295,
+    "Post-Merge Release Evidence": 39614386842
+  },
+  "all_source_main_workflows": "SUCCESS",
+  "source_reviews": "https://github.com/pcvantol/djconnect-api/pull/127#issuecomment-6317966222",
+  "initial_source_reviews": "https://github.com/pcvantol/djconnect-api/pull/125#issuecomment-6317645303",
+  "exact_high_risk_owner_authorization": 39613926110,
+  "qa": {
+    "main": "3daeb9ae099fd498631745e416c292650cccfc7d",
+    "run": 39614166303,
+    "artifact_id": 12351518102,
+    "provider_zip_sha256": "ef0d436da1ab3f158acc5a2e2d8e63f91168769ca789605640c989853e5881fe",
+    "archive_sha256": "3deb35b06d171a7f536cc7dfc77cf261922e46eb30eb8e3433d275ada9f4cecb",
+    "worker_sha256": "1110889fc0704fd59fc5f0868e71381ce4c092bdf6217b9542410ebaff6b08d8",
+    "worker_bytes": 1166683,
+    "wire_schema_sha256": "24ab72719195f7971e070e56c52ceea7e67e02ee1bd7c6946eca99883194505f",
+    "file_sha256": {
+      "package-lock.json": "9947367deb9b7028fb58fd431f3e3bfd57fc2db207d00497224e833dde911948",
+      "qualification-evidence.json": "2c3b1cd2a39f4b11a2b0c17933fb5d0da8c0d5c33a0b92bec12bb8aa50f8dcc7",
+      "wrangler.json": "c6d83289b88d2f4e2420d970a85727109f3b789ec61ca1f5635174dfc8a16c44",
+      "worker.mjs": "1110889fc0704fd59fc5f0868e71381ce4c092bdf6217b9542410ebaff6b08d8",
+      "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "THIRD_PARTY_NOTICES.md": "6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e",
+      "qa-origin-fixture.json": "a71efe7eb77b4237dd74d8e96d126d07acf33275ab00dec07f3c614ead64450c",
+      "build-evidence.json": "617c7d38d49ae7647672716b22ea76d3e5d91d3aaaba8377712d40141e598fcb",
+      "wire-request-schemas-qa.json": "24ab72719195f7971e070e56c52ceea7e67e02ee1bd7c6946eca99883194505f",
+      "RENDEZVOUS_THIRD_PARTY_LICENSES.md": "d01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442",
+      "package.json": "d32e8c6706816ae91682453a54b13d989f442f7da4c49fab66e80a054668a386"
+    },
+    "source_pins": 35,
+    "installed_pins": 32,
+    "source_commit_bytes_verified": true,
+    "config_package_lock_licences_equal_source": true,
+    "qualification": {
+      "scope": "FIXED_QA_GRAPH_COMPILED_CLOSED_NOT_NATIVE_OR_OPERATIONAL_ADMISSION",
+      "result": "PASS",
+      "source_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+      "source_dirty": false,
+      "git_environment_forgery_refused": true,
+      "artifact_worker_sha256": "1110889fc0704fd59fc5f0868e71381ce4c092bdf6217b9542410ebaff6b08d8",
+      "worker_bytes": 1166683,
+      "origin_drift_guards": 11,
+      "transport_cases": [
+        {
+          "route": "/create",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/create",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/create",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/create",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/inspect",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/inspect",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/inspect",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/inspect",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/challenge",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/challenge",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/challenge",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/challenge",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/register",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/register",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/register",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/register",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit-challenge",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit-challenge",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit-challenge",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit-challenge",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/submit",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/poll",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/poll",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/poll",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/poll",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/consume",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/consume",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/consume",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/consume",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/cancel",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/cancel",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/cancel",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/cancel",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/delete",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/delete",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/delete",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/delete",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/recover",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/recover",
+          "origin": "https://vibecast.tv",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/recover",
+          "origin": "https://qa.vibecast.tv.evil.invalid",
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "route": "/attestation/recover",
+          "origin": null,
+          "status": 503,
+          "env_reads": 0,
+          "body_used": false
+        },
+        {
+          "method": "OPTIONS",
+          "origin": "https://qa.vibecast.tv",
+          "status": 503
+        },
+        {
+          "method": "OPTIONS",
+          "origin": "https://vibecast.tv",
+          "status": 503
+        },
+        {
+          "url": "https://api.djconnect.dev/v1/rendezvous/create",
+          "status": 404
+        },
+        {
+          "url": "https://evil.invalid/v1/rendezvous/create",
+          "status": 404
+        },
+        {
+          "url": "https://api-vibecast-qa.djconnect.dev/v1/install/bootstrap",
+          "status": 404
+        },
+        {
+          "url": "https://api-vibecast-qa.djconnect.dev/health?activate=true",
+          "status": 404
+        }
+      ],
+      "health": {
+        "status": 200,
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "application/json; charset=utf-8",
+          "referrer-policy": "no-referrer",
+          "vary": "Origin",
+          "x-content-type-options": "nosniff"
+        },
+        "body": {
+          "ok": true,
+          "service": "djconnect-api-vibecast-qa",
+          "release_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+          "activation_allowed": false
+        },
+        "env_reads": 0,
+        "body_used": false
+      },
+      "forbidden_rpc": 100,
+      "outbound_attempts": 0,
+      "activation_allowed": false,
+      "native_positive": false,
+      "operator_admission": null
+    },
+    "fixture": {
+      "kind": "FIXED_QA_ONLY_NOT_PRODUCT_OR_OPERATIONAL_ADMISSION",
+      "source_sha": "3daeb9ae099fd498631745e416c292650cccfc7d",
+      "service": "djconnect-api-vibecast-qa",
+      "service_origin": "https://api-vibecast-qa.djconnect.dev",
+      "browser_origin": "https://qa.vibecast.tv",
+      "wire_schema_sha256": "24ab72719195f7971e070e56c52ceea7e67e02ee1bd7c6946eca99883194505f",
+      "worker_sha256": "1110889fc0704fd59fc5f0868e71381ce4c092bdf6217b9542410ebaff6b08d8",
+      "activation_allowed": false,
+      "current_apple_profile": null,
+      "operational_admission": null
+    },
+    "activation_allowed": false,
+    "native_positive": false,
+    "runtime_equal_initial_qa_except_source_sha": true
+  },
+  "delivery_history": {
+    "initial_source_main": "b16a0cca64ada8657b55641b8c1374ddace6ad99",
+    "initial_qa_artifact": 12349614583,
+    "initial_ordinary_artifact": "12351115500",
+    "superseded_finalization_pr": 126,
+    "superseded_finalization_state": "CLOSED_UNMERGED_BRANCH_AND_SCOPED_REVIEWS_PRESERVED",
+    "initial_owner_authorization": 39610702044,
+    "patch_first_owner_authorization_failed": 39613082935,
+    "patch_failure_reason": "ACTUAL_TDE_CHECK_IN_PROGRESS_DESPITE_RUN_SUCCESS",
+    "tde_recovery": "NORMAL_TECHNICAL_RERUN_ATTEMPT2_ACTUAL_CHECK_PASS_NO_MANUAL_STATUS",
+    "patch_candidate_projection": "JOB_PASS_RUN_METADATA_IN_PROGRESS_RERUN_REFUSED_RUNNING_CANCEL_REFUSED_COMPLETED_NO_SUCCESS_CLAIM_NO_CANCEL_OCCURRED",
+    "normal_merge": "ALL_REQUIRED_JOB_CHECKS_SUCCESS_NO_BYPASS"
+  },
+  "acceptance": {
+    "activation_allowed": false,
+    "current_apple_profile": null,
+    "operational_admission": null,
+    "admitted_test_tuple": null,
+    "all_22_full_service_gates": "OPEN",
+    "native_positive": false,
+    "deployment": false,
+    "automation": "PAUSED",
+    "cumulative_finalization": "PENDING_OWN_REVIEWS_PROTECTED_DELIVERY_AND_READBACKS"
+  }
+}
