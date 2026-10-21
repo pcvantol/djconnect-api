@@ -1,0 +1,205 @@
+{
+  "source_main": "f88f237d73227981864b932cdd1d441df1276018",
+  "artifacts": {
+    "12325441228": {
+      "provider_zip_sha256": "795ff45b4ab73c08dad2ab0a18a5b7e0d5689b7d8ef9716804fdf4213cccefee",
+      "files": {
+        "api-release-artifact-evidence.json": "d77bc43fdb05b2e1d9ae80d3a93b1ed549a79dd1bc899eb9e1825c3a642447b1"
+      }
+    },
+    "12325256590": {
+      "provider_zip_sha256": "f5f5618a7219d43302eec46288be0e0cc1b6fee09b22bdadb994fea3173fb9d9",
+      "files": {
+        "djconnect-api-release.tar.gz": "d730e58b8c565ed980a4740642494dc1a4b5ea1d4a33fad38b9fa7b80171ac9b"
+      }
+    },
+    "12325786296": {
+      "provider_zip_sha256": "392cd497e322c8e787d3a9fca5a26f0d1fb79a289b40578e4405d2a758128f9c",
+      "files": {
+        "post-merge-release-evidence.json": "67b5815e4a01be1b1f16089ff4da3187ed486bdae5e590c35da846b9b98f23b0"
+      }
+    }
+  },
+  "archive_sha256": "d730e58b8c565ed980a4740642494dc1a4b5ea1d4a33fad38b9fa7b80171ac9b",
+  "worker_sha256": "9159c530328aed69ae788f627260e77873900ea3cff477fe41b83f5bbbf4b41c",
+  "worker_bytes": 1258415,
+  "main_stamp": true,
+  "license_sidecars_equal_source": true,
+  "durable": {
+    "asset_id": 661575066,
+    "sha256": "b7211778c94ea48cdac129f687a372d8b2f6e164237927f62aa3f927faec6730",
+    "receipt": {
+      "commit_sha": "f88f237d73227981864b932cdd1d441df1276018",
+      "integrity": {
+        "algorithm": "sha256-canonical-json",
+        "digest": "7c87debf44af1cc1a81a9b1d05cfab5be0f5a332672c3fc42af2e8117b4f2f95"
+      },
+      "kind": "durable_qualification_evidence",
+      "published_at": "2026-10-21T06:26:01Z",
+      "qualification": {
+        "outcome": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+        "profile": "post_merge_release_evidence",
+        "required_checks": {
+          "post_merge_build_validation": "PASS",
+          "post_merge_ci": "PASS",
+          "post_merge_coverage": "PASS",
+          "post_merge_governance": "PASS",
+          "post_merge_lint": "PASS",
+          "post_merge_static_analysis": "PASS",
+          "post_merge_tests": "PASS",
+          "required_checks": "PASS",
+          "software_assurance": "PASS",
+          "trusted_delivery": "PASS",
+          "verification": "PASS",
+          "workflow_integrity": "PASS"
+        }
+      },
+      "record_id": "pcvantol/djconnect-api@f88f237d73227981864b932cdd1d441df1276018:post-merge-release-evidence",
+      "redaction": {
+        "included_data": "formal allowlisted decision fields only",
+        "policy_version": 1,
+        "status": "REDACTED"
+      },
+      "release_identifier": "internal-api-f88f237d73227981864b932cdd1d441df1276018",
+      "repository": "pcvantol/djconnect-api",
+      "repository_role": "active_source",
+      "retention_class": "LONG_TERM",
+      "revision": 1,
+      "schema_version": 1,
+      "source_evidence_digest": "aeddafeda09eadbd6fde5e48810d7207b3a9740e8f37b98e0d19ad413ed27a56",
+      "source_revision": "733ecc2836d40611b2b7472308a7175a6130c91a",
+      "supplemental_evidence": [
+        {
+          "kind": "coverage_artifact_digest",
+          "sha256": "234851f8bf7bfe8904f0beade3844f7f3e8f52a8e7a0e5ab9d35d2b05b51cd7b"
+        }
+      ],
+      "workflow_references": {
+        "post_merge_run_ids": [
+          "39555215008"
+        ],
+        "producer_run_id": "39555350159"
+      }
+    }
+  },
+  "formal_files": {
+    "api-release-artifact-evidence.json": {
+      "artifact_id": "12325256590",
+      "artifact_sha256": "d730e58b8c565ed980a4740642494dc1a4b5ea1d4a33fad38b9fa7b80171ac9b",
+      "candidate_sha": "f88f237d73227981864b932cdd1d441df1276018",
+      "kind": "api_worker_release_artifact",
+      "repository": "pcvantol/djconnect-api",
+      "schema_version": 1,
+      "timestamp": "2026-10-21T06:26:15Z"
+    },
+    "post-merge-release-evidence.json": {
+      "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+      "evidence_digest": "aeddafeda09eadbd6fde5e48810d7207b3a9740e8f37b98e0d19ad413ed27a56",
+      "findings": [],
+      "kind": "post_merge_release_evidence",
+      "main_parents": [
+        "3458ad603350ab9481073277c7dbe561433b4453"
+      ],
+      "main_sha": "f88f237d73227981864b932cdd1d441df1276018",
+      "merge_actor": "pcvantol",
+      "merge_strategy": "SQUASH",
+      "originating_pr": {
+        "base_ref": "main",
+        "changed_files": [
+          "HANDOFF.md",
+          "TODO.md",
+          "docs/rendezvous/ENROLLMENT_CALLBACK_FAILURES_V1.md",
+          "docs/rendezvous/deployment-preparation-v1.json",
+          "docs/rendezvous/enrollment-callback-build-observations-v1.json",
+          "docs/rendezvous/enrollment-callback-shared-observations-v1.json",
+          "docs/rendezvous/enrollment-callback-source-delta-v1.json",
+          "qualification/rendezvous/enrollment-evidence-candidate.d.mts",
+          "qualification/rendezvous/enrollment-evidence-candidate.mjs",
+          "qualification/rendezvous/enrollment-evidence.check.mjs",
+          "qualification/rendezvous/enrollment-key-state.check.mjs",
+          "qualification/rendezvous/local-native-runtime.mjs",
+          "qualification/rendezvous/provider-unavailable.check.mjs",
+          "scripts/validate_rendezvous_deployment_plan.py"
+        ],
+        "head_sha": "2ffa9bf19bd50a4b9e8b12b685a6b9689c9ab7e4",
+        "main_changed_files": [
+          "HANDOFF.md",
+          "TODO.md",
+          "docs/rendezvous/ENROLLMENT_CALLBACK_FAILURES_V1.md",
+          "docs/rendezvous/deployment-preparation-v1.json",
+          "docs/rendezvous/enrollment-callback-build-observations-v1.json",
+          "docs/rendezvous/enrollment-callback-shared-observations-v1.json",
+          "docs/rendezvous/enrollment-callback-source-delta-v1.json",
+          "qualification/rendezvous/enrollment-evidence-candidate.d.mts",
+          "qualification/rendezvous/enrollment-evidence-candidate.mjs",
+          "qualification/rendezvous/enrollment-evidence.check.mjs",
+          "qualification/rendezvous/enrollment-key-state.check.mjs",
+          "qualification/rendezvous/local-native-runtime.mjs",
+          "qualification/rendezvous/provider-unavailable.check.mjs",
+          "scripts/validate_rendezvous_deployment_plan.py"
+        ],
+        "merge_actor": "pcvantol",
+        "merge_commit_sha": "f88f237d73227981864b932cdd1d441df1276018",
+        "merge_strategy": "SQUASH",
+        "merged_at": "2026-10-21T06:24:31Z",
+        "number": 116,
+        "state": "MERGED"
+      },
+      "post_merge": {
+        "build_validation": "PASS",
+        "ci": "PASS",
+        "coverage": "PASS",
+        "coverage_artifact_sha": "sha256:234851f8bf7bfe8904f0beade3844f7f3e8f52a8e7a0e5ab9d35d2b05b51cd7b",
+        "coverage_report_sha": "f88f237d73227981864b932cdd1d441df1276018",
+        "governance": "PASS",
+        "lint": "PASS",
+        "sha": "f88f237d73227981864b932cdd1d441df1276018",
+        "static_analysis": "PASS",
+        "tests": "PASS",
+        "workflow_run_ids": [
+          "39555215008"
+        ]
+      },
+      "pre_merge": {
+        "candidate_sha": "2ffa9bf19bd50a4b9e8b12b685a6b9689c9ab7e4",
+        "owner_authorization": "PASS",
+        "required_checks": "PASS",
+        "risk_classification": "NORMAL_RISK",
+        "software_assurance": "PASS",
+        "trusted_delivery": "PASS",
+        "verification": "PASS",
+        "workflow_integrity": "PASS"
+      },
+      "provenance_result": "PASS",
+      "repository": "pcvantol/djconnect-api",
+      "repository_role": "active_source",
+      "schema_version": 1,
+      "source_qualified_pr_sha": "2ffa9bf19bd50a4b9e8b12b685a6b9689c9ab7e4",
+      "timestamp": "2026-10-21T06:26:01.170Z"
+    }
+  },
+  "schema_version": 1,
+  "kind": "enrollment_callback_source_finalization",
+  "status_outside_protected_main": "FINALIZATION_CANDIDATE",
+  "exact_finalization_receipt_required": true,
+  "source_candidate": "2ffa9bf19bd50a4b9e8b12b685a6b9689c9ab7e4",
+  "source_pr": 116,
+  "source_tree": "a2740e6a87a367cffd3ffc40779363c3d73d9625",
+  "independent_source_reviews": "https://github.com/pcvantol/djconnect-api/pull/116#issuecomment-6309554865",
+  "main_ci": {
+    "Validate": 39555215008,
+    "CodeQL": 39555215517,
+    "projection": 39555214641,
+    "observe": 39555214646,
+    "local_private_browser": 39555214642,
+    "artifact": 39555349884,
+    "formal": 39555350159
+  },
+  "all_source_main_workflows": "SUCCESS",
+  "assignment_complete": false,
+  "deployment_authorized": false,
+  "public_activation_allowed": false,
+  "native_accepted": false,
+  "full_provider_taxonomy_closed": false,
+  "timer_enabled": false
+}

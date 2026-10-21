@@ -1,3 +1,7 @@
+> Enrollment callback source PR116 delivered as f88f237; own-main CI/artifact/formal/durable readbacks PASS.
+> [Separate Finalization candidate](docs/rendezvous/ENROLLMENT_CALLBACK_FINALIZATION_V1.md) requires fresh exact reviews and protected delivery.
+> Entire assignment and22 activation gates remain OPEN; no deploy; timer PAUSED.
+
 > Current [enrollment callback failure correction](docs/rendezvous/ENROLLMENT_CALLBACK_FAILURES_V1.md)
 > preserves coordinator-owned saved-state exceptions instead of labelling transient
 > server faults as invalid proof. Local1485 shared cases pass; independent reviews,
