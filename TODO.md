@@ -1,3 +1,6 @@
+> Point-digest source PR123 protected asdfdab07 with own-main CI and actual artifact/formal/durable readbacks PASS.
+> [Separate Finalization](docs/rendezvous/ENROLLMENT_POINT_DIGEST_FINALIZATION_V1.md) awaits its own protected delivery. Full taxonomy/all22 gates OPEN; no deploy; timer PAUSED.
+
 > Fixed enrollment point-digest exception preservation is locally qualified: [scope/evidence](docs/rendezvous/ENROLLMENT_POINT_DIGEST_FAILURES_V1.md).
 > Protected delivery/reviews and separate Finalization remain pending. Full taxonomy/all22 gates OPEN; no deploy or native effect; timer PAUSED.
 
