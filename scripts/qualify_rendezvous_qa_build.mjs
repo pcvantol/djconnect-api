@@ -20,7 +20,12 @@ try{
  }
  assert.throws(()=>deriveFixedQaSource('arbitrary.ts','',{}));driftChecks++;
  const wire=JSON.parse(deriveFixedQaSource('docs/rendezvous/wire-request-schemas-v1.json',await readFile(join(repo,'docs/rendezvous/wire-request-schemas-v1.json'),'utf8'),built.receipt.profile.transforms['docs/rendezvous/wire-request-schemas-v1.json']));
- const wireText=JSON.stringify(wire);assert(!wireText.includes('https://api.djconnect.dev')&&!wireText.includes('https://vibecast.tv'));
+ const constants=[];
+ const collect=value=>{if(value&&typeof value==='object'){if(Object.hasOwn(value,'const'))constants.push(value.const);for(const child of Object.values(value))collect(child);}};
+ collect(wire);
+ assert.equal(constants.filter(value=>value==='https://api-vibecast-qa.djconnect.dev').length,4);
+ assert.equal(constants.filter(value=>value==='https://qa.vibecast.tv').length,1);
+ assert.equal(constants.filter(value=>value==='https://api.djconnect.dev'||value==='https://vibecast.tv').length,0);
  const require=createRequire(import.meta.resolve('wrangler'));
  const {Miniflare,Log,LogLevel,convertV4MiniflareOptions}=require('miniflare');
  const inputs=JSON.parse(await readFile(join(repo,'rendezvous-build-inputs.json'),'utf8'));
