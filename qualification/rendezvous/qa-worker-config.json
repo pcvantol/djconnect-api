@@ -1,0 +1,20 @@
+{
+  "name": "djconnect-api-vibecast-qa",
+  "main": "worker.mjs",
+  "no_bundle": true,
+  "compatibility_date": "2026-06-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [],
+  "send_metrics": false,
+  "observability": {"enabled": false},
+  "durable_objects": {"bindings": [
+    {"name":"REQUEST_ADMISSION","class_name":"RequestAdmission"},
+    {"name":"ADMISSION_STATE","class_name":"AllocationBudget"},
+    {"name":"ALLOCATION_INDEX","class_name":"AllocationIndex"},
+    {"name":"ENROLLMENT_COORDINATOR","class_name":"EnrollmentCoordinator"},
+    {"name":"COMPOSED_TRANSACTIONS","class_name":"BudgetedTransactionCoordinator"}
+  ]},
+  "migrations": [{"tag":"djc-rendezvous-qa-sqlite-v1","new_sqlite_classes":["RequestAdmission","AllocationBudget","AllocationIndex","EnrollmentCoordinator","BudgetedTransactionCoordinator"]}]
+}

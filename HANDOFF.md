@@ -1,3 +1,6 @@
+> Selected fixed isolated QA build: [source and qualification](docs/rendezvous/FIXED_QA_BUILD_V1.md).
+> Compiled closed; current Apple/admission null; own reviews/delivery/Finalization pending. No deployment or native effects; all22 gates OPEN.
+
 > Point-digest source PR123 protected asdfdab07 with own-main CI and actual artifact/formal/durable readbacks PASS.
 > [Separate Finalization](docs/rendezvous/ENROLLMENT_POINT_DIGEST_FINALIZATION_V1.md) awaits its own protected delivery. Full taxonomy/all22 gates OPEN; no deploy; timer PAUSED.
 
