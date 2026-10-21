@@ -1,3 +1,6 @@
+> Fixed isolated QA source PR125 protected asb16a0cc; eight own-main workflows and actual ordinary+QA artifact/formal/durable readbacks PASS.
+> [Separate Finalization](docs/rendezvous/FIXED_QA_BUILD_FINALIZATION_V1.md) pending own delivery; QAguardfalse/currentApple+admissionnull/all22 gates OPEN/no effects.
+
 > Selected fixed isolated QA build: [source and qualification](docs/rendezvous/FIXED_QA_BUILD_V1.md).
 > Compiled closed; current Apple/admission null; own reviews/delivery/Finalization pending. No deployment or native effects; all22 gates OPEN.
 
