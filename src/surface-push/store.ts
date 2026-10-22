@@ -1,7 +1,7 @@
 import { sha256Hex } from "../crypto";
 import { canonical, need, type Coordinate, type Input, type OperationKind, type RegisterInput, type Role } from "./wire";
 export interface Principal {
- id: string; token_hash: string; install_id: string; device_binding: string; owner_binding: string;
+ id: string; delegation_id: string; delegation_revision: number; binding_id: string; grant_binding: string; source_binding: string; scope_digest: string; token_hash: string; install_id: string; device_binding: string; owner_binding: string;
  parent_bundle: string; extension_bundle: string; widget_kind: string; attributes_type: string;
  platform: string; environment: "sandbox" | "production"; role: Role;
  activity_profile: string; external_content_allowed: number;
@@ -20,7 +20,7 @@ export class SurfaceStore {
  constructor(readonly db: D1Database) {}
  async authenticate(authorization: string | null, now: number): Promise<Principal> {
   need(authorization && /^Bearer djcs_[A-Za-z0-9_-]{43}$/.test(authorization), "surface_auth_required", 401);
-  const principal = await this.db.prepare("SELECT * FROM surface_push_capabilities WHERE token_hash=? AND revoked_at IS NULL AND expires_at>?").bind(await sha256Hex(authorization.slice(7)), now).first<Principal>();
+  const principal = await this.db.prepare("SELECT * FROM surface_push_live_capabilities WHERE token_hash=? AND revoked_at IS NULL AND expires_at>?").bind(await sha256Hex(authorization.slice(7)), now).first<Principal>();
   need(principal, "surface_auth_required", 401);
   need(Number.isSafeInteger(principal.expires_at) && /^[a-f0-9]{64}$/.test(principal.device_binding) && /^[a-f0-9]{64}$/.test(principal.owner_binding), "surface_configuration_invalid", 503);
   need(/^[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/.test(principal.parent_bundle) && ["sandbox", "production"].includes(principal.environment), "surface_configuration_invalid", 503);
@@ -31,7 +31,7 @@ export class SurfaceStore {
   return principal;
  }
  async identity(p: Principal, input: Coordinate): Promise<string> {
-  need(input.device_binding === p.device_binding && input.owner_binding === p.owner_binding, "surface_scope_mismatch", 403);
+  need(input.binding_id === p.binding_id && input.device_binding === p.device_binding && input.owner_binding === p.owner_binding, "surface_scope_mismatch", 403);
   return sha256Hex(canonical(["surface-target/1", p.id, input.registration_id, input.generation, input.binding_id, input.device_binding, input.owner_binding]));
  }
  async target(id: string): Promise<TargetRow | null> { return this.db.prepare("SELECT * FROM surface_push_targets WHERE id=?").bind(id).first<TargetRow>(); }
@@ -40,7 +40,7 @@ export class SurfaceStore {
   return this.db.prepare(`INSERT OR IGNORE INTO surface_push_operations
    (capability_id,operation_id,request_hash,kind,target_id,claim_id,outcome,accepted_at,registration_id,generation,revision,expires_at)
    SELECT ?,?,?,?,?,?,'pending',?,?,?,?,? WHERE
-   EXISTS(SELECT 1 FROM surface_push_capabilities WHERE id=? AND revoked_at IS NULL AND expires_at>?) AND
+   EXISTS(SELECT 1 FROM surface_push_live_capabilities WHERE id=? AND revoked_at IS NULL AND expires_at>?) AND
    (SELECT COUNT(*) FROM surface_push_operations WHERE capability_id=? AND ((?='revoke' AND kind='revoke') OR (?!='revoke' AND kind!='revoke')))<?`)
    .bind(p.id, input.operation_id, hash, kind, id, claim, now, input.registration_id, input.generation, input.revision, expiry, p.id, now, p.id, kind, kind, p.max_operations);
  }
@@ -93,7 +93,7 @@ export class SurfaceStore {
   const result = await this.db.prepare(`UPDATE surface_push_operations SET outcome='dispatch_started'
    WHERE capability_id=? AND operation_id=? AND claim_id=? AND outcome='event_reserved' AND
    EXISTS(SELECT 1 FROM surface_push_targets WHERE id=? AND revision=? AND state='active' AND expires_at>?) AND
-   EXISTS(SELECT 1 FROM surface_push_capabilities WHERE id=? AND revoked_at IS NULL AND expires_at>?)`)
+   EXISTS(SELECT 1 FROM surface_push_live_capabilities WHERE id=? AND revoked_at IS NULL AND expires_at>?)`)
    .bind(p.id, input.operation_id, claim, id, input.revision, now, p.id, now).run();
   return result.meta.changes === 1;
  }

@@ -18,7 +18,7 @@ function json(body: unknown, status = 200): Response {
  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "referrer-policy": "no-referrer", "x-content-type-options": "nosniff" } });
 }
 function aad(p: Principal, row: Pick<TargetRow, "id" | "generation" | "revision" | "expires_at" | "target_json">): string {
- return canonical(["surface-token/1", p.id, row.id, row.generation, row.revision, row.expires_at, row.target_json, p.parent_bundle, p.role, p.environment]);
+ return canonical(["surface-token/2", p.id, p.delegation_id, p.delegation_revision, p.binding_id, p.grant_binding, p.source_binding, p.scope_digest, row.id, row.generation, row.revision, row.expires_at, row.target_json, p.parent_bundle, p.role, p.environment]);
 }
 function validateRegistration(p: Principal, input: RegisterInput, now: number): void {
  need(input.token_role === p.role && input.platform === p.platform && input.apns_environment === p.environment && input.target.app_bundle_id === p.parent_bundle, "surface_scope_mismatch", 403);
@@ -38,7 +38,7 @@ export function createSurfacePushHandler(options: SurfaceOptions): (request: Req
  const now = () => { const value = (options.now ?? Date.now)(); need(Number.isSafeInteger(value) && value >= 0, "surface_clock_unqualified", 503); return highWater = Math.max(highWater, value); };
  async function receipt(p: Principal, input: Coordinate, id: string, op: OperationRow | null, replayed: boolean, readOnly = false): Promise<Response> {
   const row = await store.target(id), clock = now();
-  const liveCapability = await options.db.prepare("SELECT 1 AS live FROM surface_push_capabilities WHERE id=? AND revoked_at IS NULL AND expires_at>?").bind(p.id, clock).first();
+  const liveCapability = await options.db.prepare("SELECT 1 AS live FROM surface_push_live_capabilities WHERE id=? AND revoked_at IS NULL AND expires_at>?").bind(p.id, clock).first();
   const current = !row ? "unknown" : row.state === "revoked" ? "revoked" : row.expires_at <= clock ? "expired" : !liveCapability ? "withdrawn" : "registered";
   const outcome = op?.outcome ?? "unknown";
   const exactOperation = op?.target_id === id && op.registration_id === input.registration_id && op.generation === input.generation && op.revision === input.revision;

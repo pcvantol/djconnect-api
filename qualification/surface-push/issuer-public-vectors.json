@@ -1,0 +1,72 @@
+{
+  "scope": "SYNTHETIC_OFFLINE_PUBLIC_TEST_VECTORS_NOT_ENROLLED_NO_PRIVATE_KEY_PERSISTED",
+  "key_thumbprint_format": "lowercase SHA256 hex of canonical([djc-surface-issuer/1,public-key,closedPublicJWK]); not RFC7638",
+  "public_key": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "_T8fu6JQkF3lxxM5xuNfBOydYGFf9I5mH2c2KJ1O8pk",
+    "y": "BSaHOkjr8rnvQeA2s4RJdfw9RtgfBznK8GHkNPXPnlk"
+  },
+  "key_thumbprint": "6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01",
+  "vectors": [
+    {
+      "path": "/v1/push/surface/issuer/challenge",
+      "payload": {
+        "contract_version": 1,
+        "purpose": "surface_push",
+        "action": "challenge",
+        "operation_id": "019a0000-0000-7000-8000-000000000001",
+        "delegation_id": "synthetic-cross-language-example",
+        "delegation_revision": 1,
+        "key_thumbprint": "6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01"
+      },
+      "signing_bytes_utf8": "[\"djc-surface-issuer/1\",\"POST\",\"/v1/push/surface/issuer/challenge\",{\"action\":\"challenge\",\"contract_version\":1,\"delegation_id\":\"synthetic-cross-language-example\",\"delegation_revision\":1,\"key_thumbprint\":\"6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01\",\"operation_id\":\"019a0000-0000-7000-8000-000000000001\",\"purpose\":\"surface_push\"}]",
+      "signature": "JUrOyVEP3QiheQ7nP6nS_SA3Z2gn7I992Vx5y0DlVXeF3WFpUrR1l3V7e6ia5LGJt9VhLMWRxyC6U_n-vELsjQ"
+    },
+    {
+      "path": "/v1/push/surface/issuer/issue",
+      "payload": {
+        "contract_version": 1,
+        "purpose": "surface_push",
+        "action": "issue",
+        "operation_id": "019a0000-0000-7000-8000-000000000001",
+        "delegation_id": "synthetic-cross-language-example",
+        "delegation_revision": 1,
+        "key_thumbprint": "6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01",
+        "challenge_id": "synthetic-challenge",
+        "nonce": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "scope_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      },
+      "signing_bytes_utf8": "[\"djc-surface-issuer/1\",\"POST\",\"/v1/push/surface/issuer/issue\",{\"action\":\"issue\",\"challenge_id\":\"synthetic-challenge\",\"contract_version\":1,\"delegation_id\":\"synthetic-cross-language-example\",\"delegation_revision\":1,\"key_thumbprint\":\"6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01\",\"nonce\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"operation_id\":\"019a0000-0000-7000-8000-000000000001\",\"purpose\":\"surface_push\",\"scope_digest\":\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\"}]",
+      "signature": "zH9b03xTUOdr39rYQPTgv2TXBBdc6Q7pOqZBnONTeT0RZrXOTdPeOg20GsFMpxK2hy6rMjqXQfjxVTAuLOlQUQ"
+    },
+    {
+      "path": "/v1/push/surface/issuer/status",
+      "payload": {
+        "contract_version": 1,
+        "purpose": "surface_push",
+        "action": "status",
+        "operation_id": "019a0000-0000-7000-8000-000000000001",
+        "delegation_id": "synthetic-cross-language-example",
+        "delegation_revision": 1,
+        "key_thumbprint": "6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01"
+      },
+      "signing_bytes_utf8": "[\"djc-surface-issuer/1\",\"POST\",\"/v1/push/surface/issuer/status\",{\"action\":\"status\",\"contract_version\":1,\"delegation_id\":\"synthetic-cross-language-example\",\"delegation_revision\":1,\"key_thumbprint\":\"6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01\",\"operation_id\":\"019a0000-0000-7000-8000-000000000001\",\"purpose\":\"surface_push\"}]",
+      "signature": "tsHL9plzVsd5AHfrlt__L8-tnOCwMlehS8nk8wCz-uceqevopWFF1s3EInllOW29ymjSlshoRVrW4ShYS-wBeQ"
+    },
+    {
+      "path": "/v1/push/surface/issuer/withdraw",
+      "payload": {
+        "contract_version": 1,
+        "purpose": "surface_push",
+        "action": "withdraw",
+        "operation_id": "019a0000-0000-7000-8000-000000000001",
+        "delegation_id": "synthetic-cross-language-example",
+        "delegation_revision": 1,
+        "key_thumbprint": "6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01"
+      },
+      "signing_bytes_utf8": "[\"djc-surface-issuer/1\",\"POST\",\"/v1/push/surface/issuer/withdraw\",{\"action\":\"withdraw\",\"contract_version\":1,\"delegation_id\":\"synthetic-cross-language-example\",\"delegation_revision\":1,\"key_thumbprint\":\"6cfbe2bb1cffbd797eb833021b4530954896304c54688891e14493f262f3af01\",\"operation_id\":\"019a0000-0000-7000-8000-000000000001\",\"purpose\":\"surface_push\"}]",
+      "signature": "H1DMb97OAKVzaGflJSu-7uvXxe-qIXHeQyoVIKDG6HaH15C_aHdAlBeHrY4pVrTWZfY5wfbX80W6C1Nk-wPDZg"
+    }
+  ]
+}

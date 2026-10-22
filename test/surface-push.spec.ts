@@ -1,6 +1,7 @@
 import { env } from "cloudflare:test";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import migration from "../migrations/0009_surface_push.sql?raw";
+import purposeMigration from "../migrations/0010_surface_delegations.sql?raw";
 import ordinarySchema from "../migrations/0001_initial.sql?raw";
 import { sha256Hex } from "../src/crypto";
 import { createSurfaceProvider } from "../src/surface-push/provider";
@@ -22,10 +23,15 @@ function client(overrides: Partial<SurfaceOptions> = {}) {
 }
 function terminal(body: Pick<ReturnType<typeof registration>, "contract_version" | "registration_id" | "generation" | "revision" | "binding_id" | "device_binding" | "owner_binding">) { const { contract_version, registration_id, generation, revision, binding_id, device_binding, owner_binding } = body; return { contract_version, registration_id, generation, revision, binding_id, device_binding, owner_binding, operation_id: operation() }; }
 async function capability(role = "widget", platform = "macos", external = 0) {
+ await env.DB.prepare("DELETE FROM surface_push_delegations WHERE id='example-delegation'").run();
  const parent = platform === "ios" ? "dev.djconnect.ios" : "dev.djconnect.mac";
+ const policy = { token_role: role, platform, apns_environment: "sandbox", target: role === "widget" ? { app_bundle_id: parent, extension_bundle_id: parent + ".track-insight-widget", widget_kind: "DJConnectSessionWidget" } : { app_bundle_id: parent, attributes_type: "ExampleAttributes" }, activity_profile: "example-closed/1", external_content_allowed: !!external, original_grant_expires_at_ms: NOW + 8 * 3600000, max_operations: 100, max_events: 10, max_challenges: 10 };
+ // Trusted synthetic operator-row seed for pre-existing handler tests, not issuer evidence.
+ await env.DB.prepare(`INSERT INTO surface_push_delegations(id,revision,enrol_operation_id,approval_reference,install_id,device_binding,owner_binding,grant_binding,source_binding,binding_id,public_key_json,key_thumbprint,policy_json,scope_digest,expires_at,created_at,revoked_at) VALUES('example-delegation',1,'example-enrol-op','fixture','example-install',?,?,?,?,?,'{}','fixture',?,?,?, ?,NULL)`)
+  .bind("d".repeat(64),"e".repeat(64),"1".repeat(64),"2".repeat(64),"b".repeat(64),JSON.stringify(policy),"f".repeat(64),NOW+8*3600000,NOW).run();
  await env.DB.prepare(`INSERT INTO surface_push_capabilities
- (id,token_hash,install_id,device_binding,owner_binding,parent_bundle,extension_bundle,widget_kind,attributes_type,activity_profile,external_content_allowed,platform,environment,role,expires_at,revoked_at,max_operations,max_events)
- VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL,?,?)`).bind("example-cap", await sha256Hex(CAP), "example-install", "d".repeat(64), "e".repeat(64), parent, parent + ".track-insight-widget", "DJConnectSessionWidget", "ExampleAttributes", "example-closed/1", external, platform, "sandbox", role, NOW + 8 * 3600000, 100, 10).run();
+ (id,token_hash,install_id,device_binding,owner_binding,parent_bundle,extension_bundle,widget_kind,attributes_type,activity_profile,external_content_allowed,platform,environment,role,expires_at,revoked_at,max_operations,max_events,delegation_id,delegation_revision,binding_id,grant_binding,source_binding,scope_digest)
+ VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL,?,?,'example-delegation',1,?,?,?,?)`).bind("example-cap", await sha256Hex(CAP), "example-install", "d".repeat(64), "e".repeat(64), parent, role === "widget" ? parent + ".track-insight-widget" : "", role === "widget" ? "DJConnectSessionWidget" : "", role === "widget" ? "" : "ExampleAttributes", "example-closed/1", external, platform, "sandbox", role, NOW + 8 * 3600000, 100, 10, "b".repeat(64), "1".repeat(64), "2".repeat(64), "f".repeat(64)).run();
 }
 async function row() { return env.DB.prepare("SELECT * FROM surface_push_targets").first<Record<string, unknown>>(); }
 const profile: ActivityProfile = { id: "example-closed/1", parseContent(payload) {
@@ -34,8 +40,8 @@ const profile: ActivityProfile = { id: "example-closed/1", parseContent(payload)
 } };
 
 describe("source-only typed surface relay with actual D1", () => {
- beforeAll(async () => { for (const sql of (ordinarySchema + "\n" + migration).split(";").filter(s => s.replace(/--[^\n]*/g, "").trim())) await env.DB.prepare(sql).run(); });
- beforeEach(async () => { sequence = 0; await env.DB.batch([env.DB.prepare("DELETE FROM surface_push_operations"), env.DB.prepare("DELETE FROM surface_push_targets"), env.DB.prepare("DELETE FROM surface_push_capabilities")]); await capability(); });
+ beforeAll(async () => { for (const sql of (ordinarySchema + "\n" + migration + "\n" + purposeMigration).split(";").filter(s => s.replace(/--[^\n]*/g, "").trim())) await env.DB.prepare(sql).run(); });
+ beforeEach(async () => { sequence = 0; await env.DB.batch([env.DB.prepare("DELETE FROM surface_push_operations"), env.DB.prepare("DELETE FROM surface_push_targets"), env.DB.prepare("DELETE FROM surface_push_capabilities"), env.DB.prepare("DELETE FROM surface_push_issuer_operations"), env.DB.prepare("DELETE FROM surface_push_operator_operations"), env.DB.prepare("DELETE FROM surface_push_delegations")]); await capability(); });
  it("registers exactly Core's opaque generation/revision/expiry and stores only authenticated ciphertext", async () => {
   const input = registration(), response = await client()("register", input); expect(response.status).toBe(200);
   expect(await response.json()).toMatchObject({ contract_version: 1, success: true, registration_id: input.registration_id, generation: input.generation, revision: 1, expires_at_ms: EXPIRES });

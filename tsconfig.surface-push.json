@@ -13,6 +13,7 @@
     "src/**/*.ts",
     "test/surface-push.spec.ts",
     "test/surface-provider.spec.ts",
+    "test/surface-issuer.spec.ts",
     "test/surface-raw.d.ts",
     "test/env.d.ts"
   ]
