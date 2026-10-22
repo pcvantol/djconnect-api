@@ -64,3 +64,10 @@ evidence. Existing negative tests check all six delta paths, proof hashes,
 source-map conflicts, installed-input drift, shallow-history reconstruction,
 unsafe Git inputs and denied gate/authorization promotion. The validator's
 acceptance rules are unchanged; only explicit pinned inputs are updated.
+
+The second candidate63a416c passed all34 preparation checks in actual CI,
+then its private runtime source snapshot correctly refused the still-old
+root-observation pointer. The local-only runtime now selects the same newly
+pinned product observation as the preparation validator. Its32 installed
+hashes, source-byte checks and all runtime/admission guards remain intact.
+Both earlier CI failures are retained; neither is a passed native check.
