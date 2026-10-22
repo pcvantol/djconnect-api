@@ -19,7 +19,7 @@ function client(overrides: Partial<SurfaceOptions> = {}) {
  const handler = createSurfacePushHandler(options(overrides));
  return (kind: string, body: Body | string, headers: Record<string, string> = {}) => handler(new Request("https://local.test/v1/push/surface/" + kind, { method: "POST", headers: { authorization: "Bearer " + CAP, "content-type": "application/json", ...headers }, body: typeof body === "string" ? body : JSON.stringify(body) }));
 }
-function terminal(body: ReturnType<typeof registration>) { const { contract_version, registration_id, generation, revision, binding_id, device_binding, owner_binding } = body; return { contract_version, registration_id, generation, revision, binding_id, device_binding, owner_binding, operation_id: operation() }; }
+function terminal(body: Pick<ReturnType<typeof registration>, "contract_version" | "registration_id" | "generation" | "revision" | "binding_id" | "device_binding" | "owner_binding">) { const { contract_version, registration_id, generation, revision, binding_id, device_binding, owner_binding } = body; return { contract_version, registration_id, generation, revision, binding_id, device_binding, owner_binding, operation_id: operation() }; }
 async function capability(role = "widget", platform = "macos", external = 0) {
  const parent = platform === "ios" ? "dev.djconnect.ios" : "dev.djconnect.mac";
  await env.DB.prepare(`INSERT INTO surface_push_capabilities
@@ -56,6 +56,15 @@ describe("source-only typed surface relay with actual D1", () => {
   const next = { ...input, revision: 2, operation_id: operation(), apns_token: "02".repeat(32) }; expect((await call("register", next)).status).toBe(200);
   expect((await call("revoke", terminal(input))).status).toBe(409); expect((await row())?.revision).toBe(2); expect((await row())?.state).toBe("active");
   expect((await call("register", { ...next, operation_id: operation() })).status).toBe(409);
+ });
+ it("status binds the historical operation to its recorded revision after rotation", async () => {
+  const input = registration(), call = client(); await call("register", input);
+  await call("register", { ...input, revision: 2, operation_id: operation() });
+  const status = { ...terminal(input), operation_id: input.operation_id };
+  const before = await row();
+  expect((await call("status", { ...status, revision: 2 })).status).toBe(409);
+  expect(await (await call("status", status)).json()).toMatchObject({ success: false, revision: 1, current_revision: 2, operation_id: input.operation_id, operation_state: "registered" });
+  expect(await row()).toEqual(before);
  });
  it("concurrent register CAS has one winner and no mixed token state", async () => {
   const input = registration(), call = client(); await call("register", input);
@@ -149,8 +158,33 @@ describe("source-only typed surface relay with actual D1", () => {
   const input = { ...registration(), token_role: "live_activity_update", platform: "ios", target: { instance_id: "instance", app_bundle_id: "dev.djconnect.ios", activity_id: "activity", attributes_type: "ExampleAttributes" } };
   const transport = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 200 })), call = client({ fetcher: transport, activityProfiles: [profile] }); await call("register", input);
   for (const event of ["activity_update", "activity_end"]) expect((await call("event", { ...terminal(registration()), event, profile_id: profile.id, payload: { state: "playing", observed_at_ms: NOW, expires_at_ms: NOW + 60000 } })).status).toBe(200);
-  expect(transport).toHaveBeenCalledTimes(2); for (const [, init] of transport.mock.calls) expect(init?.headers).toMatchObject({ "apns-topic": "dev.djconnect.ios.push-type.liveactivity", "apns-push-type": "liveactivity" });
+  expect(transport).toHaveBeenCalledTimes(2); for (const [, init] of transport.mock.calls) expect(init?.headers).toMatchObject({ "apns-topic": "dev.djconnect.ios.push-type.liveactivity", "apns-push-type": "liveactivity", "apns-expiration": String((NOW + 60000) / 1000) });
   const ended = JSON.parse(String(transport.mock.calls[1]![1]?.body)); expect(ended.aps).toMatchObject({ event: "end", timestamp: NOW / 1000, "content-state": { state: "playing" }, "dismissal-date": NOW / 1000 - 1 });
+ });
+ it("expired activity content during provider authorization is durably not sent or retried", async () => {
+  await env.DB.prepare("DELETE FROM surface_push_capabilities").run(); await capability("live_activity_update", "ios", 1);
+  const input = { ...registration(), token_role: "live_activity_update", platform: "ios", target: { instance_id: "instance", app_bundle_id: "dev.djconnect.ios", activity_id: "activity", attributes_type: "ExampleAttributes" } };
+  let clock = NOW;
+  const transport = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 200 }));
+  const call = client({ fetcher: transport, activityProfiles: [profile], now: () => clock, authorizeProvider: async () => { clock = NOW + 1000; return "example.provider.jwt"; } });
+  await call("register", input);
+  const event = { ...terminal(input), event: "activity_update", profile_id: profile.id, payload: { state: "playing", observed_at_ms: NOW, expires_at_ms: NOW + 1000 } };
+  expect(await (await call("event", event)).json()).toMatchObject({ success: false, operation_state: "not_sent" });
+  expect(await (await client({ fetcher: transport, now: () => clock })("event", event)).json()).toMatchObject({ success: false, replayed: true, operation_state: "not_sent" });
+  expect(transport).not.toHaveBeenCalled();
+ });
+ it("bounds the remaining provider timeout by the original activity deadline after authorization", async () => {
+  await env.DB.prepare("DELETE FROM surface_push_capabilities").run(); await capability("live_activity_update", "ios", 1);
+  const input = { ...registration(), token_role: "live_activity_update", platform: "ios", target: { instance_id: "instance", app_bundle_id: "dev.djconnect.ios", activity_id: "activity", attributes_type: "ExampleAttributes" } };
+  let clock = NOW;
+  const timeout = vi.spyOn(AbortSignal, "timeout"), transport = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 200 }));
+  try {
+   const call = client({ fetcher: transport, activityProfiles: [profile], now: () => clock, authorizeProvider: async () => { clock = NOW + 750; return "example.provider.jwt"; } });
+   await call("register", input);
+   expect((await call("event", { ...terminal(input), event: "activity_update", profile_id: profile.id, payload: { state: "playing", observed_at_ms: NOW, expires_at_ms: NOW + 1000 } })).status).toBe(200);
+   expect(timeout).toHaveBeenLastCalledWith(250);
+   expect(transport.mock.calls[0]![1]?.headers).toMatchObject({ "apns-expiration": String((NOW + 1000) / 1000) });
+  } finally { timeout.mockRestore(); }
  });
  it("does not overwrite ordinary app-token registration during surface register/rotate/revoke", async () => {
   await env.DB.prepare("INSERT INTO registrations(id,ha_install_id,device_id,client_type,apns_token_hash,apns_token,apns_environment,topic) VALUES('ordinary-sentinel','example-install','device','macos','example-hash','example-app-token','sandbox','dev.djconnect.mac')").run();

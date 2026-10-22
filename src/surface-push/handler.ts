@@ -41,7 +41,8 @@ export function createSurfacePushHandler(options: SurfaceOptions): (request: Req
   const liveCapability = await options.db.prepare("SELECT 1 AS live FROM surface_push_capabilities WHERE id=? AND revoked_at IS NULL AND expires_at>?").bind(p.id, clock).first();
   const current = !row ? "unknown" : row.state === "revoked" ? "revoked" : row.expires_at <= clock ? "expired" : !liveCapability ? "withdrawn" : "registered";
   const outcome = op?.outcome ?? "unknown";
-  const exact = row?.revision === input.revision && row.generation === input.generation;
+  const exactOperation = op?.target_id === id && op.registration_id === input.registration_id && op.generation === input.generation && op.revision === input.revision;
+  const exact = exactOperation && row?.revision === input.revision && row.generation === input.generation;
   const success = (outcome === "registered" && current === "registered" && exact) || (op?.kind === "revoke" && outcome === "revoked" && current === "revoked" && exact) || (outcome === "provider_accepted" && current === "registered" && exact);
   const ambiguous = ["pending", "event_reserved", "dispatch_started", "outcome_unknown", "unknown"].includes(outcome);
   return json({ contract_version: 1, success, registration_id: input.registration_id, generation: input.generation, revision: input.revision,
@@ -58,7 +59,7 @@ export function createSurfacePushHandler(options: SurfaceOptions): (request: Req
    const clock = now(), p = await store.authenticate(request.headers.get("authorization"), clock);
    const input = await readInput(request, kind, clock), id = await store.identity(p, input);
    const existing = await store.operation(p, input.operation_id);
-   if (kind === "status") { need(!existing || existing.target_id === id, "surface_operation_conflict", 409); return receipt(p, input, id, existing, true, true); }
+   if (kind === "status") { need(!existing || (existing.target_id === id && existing.registration_id === input.registration_id && existing.generation === input.generation && existing.revision === input.revision), "surface_operation_conflict", 409); return receipt(p, input, id, existing, true, true); }
    const hash = await sha256Hex(canonical([kind, input]));
    if (existing) { need(existing.request_hash === hash && existing.target_id === id && existing.kind === kind, "surface_operation_conflict", 409); return receipt(p, input, id, existing, true); }
    const claim = crypto.randomUUID();
@@ -84,7 +85,7 @@ export function createSurfacePushHandler(options: SurfaceOptions): (request: Req
       authorization = await options.authorizeProvider();
       need(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(authorization), "surface_provider_not_admitted", 503);
      } catch { await store.finish(p, input, claim, "not_sent"); return receipt(p, input, id, await store.operation(p, input.operation_id), false); }
-     if (await store.dispatch(p, input, id, claim, now())) {
+     if (now() < body.expiresAt && await store.dispatch(p, input, id, claim, now())) {
       try {
        // Durable dispatch marker precedes the one outbound attempt. No automatic retry.
        const built = apnsRequest(p, row, token, body, authorization, now());
