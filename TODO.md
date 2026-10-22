@@ -1,3 +1,6 @@
+> Fixed QA app/profile source PR129 is protected as `93fdd71a3093ce37d85f92ed55474990aa88775f`; eight actual own-main release workflows and ordinary+QA/formal/durable readbacks passed.
+> [Separate source Finalization](docs/rendezvous/FIXED_QA_APP_PROFILE_FINALIZATION_V1.md) awaits its own fresh reviews and delivery. Historical40408 expired; profile/admission null, guardfalse, all22 gates OPEN, no provider/native effects.
+
 > Fixed closed QA source125 and Git-replacement correction127 protected; latest main3daeb9a has eight complete own-main SUCCESS workflows and actual ordinary+QA readbacks.
 > [Cumulative separate Finalization](docs/rendezvous/FIXED_QA_BUILD_FINALIZATION_V1.md) awaits own delivery; old docs126 closed unmerged. QAguardfalse/all22gatesOPEN/no effects.
 
