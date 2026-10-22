@@ -76,6 +76,17 @@ describe("actual D1 surface issuer with synthetic operator and ephemeral install
   const body=enrol();expect((await call(issuer(),"operator/enrol",{...body,public_key:{...jwk,x:"A".repeat(43),y:"A".repeat(43)}},{authorization:"Bearer "+OPERATOR})).status).toBe(400);
   expect((await call(issuer(),"operator/enrol",{...body,policy:{...body.policy,external_content_allowed:true}},{authorization:"Bearer "+OPERATOR})).status).toBe(403);
  });
+ it("malformed base64 in keys, signatures and nonces stays a bounded client error",async()=>{
+  const body=enrol();expect((await call(issuer(),"operator/enrol",{...body,public_key:{...jwk,x:"A"}},{authorization:"Bearer "+OPERATOR})).status).toBe(400);
+  const x=await prepared();expect((await call(x.handler,"challenge",{payload:input("challenge"),signature:"A"})).status).toBe(400);
+  expect((await call(x.handler,"issue",await signed({...x.issue,nonce:"A"}))).status).toBe(400);expect(await count("surface_push_capabilities")).toBe(0);
+ });
+ it.each(["token_role","platform","apns_environment"] as const)("rejects an array enum for %s before persisting an operator approval",async field=>{
+  const body=enrol();body.policy={...body.policy,token_role:"live_activity_update",platform:"ios",target:{app_bundle_id:"dev.djconnect.ios",attributes_type:"ExampleAttributes"}};
+  const policy={...body.policy,[field]:[body.policy[field]]};
+  expect((await call(issuer(),"operator/enrol",{...body,policy},{authorization:"Bearer "+OPERATOR})).status).toBe(400);
+  expect(await count("surface_push_delegations")).toBe(0);
+ });
  it("unenrolled proof and djci-only requests cannot self-enrol or bootstrap a credential",async()=>{
   const p=input("challenge");expect((await call(issuer(),"challenge",await signed(p))).status).toBe(401);
   await enrolled();expect((await call(issuer(),"challenge",{payload:p},{authorization:"Bearer djci_example"})).status).toBe(401);expect(await count("surface_push_capabilities")).toBe(0);

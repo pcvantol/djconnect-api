@@ -37,7 +37,9 @@ export function operationDeadline(operation: string, now: number): number {
 }
 export function bytes(value: string, length: number): Uint8Array {
  need(typeof value === "string" && /^[A-Za-z0-9_-]+$/.test(value));
- const result = Uint8Array.from(atob(value.replaceAll("-", "+").replaceAll("_", "/")), c => c.charCodeAt(0));
+ let result: Uint8Array<ArrayBuffer>;
+ try { result = Uint8Array.from(atob(value.replaceAll("-", "+").replaceAll("_", "/")), c => c.charCodeAt(0)); }
+ catch { throw new SurfaceError(400,"invalid_request"); }
  need(result.length === length && base64Url(result.buffer) === value); return result;
 }
 export async function publicKey(value: Enrolment["public_key"]): Promise<CryptoKey> {
@@ -59,10 +61,10 @@ export function enrolment(value: unknown, now: number, admittedProfiles: readonl
  for (const k of ["device_binding","owner_binding","grant_binding","source_binding","binding_id"]) hex(value[k]);
  need(typeof value.operation_id === "string"); operationDeadline(value.operation_id, now);
  const p = value.policy; closed(p, ["token_role","platform","apns_environment","target","activity_profile","external_content_allowed","original_grant_expires_at_ms","max_operations","max_events","max_challenges"]);
- need(["widget","live_activity_update","live_activity_start"].includes(String(p.token_role)));
- need(["ios","ipados","maccatalyst","macos","watchos","visionos"].includes(String(p.platform)));
- need(p.token_role === "widget" || ["ios","ipados"].includes(String(p.platform)));
- need(["sandbox","production"].includes(String(p.apns_environment)));
+ need(typeof p.token_role === "string" && ["widget","live_activity_update","live_activity_start"].includes(p.token_role));
+ need(typeof p.platform === "string" && ["ios","ipados","maccatalyst","macos","watchos","visionos"].includes(p.platform));
+ need(p.token_role === "widget" || ["ios","ipados"].includes(p.platform));
+ need(typeof p.apns_environment === "string" && ["sandbox","production"].includes(p.apns_environment));
  const fields = p.token_role === "widget" ? ["app_bundle_id","extension_bundle_id","widget_kind"] : ["app_bundle_id","attributes_type"];
  closed(p.target, fields);
  for (const field of fields) { const v = p.target[field]; if (field.endsWith("bundle_id")) need(typeof v === "string" && v.length <= 200 && /^[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/.test(v)); else id(v); }
