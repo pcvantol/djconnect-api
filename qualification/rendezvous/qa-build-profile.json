@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scope": "FIXED_QA_GRAPH_COMPILED_CLOSED_NOT_NATIVE_OR_OPERATIONAL_ADMISSION",
-  "base_main_sha": "2c1a93a3660c9d1ef6d40a9bdfe26708c8816aca",
+  "base_main_sha": "3b43332bb28ed4aea228938f2d3a61796c8c3f33",
   "service": "djconnect-api-vibecast-qa",
   "service_origin": "https://api-vibecast-qa.djconnect.dev",
   "browser_origin": "https://qa.vibecast.tv",
@@ -13,34 +13,110 @@
     "src/rendezvous/composition.ts": {
       "source_sha256": "d78fdc0a92794dd0399f3ca618babbf011d3a186a4f6d83f780775c23e2e8325",
       "counts": {
-        "https://api.djconnect.dev": 1
-      }
+        "https://api.djconnect.dev": 1,
+        "ios-dev-qualification/1": 1
+      },
+      "derived_sha256": "2bae21264ab30cd24bae1c753d69dec97e5c587c58e1865fac56743fd344b3d9"
     },
     "qualification/rendezvous/http-ingress.ts": {
       "source_sha256": "d01adf7731975bbb846aec3d4980d88d7b7f3c2f7e59b801b3124ed4cd068554",
       "counts": {
         "https://api.djconnect.dev": 1,
         "https://vibecast.tv": 1
-      }
+      },
+      "derived_sha256": "95e53c82c2822ccae6222514791489e940fd24df7a0d999906ba72adca6ccddd"
     },
     "qualification/rendezvous/assertion-key-state.ts": {
       "source_sha256": "fa7b29c185c2163e1ec652f6fe2808f9f2d687dfe70ae48572ec4f44ba7dc2e6",
       "counts": {
-        "https://api.djconnect.dev": 1
-      }
+        "https://api.djconnect.dev": 1,
+        "ios-dev-qualification/1": 1
+      },
+      "derived_sha256": "dd01534557cddeabdf5f3ea714583e23ee27db0239e95fe7a328327395230306"
     },
     "qualification/rendezvous/transaction-state.ts": {
       "source_sha256": "40d84abd12043f00da12b50a14bd178e85228662815b894aea6618227ea4423b",
       "counts": {
-        "https://api.djconnect.dev": 1
-      }
+        "https://api.djconnect.dev": 1,
+        "ios-dev-qualification/1": 1
+      },
+      "derived_sha256": "c2da3616b61d98d3e28398cb1a914e7b4e07f62530d63d0a742e5fa12e3f5c2c"
     },
     "docs/rendezvous/wire-request-schemas-v1.json": {
       "source_sha256": "c00d495222a5bc719e5ef22280e4bbacbb7496f03740cb9c6ccf8b464f4d8a0d",
       "counts": {
         "https://api.djconnect.dev": 4,
         "https://vibecast.tv": 1
-      }
+      },
+      "derived_sha256": "24ab72719195f7971e070e56c52ceea7e67e02ee1bd7c6946eca99883194505f"
+    },
+    "qualification/rendezvous/key-routing.ts": {
+      "source_sha256": "8ce1268598a5c12c448510f81691c185f0a0d5688ccc163e01d0bfd5fe3a97af",
+      "counts": {
+        "ios-dev-qualification/1": 1
+      },
+      "derived_sha256": "06e8939953021a4c4906160abb2416f2f447f8079e3509a88d2be225d1f6c051"
+    },
+    "qualification/rendezvous/receipt-key-store.ts": {
+      "source_sha256": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
+      "counts": {
+        "ios-dev-qualification/1": 1
+      },
+      "derived_sha256": "c8a048c438aa653714e4efa66893f2961ebe8234cfc92a69eaf62651c0952206"
+    },
+    "qualification/rendezvous/app-attest-core-candidate.mjs": {
+      "source_sha256": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
+      "counts": {
+        "ZEML4LPXH4.dev.djconnect.ios": 1,
+        "const BUILDS = new Set(['40227', '40228', '40230']);": 1
+      },
+      "derived_sha256": "5bd36e83941554785adf362eb3240e6ce9039fdf360fb83ac0204b660c4361a1"
+    },
+    "qualification/rendezvous/receipt-cms-candidate.mjs": {
+      "source_sha256": "0dadf10ef3055862ef952dd551907d15f6aedc66f19400d8ed268e3c9daf5dd0",
+      "counts": {
+        "ZEML4LPXH4.dev.djconnect.ios": 1
+      },
+      "derived_sha256": "5dd60d52d33fe12c732f3d9c3a58ad4c7258c9b9ca5f8f3c31cd2b69e2ccec2b"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.mjs": {
+      "source_sha256": "55f99c8073f10f29c834b459ac84cb4f9c9290476fa51c8741dc5db8b1781644",
+      "counts": {
+        "ios-dev-qualification/1": 1
+      },
+      "derived_sha256": "a7c147c1dbe91ae9393e32bdda36d7f4a598fee38491222d095ce8c1505b8b8c"
+    },
+    "qualification/rendezvous/enrollment-key-state.ts": {
+      "source_sha256": "a6782474798f90f0d338bbcfd518cda6ee9338c5ce40205b1020258897c448b0",
+      "counts": {
+        "ios-dev-qualification/1": 1
+      },
+      "derived_sha256": "c6883089bfa1b92a84d7016f2dbf032331c19114c203c74a68ab115778835ec5"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.d.mts": {
+      "source_sha256": "176ad10c9ee9b9ea92846576b8db115271e33ff09eaf485edf1285020b543209",
+      "counts": {
+        "ios-dev-qualification/1": 2
+      },
+      "derived_sha256": "5fadf27a2b32efa3cfb9611f93c7fe95a039218252031a24179ff05c657b25d8"
     }
+  },
+  "qa_verifier_identity": {
+    "application_identifier": "ZEML4LPXH4.dev.djconnect.ios.vibecastqa",
+    "build": "40408",
+    "app_policy": "ios-vibecast-qa-development/1",
+    "environment": "development"
+  },
+  "historical_apple_artifact": {
+    "bundle": "dev.djconnect.ios.vibecastqa",
+    "build": "40408",
+    "full_app_id": "ZEML4LPXH4.dev.djconnect.ios.vibecastqa",
+    "team": "ZEML4LPXH4",
+    "profile_sha256": "360cd855d18b010760f221fc6adba0d5cb53588fe4e816b68b4995d2ce830073",
+    "archive_sha256": "78c9b1bb3aa0d134ef79168ced06cb4e5d3a2a847a34c782aa8c2b7d4cea2a6e",
+    "archive_bytes": 25626066,
+    "bundle_manifest_sha256": "c6070104a5588bb39e9b25c7f31812acbcbb2dd0e83fb68cfed89f8decb623d8",
+    "source_sha": "b406d366f34622282fb5235ffd888f2d42a09af6",
+    "disposition": "HISTORICAL_SIGNED_READBACK_ONLY_EXPIRED_WINDOW_NO_ADMISSION"
   }
 }

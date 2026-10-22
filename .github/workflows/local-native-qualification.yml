@@ -40,6 +40,7 @@ jobs:
           printf '{"private":true}\n' > "$DJC_POLICY_DEPS/package.json"
           ln -s "$GITHUB_WORKSPACE/node_modules" "$DJC_POLICY_DEPS/node_modules"
           node qualification/rendezvous/run_challenge_budget_workerd.mjs "$DJC_POLICY_DEPS" "$DJC_POLICY_OUTPUT" "$DJC_INTEROP_INPUTS/node_modules/jose"
+          node scripts/qualify_rendezvous_qa_profile.mjs "$DJC_POLICY_DEPS" "${DJC_POLICY_OUTPUT}-qa-profile" "$DJC_INTEROP_INPUTS/node_modules/jose"
   actual-browser-worker:
     runs-on: ubuntu-latest
     timeout-minutes: 10
