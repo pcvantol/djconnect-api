@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "./worker-configuration.d.ts",
+      "node",
+      "@cloudflare/vitest-pool-workers/types"
+    ]
+  },
+  "exclude": [],
+  "include": [
+    "worker-configuration.d.ts",
+    "src/**/*.ts",
+    "test/surface-push.spec.ts",
+    "test/surface-raw.d.ts",
+    "test/env.d.ts"
+  ]
+}
