@@ -1,3 +1,5 @@
+> Surface provider authorizer successor: [source scope and evidence](docs/push/SURFACE_PROVIDER_SOURCE_V1.md). ES256/cached JWT plus local WidgetKit/iPhone update/end composition; no real credentials/provider traffic/root admission. PR132/a0ff403 and maintenancePR131 preserved.
+
 > Typed surface-push source candidate: [contract and boundaries](docs/push/SURFACE_PUSH_SOURCE_V1.md). Internal local-D1 register/revoke/event/status component; no public-root routing, capability issuance, real provider adapter, actual Apple content profile or native acceptance. Existing appalerts and PR131 remain unchanged; no deployment/install.
 
 > Fixed QA app/profile source PR129 is protected as `93fdd71a3093ce37d85f92ed55474990aa88775f`; eight actual own-main release workflows and ordinary+QA/formal/durable readbacks passed.

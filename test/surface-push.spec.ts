@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import migration from "../migrations/0009_surface_push.sql?raw";
 import ordinarySchema from "../migrations/0001_initial.sql?raw";
 import { sha256Hex } from "../src/crypto";
+import { createSurfaceProvider } from "../src/surface-push/provider";
 import { createSurfacePushHandler, type SurfaceOptions } from "../src/surface-push/handler";
 import { parseStrictJson, type JsonObject } from "../src/surface-push/wire";
 import type { ActivityProfile } from "../src/surface-push/apns";
@@ -200,6 +201,27 @@ describe("source-only typed surface relay with actual D1", () => {
    expect(timeout).toHaveBeenLastCalledWith(250);
    expect(transport.mock.calls[0]![1]?.headers).toMatchObject({ "apns-expiration": String((NOW + 1000) / 1000) });
   } finally { timeout.mockRestore(); }
+ });
+ it.each(["widget_reload", "activity_update", "activity_end"])("composes real local provider JWT with D1 and %s without an APNs call", async event => {
+  const activity = event !== "widget_reload";
+  if (activity) { await env.DB.prepare("DELETE FROM surface_push_capabilities").run(); await capability("live_activity_update", "ios", 1); }
+  const pair = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]) as CryptoKeyPair;
+  const bytes = new Uint8Array((await crypto.subtle.exportKey("pkcs8", pair.privateKey)) as ArrayBuffer);
+  const provider = createSurfaceProvider({ APNS_TEAM_ID: "TEAM123456", APNS_KEY_ID: "KEY1234567", APNS_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\n" + btoa(String.fromCharCode(...bytes)) + "\n-----END PRIVATE KEY-----" }, () => NOW);
+  const input = activity ? { ...registration(), token_role: "live_activity_update", platform: "ios", target: { instance_id: "instance", app_bundle_id: "dev.djconnect.ios", activity_id: "activity", attributes_type: "ExampleAttributes" } } : registration();
+  const transport = vi.fn<typeof fetch>().mockImplementation(async (_url, init) => {
+   const authorization = new Headers(init?.headers).get("authorization")!;
+   const [header, claims, signature] = authorization.slice("bearer ".length).split(".") as [string, string, string];
+   const binary = Uint8Array.from(atob(signature.replaceAll("-", "+").replaceAll("_", "/")), c => c.charCodeAt(0));
+   expect(await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pair.publicKey, binary, new TextEncoder().encode(header + "." + claims))).toBe(true);
+   expect(new Headers(init?.headers).get("apns-topic")).toBe(activity ? "dev.djconnect.ios.push-type.liveactivity" : "dev.djconnect.mac.push-type.widgets");
+   return new Response(null, { status: 200 });
+  });
+  const call = client({ fetcher: transport, authorizeProvider: provider.authorizeProvider, activityProfiles: [profile] });
+  expect((await call("register", input)).status).toBe(200);
+  const body = { ...terminal(input), event, ...(activity ? { profile_id: profile.id, payload: { state: "playing", observed_at_ms: NOW, expires_at_ms: NOW + 60000 } } : {}) };
+  expect(await (await call("event", body)).json()).toMatchObject({ success: true, operation_state: "provider_accepted" });
+  expect(transport).toHaveBeenCalledTimes(1); provider.close();
  });
  it("does not overwrite ordinary app-token registration during surface register/rotate/revoke", async () => {
   await env.DB.prepare("INSERT INTO registrations(id,ha_install_id,device_id,client_type,apns_token_hash,apns_token,apns_environment,topic) VALUES('ordinary-sentinel','example-install','device','macos','example-hash','example-app-token','sandbox','dev.djconnect.mac')").run();
