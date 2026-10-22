@@ -84,7 +84,7 @@ export async function buildFixedQa(){
  // Typecheck the actual derived graph, including the erased declaration module.
  // Stage only committed source bytes; declarations never enter the Worker bundle.
  const typed=join(output,'derived-types');await mkdir(typed);await symlink(join(repo,'node_modules'),join(typed,'node_modules'),'dir');
- const typeNames=gitRead(['ls-files','src','qualification/rendezvous','tsconfig.json','worker-configuration.d.ts']).trim().split('\n').filter(name=>/\.(?:ts|mts|mjs|json)$/.test(name));
+ const typeNames=gitRead(['ls-files','src','qualification/rendezvous','tsconfig.json','worker-configuration.d.ts','docs/rendezvous/wire-request-schemas-v1.json']).trim().split('\n').filter(name=>/\.(?:ts|mts|mjs|json)$/.test(name));
  for(const name of typeNames){
   const source=await readFile(join(repo,name),'utf8');pins[name]=hash(source);verifyCommittedInput(sourceSha,name,pins[name]);
   const contents=Object.hasOwn(expected,name)?deriveFixedQaSource(name,source,profile.transforms[name]):source;
