@@ -44,3 +44,23 @@ DNS, namespace, credential, native/device/SDK/Keychain, HA or publication effect
 is included. The fixed QA guard stays false, current Apple profile and
 operational admission stay null; the historical40408 window remains expired.
 All22 full-service gates remain OPEN and the original automation stays PAUSED.
+
+## Preparation source provenance correction
+
+The first exact source candidate bdb8c701 received two scoped review GO receipts,
+but its actual private-worker CI job failed two of34 offline preparation tests:
+the historical effective map correctly rejected the changed package and lock
+bytes. That CI failure is retained and is not called PASS or bypassed.
+
+The revised preparation keeps protected baseline896ccdc and all historical
+proofs intact. A new pinned cumulative delta retains the existing four
+enrollment-source differences and adds exactly the two package files. The
+106-source effective map uses the unchanged historical66-input shared proof,
+the actual new85-input product-build proof and fresh49-case/19-input composition
+proof. The32 product installed-input hashes remain exactly equal to the
+protected baseline. The historical shared proof is not presented as a rerun
+with new test tools; the separate1578-case QA run supplies that compatibility
+evidence. Existing negative tests check all six delta paths, proof hashes,
+source-map conflicts, installed-input drift, shallow-history reconstruction,
+unsafe Git inputs and denied gate/authorization promotion. The validator's
+acceptance rules are unchanged; only explicit pinned inputs are updated.

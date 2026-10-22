@@ -75,9 +75,9 @@
     "docs/rendezvous/sharp-0355-composition-observations-v1.json": "d0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531",
     "docs/rendezvous/sharp-0355-build-observations-v1.json": "cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089",
     "docs/rendezvous/enrollment-point-digest-shared-observations-v1.json": "2bfee77c019a3a70f66de10887ccccc3f00e97e75d42e357bb30660059be8dac",
-    "docs/rendezvous/enrollment-point-digest-build-observations-v1.json": "2725d99610f66d9724038eeb772ffa24e94d5b1b94443da0eb6bbd4b914062cc",
-    "docs/rendezvous/enrollment-point-digest-composition-observations-v1.json": "0e2bc1a993bc7593203fc4be09c34a063524082cbac7631193717b16907d3d46",
-    "docs/rendezvous/enrollment-point-digest-source-delta-v1.json": "fd97e9a23a8da29cf2c915d233b23eb03897d2ada3b881e72464805a9277ebf2"
+    "docs/rendezvous/vite-vitest-build-observations-v1.json": "4017729565321d50cd25f98cb835b9cb989be0f13287fc20bcb54f2de5f4fffd",
+    "docs/rendezvous/vite-vitest-composition-observations-v1.json": "89edc281d4f1395817453e6d565712c2c3edc72b791ec5a28c2aec22b0e82173",
+    "docs/rendezvous/vite-vitest-source-delta-v1.json": "7a4a78b77d2dfb674a2abe52466b00038a3996f7de43c5aeec425c7999a883dd"
   },
   "schema_version": 1,
   "secret_names": [
@@ -162,8 +162,8 @@
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
     "rendezvous-build-inputs.json": "c0dff3c47cf35122813b2a728df1759c14cc20e3b28f76118f1572f61d644d79",
     "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
-    "package.json": "d32e8c6706816ae91682453a54b13d989f442f7da4c49fab66e80a054668a386",
-    "package-lock.json": "9947367deb9b7028fb58fd431f3e3bfd57fc2db207d00497224e833dde911948",
+    "package.json": "03cc05259272c45fc63baf2d58c6abeac0bf70cd4edf86b119cfa523101e93ae",
+    "package-lock.json": "ecb262a241df4e3d00ff895d2970f65cdbcafd378fafab2a242e1033539805e1",
     ".github/workflows/ci-cd.yml": "546ad4495db1fbf8f83489c16cf7e32919525c3fa4e58e69e4e62b61ce5ab82b",
     "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
     "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
@@ -196,8 +196,8 @@
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
-    "delta_sha256": "fd97e9a23a8da29cf2c915d233b23eb03897d2ada3b881e72464805a9277ebf2",
-    "effective_source_map_sha256": "1f35b6e34d31e8a86c8306b1bcfa8983c45ba525e72b02e5d5a9682ed48898a9",
+    "delta_sha256": "7a4a78b77d2dfb674a2abe52466b00038a3996f7de43c5aeec425c7999a883dd",
+    "effective_source_map_sha256": "1a59d29936688bb3ae6759ef1436c319fcc685558a3881100a04c6a656b2336b",
     "kind": "BASELINE_PLUS_PINNED_DELTA"
   },
   "status": "NOT_AUTHORIZED",
