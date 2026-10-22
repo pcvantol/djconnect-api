@@ -107,6 +107,21 @@ describe("source-only typed surface relay with actual D1", () => {
   expect((await client()("register", { ...registration(), operation_id: operation(NOW + 30001) })).status).toBe(409);
   expect((await client()("register", { ...registration(), expires_at_ms: NOW + 8 * 3600000 + 1 })).status).toBe(400);
  });
+ it("a delayed body cannot admit a register after its original operation deadline", async () => {
+  let clock = NOW; const input = registration();
+  const stream = new ReadableStream<Uint8Array>({ pull(controller) { clock = NOW + 300000; controller.enqueue(new TextEncoder().encode(JSON.stringify(input))); controller.close(); } }, { highWaterMark: 0 });
+  const handler = createSurfacePushHandler(options({ now: () => clock }));
+  const response = await handler(new Request("https://local.test/v1/push/surface/register", { method: "POST", headers: { authorization: "Bearer " + CAP, "content-type": "application/json" }, body: stream }));
+  expect(response.status).toBe(409); expect(await row()).toBeNull();
+  expect(await env.DB.prepare("SELECT COUNT(*) AS n FROM surface_push_operations").first("n")).toBe(0);
+ });
+ it("a widget operation expiring during provider authorization is never dispatched", async () => {
+  let clock = NOW; const input = registration(), transport = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 200 }));
+  const call = client({ now: () => clock, fetcher: transport, authorizeProvider: async () => { clock = NOW + 300000; return "example.provider.jwt"; } });
+  await call("register", input); const event = { ...terminal(input), event: "widget_reload" };
+  expect(await (await call("event", event)).json()).toMatchObject({ success: false, operation_state: "not_sent" });
+  expect(transport).not.toHaveBeenCalled();
+ });
  it("unknown original operation status is read-only, scoped and secret-free", async () => {
   const input = terminal(registration()), response = await client()("status", input);
   expect(response.status).toBe(200); expect(await response.json()).toMatchObject({ success: false, state: "unknown", operation_state: "unknown" }); expect(await row()).toBeNull();

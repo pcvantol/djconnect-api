@@ -3,7 +3,7 @@ import { sha256Hex } from "../crypto";
 import { seal, unseal } from "./crypto";
 import { SurfaceStore, type Principal, type TargetRow, type OperationRow } from "./store";
 import { payload, request as apnsRequest, type ActivityProfile } from "./apns";
-import { canonical, need, readInput, SurfaceError, type Coordinate, type RegisterInput, type EventInput, type OperationKind } from "./wire";
+import { canonical, need, operationCreated, readInput, SurfaceError, type Coordinate, type RegisterInput, type EventInput, type OperationKind } from "./wire";
 export interface SurfaceOptions {
  db: D1Database;
  encryptionKey: string;
@@ -58,6 +58,9 @@ export function createSurfacePushHandler(options: SurfaceOptions): (request: Req
    need(!request.headers.has("origin") && !request.headers.has("cookie"), "surface_server_transport_required", 403);
    const clock = now(), p = await store.authenticate(request.headers.get("authorization"), clock);
    const input = await readInput(request, kind, clock), id = await store.identity(p, input);
+   const operationDeadline = operationCreated(input.operation_id) + 300000;
+   const executionClock = () => { const value = now(); need(value < operationDeadline, "operation_expired", 409); return value; };
+   if (kind !== "status") executionClock();
    const existing = await store.operation(p, input.operation_id);
    if (kind === "status") { need(!existing || (existing.target_id === id && existing.registration_id === input.registration_id && existing.generation === input.generation && existing.revision === input.revision), "surface_operation_conflict", 409); return receipt(p, input, id, existing, true, true); }
    const hash = await sha256Hex(canonical([kind, input]));
@@ -66,15 +69,16 @@ export function createSurfacePushHandler(options: SurfaceOptions): (request: Req
    if (kind === "register") {
     const registration = input as RegisterInput; validateRegistration(p, registration, clock);
     const sealed = await seal(registration.apns_token, options.encryptionKey, aad(p, { id, generation: input.generation, revision: input.revision, expires_at: registration.expires_at_ms, target_json: canonical(registration.target) }));
-    validateRegistration(p, registration, now());
-    await store.register(p, registration, id, hash, claim, now(), sealed);
-   } else if (kind === "revoke") await store.revoke(p, input, id, hash, claim, now());
+    validateRegistration(p, registration, executionClock());
+    await store.register(p, registration, id, hash, claim, executionClock(), sealed);
+   } else if (kind === "revoke") await store.revoke(p, input, id, hash, claim, executionClock());
    else {
     const event = input as EventInput, row = await store.target(id);
     need(row && row.state === "active" && row.revision === input.revision && row.expires_at > clock, "surface_registration_not_current", 409);
-    const body = payload(p, row, event, clock, options.activityProfiles);
+    const content = payload(p, row, event, clock, options.activityProfiles);
+    const body = { ...content, expiresAt: Math.min(content.expiresAt, operationDeadline) };
     need(options.authorizeProvider, "surface_provider_not_admitted", 503);
-    await store.reserveEvent(p, input, id, hash, claim, clock);
+    await store.reserveEvent(p, input, id, hash, claim, executionClock());
     const reserved = await store.operation(p, input.operation_id);
     need(reserved, "surface_capacity_exhausted", 429);
     if (reserved.claim_id === claim && reserved.outcome === "event_reserved") {
