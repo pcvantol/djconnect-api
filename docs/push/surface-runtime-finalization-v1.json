@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "kind": "surface_runtime_source_finalization",
+  "source_pr": 139,
+  "source_candidate": "a09f6b97abb52e3860e260dd59a43e887f1f9756",
+  "source_main": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+  "source_tree": "6944f3ea3fab7b3e6c8ab3bc69360d188aa463ae",
+  "actual_pr_ci_merge": "3a3c2e3036c17b05add467bbee55637635fc0b5b",
+  "actual_pr_ci_tree_equal": true,
+  "source_review_comment": "https://github.com/pcvantol/djconnect-api/pull/139#issuecomment-6365793740",
+  "source_review_packet_sha256": "55838edce3f9f3cf18ced4ef4dc352dd0c6327568d45fe983b368b907a3aab39",
+  "source_reviews": {
+    "Core": "46f0e7c2a8386957865730eab398be1132af8429c95b0370fa6f802722681dff",
+    "Apple": "e99b7cde2ac5fd1da1d4a204d255241204e54d021f92ee425d3f3d503d7d64aa",
+    "findings": []
+  },
+  "own_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 39960254633,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39960253964,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39960047863,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39960047701,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39960047710,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39960048720,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39960048724,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39960047986,
+      "headSha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "own_main_workflows_result": "ALL_8_TERMINAL_SUCCESS",
+  "main_native_browser_log_sha256": "cf3f1e321116816051f85b63702b481234c0d4255cdd5a60466b286591831f75",
+  "artifact": {
+    "artifact_id": "12504441921",
+    "artifact_sha256": "ebdeaedb8b4528362d391c76b2cd131126c5ec2597aeca90b46c9b947a45a988",
+    "candidate_sha": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+    "kind": "api_worker_release_artifact",
+    "repository": "pcvantol/djconnect-api",
+    "schema_version": 1,
+    "timestamp": "2026-10-23T13:20:02Z"
+  },
+  "artifact_run": 39960253964,
+  "worker_sha256": "a3f3b21e71f81d23bf7cb52db751c53115b102cc11c3596173ade2871be9cf04",
+  "worker_bytes": 1322246,
+  "formal_run": 39960254633,
+  "formal_decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+  "formal_evidence_digest": "0c821cffcfe32842b9ec1d04f1489f8ad3af7998d2c2c3c2f4bc42dded70b614",
+  "durable_asset_id": 669191463,
+  "durable_sha256": "251321e2f5013dfbe5d68df8da9dc3d56d7d0f6d29e768dfd930b8a2ea0c8377",
+  "durable_canonical_integrity": "PASS",
+  "provider_artifacts": [
+    {
+      "files": {
+        "djconnect-api-release.tar.gz": "ebdeaedb8b4528362d391c76b2cd131126c5ec2597aeca90b46c9b947a45a988"
+      },
+      "id": 12504441921,
+      "name": "djconnect-api-release-a661194ce44fc5091647078f5bcfe73d7f3a484f",
+      "zip_sha256": "b305d6a6be3e1ad991ae72585ba51cc3f6bea498a69532406a6f6f5365fe4754"
+    },
+    {
+      "files": {
+        "api-release-artifact-evidence.json": "2473964dcbcf709c998d3459a56fcf9f2a0bdca4844f55d9ead77590925b3dd8"
+      },
+      "id": 12504107651,
+      "name": "api-release-artifact-evidence",
+      "zip_sha256": "ce0bc1158f5c2d577ee78c8ab4932db7631bbbc91e9c296264d74406268e955d"
+    },
+    {
+      "files": {
+        "post-merge-release-evidence.json": "a4212018587899184b440f06caf0c4d2b6a301ac10abf4a41afe69d5bc1aff26"
+      },
+      "id": 12503438896,
+      "name": "post-merge-release-evidence",
+      "zip_sha256": "f9892f74724326f44a7891ea3748e724e2522c3233e055e0eeaa413b2e432e95"
+    }
+  ],
+  "packaged_files": {
+    "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+    "LICENSES.sha256": "79e5319d4237848e567444a980611407f370a6246e4b634759443d542b688423",
+    "THIRD_PARTY_NOTICES.md": "6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e",
+    "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "d01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442",
+    "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+    "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+    "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+    "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+    "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+    "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+    "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+    "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+    "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+    "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+    "package-lock.json": "ecb262a241df4e3d00ff895d2970f65cdbcafd378fafab2a242e1033539805e1",
+    "package.json": "03cc05259272c45fc63baf2d58c6abeac0bf70cd4edf86b119cfa523101e93ae",
+    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536"
+  },
+  "original_source_and_migrations_and_license_manifest": "PASS",
+  "local_proofs": {
+    "root_Worker_D1_cases": 229,
+    "new_root_cases": 27,
+    "module_cases": 49,
+    "product_checks": 128,
+    "forbidden_RPC": 100,
+    "offline_controls": 44,
+    "strict_types": "PASS",
+    "historical_shared1570": "BYTE_EQUAL_RETAINED_NOT_RERUN"
+  },
+  "review_limits": {
+    "Apple_additional_36_controls": "TIMEOUT45s_NOT_PASS",
+    "Apple_separate8_controls": "PASS",
+    "own44_controls": "PASS"
+  },
+  "public_surface_dispatch": false,
+  "Activity_profiles": [],
+  "production_source": "c04864ce7c885e0de5fb365aa0139a64c7921b22",
+  "deployment": "UNCHANGED_NOT_REQUESTED",
+  "real_key_operator_provider_native_effects": false,
+  "activation_allowed": false,
+  "legacy_rendezvous_gates": "22_OPEN",
+  "separate_finalization": "THIS_DOCS_CANDIDATE_REQUIRES_FRESH_EXACT_REVIEWS_PROTECTED_MERGE_AND_OWN_MAIN_EVIDENCE"
+}
