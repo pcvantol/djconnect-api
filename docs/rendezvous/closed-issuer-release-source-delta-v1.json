@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_SOURCE_DELTA_NOT_DEPLOYMENT_AUTHORIZATION",
+  "baseline_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
+  "baseline_source_map_sha256": "db164f236aa78435430266049dd145f231540e4f9ceae288c1a0827d648eba8a",
+  "effective_source_map_sha256": "00f81eb72c7c45c91c5143b4d6629c163abedaa95b3b3ab03b506aadf58613fa",
+  "changes": {
+    "package-lock.json": {
+      "before": "9947367deb9b7028fb58fd431f3e3bfd57fc2db207d00497224e833dde911948",
+      "after": "ecb262a241df4e3d00ff895d2970f65cdbcafd378fafab2a242e1033539805e1"
+    },
+    "package.json": {
+      "before": "d32e8c6706816ae91682453a54b13d989f442f7da4c49fab66e80a054668a386",
+      "after": "03cc05259272c45fc63baf2d58c6abeac0bf70cd4edf86b119cfa523101e93ae"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.mjs": {
+      "before": "c6a022e0d191348b0a50fdd939cf4a464ba67e1dc679a2ab8c516108dce87a2d",
+      "after": "55f99c8073f10f29c834b459ac84cb4f9c9290476fa51c8741dc5db8b1781644"
+    },
+    "qualification/rendezvous/enrollment-evidence.check.mjs": {
+      "before": "8e02891faa40d848d0e28b18fde268638f352eba5742694072d1145bb570ea14",
+      "after": "162593b8bad16fc988f9f901803b1f76fffca06548fae8bacf1823df1af50c80"
+    },
+    "qualification/rendezvous/enrollment-key-state.check.mjs": {
+      "before": "d714d0c3f20440b51f284f8ece64d1b6e71b47621a051c2794cb9fea39427a68",
+      "after": "2d6f2a651c96e0be4e4fdc57e9577117d6b0d9eb5749390399a51e31112cd358"
+    },
+    "qualification/rendezvous/provider-unavailable.check.mjs": {
+      "before": "f68526765f7ae5f4544306eef341dbe09e851d661b4ec5d1575df4ec430912b5",
+      "after": "9102e3f587efd77e17fe19212d02cfc9e6d4e93df66e8e3eadd4f2b5b31e68b5"
+    },
+    "src/index.ts": {
+      "before": "a94d2a7cc34c9cf09c722789aa838964ff49c23fdbdf5a04636a92d24856bd55",
+      "after": "8cb6473496803c1aa20cd33a6a9d91edb9d70993e64fa523b73eae29363e5c17"
+    },
+    "src/surface-push/dispatch.ts": {
+      "before": null,
+      "after": "91c4a70131ff53263d26bfdad2df379a587f567ce896bf1ddbb125f7a3b08aa5"
+    },
+    "src/surface-push/issuer-wire.ts": {
+      "before": null,
+      "after": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8"
+    },
+    "src/surface-push/issuer.ts": {
+      "before": null,
+      "after": "0ea6654a7fff5db40f14f7ec439b064191611510a5b2db162a3e796e746e887d"
+    },
+    "src/surface-push/wire.ts": {
+      "before": null,
+      "after": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7"
+    }
+  },
+  "proofs": {
+    "shared": {
+      "path": "docs/rendezvous/enrollment-point-digest-shared-observations-v1.json",
+      "sha256": "2bfee77c019a3a70f66de10887ccccc3f00e97e75d42e357bb30660059be8dac"
+    },
+    "root": {
+      "path": "docs/rendezvous/closed-issuer-release-build-observations-v1.json",
+      "sha256": "6db83aade81ced01027733bc6a6ffa70f2ddc9be6eac9611394800061fc2809a"
+    },
+    "module": {
+      "path": "docs/rendezvous/closed-issuer-release-composition-observations-v1.json",
+      "sha256": "4a4117a2e3197ef27709a09c343e531b869ec889c9a8c5e821710d389a6d048d"
+    }
+  }
+}
