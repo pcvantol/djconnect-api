@@ -15,9 +15,21 @@ const denied=async p=>expect(await p).toMatchObject({ok:false});
 async function software(){const keys=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},false,['sign','verify']),point=new Uint8Array(await crypto.subtle.exportKey('raw',keys.publicKey));return {keys,point,keyId:btoa(String.fromCharCode(...await hash(point)))};}
 async function setup(f,install=true){
  const s=stub();await runInDurableObject(s,i=>{i.env.RECEIPT_ACTIVE_KEY=btoa(String.fromCharCode(...new Uint8Array(32).fill(11)));i.env.ASSERTION_POLICY_ENABLED='ios-dev-qualification/1';i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now()+1e9);});
- const m={keyAddress:hex(await hash(text(JSON.stringify(['development','ios-dev-qualification/1',f.keyId])))),appPolicy:'ios-dev-qualification/1',environment:'development',publicPoint:btoa(String.fromCharCode(...f.point)),receipt:btoa('PUBLIC_SYNTHETIC_TRUSTED_STORAGE_SEED_NOT_ENROLLMENT'),receiptCreatedAt:Date.now()-1000,challengeCreatedAt:Date.now()-1000,challengeExpiresAt:Date.now()+119000,operationId:crypto.randomUUID(),requestDigest:'b'.repeat(64)};
+ const keyAddress=hex(await hash(text(JSON.stringify(['development','ios-dev-qualification/1',f.keyId])))),originalNow=Date.now();
+ const m={keyAddress,appPolicy:'ios-dev-qualification/1',environment:'development',publicPoint:btoa(String.fromCharCode(...f.point)),receipt:btoa('PUBLIC_SYNTHETIC_TRUSTED_STORAGE_SEED_NOT_ENROLLMENT'),receiptCreatedAt:originalNow-1000,challengeCreatedAt:originalNow-1000,challengeExpiresAt:originalNow+119000,operationId:crypto.randomUUID(),requestDigest:'b'.repeat(64)};
  if(install)expect((await runInDurableObject(s,i=>ReceiptKeyStore.prototype.install.call(i,m))).ok).toBe(true);return {s,m};
 }
+test('trusted storage fixture retains one original clock sample across a millisecond boundary',async()=>{
+ const f=await software(),started=Date.now();let ticks=0;
+ const timer=vi.spyOn(Date,'now').mockImplementation(()=>started+ticks++);
+ try{
+  const {m}=await setup(f);
+  expect(m.challengeExpiresAt-m.challengeCreatedAt).toBe(120000);
+  expect(m.receiptCreatedAt).toBe(m.challengeCreatedAt);
+  const s=stub(),overlong={...m,challengeExpiresAt:m.challengeExpiresAt+1};
+  expect(await runInDurableObject(s,i=>ReceiptKeyStore.prototype.install.call(i,overlong))).toEqual({ok:false,error:'store_rejected'});
+ }finally{timer.mockRestore();}
+});
 const issue=(s,f,action='recover-key',binding)=>s.issue({action,keyId:f.keyId,...(binding?{binding}:{})});
 const binding=()=>({transactionId:crypto.randomUUID(),generation:1,browserThumbprint:u(new Uint8Array(32).fill(1)),envelopeDigest:u(new Uint8Array(32).fill(2)),expiresAt:Date.now()+120000});
 async function proof(f,ch,counter=1,action='recover-key'){
