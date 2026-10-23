@@ -1,3 +1,5 @@
+> Closed push source PR135 is protected as `c04864ce7c885e0de5fb365aa0139a64c7921b22`; its actual own-main artifact/formal/durable receipts are verified. [Separate Finalization candidate](docs/push/CLOSED_PUSH_SOURCE_FINALIZATION_V1.md) still requires exact reviews/delivery and completed main-native/browser run39926574420. Requested deployment remains pending a fresh central manifest and live smoke; issuer/public/QA guards false, all22 full-service gatesOPEN, no actual owner/service/Activity/native acceptance. Earlier source-candidate holds below are historical.
+
 > Surface purpose issuer successor: [exact source contract and scope](docs/push/SURFACE_ISSUER_SOURCE_V1.md). Internal operator-delegation/challenge/issue/status/withdraw plus grant/source/binding fences; no real approval/credentials/root/provider/native effects. Existing source PRs preserved, interim merge/deploy hold.
 
 > Surface provider authorizer successor: [source scope and evidence](docs/push/SURFACE_PROVIDER_SOURCE_V1.md). ES256/cached JWT plus local WidgetKit/iPhone update/end composition; no real credentials/provider traffic/root admission. PR132/a0ff403 and maintenancePR131 preserved.
