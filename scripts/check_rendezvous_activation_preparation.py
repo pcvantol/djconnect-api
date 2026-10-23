@@ -11,7 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = 'docs/rendezvous/controlled-activation-preparation-v1.json'
-RECORD_SHA256 = '822d01e72a429697551084ef0d8b02a3b7e9c9f6eca2be1b698252e2adf0d3f0'
+RECORD_SHA256 = '8c5c734d79b6d41881323e4d712080290c9e78949320b592b0090e7013e4de05'
 EXPECTED_VERSION = '6d6531ba-ea62-48c2-b132-8649cdcee627'
 EXPECTED_SOURCE = 'c04864ce7c885e0de5fb365aa0139a64c7921b22'
 
