@@ -46,20 +46,26 @@ jobs:
         run: |
           python3 - <<'PY'
           import hashlib, json, os, pathlib, re
+          def read_limited(path):
+              with path.open('rb') as file:
+                  raw = file.read(8 * 1024 * 1024 + 1)
+              if len(raw) > 8 * 1024 * 1024:
+                  raise ValueError('diagnostic input limit')
+              return raw.decode('utf-8')
           def report_failure(root, data_root, label):
               report = {'scope': 'SHARED_WORKER_FAILURE_COORDINATES_ONLY', 'root_kind': label, 'phase': 'unavailable', 'failed_cases': []}
               log = root / 'runner.log'
               if log.is_file():
                   try:
-                      match = re.search(r'Request admission qualification failed at (staging|types|tests|metadata|summary);', log.read_text())
+                      match = re.search(r'Request admission qualification failed at (staging|types|tests|metadata|summary);', read_limited(log))
                       if match:
                           report['phase'] = match.group(1)
-                  except (OSError, UnicodeError):
+                  except (OSError, ValueError):
                       report['log_unreadable'] = True
               results = data_root / 'results-private.json'
               if results.is_file():
                   try:
-                      data = json.loads(results.read_text())
+                      data = json.loads(read_limited(results))
                       for key in ('numTotalTests', 'numPassedTests', 'numFailedTests', 'numPendingTests'):
                           value = data.get(key)
                           if type(value) is int and 0 <= value <= 1000000:
@@ -67,32 +73,45 @@ jobs:
                       for file in data.get('testResults', []):
                           for case in file.get('assertionResults', []):
                               if case.get('status') == 'failed' and type(case.get('fullName')) is str:
-                                  report['failed_cases'].append(hashlib.sha256(case['fullName'].encode()).hexdigest())
-                  except (OSError, ValueError, TypeError, AttributeError):
+                                  if len(report['failed_cases']) >= 128:
+                                      report['failed_cases_truncated'] = report.get('failed_cases_truncated', 0) + 1
+                                      continue
+                                  coordinate = hashlib.sha256(case['fullName'].encode()).hexdigest()
+                                  report['failed_cases'].append(coordinate)
+                                  locations, classes = set(), set()
+                                  messages = case.get('failureMessages')
+                                  for message in messages[:4] if type(messages) is list else []:
+                                      if type(message) is str:
+                                          locations.update(re.findall(r'\b(assertion-key-state\.check\.mjs):([1-9][0-9]{0,4}):([1-9][0-9]{0,4})\b', message))
+                                          classes.update(kind for kind in ('service_unavailable', 'proof_rejected') if kind in message)
+                                  report.setdefault('case_details', []).append({'case_sha256': coordinate,
+                                      'locations': [{'file': file, 'line': int(line), 'column': int(column)} for file, line, column in sorted(locations)[:4]],
+                                      'error_classes': sorted(classes)})
+                  except (OSError, ValueError, TypeError, AttributeError, RecursionError):
                       report['results_unreadable'] = True
               state = data_root / 'process-state-private.json'
               if state.is_file():
                   try:
-                      value = json.loads(state.read_text())
+                      value = json.loads(read_limited(state))
                       status = value.get('status')
                       signal = value.get('signal')
                       if type(status) is int and -255 <= status <= 255:
                           report['test_process_status'] = status
                       if signal in (None, 'SIGTERM', 'SIGKILL', 'SIGABRT', 'SIGSEGV'):
                           report['test_process_signal'] = signal
-                  except (OSError, ValueError, TypeError, AttributeError):
+                  except (OSError, ValueError, TypeError, AttributeError, RecursionError):
                       report['process_state_unreadable'] = True
               for kind in ('capacity', 'create', 'shared'):
                   for suffix in ('private', 'tests-private'):
                       path = data_root / (kind + '-' + suffix + '.jsonl')
                       if path.is_file():
                           try:
-                              rows = [json.loads(line) for line in path.read_text().splitlines()]
+                              rows = [json.loads(line) for line in read_limited(path).splitlines()]
                               if len(rows) <= 1000000 and all(type(row) is dict for row in rows):
                                   report[kind + '_' + suffix + '_rows'] = len(rows)
                                   field = 'task_id' if suffix == 'private' else 'id'
                                   report[kind + '_' + suffix + '_unique_ids'] = len({row[field] for row in rows if type(row.get(field)) is str})
-                          except (OSError, ValueError, TypeError):
+                          except (OSError, ValueError, TypeError, RecursionError):
                               report[kind + '_' + suffix + '_unreadable'] = True
               print(json.dumps(report, sort_keys=True))
           base = pathlib.Path(os.environ['RUNNER_TEMP']) / 'enrollment-policy-qualification'
