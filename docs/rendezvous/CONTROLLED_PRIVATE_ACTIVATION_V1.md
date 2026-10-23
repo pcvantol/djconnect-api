@@ -139,3 +139,15 @@ reviewed overlay; the current128-check product proof matches the retained config
 Independent exact source/commit reviews and protected delivery remain pending.
 No public/private service-readiness, installed or activation claim is made by
 this preparation document.
+
+## Closed qualification consumer rebind
+
+The first candidate CI correctly rejected stale source pins in fixed-QA derivation
+and the local native/browser harness. The QA record changes only composition
+source/derived hashes under the original exact two replacement rules; historical
+40408 identity and null current profile/admission are unchanged. The local harness
+now reads the new independently pinned product proof, verifies its original digest
+and rejects any overlapping source pin mismatch before merging installed hashes.
+It still requires a clean exact source tree, literal closed guards and original
+finite local nonce windows. This rebind cannot create native or provider admission.
+The original failed CI remains failed; fresh exact-head results are required.
