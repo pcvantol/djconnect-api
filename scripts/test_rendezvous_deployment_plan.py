@@ -164,7 +164,7 @@ class PreparationTests(unittest.TestCase):
                 else:
                     changed['changes'][name]['grant'] = True
                 self.rejects_changed_proof(v.DELTA_PATH, changed)
-        self.assertEqual(len(self.plan['source_hashes']), 110)
+        self.assertEqual(len(self.plan['source_hashes']), 116)
         for name in v.DELTA_SOURCES:
             changed = copy.deepcopy(delta)
             changed['changes'][name]['before'] = None
@@ -176,7 +176,7 @@ class PreparationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             v.merge_sources(maps[0], maps[2], maps[1])
         self.assertEqual(len(v.merge_sources(maps[0], maps[2], maps[1],
-                                           with_closed_issuer=True)), 110)
+                                           with_closed_issuer=True)), 116)
 
     def test_git_cannot_lazy_fetch_or_prompt(self):
         with patch.object(v.subprocess, 'run') as run:

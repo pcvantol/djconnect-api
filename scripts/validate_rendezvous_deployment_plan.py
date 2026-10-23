@@ -10,28 +10,26 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SUPPLYING_SHA = '896ccdc69447c231d04da3a6af4f27ea1f763697'
 
-DELTA_PATH = 'docs/rendezvous/private-household-source-delta-v1.json'
-DELTA_SHA256 = '80904f95330cc33cb2cc4dcfcbb8118ec52222bc2141a432d17ffe50c315cbee'
+DELTA_PATH = 'docs/push/surface-runtime-source-delta-v1.json'
+DELTA_SHA256 = '9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a'
 DELTA_PROOFS = (('docs/rendezvous/private-household-shared-observations-v1.json',
   '030fd6fd4546b5eb88d19974a1ff0dd6b8eeae7d0158c77c7e1414eeefb3036e',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
- ('docs/rendezvous/private-household-build-observations-v1.json',
-  'c77773c59ec43879cf8435384989946f77eca9181a298c1cdb39ea242feae5dd',
+ ('docs/push/surface-runtime-product-observations-v1.json',
+  'c12c554ae95580d1e1de471784c5261bc47581879e9a8aea164c8183d26f5681',
   'source_hashes',
-  89,
+  95,
   'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
- ('docs/rendezvous/private-household-composition-observations-v1.json',
-  '0bd60ae631949242cd056347058658010037f7fc8464f61382a7e6fd1b9c7712',
+ ('docs/push/surface-runtime-rendezvous-module-observations-v1.json',
+  'dc22de8c903920a9022d42185e5ebae4c2b7d248fa6c9669a3dcbbdda1251624',
   'source_sha256',
   19,
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
 DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'src/index.ts', 'src/rendezvous/composition.ts'))
-DELTA_ADDITIONS = frozenset(('src/surface-push/wire.ts',
- 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts',
- 'src/surface-push/dispatch.ts'))
-SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': '80904f95330cc33cb2cc4dcfcbb8118ec52222bc2141a432d17ffe50c315cbee', 'effective_source_map_sha256': '510cb4973c20109f00486bb9906dd92251ba1d395d07bea1ddb15c63f4bb9e5d', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
+DELTA_ADDITIONS = frozenset(('src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
+SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': '9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a', 'effective_source_map_sha256': '8aab40a221501bcf8dc9d072e44c06319f537fe2f3a10744dbaa0d30da2ed6a4', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
 PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
   'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',
@@ -139,7 +137,7 @@ def merge_sources(shared, module, root, *, with_closed_issuer=False):
     sources = {}
     excluded = set()
     for index, recorded in enumerate((shared, module, root)):
-        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 89 if with_closed_issuer else 85)[index])
+        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 95 if with_closed_issuer else 85)[index])
         for name, expected in recorded.items():
             require(isinstance(name, str) and isinstance(expected, str)
                     and len(expected) == 64 and all(c in '0123456789abcdef' for c in expected))
@@ -152,7 +150,7 @@ def merge_sources(shared, module, root, *, with_closed_issuer=False):
             safe_path(path)
             require(path not in sources or sources[path] == expected)
             sources[path] = expected
-    require(len(excluded) == 32 and len(sources) == (110 if with_closed_issuer else 106))
+    require(len(excluded) == 32 and len(sources) == (116 if with_closed_issuer else 106))
     return sources
 
 

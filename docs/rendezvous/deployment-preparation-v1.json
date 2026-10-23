@@ -75,9 +75,9 @@
     "docs/rendezvous/sharp-0355-composition-observations-v1.json": "d0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531",
     "docs/rendezvous/sharp-0355-build-observations-v1.json": "cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089",
     "docs/rendezvous/private-household-shared-observations-v1.json": "030fd6fd4546b5eb88d19974a1ff0dd6b8eeae7d0158c77c7e1414eeefb3036e",
-    "docs/rendezvous/private-household-build-observations-v1.json": "c77773c59ec43879cf8435384989946f77eca9181a298c1cdb39ea242feae5dd",
-    "docs/rendezvous/private-household-composition-observations-v1.json": "0bd60ae631949242cd056347058658010037f7fc8464f61382a7e6fd1b9c7712",
-    "docs/rendezvous/private-household-source-delta-v1.json": "80904f95330cc33cb2cc4dcfcbb8118ec52222bc2141a432d17ffe50c315cbee"
+    "docs/push/surface-runtime-product-observations-v1.json": "c12c554ae95580d1e1de471784c5261bc47581879e9a8aea164c8183d26f5681",
+    "docs/push/surface-runtime-rendezvous-module-observations-v1.json": "dc22de8c903920a9022d42185e5ebae4c2b7d248fa6c9669a3dcbbdda1251624",
+    "docs/push/surface-runtime-source-delta-v1.json": "9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a"
   },
   "schema_version": 1,
   "secret_names": [
@@ -157,7 +157,7 @@
     "qualification/rendezvous/product-composition.check.ts": "9f0459d1d825413936086974f63e22d8b164cc0ff9c8a194aa97872546f93b93",
     "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
     "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
-    "src/index.ts": "8cb6473496803c1aa20cd33a6a9d91edb9d70993e64fa523b73eae29363e5c17",
+    "src/index.ts": "172fffb5e9d015f7ad17af205fef82bf0cb247bb35e685b8b57b7ba93f055f94",
     "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
     "rendezvous-build-inputs.json": "c0dff3c47cf35122813b2a728df1759c14cc20e3b28f76118f1572f61d644d79",
@@ -196,12 +196,18 @@
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8",
     "src/surface-push/issuer.ts": "0ea6654a7fff5db40f14f7ec439b064191611510a5b2db162a3e796e746e887d",
-    "src/surface-push/dispatch.ts": "91c4a70131ff53263d26bfdad2df379a587f567ce896bf1ddbb125f7a3b08aa5"
+    "src/surface-push/crypto.ts": "1b2d5a85c8c8e568668c0239f7b9ab6d59d60ecc6079662a2a82d06bbac5546d",
+    "src/surface-push/store.ts": "1f193ee71856c80e73ff331e01188fa659d3469a8e974b4955ca784ed5e4a3b1",
+    "src/surface-push/apns.ts": "fa760bb5c1e1dde207cfae3da29d08832dc3537d60c918370530469f53d24f29",
+    "src/surface-push/handler.ts": "64a0f1b4ea3379cfe81c83676eaae38b14ba78e9e4a20d3409c60f519accfd44",
+    "src/surface-push/provider.ts": "e7f7abe7bbc5cc2b1875db877a830be16024b8bc1ffd2c4c212a88a9bec23392",
+    "src/surface-push/composition.ts": "e03a67ef6f4759bb52207c8c690b34877c183eecdb072619a6d077df438a8600",
+    "src/surface-push/dispatch.ts": "1bfbb6f8003970a4cdfd4e0bd21a739d6dccbf6e10ee1411df13dada13ef3ce7"
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
-    "delta_sha256": "80904f95330cc33cb2cc4dcfcbb8118ec52222bc2141a432d17ffe50c315cbee",
-    "effective_source_map_sha256": "510cb4973c20109f00486bb9906dd92251ba1d395d07bea1ddb15c63f4bb9e5d",
+    "delta_sha256": "9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a",
+    "effective_source_map_sha256": "8aab40a221501bcf8dc9d072e44c06319f537fe2f3a10744dbaa0d30da2ed6a4",
     "kind": "BASELINE_PLUS_PINNED_DELTA"
   },
   "status": "NOT_AUTHORIZED",

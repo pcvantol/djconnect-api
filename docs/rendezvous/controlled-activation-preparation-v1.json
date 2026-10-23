@@ -15,7 +15,7 @@
   "health_scope": "ordinary closed Worker health only; not rendezvous success",
   "source_hashes": {
     "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
-    "src/index.ts": "8cb6473496803c1aa20cd33a6a9d91edb9d70993e64fa523b73eae29363e5c17",
+    "src/index.ts": "172fffb5e9d015f7ad17af205fef82bf0cb247bb35e685b8b57b7ba93f055f94",
     "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
     "src/rendezvous/composition.ts": "79e8fe0dc4c04d872e3edc9bf7753bc05c1bae305b2e4b3ddbf3d6701c0b5a44",
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
@@ -26,7 +26,7 @@
     "qualification/rendezvous/assertion-key-state.ts": "fa7b29c185c2163e1ec652f6fe2808f9f2d687dfe70ae48572ec4f44ba7dc2e6",
     "qualification/rendezvous/enrollment-key-state.ts": "a6782474798f90f0d338bbcfd518cda6ee9338c5ce40205b1020258897c448b0",
     "qualification/rendezvous/receipt-key-store.ts": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
-    "docs/rendezvous/deployment-preparation-v1.json": "baccc45340d94b9197f5ef923954903803d0661f53d2ccd9e229e813e7a06e78",
+    "docs/rendezvous/deployment-preparation-v1.json": "c0b7115fa080f4e1bca0b84f888c8615da9d9ddb5625b28c2d7c2074f77e1e41",
     "qualification/rendezvous/request-admission.check.mjs": "521c50d88178cb8324a4ffb2d3d87f1cb837126c40fbdd83f207cb76bb30009e"
   },
   "provider_readback": {
@@ -393,12 +393,12 @@
         "sha256": "030fd6fd4546b5eb88d19974a1ff0dd6b8eeae7d0158c77c7e1414eeefb3036e"
       },
       "root": {
-        "path": "docs/rendezvous/private-household-build-observations-v1.json",
-        "sha256": "c77773c59ec43879cf8435384989946f77eca9181a298c1cdb39ea242feae5dd"
+        "path": "docs/push/surface-runtime-product-observations-v1.json",
+        "sha256": "c12c554ae95580d1e1de471784c5261bc47581879e9a8aea164c8183d26f5681"
       },
       "module": {
-        "path": "docs/rendezvous/private-household-composition-observations-v1.json",
-        "sha256": "0bd60ae631949242cd056347058658010037f7fc8464f61382a7e6fd1b9c7712"
+        "path": "docs/push/surface-runtime-rendezvous-module-observations-v1.json",
+        "sha256": "dc22de8c903920a9022d42185e5ebae4c2b7d248fa6c9669a3dcbbdda1251624"
       }
     }
   }
