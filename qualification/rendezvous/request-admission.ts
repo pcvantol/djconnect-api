@@ -5,8 +5,11 @@ import {base64Url} from 'djc-existing-crypto';
 import {type IngressRoute} from './http-ingress';
 import {createComposedHandler,COMPOSED_POLICY,type ComposedEnv,type TrustedIdentityResolver} from './composed-http';
 export const REQUEST_NAME='djc-rendezvous-requests/1',REQUEST_POLICY='djc-request-admission-qualification/2';
-export interface RequestEnv {REQUEST_ADMISSION:DurableObjectNamespace<RequestAdmission>;REQUEST_POLICY_ENABLED?:string}
+export interface RequestEnv {REQUEST_ADMISSION:DurableObjectNamespace<RequestAdmission>;REQUEST_POLICY_ENABLED?:string;RENDEZVOUS_CAPACITY_POLICY?:string}
 export const REQUEST_LIMITS=Object.freeze({poll:256,create:16,native:64,terminal:16,total:352,regularMinute:9000,totalMinute:10000,regularDay:900000,totalDay:1000000,identities:20000});
+// Capacity only: this never supplies native, public-route or operator authority.
+export const PRIVATE_REQUEST_LIMITS=Object.freeze({...REQUEST_LIMITS,regularMinute:400,totalMinute:500,regularDay:2000,totalDay:2500,identities:128});
+function requestLimits(env:RequestEnv){need(env.RENDEZVOUS_CAPACITY_POLICY===undefined||env.RENDEZVOUS_CAPACITY_POLICY==='private-household/1');return env.RENDEZVOUS_CAPACITY_POLICY===undefined?REQUEST_LIMITS:PRIVATE_REQUEST_LIMITS;}
 export type RequestLane='poll'|'create'|'native'|'terminal';
 interface RequestInput {identity:BudgetIdentity;lane:RequestLane}
 const tables=['request_days','request_minutes','request_ips','request_ip_partitions','request_terminal_totals'];
@@ -27,11 +30,11 @@ export class RequestAdmissionState {
     if(this.#busy)return {ok:false,error:'service_unavailable'};this.#busy=true;
     try{
       closed(input,['identity','lane']);input={identity:copyIdentity(input.identity),lane:input.lane};need(['poll','create','native','terminal'].includes(input.lane));this.#policy();
-      const now=Date.now(),minute=Math.floor(now/60000),day=Math.floor(now/86400000);need(input.identity.minute===minute);const expires=(minute+2)*60000,alarm=await this.#ctx.storage.getAlarm();
+      const limits=requestLimits(this.#env),now=Date.now(),minute=Math.floor(now/60000),day=Math.floor(now/86400000);need(input.identity.minute===minute);const expires=(minute+2)*60000,alarm=await this.#ctx.storage.getAlarm();
       await this.#ctx.storage.setAlarm(Math.min(alarm??expires,expires,(day+1)*86400000));
       return this.#ctx.storage.transactionSync(()=>{
-        this.#policy();const at=Date.now();need(at>=now&&Math.floor(at/60000)===minute&&Math.floor(at/86400000)===day);this.#cleanup(at);
-        const sql=this.#ctx.storage.sql,limits=REQUEST_LIMITS;
+        this.#policy();need(requestLimits(this.#env)===limits);const at=Date.now();need(at>=now&&Math.floor(at/60000)===minute&&Math.floor(at/86400000)===day);this.#cleanup(at);
+        const sql=this.#ctx.storage.sql;
         const dayRow=sql.exec<{count:number;expires_at:number}>('SELECT count,expires_at FROM request_days WHERE day=?',day).toArray()[0];
         const minuteRow=sql.exec<{count:number;expires_at:number}>('SELECT count,expires_at FROM request_minutes WHERE minute=?',minute).toArray()[0];
         const days=dayRow?.count??0,minutes=minuteRow?.count??0;count(days);count(minutes);need(!dayRow||dayRow.expires_at===(day+1)*86400000);need(!minuteRow||minuteRow.expires_at===expires);
@@ -67,7 +70,8 @@ export class RequestAdmission extends DurableObject<RequestEnv>{
 }
 export const REQUEST_LANES:Readonly<Record<IngressRoute,RequestLane>>=Object.freeze({'/create':'create','/poll':'poll','/consume':'terminal','/cancel':'terminal','/inspect':'native','/attestation/challenge':'native','/attestation/register':'native','/submit-challenge':'native','/submit':'native','/attestation/delete':'native','/attestation/recover':'native'});
 export function createRequestBudgetedHandler(env?:ComposedEnv&RequestEnv,resolveIdentity?:TrustedIdentityResolver){
-  const enabled=()=>env?.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY&&env.REQUEST_POLICY_ENABLED===REQUEST_POLICY&&typeof resolveIdentity==='function';
+  const originalCapacity=env?.RENDEZVOUS_CAPACITY_POLICY;
+  const enabled=()=>env?.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY&&env.REQUEST_POLICY_ENABLED===REQUEST_POLICY&&typeof resolveIdentity==='function'&&env.RENDEZVOUS_CAPACITY_POLICY===originalCapacity&&(originalCapacity===undefined||originalCapacity==='private-household/1');
   return async(request:Request)=>{
     let identity:BudgetIdentity|undefined;const startedAt=Date.now();
     const requestEnabled=()=>enabled()&&Date.now()>=startedAt&&(!identity||identity.minute===Math.floor(Date.now()/60000));

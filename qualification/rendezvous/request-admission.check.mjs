@@ -18,8 +18,75 @@ const rig=(overrides={},resolver=()=>identity())=>{const e={...env,REQUEST_POLIC
 const request=(path,body,extra={})=>new Request(BASE+path,{method:'POST',headers:{'Content-Type':'application/json',...(extra.native?{}:{Origin:ORIGIN}),...extra.headers},body:typeof body==='string'?body:JSON.stringify({v:V,...body})});
 async function post(r,path,body,extra){const response=await r.handle(request(path,body,extra));return {status:response.status,body:await response.json(),headers:response.headers};}
 const reject=async(p,error,status)=>{const r=await p;expect(r.status).toBe(status);expect(r.body).toEqual({v:V,error});return r;};
-async function reset(){await runInDurableObject(gate(),async(i,c)=>{i.env.REQUEST_POLICY_ENABLED=REQUEST_POLICY;for(const t of tables)c.storage.sql.exec('DELETE FROM '+t);await c.storage.deleteAlarm();});await runInDurableObject(budget(),async(i,c)=>{i.env.ALLOCATION_POLICY_ENABLED=BUDGET_POLICY;for(const t of ['allocation_days','allocation_ips','allocation_key_calls'])c.storage.sql.exec('DELETE FROM '+t);await c.storage.deleteAlarm();});await runInDurableObject(index(),async(i,c)=>{i.env.INDEX_POLICY_ENABLED=INDEX_POLICY;c.storage.sql.exec('DELETE FROM allocation_index');await c.storage.deleteAlarm();});}
+async function reset(){await runInDurableObject(gate(),async(i,c)=>{i.env.REQUEST_POLICY_ENABLED=REQUEST_POLICY;delete i.env.RENDEZVOUS_CAPACITY_POLICY;for(const t of tables)c.storage.sql.exec('DELETE FROM '+t);await c.storage.deleteAlarm();});await runInDurableObject(budget(),async(i,c)=>{i.env.ALLOCATION_POLICY_ENABLED=BUDGET_POLICY;delete i.env.RENDEZVOUS_CAPACITY_POLICY;for(const t of ['allocation_days','allocation_ips','allocation_key_calls'])c.storage.sql.exec('DELETE FROM '+t);await c.storage.deleteAlarm();});await runInDurableObject(index(),async(i,c)=>{i.env.INDEX_POLICY_ENABLED=INDEX_POLICY;c.storage.sql.exec('DELETE FROM allocation_index');await c.storage.deleteAlarm();});}
 beforeEach(async()=>{vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(fixed);await reset();});afterEach(()=>vi.useRealTimers());afterAll(reset);
+
+const privatePolicy='private-household/1';
+const setGateCapacity=value=>runInDurableObject(gate(),i=>{if(value===undefined)delete i.env.RENDEZVOUS_CAPACITY_POLICY;else i.env.RENDEZVOUS_CAPACITY_POLICY=value;});
+const setBudgetCapacity=value=>runInDurableObject(budget(),i=>{if(value===undefined)delete i.env.RENDEZVOUS_CAPACITY_POLICY;else i.env.RENDEZVOUS_CAPACITY_POLICY=value;});
+
+test('private household creates and cancels one original local software transaction',async()=>{
+ await setGateCapacity(privatePolicy);await setBudgetCapacity(privatePolicy);
+ const r=rig({RENDEZVOUS_CAPACITY_POLICY:privatePolicy}),b=await browser(r);
+ const cancelled=await post(r,'/cancel',b.browser);
+ expect(cancelled.status).toBe(200);expect((await counts()).days[0].transactions).toBe(1);
+ expect((await gateRows('request_days'))[0].count).toBe(2);
+});
+
+test('private household preserves daily terminal reserve after regular exhaustion',async()=>{
+ await setGateCapacity(privatePolicy);const id=await identity();
+ expect(await gate().admit({identity:id,lane:'poll'})).toEqual({ok:true});
+ await runInDurableObject(gate(),(_i,c)=>c.storage.sql.exec('UPDATE request_days SET count=2000'));
+ expect(await gate().admit({identity:id,lane:'poll'})).toMatchObject({ok:false,error:'rate_limited'});
+ expect(await gate().admit({identity:id,lane:'terminal'})).toEqual({ok:true});
+ expect((await gateRows('request_days'))[0].count).toBe(2001);
+ await runInDurableObject(gate(),(_i,c)=>c.storage.sql.exec('UPDATE request_days SET count=2500'));
+ expect(await gate().admit({identity:id,lane:'terminal'})).toMatchObject({ok:false,error:'rate_limited'});
+ expect((await gateRows('request_days'))[0].count).toBe(2500);
+});
+test('private household preserves minute terminal reserve without resetting counters',async()=>{
+ await setGateCapacity(privatePolicy);const id=await identity();
+ expect(await gate().admit({identity:id,lane:'poll'})).toEqual({ok:true});
+ await runInDurableObject(gate(),(_i,c)=>{c.storage.sql.exec('UPDATE request_minutes SET count=400');c.storage.sql.exec('UPDATE request_days SET count=400');});
+ expect(await gate().admit({identity:id,lane:'native'})).toMatchObject({ok:false,error:'rate_limited'});
+ expect(await gate().admit({identity:id,lane:'terminal'})).toEqual({ok:true});
+ expect((await gateRows('request_minutes'))[0].count).toBe(401);
+ await runInDurableObject(gate(),(_i,c)=>c.storage.sql.exec('UPDATE request_minutes SET count=500'));
+ expect(await gate().admit({identity:id,lane:'terminal'})).toMatchObject({ok:false,error:'rate_limited'});
+});
+test('private household cannot allocate transaction21 or registration6',async()=>{
+ await setBudgetCapacity(privatePolicy);const id=await identity(),day=Math.floor(fixed/86400000);
+ await runInDurableObject(budget(),(_i,c)=>c.storage.sql.exec('INSERT INTO allocation_days(day,transactions,keys,expires_at) VALUES(?,20,5,?)',day,(day+1)*86400000));
+ for(const kind of ['transaction','key'])expect(await budget().admit({kind,identity:id})).toMatchObject({ok:false,error:'rate_limited'});
+ expect((await counts()).days[0]).toMatchObject({transactions:20,keys:5});
+});
+test('private household key RPC501 is denied with original day unchanged',async()=>{
+ await setBudgetCapacity(privatePolicy);const day=Math.floor(fixed/86400000);
+ await runInDurableObject(budget(),(_i,c)=>c.storage.sql.exec('INSERT INTO allocation_key_calls(day,count,expires_at) VALUES(?,500,?)',day,(day+1)*86400000));
+ expect(await budget().admitKeyCall()).toMatchObject({ok:false,error:'rate_limited'});
+ expect((await counts()).calls[0]).toMatchObject({count:500,expires_at:(day+1)*86400000});
+});
+for(const bad of ['',false,'private-household/2'])test('private household unknown capacity fails closed '+JSON.stringify(bad),async()=>{
+ await setGateCapacity(bad);await setBudgetCapacity(bad);const id=await identity();
+ expect(await gate().admit({identity:id,lane:'poll'})).toEqual({ok:false,error:'service_unavailable'});
+ expect(await budget().admit({kind:'transaction',identity:id})).toEqual({ok:false,error:'service_unavailable'});
+ expect(await budget().admitKeyCall()).toEqual({ok:false,error:'service_unavailable'});
+ expect(await gateRows('request_days')).toEqual([]);expect((await counts()).days).toEqual([]);
+});
+test('private household capacity selection cannot change during gate alarm await',async()=>{
+ const id=await identity();
+ await runInDurableObject(gate(),async(i,c)=>{i.env.RENDEZVOUS_CAPACITY_POLICY=privatePolicy;const set=c.storage.setAlarm.bind(c.storage),spy=vi.spyOn(c.storage,'setAlarm').mockImplementation(async(...args)=>{delete i.env.RENDEZVOUS_CAPACITY_POLICY;return set(...args);});try{expect(await i.admit({identity:id,lane:'poll'})).toEqual({ok:false,error:'service_unavailable'});}finally{spy.mockRestore();}});
+ expect(await gateRows('request_days')).toEqual([]);
+});
+for(const keyCall of [false,true])test('private household capacity selection cannot change during allocation alarm await '+keyCall,async()=>{
+ const id=await identity();
+ await runInDurableObject(budget(),async(i,c)=>{i.env.RENDEZVOUS_CAPACITY_POLICY=privatePolicy;const set=c.storage.setAlarm.bind(c.storage),spy=vi.spyOn(c.storage,'setAlarm').mockImplementation(async(...args)=>{delete i.env.RENDEZVOUS_CAPACITY_POLICY;return set(...args);});try{expect(await(keyCall?i.admitKeyCall():i.admit({kind:'transaction',identity:id}))).toEqual({ok:false,error:'service_unavailable'});}finally{spy.mockRestore();}});
+ expect((await counts()).days).toEqual([]);expect((await counts()).calls).toEqual([]);
+});
+test('private household handler cannot change selected capacity during a request',async()=>{
+ const r=rig({...noDownstream,RENDEZVOUS_CAPACITY_POLICY:privatePolicy,REQUEST_ADMISSION:{idFromName:v=>v,get:()=>({admit:async()=>{delete r.e.RENDEZVOUS_CAPACITY_POLICY;return {ok:true};}})}});
+ await denial(r.handle(request('/inspect','!')));expect(downstreamCalls).toBe(0);
+});
 async function browser(r,{real=false}={}){let pair,jwk={...fixture.jwk};if(real){pair=await crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},false,['encrypt','decrypt']);const {kty,n,e}=await crypto.subtle.exportKey('jwk',pair.publicKey);jwk={kty,n,e};}const claim=u(crypto.getRandomValues(new Uint8Array(32))),created=await post(r,'/create',{generation:3,browser_public_key:jwk,claim_commitment:u(await sha(Buffer.from(claim,'base64url')))});expect(created.status).toBe(201);const b=created.body,scan={transaction_id:b.transaction_id,generation:3,qr_capability:b.qr_payload.qr_capability};return {pair,jwk,claim,created:b,scan,browser:{transaction_id:b.transaction_id,generation:3,claim_secret:claim}};}
 async function app(r){const pair=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},false,['sign','verify']),point=new Uint8Array(await crypto.subtle.exportKey('raw',pair.publicKey)),keyId=b64(await sha(point)),ch=await post(r,'/attestation/challenge',{key_id:keyId,action:'register'},{native:true});expect(ch.status).toBe(200);const body={key_id:keyId,challenge_id:ch.body.challenge_id,attestation:u(text(JSON.stringify({point:b64(point),nonce:ch.body.challenge,receipt:btoa('PUBLIC_SOFTWARE_INITIAL_RECEIPT_NOT_GENUINE'),created:Date.now()-1000,deadline:Date.now()+30000})))},registered=await post(r,'/attestation/register',body,{native:true});expect(registered.status).toBe(201);return {pair,point,keyId,ch:ch.body,register:body,registered:registered.body};}
 async function assertion(a,ch,counter=1){let auth=new Uint8Array(37);auth.set(await sha(text('ZEML4LPXH4.dev.djconnect.ios')));auth[32]=0xc0;new DataView(auth.buffer).setUint32(33,counter,false);auth=Uint8Array.from([...auth,...cbor.encode(new Map([['apple_bundle_version_01','40230'],['apple_validation_category_01',Buffer.from([3,0,0,0])]]))]);const nonce=await sha(Uint8Array.from([...auth,...await sha(Buffer.from(ch.client_data,'base64url'))])),signature=pki.createCMSECDSASignature(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},a.pair.privateKey,nonce));return u(cbor.encode(new Map([['signature',Buffer.from(signature)],['authenticatorData',Buffer.from(auth)]])));}

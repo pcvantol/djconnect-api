@@ -6,7 +6,10 @@ export const BUDGET_POLICY='djc-allocation-qualification/1';
 export interface BudgetIdentity {minute:number;key:string}
 export type AllocationKind='transaction'|'key';
 export interface BudgetRequest {kind:AllocationKind;identity:BudgetIdentity}
-export interface BudgetEnv {ADMISSION_STATE:DurableObjectNamespace;ALLOCATION_POLICY_ENABLED?:string}
+export interface BudgetEnv {ADMISSION_STATE:DurableObjectNamespace;ALLOCATION_POLICY_ENABLED?:string;RENDEZVOUS_CAPACITY_POLICY?:string}
+const DEFAULT_ALLOCATION_LIMITS=Object.freeze({transactions:10000,keys:500,keyCalls:50000});
+const PRIVATE_ALLOCATION_LIMITS=Object.freeze({transactions:20,keys:5,keyCalls:500});
+function allocationLimits(env:BudgetEnv){need(env.RENDEZVOUS_CAPACITY_POLICY===undefined||env.RENDEZVOUS_CAPACITY_POLICY==='private-household/1');return env.RENDEZVOUS_CAPACITY_POLICY===undefined?DEFAULT_ALLOCATION_LIMITS:PRIVATE_ALLOCATION_LIMITS;}
 export type BudgetResult={ok:true}|{ok:false;error:'rate_limited'|'service_unavailable';retry_after_ms?:number};
 const need:(v:unknown)=>asserts v=v=>{if(!v)throw new Error('admission_rejected');};
 const closed=(v:object,names:string[])=>need(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===[...names].sort().join(','));
@@ -36,12 +39,12 @@ export class AllocationBudgetState {
     if(this.#busy)return {ok:false,error:'service_unavailable'};this.#busy=true;
     try{
       closed(input,['kind','identity']);closed(input.identity,['minute','key']);input={kind:input.kind,identity:{...input.identity}};need(input.kind==='transaction'||input.kind==='key');opaque(input.identity.key);need(Number.isSafeInteger(input.identity.minute)&&input.identity.minute>=0);
-      this.#policy();const now=Date.now(),minute=Math.floor(now/60000),day=Math.floor(now/86400000);need(input.identity.minute===minute);
+      this.#policy();const limits=allocationLimits(this.#env),now=Date.now(),minute=Math.floor(now/60000),day=Math.floor(now/86400000);need(input.identity.minute===minute);
       const deadline=Math.min((day+1)*86400000,input.kind==='transaction'?(minute+2)*60000:(day+1)*86400000),alarm=await this.#ctx.storage.getAlarm();await this.#ctx.storage.setAlarm(Math.min(alarm??deadline,deadline));
       return this.#ctx.storage.transactionSync(()=>{
-        this.#policy();const at=Date.now();need(Math.floor(at/60000)===minute&&Math.floor(at/86400000)===day);this.#cleanup(at);
+        this.#policy();need(allocationLimits(this.#env)===limits);const at=Date.now();need(Math.floor(at/60000)===minute&&Math.floor(at/86400000)===day);this.#cleanup(at);
         const current=this.#ctx.storage.sql.exec<{transactions:number;keys:number}>('SELECT transactions,keys FROM allocation_days WHERE day=?',day).toArray()[0]??{transactions:0,keys:0};
-        if(current.transactions>=10000&&input.kind==='transaction'||current.keys>=500&&input.kind==='key')return {ok:false as const,error:'rate_limited' as const,retry_after_ms:60000};
+        if(current.transactions>=limits.transactions&&input.kind==='transaction'||current.keys>=limits.keys&&input.kind==='key')return {ok:false as const,error:'rate_limited' as const,retry_after_ms:60000};
         if(input.kind==='transaction'){
           const bucket=this.#ctx.storage.sql.exec<{minute:number;count:number}>('SELECT minute,count FROM allocation_ips WHERE key=?',input.identity.key).toArray()[0];need(!bucket||bucket.minute===minute);
           if(bucket&&bucket.count>=5)return {ok:false as const,error:'rate_limited' as const,retry_after_ms:Math.max(1,(minute+1)*60000-at)};
@@ -57,12 +60,12 @@ export class AllocationBudgetState {
   async admitKeyCall():Promise<BudgetResult>{
     if(this.#busy)return {ok:false,error:'service_unavailable'};this.#busy=true;
     try{
-      this.#policy();const now=Date.now(),day=Math.floor(now/86400000),deadline=(day+1)*86400000;
+      this.#policy();const limits=allocationLimits(this.#env),now=Date.now(),day=Math.floor(now/86400000),deadline=(day+1)*86400000;
       const alarm=await this.#ctx.storage.getAlarm();await this.#ctx.storage.setAlarm(Math.min(alarm??deadline,deadline));
       return this.#ctx.storage.transactionSync(()=>{
-        this.#policy();const at=Date.now();need(at>=now&&Math.floor(at/86400000)===day);this.#cleanup(at);
+        this.#policy();need(allocationLimits(this.#env)===limits);const at=Date.now();need(at>=now&&Math.floor(at/86400000)===day);this.#cleanup(at);
         const count=this.#ctx.storage.sql.exec<{count:number}>('SELECT count FROM allocation_key_calls WHERE day=?',day).toArray()[0]?.count??0;
-        if(count>=50000)return {ok:false as const,error:'rate_limited' as const,retry_after_ms:60000};
+        if(count>=limits.keyCalls)return {ok:false as const,error:'rate_limited' as const,retry_after_ms:60000};
         this.#ctx.storage.sql.exec('INSERT INTO allocation_key_calls(day,count,expires_at) VALUES(?,1,?) ON CONFLICT(day) DO UPDATE SET count=allocation_key_calls.count+1',day,deadline);
         return {ok:true as const};
       });

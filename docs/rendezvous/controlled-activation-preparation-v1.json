@@ -1,0 +1,405 @@
+{
+  "schema_version": 1,
+  "kind": "rendezvous_controlled_activation_preparation",
+  "status": "BLOCKED_NOT_AUTHORIZED",
+  "activation_allowed": false,
+  "observed_at": "2026-10-23T10:59:50.988954+00:00",
+  "deployed_api_source": "c04864ce7c885e0de5fb365aa0139a64c7921b22",
+  "documentary_base": "812eec9a6bf6393a8d98889dc73aa7d1fca25d6f",
+  "account_id": "efe77cadf8317a53832fca0848e3ae51",
+  "worker": "djconnect-api",
+  "provider_version": "6d6531ba-ea62-48c2-b132-8649cdcee627",
+  "provider_deployment": "84fdd4eb-7706-450f-849b-c9ba174a3204",
+  "artifact_id": "12489837064",
+  "artifact_sha256": "4ecd3a6cbb597ece37a3b6d4099e25e0c750605db8eb30ef0f9bd7c15bdb7b5b",
+  "health_scope": "ordinary closed Worker health only; not rendezvous success",
+  "source_hashes": {
+    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+    "src/index.ts": "8cb6473496803c1aa20cd33a6a9d91edb9d70993e64fa523b73eae29363e5c17",
+    "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
+    "src/rendezvous/composition.ts": "79e8fe0dc4c04d872e3edc9bf7753bc05c1bae305b2e4b3ddbf3d6701c0b5a44",
+    "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
+    "src/rendezvous/trust.ts": "976b08f018dff384e2d9390afce98c46e8c84e9d1ab7a099f2345c00b2c0cd95",
+    "qualification/rendezvous/request-admission.ts": "d3604825e83218e44eeaa69aabea3dc4fe5820d7532ab3600bc101d2d032ce29",
+    "qualification/rendezvous/allocation-budget.ts": "51a708467a13992896093a350c71c8ba08f9bcf5711f6542c92cc1e4bdb77f8e",
+    "qualification/rendezvous/app-attest-core-candidate.mjs": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
+    "qualification/rendezvous/assertion-key-state.ts": "fa7b29c185c2163e1ec652f6fe2808f9f2d687dfe70ae48572ec4f44ba7dc2e6",
+    "qualification/rendezvous/enrollment-key-state.ts": "a6782474798f90f0d338bbcfd518cda6ee9338c5ce40205b1020258897c448b0",
+    "qualification/rendezvous/receipt-key-store.ts": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
+    "docs/rendezvous/deployment-preparation-v1.json": "baccc45340d94b9197f5ef923954903803d0661f53d2ccd9e229e813e7a06e78",
+    "qualification/rendezvous/request-admission.check.mjs": "521c50d88178cb8324a4ffb2d3d87f1cb837126c40fbdd83f207cb76bb30009e"
+  },
+  "provider_readback": {
+    "binding_names_and_types": [
+      {
+        "name": "APNS_ENVIRONMENT",
+        "type": "plain_text"
+      },
+      {
+        "name": "APNS_KEY_ID",
+        "type": "plain_text"
+      },
+      {
+        "name": "APNS_PRIVATE_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "APNS_TEAM_ID",
+        "type": "plain_text"
+      },
+      {
+        "name": "APNS_TOKEN_ENCRYPTION_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "APNS_TOPIC_IOS",
+        "type": "plain_text"
+      },
+      {
+        "name": "APNS_TOPIC_MACOS",
+        "type": "plain_text"
+      },
+      {
+        "name": "APNS_TOPIC_WATCHOS",
+        "type": "plain_text"
+      },
+      {
+        "name": "DB",
+        "type": "d1"
+      },
+      {
+        "name": "DJCONNECT_PAIRING_ISSUER_SECRET",
+        "type": "secret_text"
+      },
+      {
+        "name": "DJCONNECT_RELAY_SECRET",
+        "type": "secret_text"
+      },
+      {
+        "name": "DJCONNECT_SMOKE_TEST_MODE",
+        "type": "secret_text"
+      }
+    ],
+    "secret_names": [
+      "APNS_PRIVATE_KEY",
+      "APNS_TOKEN_ENCRYPTION_KEY",
+      "DJCONNECT_PAIRING_ISSUER_SECRET",
+      "DJCONNECT_RELAY_SECRET",
+      "DJCONNECT_SMOKE_TEST_MODE"
+    ],
+    "namespaces": {
+      "complete": true,
+      "pages": [
+        {
+          "http": 200,
+          "success": true,
+          "result_info": {
+            "page": 1,
+            "per_page": 100,
+            "count": 0,
+            "total_count": 0
+          },
+          "error_codes": []
+        }
+      ],
+      "namespaces": []
+    },
+    "worker_settings": {
+      "http": 200,
+      "success": true,
+      "result_info": null,
+      "error_codes": [],
+      "configuration": {
+        "compatibility_date": "2026-06-20",
+        "compatibility_flags": [
+          "nodejs_compat"
+        ],
+        "usage_model": "standard",
+        "migration_tag": null,
+        "limits": null,
+        "observability": {
+          "enabled": true,
+          "head_sampling_rate": 1,
+          "redact_query_string": false,
+          "logs": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "persist": true,
+            "invocation_logs": true
+          },
+          "traces": {
+            "enabled": false,
+            "persist": true,
+            "head_sampling_rate": 1
+          }
+        },
+        "logpush": false,
+        "tail_consumers": [],
+        "placement": {}
+      },
+      "binding_names_and_types": [
+        {
+          "name": "APNS_ENVIRONMENT",
+          "type": "plain_text"
+        },
+        {
+          "name": "APNS_KEY_ID",
+          "type": "plain_text"
+        },
+        {
+          "name": "APNS_PRIVATE_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "APNS_TEAM_ID",
+          "type": "plain_text"
+        },
+        {
+          "name": "APNS_TOKEN_ENCRYPTION_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "APNS_TOPIC_IOS",
+          "type": "plain_text"
+        },
+        {
+          "name": "APNS_TOPIC_MACOS",
+          "type": "plain_text"
+        },
+        {
+          "name": "APNS_TOPIC_WATCHOS",
+          "type": "plain_text"
+        },
+        {
+          "name": "DB",
+          "type": "d1"
+        },
+        {
+          "name": "DJCONNECT_PAIRING_ISSUER_SECRET",
+          "type": "secret_text"
+        },
+        {
+          "name": "DJCONNECT_RELAY_SECRET",
+          "type": "secret_text"
+        },
+        {
+          "name": "DJCONNECT_SMOKE_TEST_MODE",
+          "type": "secret_text"
+        }
+      ]
+    },
+    "subscriptions": {
+      "http": 403,
+      "success": false,
+      "plans": []
+    },
+    "zone_plan": "Free Website",
+    "zone_plan_is_not_workers_plan": true,
+    "edge_rule_readback": {
+      "http_ratelimit": {
+        "http": 403,
+        "success": false
+      },
+      "http_request_firewall_custom": {
+        "http": 403,
+        "success": false
+      },
+      "http_request_transform": {
+        "http": 403,
+        "success": false
+      },
+      "http_request_late_transform": {
+        "http": 403,
+        "success": false
+      }
+    }
+  },
+  "configuration_overlay": {
+    "scope": "REVIEWABLE_NOT_A_WRANGLER_CONFIG_OR_DEPLOYMENT_GRANT",
+    "preserve_all_existing_bindings_and_routes": true,
+    "durable_objects": {
+      "bindings": [
+        {
+          "name": "ADMISSION_STATE",
+          "class_name": "AllocationBudget"
+        },
+        {
+          "name": "ALLOCATION_INDEX",
+          "class_name": "AllocationIndex"
+        },
+        {
+          "name": "COMPOSED_TRANSACTIONS",
+          "class_name": "BudgetedTransactionCoordinator"
+        },
+        {
+          "name": "ENROLLMENT_COORDINATOR",
+          "class_name": "EnrollmentCoordinator"
+        },
+        {
+          "name": "REQUEST_ADMISSION",
+          "class_name": "RequestAdmission"
+        }
+      ]
+    },
+    "migrations": [
+      {
+        "tag": "djc-rendezvous-sqlite-v1",
+        "new_sqlite_classes": [
+          "AllocationBudget",
+          "AllocationIndex",
+          "BudgetedTransactionCoordinator",
+          "EnrollmentCoordinator",
+          "RequestAdmission"
+        ]
+      }
+    ],
+    "observability": {
+      "redact_query_string": true,
+      "logs": {
+        "invocation_logs": false
+      }
+    },
+    "required_secret_names": [
+      "RENDEZVOUS_IP_HASH_KEY",
+      "RECEIPT_ACTIVE_KEY"
+    ],
+    "optional_rotation_secret_names": [
+      "RECEIPT_PREVIOUS_KEY"
+    ],
+    "secret_format": "independent canonical base64 32-byte keys; operator custody only; no values in this record",
+    "native_policy": {
+      "policy": null,
+      "app_identifier": null,
+      "build": null,
+      "environment": null,
+      "profile_sha256": null,
+      "expires_at": null,
+      "revision": null
+    },
+    "limits_cpu_ms": null,
+    "cpu_limit_scope": "No measured production CPU bound or billing plan established; do not invent one",
+    "capacity_policy": {
+      "name": "RENDEZVOUS_CAPACITY_POLICY",
+      "value": "private-household/1",
+      "scope": "server-owned reduced capacity only; never enables native/public/root authority"
+    }
+  },
+  "reviewed_source_limits": {
+    "per_ip_per_minute": {
+      "poll": 256,
+      "create": 16,
+      "native": 64,
+      "terminal": 16,
+      "total": 352
+    },
+    "global_per_minute": {
+      "regular": 9000,
+      "total": 10000
+    },
+    "global_per_day": {
+      "regular": 900000,
+      "total": 1000000
+    },
+    "minute_identity_capacity": 20000,
+    "new_transactions_per_day": 10000,
+    "new_transactions_per_ip_per_minute": 5,
+    "registration_attempts_per_day": 500,
+    "key_operations_per_day": 50000,
+    "transaction_original_ttl_seconds": 120,
+    "source_policy": "djc-request-admission-qualification/2",
+    "scope": "unchanged application admission bounds, not an edge/paid-spend cap or demonstrated provider throughput"
+  },
+  "external_decisions": {
+    "workers_plan": null,
+    "approved_extra_monthly_budget": null,
+    "edge_policy_and_readback": null,
+    "native_admission_receipt": null,
+    "retention_backups_logs_dpa": null,
+    "full_live_load_cpu_sql_duration": null,
+    "activation_source_manifest_and_explicit_effect_approval": null
+  },
+  "prior_22_service_gates": "All OPEN; historical offline plan remains unchanged. This preparation does not close service gates.",
+  "original_private_receipt_sha256": {
+    "rendezvous-current-provider-version-readonly.json": "987ad9765c2065abc44cccfb1e7b1371d85b2176df566b349e831b3b339dcd81",
+    "rendezvous-provider-readiness-readonly.json": "76d0470064f64a91007e4e7a3bbbe0ec5bcb732582feb1aef32bccb3cab6c358",
+    "rendezvous-secret-names-readonly.json": "fe53ecc763ebfe5a4f69ea2a65621143b954e44af15440204cc5dd025ab379c0",
+    "production-delivery-receipt.json": "b4e35ff4771c0b4a2956d1a0f182b212f4dab5e8434f7fdbb9cafb3a013ffbc1"
+  },
+  "official_references": [
+    "https://developers.cloudflare.com/durable-objects/platform/limits/",
+    "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "https://developers.cloudflare.com/workers/platform/limits/",
+    "https://developers.cloudflare.com/workers/platform/pricing/",
+    "https://developers.cloudflare.com/workers/observability/logs/workers-logs/"
+  ],
+  "scope": "actual read-only provider metadata plus exact source/configuration preparation; no secrets, deployment, provisioning, enrollment, native test or new spending",
+  "free_tier_preparation_constraint": {
+    "basis": "User-provided Cloudflare Workers dashboard screenshot23Oct13:03 local:990/100000 dailyrequests; this is observed quota, not billing API confirmation",
+    "requests_today": 990,
+    "worker_daily_quota_shown": 100000,
+    "observability_events_today": 26,
+    "observability_daily_quota_shown": 200000,
+    "month_requests_shown": 38460,
+    "month_CPU_ms_shown": 76870,
+    "no_plan_upgrade_or_additional_spend_assumed": true,
+    "Workers_plan_API_confirmation": "UNAVAILABLE_HTTP403",
+    "provider_free_limits_checked_20261023": {
+      "Worker_requests_per_day": 100000,
+      "Worker_CPU_ms_per_HTTP_request": 10,
+      "DO_requests_per_day": 100000,
+      "DO_duration_GBs_per_day": 13000,
+      "DO_SQL_rows_read_per_day": 5000000,
+      "DO_SQL_rows_written_per_day": 100000,
+      "DO_SQL_storage_GB_total": 5
+    },
+    "source_model_successful_flow_60polls": {
+      "Worker_requests": 65,
+      "DO_method_calls": 201,
+      "scope": "source-inferred success graph, not measured provider usage; excludes enrollment, alarms/retries/invalid traffic and SQL",
+      "legacy_source_model_reference": "docs/rendezvous/COST_CAPACITY_MODEL_V1.md"
+    },
+    "mismatch": "Historical qualification profile1millionHTTP/day/10ktransactions/day is not selected by prepared private-household/1. Reduced sourcecaps still are not a provider bill/SQL/CPU/shared-account cap or native readiness."
+  },
+  "private_household_source_limits": {
+    "global_per_minute": {
+      "regular": 400,
+      "total": 500
+    },
+    "global_per_day": {
+      "regular": 2000,
+      "total": 2500
+    },
+    "minute_identity_capacity": 128,
+    "new_transactions_per_day": 20,
+    "registration_attempts_per_day": 5,
+    "key_operations_per_day": 500,
+    "per_ip_per_minute": "unchanged poll256/create16/native64/terminal16/total352; allocation5",
+    "scope": "new source candidate, not deployed; no counter reset, original expiry unchanged; no assurance all500reservedterminal requests succeed under perIPbound"
+  },
+  "readiness_source_scope": "Private capacity source candidate derived from documentarybase812; deployedbaselinec048 remains unchanged. source_hashes below bind current candidate inputs, not a claim these new bytes are deployed.",
+  "private_capacity_qualification": {
+    "actual_shared_tests": 1570,
+    "new_private_cases": 12,
+    "shared_types": "PASS",
+    "actual_product_checks": 128,
+    "forbidden_private_RPC_rejections": 100,
+    "outbound_calls": 0,
+    "actual_composition_cases": 49,
+    "composition_types": "PASS",
+    "scope": "localsoftware/privateDO/product only; no native or edge proof",
+    "proofs": {
+      "shared": {
+        "path": "docs/rendezvous/private-household-shared-observations-v1.json",
+        "sha256": "030fd6fd4546b5eb88d19974a1ff0dd6b8eeae7d0158c77c7e1414eeefb3036e"
+      },
+      "root": {
+        "path": "docs/rendezvous/private-household-build-observations-v1.json",
+        "sha256": "c77773c59ec43879cf8435384989946f77eca9181a298c1cdb39ea242feae5dd"
+      },
+      "module": {
+        "path": "docs/rendezvous/private-household-composition-observations-v1.json",
+        "sha256": "0bd60ae631949242cd056347058658010037f7fc8464f61382a7e6fd1b9c7712"
+      }
+    }
+  }
+}
