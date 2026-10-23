@@ -1,0 +1,774 @@
+{
+  "schema_version": 1,
+  "kind": "cumulative_closed_runtime_and_ci_observability_finalization",
+  "runtime_source_pr": 139,
+  "runtime_source_main": "a661194ce44fc5091647078f5bcfe73d7f3a484f",
+  "runtime_source_own_main": "ALL8_SUCCESS retained",
+  "prior_final140": {
+    "main": "8c827f9497edfe0773e26c27f5a4ed7d23e1dbf3",
+    "qualification": "INCOMPLETE ownbrowserattempts1+2cancelledAPTbeforetests_NOT_PASS"
+  },
+  "mirror_repair141": {
+    "main": "0fad822928ba70cae3b4317d72609a01985be8e9",
+    "candidate": "240f67e58ed22e1601be1d12594a52b0fcb2d796",
+    "HIGH_RISK_authorization": 39966725491,
+    "qualification": "ActualPRall8SUCCESS afteronehostretry; ownmainfirstQAsharedFAIL andsecondoriginalsharedFAIL; causeUNKNOWN, notfullyqualified"
+  },
+  "diagnostic142": {
+    "candidate": "8c78a3069dc7c656ca920ea7fcfb48e60523a025",
+    "source_main": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+    "scope": "Onefailure-onlyworkflowfile;fixedtwooutputroots;8MiBreadcap/128casecap;knownfile numericlocations/errorenums;no rawprivateinput",
+    "reviews": {
+      "Core_sha256": "72b97f1c9b5ea4b27f3803339d1db0c5417fa60de71a2c781efd6d84c3f28a79",
+      "Apple_sha256": "3bb907c5a27ba175b579c1d37861ee23b02bbde3087ad56cc303f3ac5fa246c5",
+      "scope": "Fresh exact R3, no old-head GO transfer"
+    },
+    "HIGH_RISK_authorization_run": 39973595570,
+    "review_register": "https://github.com/pcvantol/djconnect-api/pull/142#issuecomment-6367761525",
+    "local_validation": "Actualembedded5syntheticprivacy/bounds scenariosPASS; no privilegedlocaloperation",
+    "own_main_workflows": {
+      "Validate": {
+        "conclusion": "success",
+        "databaseId": 39973691552,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Validate"
+      },
+      "CodeQL": {
+        "conclusion": "success",
+        "databaseId": 39973692126,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "CodeQL"
+      },
+      "AI-development projection": {
+        "conclusion": "success",
+        "databaseId": 39973690914,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "AI-development projection"
+      },
+      "TDE observe": {
+        "conclusion": "success",
+        "databaseId": 39973690919,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "TDE observe"
+      },
+      "Fixed rendezvous QA build": {
+        "conclusion": "success",
+        "databaseId": 39973690905,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Fixed rendezvous QA build"
+      },
+      "Local native experiment qualification": {
+        "conclusion": "success",
+        "databaseId": 39973691340,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Local native experiment qualification"
+      },
+      "API release artifact": {
+        "conclusion": "success",
+        "databaseId": 39973957497,
+        "event": "workflow_run",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "API release artifact"
+      },
+      "Post-Merge Release Evidence": {
+        "conclusion": "success",
+        "databaseId": 39973958083,
+        "event": "workflow_run",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Post-Merge Release Evidence"
+      }
+    },
+    "release_evidence": {
+      "artifacts": [
+        {
+          "files": {
+            "djconnect-api-release.tar.gz": "29f2e3e331af390c262345f92e98dfe1f7e0561eabc9add5aef31dedabaa9e6f"
+          },
+          "id": 12511190025,
+          "name": "djconnect-api-release-39ad722c253475bae7acd183bcc5e0688dced3e4",
+          "zip_sha256": "e82e9878ffee19b1de17e4d4ebfbd98bc1290425eb452df7f712ad973d3a5577"
+        },
+        {
+          "files": {
+            "api-release-artifact-evidence.json": "5217a26113669a160e7b71a984a249a837f38e5da744bd257f63686bec1ac954"
+          },
+          "id": 12510297790,
+          "name": "api-release-artifact-evidence",
+          "zip_sha256": "bdbff650701dab4811207205032c5cb1e975bc8cda3db87457328ecdabba0757"
+        },
+        {
+          "files": {
+            "post-merge-release-evidence.json": "48c374be903c1f75f2eb4ea4068ce20e8ac41b17d353363305cf5fb6ff2e56d9"
+          },
+          "id": 12509364250,
+          "name": "post-merge-release-evidence",
+          "zip_sha256": "cba81bc23db67a9d057d15b8e276796cc8b776abe777d3f7f72dc8eae612f932"
+        }
+      ],
+      "durable_asset_id": 669455591,
+      "durable_canonical_integrity": "PASS",
+      "durable_sha256": "0940254a7eb623af2b67e0a858e899cb53c3cb323c6551cec598840969de8338",
+      "formal": {
+        "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+        "evidence_digest": "d7169d25ca28dcccc82603ddc2553a32f2fbf7095a944e62ffcf9cc8b611c957",
+        "findings": [],
+        "kind": "post_merge_release_evidence",
+        "main_parents": [
+          "0fad822928ba70cae3b4317d72609a01985be8e9"
+        ],
+        "main_sha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "merge_actor": "pcvantol",
+        "merge_strategy": "SQUASH",
+        "originating_pr": {
+          "base_ref": "main",
+          "changed_files": [
+            ".github/workflows/local-native-qualification.yml"
+          ],
+          "head_sha": "8c78a3069dc7c656ca920ea7fcfb48e60523a025",
+          "main_changed_files": [
+            ".github/workflows/local-native-qualification.yml"
+          ],
+          "merge_actor": "pcvantol",
+          "merge_commit_sha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+          "merge_strategy": "SQUASH",
+          "merged_at": "2026-10-23T14:54:45Z",
+          "number": 142,
+          "state": "MERGED"
+        },
+        "post_merge": {
+          "build_validation": "PASS",
+          "ci": "PASS",
+          "coverage": "PASS",
+          "coverage_artifact_sha": "sha256:cc74c3495ffb286172f59e2aa4324d112032384fe92ddc97ba920694c3775989",
+          "coverage_report_sha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+          "governance": "PASS",
+          "lint": "PASS",
+          "sha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+          "static_analysis": "PASS",
+          "tests": "PASS",
+          "workflow_run_ids": [
+            "39973691552"
+          ]
+        },
+        "pre_merge": {
+          "candidate_sha": "8c78a3069dc7c656ca920ea7fcfb48e60523a025",
+          "owner_authorization": "PASS",
+          "required_checks": "PASS",
+          "risk_classification": "HIGH_RISK",
+          "software_assurance": "PASS",
+          "trusted_delivery": "PASS",
+          "verification": "PASS",
+          "workflow_integrity": "PASS"
+        },
+        "provenance_result": "PASS",
+        "repository": "pcvantol/djconnect-api",
+        "repository_role": "active_source",
+        "schema_version": 1,
+        "source_qualified_pr_sha": "8c78a3069dc7c656ca920ea7fcfb48e60523a025",
+        "timestamp": "2026-10-23T14:56:48.888Z"
+      },
+      "packaged_files": {
+        "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+        "LICENSES.sha256": "79e5319d4237848e567444a980611407f370a6246e4b634759443d542b688423",
+        "THIRD_PARTY_NOTICES.md": "6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e",
+        "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "d01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442",
+        "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+        "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+        "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+        "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+        "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+        "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+        "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+        "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+        "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+        "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+        "package-lock.json": "ecb262a241df4e3d00ff895d2970f65cdbcafd378fafab2a242e1033539805e1",
+        "package.json": "03cc05259272c45fc63baf2d58c6abeac0bf70cd4edf86b119cfa523101e93ae",
+        "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536"
+      },
+      "release_artifact": {
+        "artifact_id": "12511190025",
+        "artifact_sha256": "29f2e3e331af390c262345f92e98dfe1f7e0561eabc9add5aef31dedabaa9e6f",
+        "candidate_sha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "kind": "api_worker_release_artifact",
+        "repository": "pcvantol/djconnect-api",
+        "schema_version": 1,
+        "timestamp": "2026-10-23T14:56:57Z"
+      },
+      "runs": {
+        "API release artifact": 39973957497,
+        "Post-Merge Release Evidence": 39973958083
+      },
+      "scope": "EXACT_SOURCE_ARTIFACT_FORMAL_NOT_DEPLOYMENT_OR_NATIVE_ACCEPTANCE",
+      "source_main": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+      "worker_bytes": 1322246,
+      "worker_sha256": "9ef40f2b2d247763808fe3f97ce0da81ec369057978eedfa5131e91c70131db5"
+    },
+    "full_run_inventory": [
+      {
+        "conclusion": "success",
+        "databaseId": 39973958083,
+        "event": "workflow_run",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Post-Merge Release Evidence"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39973957497,
+        "event": "workflow_run",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "API release artifact"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39973690914,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "AI-development projection"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39973690905,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Fixed rendezvous QA build"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39973690919,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "TDE observe"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39973692126,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "CodeQL"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39973691552,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Validate"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39973691340,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+        "status": "completed",
+        "workflowName": "Local native experiment qualification"
+      }
+    ]
+  },
+  "source_main_workflows": {
+    "Validate": {
+      "conclusion": "success",
+      "databaseId": 39994032757,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    "CodeQL": {
+      "conclusion": "success",
+      "databaseId": 39994033491,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    "AI-development projection": {
+      "conclusion": "success",
+      "databaseId": 39994032248,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    "TDE observe": {
+      "conclusion": "success",
+      "databaseId": 39994032341,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    "Fixed rendezvous QA build": {
+      "conclusion": "success",
+      "databaseId": 39994032337,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    "Local native experiment qualification": {
+      "conclusion": "success",
+      "databaseId": 39994032264,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    },
+    "API release artifact": {
+      "conclusion": "success",
+      "databaseId": 39994246157,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    "Post-Merge Release Evidence": {
+      "conclusion": "success",
+      "databaseId": 39994246829,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    }
+  },
+  "full_run_inventory": [
+    {
+      "conclusion": "success",
+      "databaseId": 39994246829,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39994246157,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39994032757,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39994033491,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39994032248,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39994032337,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39994032341,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39994032264,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "source_main_qualification": "ALL8_ACTUAL_APPLICABLE_SUCCESS",
+  "source_main_native_browser_log_sha256": "78103da4b3d80fedde8b50ccac9fca2886cb3f751ef1dba533ddf8dbfe5efbb6",
+  "release_evidence": {
+    "artifacts": [
+      {
+        "files": {
+          "djconnect-api-release.tar.gz": "6c97732d06fc77c6bdd8a45bbdf9440b5c72a9981df7b9d9bb23d62377e2bd72"
+        },
+        "id": 12519122063,
+        "name": "djconnect-api-release-e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+        "zip_sha256": "51dd1c3cc2d4249e0de3be18e8d089ed42428d94ca7fc6b074de555493f71160"
+      },
+      {
+        "files": {
+          "api-release-artifact-evidence.json": "68f2e2e9426219c5c6ee89d3736c473301f27705fb308e9e5fb3cf5c131a8398"
+        },
+        "id": 12518054148,
+        "name": "api-release-artifact-evidence",
+        "zip_sha256": "67f21f7a4999c269748b38d34dbfb1e184a798418234b59c9078e260d973eab6"
+      },
+      {
+        "files": {
+          "post-merge-release-evidence.json": "5aab5f5464964a5711bc9a998a5c6bcfa461874935deb594f3c03bd939604e62"
+        },
+        "id": 12518923296,
+        "name": "post-merge-release-evidence",
+        "zip_sha256": "a0c16408114dcb9801791298d6370682f524902a496bf80e7bff505cd8bf2d40"
+      }
+    ],
+    "durable_asset_id": 669837301,
+    "durable_canonical_integrity": "PASS",
+    "durable_sha256": "b048c7b152dfc43aca40f63455ba38a63a12ee24f58ca9c766131b33e5cdf787",
+    "formal": {
+      "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+      "evidence_digest": "19e558ab6e9250adcf815ed7533fcfcc5644ac2a54959aae98a9f10e9e96e60c",
+      "findings": [],
+      "kind": "post_merge_release_evidence",
+      "main_parents": [
+        "39ad722c253475bae7acd183bcc5e0688dced3e4"
+      ],
+      "main_sha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "merge_actor": "pcvantol",
+      "merge_strategy": "SQUASH",
+      "originating_pr": {
+        "base_ref": "main",
+        "changed_files": [
+          "docs/rendezvous/TRUSTED_FIXTURE_ORIGINAL_CLOCK_V1.md",
+          "docs/rendezvous/deployment-preparation-v1.json",
+          "docs/rendezvous/trusted-fixture-clock-shared-observations-v1.json",
+          "docs/rendezvous/trusted-fixture-clock-source-delta-v1.json",
+          "qualification/rendezvous/assertion-key-state.check.mjs",
+          "scripts/validate_rendezvous_deployment_plan.py"
+        ],
+        "head_sha": "457771186b03b063409182c64e2f1f7280cea491",
+        "main_changed_files": [
+          "docs/rendezvous/TRUSTED_FIXTURE_ORIGINAL_CLOCK_V1.md",
+          "docs/rendezvous/deployment-preparation-v1.json",
+          "docs/rendezvous/trusted-fixture-clock-shared-observations-v1.json",
+          "docs/rendezvous/trusted-fixture-clock-source-delta-v1.json",
+          "qualification/rendezvous/assertion-key-state.check.mjs",
+          "scripts/validate_rendezvous_deployment_plan.py"
+        ],
+        "merge_actor": "pcvantol",
+        "merge_commit_sha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+        "merge_strategy": "SQUASH",
+        "merged_at": "2026-10-23T17:18:50Z",
+        "number": 144,
+        "state": "MERGED"
+      },
+      "post_merge": {
+        "build_validation": "PASS",
+        "ci": "PASS",
+        "coverage": "PASS",
+        "coverage_artifact_sha": "sha256:e2f87e61dcd58825e6648bc473988d7711198bc4a48aaf2ec3c695342e2cc7d1",
+        "coverage_report_sha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+        "governance": "PASS",
+        "lint": "PASS",
+        "sha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+        "static_analysis": "PASS",
+        "tests": "PASS",
+        "workflow_run_ids": [
+          "39994032757"
+        ]
+      },
+      "pre_merge": {
+        "candidate_sha": "457771186b03b063409182c64e2f1f7280cea491",
+        "owner_authorization": "PASS",
+        "required_checks": "PASS",
+        "risk_classification": "NORMAL_RISK",
+        "software_assurance": "PASS",
+        "trusted_delivery": "PASS",
+        "verification": "PASS",
+        "workflow_integrity": "PASS"
+      },
+      "provenance_result": "PASS",
+      "repository": "pcvantol/djconnect-api",
+      "repository_role": "active_source",
+      "schema_version": 1,
+      "source_qualified_pr_sha": "457771186b03b063409182c64e2f1f7280cea491",
+      "timestamp": "2026-10-23T17:20:34.683Z"
+    },
+    "packaged_files": {
+      "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "LICENSES.sha256": "79e5319d4237848e567444a980611407f370a6246e4b634759443d542b688423",
+      "THIRD_PARTY_NOTICES.md": "6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "d01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442",
+      "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+      "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+      "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+      "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+      "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+      "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+      "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+      "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+      "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+      "package-lock.json": "ecb262a241df4e3d00ff895d2970f65cdbcafd378fafab2a242e1033539805e1",
+      "package.json": "03cc05259272c45fc63baf2d58c6abeac0bf70cd4edf86b119cfa523101e93ae",
+      "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536"
+    },
+    "release_artifact": {
+      "artifact_id": "12519122063",
+      "artifact_sha256": "6c97732d06fc77c6bdd8a45bbdf9440b5c72a9981df7b9d9bb23d62377e2bd72",
+      "candidate_sha": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+      "kind": "api_worker_release_artifact",
+      "repository": "pcvantol/djconnect-api",
+      "schema_version": 1,
+      "timestamp": "2026-10-23T17:20:52Z"
+    },
+    "runs": {
+      "API release artifact": 39994246157,
+      "Post-Merge Release Evidence": 39994246829
+    },
+    "scope": "EXACT_SOURCE_ARTIFACT_FORMAL_NOT_DEPLOYMENT_OR_NATIVE_ACCEPTANCE",
+    "source_main": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+    "worker_bytes": 1322246,
+    "worker_sha256": "a857feb701480ff0db84a80ca9d1e6b52eb3540f1508cf92287f816d6215ab5b"
+  },
+  "worker_runtime_equality": "BYTE_EQUAL runtimea661 after exactsourceSHA substitution only",
+  "retained_failures": {
+    "Final140browserattempt1": "ebe626ac79697e004be5cc328409eea93d574b19d30d74176602b1b634c2a21f",
+    "Final140browserattempt2": "95ad76bc544354dc473394e879ef77358a30d030f497cfd25c1cb48079bff708",
+    "PR141firsthost": "275c525480ed0bfbad13f4b54f42db63924467a76fb3425782bd195d2c157f2d",
+    "main0fadfirsthost": "e0b1c1dc3feddeb7c2bd0b9013f95f05eb0f28cd1fb1dc1057f2f58208691455",
+    "main0fadsecondhost": "c5e00aef25ef86940d90ef4521fa19fc1b4d9e21d7f10f17089682068b41b1e8",
+    "PR142supersededR2host": "225b71d478e7ffc04c66ff8d3fb40c921ab984285b2a5de88eb9c5cfdf2c0e4c"
+  },
+  "known_test_stability_issue": {
+    "status": "OPEN not claimed fixed",
+    "safeCIevidence": "Originalshared1363PASS/1FAIL; SHA069de8b36af38b99cce35800d272c5f1139eb3a9ea73308df44f4f9a75c35139 maps recover-key/set-alarm",
+    "local_original": "1365PASS/types after fixture repair",
+    "local_QA": "1591PASS/types after fixture repair; exact staged input joins",
+    "selected_probe": "80isolatedsamebodyPASS/183othersfilterSKIP_NOTwholequalification",
+    "causal_resolution": "Not established by localPASS or latergreenCI; no sourceclassifier/testoracle changed",
+    "trusted_synthetic_fixture_race": "REPRODUCED_AND_REPAIRED_FIXTURE_ONLY; actual old/new/overlong counterproof; no relaxed runtime policy"
+  },
+  "new_native_clock_blocker": {
+    "status": "OPEN_NONOPERATIVE",
+    "source": "ActualcompiledApple1912 syntheticclockprobe independentlyhashverified",
+    "control_seconds": 28800,
+    "client240sbehind_seconds": 29040,
+    "original_server_seconds": 28800,
+    "context_submit30s": "Stillcapped",
+    "canonical_contract": "PrivateCore/APIoriginalservermonobound/clientpreawaitv3proposals notpublishedwire or sourceGO; UUID/rounding/rate/originalscope proofs pending",
+    "restart_boot_field_history": "SeparateOPENgate"
+  },
+  "public_surface_dispatch": false,
+  "Activity_profiles": [],
+  "legacy_rendezvous_gates": "22_OPEN",
+  "production_effects": "NONE_PERFORMED",
+  "activation_allowed": false,
+  "separate_finalization": "REFRESHED_TWO_DOC_CANDIDATE requires fresh exact reviews/protectedmerge/ownmainevidence/API90receipt",
+  "fixture144": {
+    "candidate": "457771186b03b063409182c64e2f1f7280cea491",
+    "source_main": "e31c29a7d4e4e5258e02c4bf905e4262db1f6373",
+    "scope": "One test helper and actual clock-boundary regression, plus explanatory document; no runtime/config/dependency/locale change",
+    "reviews": {
+      "at": "2026-10-23T17:18:15.566526+00:00",
+      "candidate": "457771186b03b063409182c64e2f1f7280cea491",
+      "tree": "298d1f0dc7ce1b955cb3381c0287062ac17e8ba9",
+      "reviews": [
+        {
+          "path": "/Volumes/Shared Data/tmp/pcvantol/core-window-20261021-12h/api144-4577-root-personal-whole-six-source-review.json",
+          "sha256": "89503445a63b5260471eebf222278d82c4746302b7480843bb2e9b6fa1fbfcf7",
+          "decision": "BOUNDED_WHOLE_SIX_FILE_SOURCE_NO_BLOCKERS"
+        },
+        {
+          "path": "/Volumes/Shared Data/tmp/pcvantol/apple-api144-4577-six-file-review-20261023.json",
+          "sha256": "36570b79d1aaef1151f4cd8490020024aae2da3d73f19587c9376f1ef7366298",
+          "decision": "BOUNDED_SIX_FILE_PREPARATION_NO_BLOCKERS"
+        }
+      ],
+      "scope": "Whole six-file test/proof-binding source only; no runtime/native/provider/activation GO"
+    },
+    "actual_local_qualification": {
+      "original": {
+        "passed": 1365,
+        "types": "PASS",
+        "summary_sha256": "fccdc6273bb587c0bb218b813fef07bceb33faa70580e6e764aa5f0d7f6d860f"
+      },
+      "QA": {
+        "passed": 1591,
+        "types": "PASS",
+        "summary_sha256": "3274b04152d054a504d65bdb9e1f3a855c3d7d5ce63a5b4abca6de98793955d8",
+        "derivation_map_sha256": "868ea38cb06c9c576cbbd9faf9f9fc2b6225504e6604895fae77bee4580a2caf"
+      },
+      "source_join": "exact current test file equals actual original staged source and QA input hash",
+      "runtime": "unchanged tracked runtime/config/dependencies/user-facing files; no redundant product rerun",
+      "locale_review": "en/nl/de/fr/es unchanged",
+      "secret_scan": "no secret values in candidate delta",
+      "paired_counterproof": "fixture-clock-regression-paired-counterproof.json",
+      "full_shared": {
+        "passed": 1571,
+        "types": "PASS",
+        "full_original_summary_path": "/private/tmp/djc-api-fixture-clock-full-shared-20261023/summary-sanitized.json",
+        "full_original_summary_sha256": "42584e8697c2fe1ad91a8cb6afdeae4e97cf6322f5de0c7a6ab1a0090657b566",
+        "source_inputs": 66
+      },
+      "preparation_controls": {
+        "passed": 36,
+        "failures": 0,
+        "duration_seconds": 81.726,
+        "gates": "22_OPEN/activationfalse"
+      }
+    },
+    "paired_counterproof": {
+      "at": "2026-10-23T15:10:35.667009+00:00",
+      "scope": "Actual local workerd/SQLite ReceiptKeyStore with copied exact synthetic fixture constructor; no runtime source change",
+      "source_main": "39ad722c253475bae7acd183bcc5e0688dced3e4",
+      "actual_cases": [
+        {
+          "name": "actual trusted-store fixture original clock boundary old/0",
+          "status": "passed"
+        },
+        {
+          "name": "actual trusted-store fixture original clock boundary old/1",
+          "status": "passed"
+        },
+        {
+          "name": "actual trusted-store fixture original clock boundary single/1",
+          "status": "passed"
+        },
+        {
+          "name": "actual trusted-store fixture original clock boundary overlong/1",
+          "status": "passed"
+        }
+      ],
+      "source_runtime_byte_equal": {
+        "receipt-key-store.ts": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
+        "assertion-key-state.ts": "fa7b29c185c2163e1ec652f6fe2808f9f2d687dfe70ae48572ec4f44ba7dc2e6"
+      },
+      "finding": "Old separate Date.now calls can make challengeExpiresAt-challengeCreatedAt=120001ms with a1ms tick and actual install rejects store_rejected. One original sample yields120000ms accepted. Fixed-sample fixture deliberately enlarged1ms still rejects. Runtime120s gate preserved.",
+      "qualification": "Concrete fixture race reproduced; exact historic CI callback timing not recorded, so no claim of exclusive CI cause or closure of recover-key/set-alarm fault classification.",
+      "results_sha256": "69d789503afdfbc081da7ed7a2a9af10ca7c02ce657947629cc0bdb428c3e3cf",
+      "probe_sha256": "7ff2b1b57132c492c1c35d82e0cc18c388ece1483345183b8ac7fbcbcf6e9eb2",
+      "native_provider_effects": false,
+      "versioned_regression": {
+        "old": {
+          "passed": 0,
+          "failed": 1,
+          "filtered": 203,
+          "sha256": "f04d088928aca42a53473a0b050df2efdb1d408f201976dbc56881233ab3370d"
+        },
+        "new": {
+          "passed": 1,
+          "failed": 0,
+          "filtered": 203,
+          "sha256": "811bc4f283b63908d2718b83b6ae9172ea8a061ea9a3f0c9765330c94d88ac93"
+        }
+      }
+    },
+    "historical_failure": {
+      "at": "2026-10-23T15:08:02.935660+00:00",
+      "run": 39974549604,
+      "candidate": "c37d6fce4e79e71d98857528389706efbb224168",
+      "attempt": 1,
+      "log_sha256": "638919a89c2e37d1cd02db3c3e985991878cfafa0a5f05c9451dcd8f9d5e3623",
+      "original_shared": {
+        "passed": 1364,
+        "failed": 0
+      },
+      "QA_derived": {
+        "passed": 1589,
+        "failed": 1,
+        "case_sha256": "621126f920ec051db9bc14fdcbb89dfeb57ed489e60d45caf70ab6a4a04099c5",
+        "mapped_name": "fixed assertion crypto preserves exact thrown value: verify/1",
+        "actual_locations": [
+          {
+            "file": "assertion-key-state.check.mjs",
+            "line": 160,
+            "column": 31
+          },
+          {
+            "file": "assertion-key-state.check.mjs",
+            "line": 19,
+            "column": 101
+          }
+        ],
+        "classification": "Trusted synthetic storage fixture install .ok was not true, before fault injection or crypto assertion; distinct from earlier recover-key/set-alarm case",
+        "actual_error_code": "NOT_AVAILABLE boolean assertion, no fixed enum in message",
+        "cause": "UNKNOWN; no claim of runtime fault or clock root cause"
+      },
+      "browser": "SUCCESS original job retained",
+      "receiver_HTTP_phase": "NOT_REACHED after QA qualification failure",
+      "action": "One bounded failed-host-job-only retry on same immutable docs-only head, after preserving actual diagnosis; not a source fix and no repeated retries. If it fails, retain HOLD.",
+      "runtime_test_oracle_deadlines": "UNCHANGED",
+      "activation_allowed": false,
+      "single_failed_host_retry": {
+        "attempt": 2,
+        "actual": "SUCCESS",
+        "log_sha256": "dae873c8ac1558b4a2ce18c0a4ae94e13db513027e212fa906fa5e2d294e82ec",
+        "meaning": "Same original c37d source; not a fixture repair or exclusive cause proof. Candidate preserved, refresh required after144."
+      }
+    },
+    "causal_limit": "Reproduced independent timestamp race; exact historical CI samples unavailable, no exclusive historical-cause claim; recover-key/set-alarm remains distinct and OPEN"
+  },
+  "superseded_Final143_R1": {
+    "candidate": "c37d6fce4e79e71d98857528389706efbb224168",
+    "merge_status": "NOT_MERGED; preserved old head and exact review scopes; replaced by refreshed two-document candidate",
+    "candidate_native_browser": "attempt1 QA fixture failure retained; one host-only attempt2 actual SUCCESS, original browser SUCCESS retained",
+    "new_candidate": "Fresh exact reviews required; no R1 review transfer"
+  }
+}
