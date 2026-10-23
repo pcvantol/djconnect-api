@@ -85,13 +85,25 @@
   "finalization_delivery": "THIS_SEPARATE_CANDIDATE_REQUIRES_FRESH_EXACT_REVIEWS_AND_PROTECTED_QUALIFICATION",
   "private_test_host": {
     "browser": "Safari Mac mini https://vibecast.tv/ title VibeCast by DJConnect HTTP200",
-    "ios_simulator": "Apple-owned iPhone17Pro; PasteButton/parser proof PENDING",
+    "ios_simulator": "PASS: actual Apple-owned iPhone17Pro PasteButton/parser UI, one test zero failures/skips",
     "input": "Existing closed eight-key QR JSON through existing PasteButton; separate HA code B unchanged",
     "not_proven": [
       "Safari QR issuance",
       "complete pairing",
       "physical App Attest"
-    ]
+    ],
+    "simulator_receipt_sha256": "baeb68e8d011e84ff02ee811271e341ee610a32f6460688f80201adb6f80f1e5",
+    "simulator_source": "913bf8d5fedd71434d8f2151ffed986cfc362192",
+    "payload_modes": [
+      "syntheticvalid8keyJSON accepted selection visible confirmdisabled unpaired",
+      "URLinvalid rejected selectionabsent",
+      "expired8keyJSON rejected selectionabsent"
+    ],
+    "no_native_or_network_effects": {
+      "native_supported": false,
+      "appattest_calls": 0,
+      "http_calls": 0
+    }
   },
   "provider_zip_digests": {
     "private-main-cb25-release-provider.zip": "fce28dd25764600801faf9d948e3a2aaa2aa47dab1b00c538cc1734f1002bafb",

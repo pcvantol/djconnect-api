@@ -52,9 +52,15 @@ Safari on the Mac mini now loads https://vibecast.tv/ with the actual title
 VibeCast by DJConnect and HTTP200. Apple owns the iPhone17Pro simulator trial.
 Existing PasteButton feeds original eight-key QR JSON to the same parser as the
 scanner; no short-code lookup or new wire was added. Separate HA code B remains.
-The simulator input proof is pending; neither this host setup nor software
-browser fixtures demonstrate real iPhone App Attest, public QR issuance or a
-complete HA/display pairing.
+The actual offline simulator UI trial on Apple source913bf8d5 passed one test,
+zero failures/skips: the real PasteButton accepted fresh synthetic eight-key JSON,
+kept confirmation disabled while unpaired, and rejected a URL and expired JSON.
+The original receipt SHA-256 is
+`baeb68e8d011e84ff02ee811271e341ee610a32f6460688f80201adb6f80f1e5`;
+its five artifact hashes and four original production-source blobs were verified.
+App Attest support was false, with zero App Attest and HTTP calls. Neither this
+UI proof nor browser fixtures demonstrate real iPhone App Attest, Safari-issued
+QR transfer or a complete HA/display pairing.
 
 This separate four-file documentation increment requires fresh exact independent
 reviews, protected merge and its own actual main/formal/durable receipt. It does
