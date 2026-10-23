@@ -1,0 +1,113 @@
+{
+  "source_sha": "cb25b9ef944bbe51b6c27a2615da57e5b57910ca",
+  "tree": "d704852d38cfc5c999032d3b354468bf6c65c39e",
+  "artifact_id": "12499122998",
+  "artifact_run": 39948621072,
+  "artifact_tar_sha256": "7061c716a436667ded2dfcc10740d405146297fc60385780b297cc198b8e21b6",
+  "worker_sha256": "95d4833e6c46bed9aba590e084d84c0a92f5292f8d0f2fb88c1f5e9dab958e56",
+  "formal_run": 39948621548,
+  "formal_decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+  "formal_evidence_digest": "a0ac3584d0a47806e2481e55a631a8a40e4d36d9c7626a8f67b2401357ff333c",
+  "durable_asset_id": 668961337,
+  "durable_sha256": "baa46a362169c93e8bf4e2c1a465e7da869791e1d13d85b0dbecc5ad678eafbe",
+  "durable_canonical_integrity": "PASS",
+  "packaged_original_files": {
+    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+    "package-lock.json": "ecb262a241df4e3d00ff895d2970f65cdbcafd378fafab2a242e1033539805e1",
+    "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+    "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+    "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+    "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+    "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+    "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+    "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+    "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+    "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+    "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+    "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+    "THIRD_PARTY_NOTICES.md": "6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e",
+    "package.json": "03cc05259272c45fc63baf2d58c6abeac0bf70cd4edf86b119cfa523101e93ae",
+    "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "d01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442"
+  },
+  "all_migration_paths_and_bytes_match": true,
+  "license_manifest": "PASS",
+  "native_browser_main": {
+    "run": 39948414607,
+    "conclusion": "SUCCESS",
+    "original_log_sha256": "784a24df24e0dc5928cbba79b7df5b05611f1e799668f7ab3d71701b89800d00",
+    "scope": "Private genuine negatives and software receiver/browser/root qualification; not native-positive or public activation"
+  },
+  "deployment": "NOT_REQUESTED_OR_PERFORMED",
+  "schema_version": 1,
+  "kind": "private_rendezvous_source_finalization",
+  "source_pr": 137,
+  "source_candidate": "f4596bab26158e312be7598681be4e3d8834a7cb",
+  "review_packet_sha256": "ba9327ed1d1d0dedae09b8a28f3b185a7079e4badea84e30dc05647f133509ab",
+  "review_comment": "https://github.com/pcvantol/djconnect-api/pull/137#issuecomment-6364131241",
+  "reviews": {
+    "security_receipt_sha256": "89ca59055e6c2febc25eac13ee5efa77170035937be6d41e68f0608bef1bee42",
+    "consumer_ux_privacy_receipt_sha256": "58a055f692914212a4cc379a157eef4c9019ca0897787290daff6e204a864934",
+    "decisions": "BOUNDED_SOURCE_NO_BLOCKERS",
+    "findings": []
+  },
+  "local_proofs": {
+    "shared_cases": 1570,
+    "composition_cases": 49,
+    "product_checks": 128,
+    "forbidden_rpc_checks": 100,
+    "preparation_negative_controls": 8,
+    "existing_plan_controls": 36,
+    "causal_old_same_selected_cases": {
+      "pass": 1,
+      "fail": 11
+    },
+    "causal_new_same_selected_cases": {
+      "pass": 12,
+      "fail": 0
+    }
+  },
+  "pr_ci": {
+    "run": 39946185917,
+    "attempt1_browser": "CANCELLED dependency-download timeout before browser tests",
+    "attempt2": "SUCCESS",
+    "actual_merge_sha": "b2b644419060fcd5e0d5813961dc6f73ab586720",
+    "tree_equal": true,
+    "scope": "Actual Chromium/WebKit, private workerd negatives, receiver fixture and derived root; no native, HA or physical acceptance"
+  },
+  "activation_allowed": false,
+  "production_source": "c04864ce7c885e0de5fb365aa0139a64c7921b22",
+  "production_unchanged": true,
+  "public_dispatcher": false,
+  "issuer_dispatcher": false,
+  "fixed_qa_admission": null,
+  "native_admission": null,
+  "legacy_full_service_gates": "22 OPEN",
+  "finalization_delivery": "THIS_SEPARATE_CANDIDATE_REQUIRES_FRESH_EXACT_REVIEWS_AND_PROTECTED_QUALIFICATION",
+  "private_test_host": {
+    "browser": "Safari Mac mini https://vibecast.tv/ title VibeCast by DJConnect HTTP200",
+    "ios_simulator": "Apple-owned iPhone17Pro; PasteButton/parser proof PENDING",
+    "input": "Existing closed eight-key QR JSON through existing PasteButton; separate HA code B unchanged",
+    "not_proven": [
+      "Safari QR issuance",
+      "complete pairing",
+      "physical App Attest"
+    ]
+  },
+  "provider_zip_digests": {
+    "private-main-cb25-release-provider.zip": "fce28dd25764600801faf9d948e3a2aaa2aa47dab1b00c538cc1734f1002bafb",
+    "private-main-cb25-artifact-evidence-provider.zip": "86b8fec67c1fcdc1797af6eee6dbe8d1caa8fb8e867289d7e7dc938f52977736",
+    "private-main-cb25-formal-provider.zip": "8c088eb67a1dfd9817c4ad33b29b62080899733866cc1b1c88ba6cd6621d8233"
+  },
+  "provider_zip_integrity": "PASS",
+  "own_main_workflows": {
+    "Validate": 39948414999,
+    "CodeQL": 39948416325,
+    "projection": 39948414554,
+    "fixed_qa": 39948414580,
+    "observe": 39948414510,
+    "native_browser": 39948414607,
+    "release_artifact": 39948621072,
+    "formal": 39948621548
+  },
+  "own_main_workflow_conclusions": "ALL_8_SUCCESS"
+}
