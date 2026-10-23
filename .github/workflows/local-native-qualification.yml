@@ -46,43 +46,58 @@ jobs:
         run: |
           python3 - <<'PY'
           import hashlib, json, os, pathlib, re
-          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'enrollment-policy-qualification-qa-profile'
-          report = {'scope': 'QA_FAILURE_COORDINATES_ONLY', 'phase': 'unavailable', 'failed_cases': []}
-          log = root / 'runner.log'
-          if log.is_file():
-              try:
-                  match = re.search(r'Request admission qualification failed at (staging|types|tests|metadata|summary);', log.read_text())
-                  if match:
-                      report['phase'] = match.group(1)
-              except (OSError, UnicodeError):
-                  report['log_unreadable'] = True
-          results = root / 'workerd/results-private.json'
-          if results.is_file():
-              try:
-                  data = json.loads(results.read_text())
-                  for key in ('numTotalTests', 'numPassedTests', 'numFailedTests', 'numPendingTests'):
-                      value = data.get(key)
-                      if type(value) is int and 0 <= value <= 1000000:
-                          report[key] = value
-                  for file in data.get('testResults', []):
-                      for case in file.get('assertionResults', []):
-                          if case.get('status') == 'failed' and type(case.get('fullName')) is str:
-                              report['failed_cases'].append(hashlib.sha256(case['fullName'].encode()).hexdigest())
-              except (OSError, ValueError, TypeError, AttributeError):
-                  report['results_unreadable'] = True
-          for kind in ('capacity', 'create', 'shared'):
-              for suffix in ('private', 'tests-private'):
-                  path = root / 'workerd' / (kind + '-' + suffix + '.jsonl')
-                  if path.is_file():
-                      try:
-                          rows = [json.loads(line) for line in path.read_text().splitlines()]
-                          if len(rows) <= 1000000 and all(type(row) is dict for row in rows):
-                              report[kind + '_' + suffix + '_rows'] = len(rows)
-                              field = 'task_id' if suffix == 'private' else 'id'
-                              report[kind + '_' + suffix + '_unique_ids'] = len({row[field] for row in rows if type(row.get(field)) is str})
-                      except (OSError, ValueError, TypeError):
-                          report[kind + '_' + suffix + '_unreadable'] = True
-          print(json.dumps(report, sort_keys=True))
+          def report_failure(root, data_root, label):
+              report = {'scope': 'SHARED_WORKER_FAILURE_COORDINATES_ONLY', 'root_kind': label, 'phase': 'unavailable', 'failed_cases': []}
+              log = root / 'runner.log'
+              if log.is_file():
+                  try:
+                      match = re.search(r'Request admission qualification failed at (staging|types|tests|metadata|summary);', log.read_text())
+                      if match:
+                          report['phase'] = match.group(1)
+                  except (OSError, UnicodeError):
+                      report['log_unreadable'] = True
+              results = data_root / 'results-private.json'
+              if results.is_file():
+                  try:
+                      data = json.loads(results.read_text())
+                      for key in ('numTotalTests', 'numPassedTests', 'numFailedTests', 'numPendingTests'):
+                          value = data.get(key)
+                          if type(value) is int and 0 <= value <= 1000000:
+                              report[key] = value
+                      for file in data.get('testResults', []):
+                          for case in file.get('assertionResults', []):
+                              if case.get('status') == 'failed' and type(case.get('fullName')) is str:
+                                  report['failed_cases'].append(hashlib.sha256(case['fullName'].encode()).hexdigest())
+                  except (OSError, ValueError, TypeError, AttributeError):
+                      report['results_unreadable'] = True
+              state = data_root / 'process-state-private.json'
+              if state.is_file():
+                  try:
+                      value = json.loads(state.read_text())
+                      status = value.get('status')
+                      signal = value.get('signal')
+                      if type(status) is int and -255 <= status <= 255:
+                          report['test_process_status'] = status
+                      if signal in (None, 'SIGTERM', 'SIGKILL', 'SIGABRT', 'SIGSEGV'):
+                          report['test_process_signal'] = signal
+                  except (OSError, ValueError, TypeError, AttributeError):
+                      report['process_state_unreadable'] = True
+              for kind in ('capacity', 'create', 'shared'):
+                  for suffix in ('private', 'tests-private'):
+                      path = data_root / (kind + '-' + suffix + '.jsonl')
+                      if path.is_file():
+                          try:
+                              rows = [json.loads(line) for line in path.read_text().splitlines()]
+                              if len(rows) <= 1000000 and all(type(row) is dict for row in rows):
+                                  report[kind + '_' + suffix + '_rows'] = len(rows)
+                                  field = 'task_id' if suffix == 'private' else 'id'
+                                  report[kind + '_' + suffix + '_unique_ids'] = len({row[field] for row in rows if type(row.get(field)) is str})
+                          except (OSError, ValueError, TypeError):
+                              report[kind + '_' + suffix + '_unreadable'] = True
+              print(json.dumps(report, sort_keys=True))
+          base = pathlib.Path(os.environ['RUNNER_TEMP']) / 'enrollment-policy-qualification'
+          report_failure(base, base, 'original_shared')
+          report_failure(pathlib.Path(str(base) + '-qa-profile'), pathlib.Path(str(base) + '-qa-profile') / 'workerd', 'qa_derived')
           PY
   actual-browser-worker:
     runs-on: ubuntu-latest
