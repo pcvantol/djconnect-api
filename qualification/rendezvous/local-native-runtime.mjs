@@ -26,7 +26,12 @@ export async function sourceSnapshot(){
  const checked=spawnSync('python3',['scripts/validate_rendezvous_deployment_plan.py'],{cwd:repo,encoding:'utf8',timeout:30000});
  need(checked.status===0&&JSON.parse(checked.stdout).activation_allowed===false);
  const plan=JSON.parse(await readFile(join(repo,'docs/rendezvous/deployment-preparation-v1.json')));
- const root=JSON.parse(await readFile(join(repo,'docs/rendezvous/closed-issuer-release-build-observations-v1.json')));
+ const rootPath='docs/rendezvous/private-household-build-observations-v1.json';
+ const rootRaw=await readFile(join(repo,rootPath));
+ need(plan.reference_hashes[rootPath]===sha(rootRaw));
+ const root=JSON.parse(rootRaw);
+ // The current immutable proof may add installed bytes, never replace source pins.
+ for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/'))need(plan.source_hashes[name]===pin);
  const pins={...plan.source_hashes,...plan.reference_hashes,...root.source_hashes};
  const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===32);
  await checkSourcePins(pins,repo);
