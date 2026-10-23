@@ -53,6 +53,10 @@ jobs:
           node-version: 26
           cache: npm
       - run: npm ci
+      - name: Bound browser dependency mirror failover
+        run: |
+          python3 -m unittest scripts/test_browser_apt_mirrors.py
+          sudo python3 scripts/prepare_browser_apt_mirrors.py
       - name: Real Chromium and WebKit crypto, QR and cancel against actual API
         run: |
           DJC_BROWSER_RECEIVER_INPUTS="$(mktemp -d)"
