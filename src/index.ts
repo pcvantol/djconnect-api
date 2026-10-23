@@ -7,6 +7,7 @@ import { recordApiDiagnostic } from "./repository";
 import { RELEASE_SOURCE_SHA, RELEASE_VERSION } from "./releaseMetadata";
 import type { AppEnv } from "./types";
 import { dispatchRendezvousRequest } from "./rendezvous/dispatch";
+import { dispatchSurfaceIssuerRequest } from "./surface-push/dispatch";
 
 type RouteHandler = (request: Request, env: AppEnv, ctx: ExecutionContext, url: URL) => Promise<Response>;
 
@@ -65,6 +66,8 @@ const routes: Array<{ method: string; path: string; handler: RouteHandler }> = [
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
+		const issuerUnavailable = await dispatchSurfaceIssuerRequest(request, env);
+		if (issuerUnavailable) return issuerUnavailable;
 		const rendezvousUnavailable = await dispatchRendezvousRequest(request, env);
 		if (rendezvousUnavailable) return rendezvousUnavailable;
 		const appEnv = env as AppEnv;
