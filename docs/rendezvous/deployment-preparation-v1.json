@@ -74,10 +74,10 @@
     "docs/rendezvous/assertion-crypto-shared-observations-v1.json": "d1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b",
     "docs/rendezvous/sharp-0355-composition-observations-v1.json": "d0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531",
     "docs/rendezvous/sharp-0355-build-observations-v1.json": "cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089",
-    "docs/rendezvous/private-household-shared-observations-v1.json": "030fd6fd4546b5eb88d19974a1ff0dd6b8eeae7d0158c77c7e1414eeefb3036e",
+    "docs/rendezvous/trusted-fixture-clock-shared-observations-v1.json": "bbc78b9984d3e984cb322f9732c2c547fb36f573dd21849a13be5973a9b4b6b2",
     "docs/push/surface-runtime-product-observations-v1.json": "c12c554ae95580d1e1de471784c5261bc47581879e9a8aea164c8183d26f5681",
     "docs/push/surface-runtime-rendezvous-module-observations-v1.json": "dc22de8c903920a9022d42185e5ebae4c2b7d248fa6c9669a3dcbbdda1251624",
-    "docs/push/surface-runtime-source-delta-v1.json": "9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a"
+    "docs/rendezvous/trusted-fixture-clock-source-delta-v1.json": "b262e8b82769ce783f03acb58de68f3974b194255c70064ed878e4f6e6c73546"
   },
   "schema_version": 1,
   "secret_names": [
@@ -92,7 +92,7 @@
     "qualification/rendezvous/receipt-key-store.check.ts": "6a2acc17becb471b35ca200b93a5ad064bdb91d43fb300944b8dbf85670bec82",
     "qualification/rendezvous/assertion-key-state.ts": "fa7b29c185c2163e1ec652f6fe2808f9f2d687dfe70ae48572ec4f44ba7dc2e6",
     "qualification/rendezvous/assertion-verifier.d.ts": "53fe57a62d1f00c2ea44c6801b24e79acaaa47d46177629bbf7d81401ba166f1",
-    "qualification/rendezvous/assertion-key-state.check.mjs": "831d5204725876f87cf2f7b734d225a55304f7f4fc1ef9363ec6d0ac7ae1e34c",
+    "qualification/rendezvous/assertion-key-state.check.mjs": "9f730fc3981bb45681f24f57b22df0021ade9c10ba75c55826548bd1ce66fa78",
     "qualification/rendezvous/assertion-state-harness.ts": "bc257394b71a4367e72b99359e44ecb2fc6987a87c05441ce52f8f4f00816c34",
     "qualification/rendezvous/app-attest-core-candidate.mjs": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
     "qualification/rendezvous/worker-path-candidate.mjs": "2ea6e9e1048e81304948b2189dee250269d30c7a18bc35738dfab7a6f8375773",
@@ -206,8 +206,8 @@
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
-    "delta_sha256": "9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a",
-    "effective_source_map_sha256": "8aab40a221501bcf8dc9d072e44c06319f537fe2f3a10744dbaa0d30da2ed6a4",
+    "delta_sha256": "b262e8b82769ce783f03acb58de68f3974b194255c70064ed878e4f6e6c73546",
+    "effective_source_map_sha256": "fed5b9b87d1b3554ec33346ee90a6bc0151dd852dfc7156427ab3270c08010ad",
     "kind": "BASELINE_PLUS_PINNED_DELTA"
   },
   "status": "NOT_AUTHORIZED",

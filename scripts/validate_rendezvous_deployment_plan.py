@@ -10,10 +10,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SUPPLYING_SHA = '896ccdc69447c231d04da3a6af4f27ea1f763697'
 
-DELTA_PATH = 'docs/push/surface-runtime-source-delta-v1.json'
-DELTA_SHA256 = '9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a'
-DELTA_PROOFS = (('docs/rendezvous/private-household-shared-observations-v1.json',
-  '030fd6fd4546b5eb88d19974a1ff0dd6b8eeae7d0158c77c7e1414eeefb3036e',
+DELTA_PATH = 'docs/rendezvous/trusted-fixture-clock-source-delta-v1.json'
+DELTA_SHA256 = 'b262e8b82769ce783f03acb58de68f3974b194255c70064ed878e4f6e6c73546'
+DELTA_PROOFS = (('docs/rendezvous/trusted-fixture-clock-shared-observations-v1.json',
+  'bbc78b9984d3e984cb322f9732c2c547fb36f573dd21849a13be5973a9b4b6b2',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
@@ -27,9 +27,9 @@ DELTA_PROOFS = (('docs/rendezvous/private-household-shared-observations-v1.json'
   'source_sha256',
   19,
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
-DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'src/index.ts', 'src/rendezvous/composition.ts'))
+DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/assertion-key-state.check.mjs', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'src/index.ts', 'src/rendezvous/composition.ts'))
 DELTA_ADDITIONS = frozenset(('src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
-SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': '9cd6e9f201265cc5f62bb4fcd55f70e53a4a60ea866bc20d12caebc4bc111d7a', 'effective_source_map_sha256': '8aab40a221501bcf8dc9d072e44c06319f537fe2f3a10744dbaa0d30da2ed6a4', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
+SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': 'b262e8b82769ce783f03acb58de68f3974b194255c70064ed878e4f6e6c73546', 'effective_source_map_sha256': 'fed5b9b87d1b3554ec33346ee90a6bc0151dd852dfc7156427ab3270c08010ad', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
 PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
   'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',
