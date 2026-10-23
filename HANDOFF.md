@@ -1,3 +1,9 @@
+> Surface purpose issuer successor: [exact source contract and scope](docs/push/SURFACE_ISSUER_SOURCE_V1.md). Internal operator-delegation/challenge/issue/status/withdraw plus grant/source/binding fences; no real approval/credentials/root/provider/native effects. Existing source PRs preserved, interim merge/deploy hold.
+
+> Surface provider authorizer successor: [source scope and evidence](docs/push/SURFACE_PROVIDER_SOURCE_V1.md). ES256/cached JWT plus local WidgetKit/iPhone update/end composition; no real credentials/provider traffic/root admission. PR132/a0ff403 and maintenancePR131 preserved.
+
+> Typed surface-push source candidate: [contract and boundaries](docs/push/SURFACE_PUSH_SOURCE_V1.md). Internal local-D1 register/revoke/event/status component; no public-root routing, capability issuance, real provider adapter, actual Apple content profile or native acceptance. Existing appalerts and PR131 remain unchanged; no deployment/install.
+
 > Fixed QA app/profile source PR129 is protected as `93fdd71a3093ce37d85f92ed55474990aa88775f`; eight actual own-main release workflows and ordinary+QA/formal/durable readbacks passed.
 > [Separate source Finalization](docs/rendezvous/FIXED_QA_APP_PROFILE_FINALIZATION_V1.md) awaits its own fresh reviews and delivery. Historical40408 expired; profile/admission null, guardfalse, all22 gates OPEN, no provider/native effects.
 

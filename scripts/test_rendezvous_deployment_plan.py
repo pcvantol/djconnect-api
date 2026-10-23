@@ -48,7 +48,7 @@ class PreparationTests(unittest.TestCase):
             with patch.object(v, 'ROOT', checkout):
                 self.rejects(self.plan)
             # Install only fixed, verified delta inputs; no fetching PR objects.
-            additions = (*v.DELTA_SOURCES, v.DELTA_PATH,
+            additions = (*v.DELTA_SOURCES, *v.DELTA_ADDITIONS, v.DELTA_PATH,
                          *(record[0] for record in v.DELTA_PROOFS))
             for path in additions:
                 raw = (canonical / path).read_bytes()
@@ -93,7 +93,7 @@ class PreparationTests(unittest.TestCase):
                 if mutation == 'missing':
                     del delta['changes'][name]
                 elif mutation == 'extra':
-                    delta['changes']['src/index.ts'] = delta['changes'][name]
+                    delta['changes']['src/foreign-source.ts'] = delta['changes'][name]
                 elif mutation == 'noop':
                     delta['changes'][name]['after'] = delta['changes'][name]['before']
                 elif mutation == 'before':
@@ -143,12 +143,40 @@ class PreparationTests(unittest.TestCase):
 
     def test_each_current_delta_source_byte_is_verified(self):
         original = Path.read_bytes
-        for name in v.DELTA_SOURCES:
+        for name in v.DELTA_SOURCES | v.DELTA_ADDITIONS:
             with self.subTest(name=name):
                 def changed(path):
                     return b'changed source' if path == v.ROOT / name else original(path)
                 with patch.object(Path, 'read_bytes', changed):
                     self.rejects(self.plan)
+
+    def test_closed_issuer_additions_are_exact_and_cannot_overwrite_baseline(self):
+        delta = self.delta()
+        for name in v.DELTA_ADDITIONS:
+            self.assertNotIn(name, v.immutable_baseline()[0])
+            self.assertIsNone(delta['changes'][name]['before'])
+            for mutation in ('before', 'missing', 'unknown'):
+                changed = copy.deepcopy(delta)
+                if mutation == 'before':
+                    changed['changes'][name]['before'] = 'f' * 64
+                elif mutation == 'missing':
+                    del changed['changes'][name]
+                else:
+                    changed['changes'][name]['grant'] = True
+                self.rejects_changed_proof(v.DELTA_PATH, changed)
+        self.assertEqual(len(self.plan['source_hashes']), 110)
+        for name in v.DELTA_SOURCES:
+            changed = copy.deepcopy(delta)
+            changed['changes'][name]['before'] = None
+            self.rejects_changed_proof(v.DELTA_PATH, changed)
+
+    def test_new_graph_cannot_be_used_as_historical_baseline(self):
+        maps = [v.decode((v.ROOT / name).read_bytes())[field]
+                for name, _pin, field, _count, _scope in v.DELTA_PROOFS]
+        with self.assertRaises(ValueError):
+            v.merge_sources(maps[0], maps[2], maps[1])
+        self.assertEqual(len(v.merge_sources(maps[0], maps[2], maps[1],
+                                           with_closed_issuer=True)), 110)
 
     def test_git_cannot_lazy_fetch_or_prompt(self):
         with patch.object(v.subprocess, 'run') as run:

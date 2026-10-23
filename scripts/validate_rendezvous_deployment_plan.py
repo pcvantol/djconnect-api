@@ -10,30 +10,34 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SUPPLYING_SHA = '896ccdc69447c231d04da3a6af4f27ea1f763697'
 
-DELTA_PATH = 'docs/rendezvous/enrollment-point-digest-source-delta-v1.json'
-DELTA_SHA256 = 'fd97e9a23a8da29cf2c915d233b23eb03897d2ada3b881e72464805a9277ebf2'
+DELTA_PATH = 'docs/rendezvous/closed-issuer-release-source-delta-v1.json'
+DELTA_SHA256 = '0de33e1a540cae3dd1890935b6a52137ccae8f357cbbcbb130a6e27c7a625e02'
 DELTA_PROOFS = (('docs/rendezvous/enrollment-point-digest-shared-observations-v1.json',
   '2bfee77c019a3a70f66de10887ccccc3f00e97e75d42e357bb30660059be8dac',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
- ('docs/rendezvous/enrollment-point-digest-build-observations-v1.json',
-  '2725d99610f66d9724038eeb772ffa24e94d5b1b94443da0eb6bbd4b914062cc',
+ ('docs/rendezvous/closed-issuer-release-build-observations-v1.json',
+  '6db83aade81ced01027733bc6a6ffa70f2ddc9be6eac9611394800061fc2809a',
   'source_hashes',
-  85,
+  89,
   'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
- ('docs/rendezvous/enrollment-point-digest-composition-observations-v1.json',
-  '0e2bc1a993bc7593203fc4be09c34a063524082cbac7631193717b16907d3d46',
+ ('docs/rendezvous/closed-issuer-release-composition-observations-v1.json',
+  '4a4117a2e3197ef27709a09c343e531b869ec889c9a8c5e821710d389a6d048d',
   'source_sha256',
   19,
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
 DELTA_SOURCES = frozenset(('qualification/rendezvous/enrollment-key-state.check.mjs',
  'qualification/rendezvous/enrollment-evidence-candidate.mjs',
  'qualification/rendezvous/enrollment-evidence.check.mjs',
- 'qualification/rendezvous/provider-unavailable.check.mjs'))
+ 'qualification/rendezvous/provider-unavailable.check.mjs',
+ 'package.json', 'package-lock.json', 'src/index.ts'))
+DELTA_ADDITIONS = frozenset(('src/surface-push/wire.ts',
+ 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts',
+ 'src/surface-push/dispatch.ts'))
 SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697',
- 'delta_sha256': 'fd97e9a23a8da29cf2c915d233b23eb03897d2ada3b881e72464805a9277ebf2',
- 'effective_source_map_sha256': '1f35b6e34d31e8a86c8306b1bcfa8983c45ba525e72b02e5d5a9682ed48898a9',
+ 'delta_sha256': '0de33e1a540cae3dd1890935b6a52137ccae8f357cbbcbb130a6e27c7a625e02',
+ 'effective_source_map_sha256': '00f81eb72c7c45c91c5143b4d6629c163abedaa95b3b3ab03b506aadf58613fa',
  'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
 PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
@@ -137,12 +141,12 @@ def safe_path(name):
     return current
 
 
-def merge_sources(shared, module, root):
+def merge_sources(shared, module, root, *, with_closed_issuer=False):
     """Only immutable proof maps define inputs; never discover mutable Git state."""
     sources = {}
     excluded = set()
     for index, recorded in enumerate((shared, module, root)):
-        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 85)[index])
+        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 89 if with_closed_issuer else 85)[index])
         for name, expected in recorded.items():
             require(isinstance(name, str) and isinstance(expected, str)
                     and len(expected) == 64 and all(c in '0123456789abcdef' for c in expected))
@@ -155,7 +159,7 @@ def merge_sources(shared, module, root):
             safe_path(path)
             require(path not in sources or sources[path] == expected)
             sources[path] = expected
-    require(len(excluded) == 32 and len(sources) == 106)
+    require(len(excluded) == 32 and len(sources) == (110 if with_closed_issuer else 106))
     return sources
 
 
@@ -197,12 +201,14 @@ def baseline():
         and delta['baseline_source_sha'] == SUPPLYING_SHA
         and delta['baseline_source_map_sha256'] == source_map_digest(original))
     changes = delta['changes']
-    require(isinstance(changes, dict) and set(changes) == DELTA_SOURCES)
+    require(isinstance(changes, dict) and set(changes) == DELTA_SOURCES | DELTA_ADDITIONS)
     effective = dict(original)
     for name, change in changes.items():
         safe_path(name)
         require(isinstance(change, dict) and set(change) == {'before', 'after'}
-            and change['before'] == original[name] and change['after'] != change['before']
+            and ((name in DELTA_ADDITIONS and name not in original and change['before'] is None)
+                 or (name in DELTA_SOURCES and change['before'] == original[name]))
+            and change['after'] != change['before']
             and isinstance(change['after'], str) and len(change['after']) == 64
             and all(c in '0123456789abcdef' for c in change['after']))
         effective[name] = change['after']
@@ -221,7 +227,7 @@ def baseline():
     installed = lambda values: {key: value for key, value in values.items()
                               if key.startswith('node_modules/')}
     require(installed(fresh[1]) == installed(old_root))
-    require(merge_sources(fresh[0], fresh[2], fresh[1]) == effective)
+    require(merge_sources(fresh[0], fresh[2], fresh[1], with_closed_issuer=True) == effective)
     references[DELTA_PATH] = DELTA_SHA256
     return effective, references
 
