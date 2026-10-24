@@ -75,9 +75,9 @@
     "docs/rendezvous/sharp-0355-composition-observations-v1.json": "d0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531",
     "docs/rendezvous/sharp-0355-build-observations-v1.json": "cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089",
     "docs/rendezvous/compatible-runtime-shared-observations-v4.json": "5bee972aa2bc3a02fe44b8f92543a90d7f1d42791e4aed59490fc7ac855153e0",
-    "docs/rendezvous/compatible-runtime-product-observations-v3.json": "891d6687bc3807cef46bcd607dada422a1c0bbf8ac35ee46ae1cfa80d95c1446",
-    "docs/rendezvous/compatible-runtime-module-observations-v3.json": "d275f7f7eef0f6ff337bc8fccd05819965a8a8f742e7595363a5a4ad875694f8",
-    "docs/rendezvous/compatible-runtime-source-delta-v4.json": "c5f23fd82f518310169f3a62945162d6625348cc128c54843b1f3d284af1926e"
+    "docs/rendezvous/compatible-runtime-product-observations-v4.json": "5662c067ffa4f88bb9567e730922ab57fb466d3e1d149a2f15f5c388627b3436",
+    "docs/rendezvous/compatible-runtime-module-observations-v4.json": "5389556e1ee2ee1e1f1d90af1ac17f3346157121f21df4e031ed23011c9f69b6",
+    "docs/rendezvous/compatible-runtime-source-delta-v5.json": "79d4ee6e074ec648b820c6333fd608ca70f35bb1622df4f238cccc191025c88d"
   },
   "schema_version": 1,
   "secret_names": [
@@ -162,8 +162,8 @@
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
     "rendezvous-build-inputs.json": "af49737535f5e1720d86c4187c3b68743566b2c170040744b9efd7cd618f07ad",
     "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
-    "package.json": "7d8d18a2634474202a9ea46a1dbee9245b1874ad80c49c03bbbd21a267c96e20",
-    "package-lock.json": "e3e129ad16c650df2c1f3be8e92a29b988f72c674aafc7c0017e3f2c46a513ef",
+    "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+    "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
     ".github/workflows/ci-cd.yml": "546ad4495db1fbf8f83489c16cf7e32919525c3fa4e58e69e4e62b61ce5ab82b",
     "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
     "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
@@ -173,7 +173,6 @@
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "vitest.config.mts": "b3a8f1f6beacdfd71836e56f5cfd632cfdef05e70bbbb164d26300e95958fb1e",
     "scripts/qualify_rendezvous_product_build.mjs": "b862f1ecd959b439af936c6d514fb5d9bca6d52fdcd0621770f896d0f8e1234b",
-    "qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json": "c709f629e3615600977c2c0b088e07121d3e1d9b7f6c383d6bbb512810ee5541",
     "src/messages.ts": "980ab421315143a27ca1e3605310fd043779fe0e175ef0e0d9f7844f5eeadb79",
     "src/http.ts": "3828f75c474dd5dcab4d5804cbcb48b129bfda684a32ff5261123e50914cbc5f",
     "src/repositories/apiDiagnostics.ts": "cbc357a51c1b140b32de601fb66a9bf5bcaed39369daa84cbdb0fc7f117c950f",
@@ -194,6 +193,7 @@
     "src/services/pushDelivery.ts": "d83fd7a13494fbd899a50b1f221ff6adda395ccd18fc29f3577678280a54fe53",
     "src/handlers/push.ts": "2129513a9c3e3c2d1075ad786370bdbbe655bdfcd0d33e4a6c16d2095dd726fd",
     "src/releaseMetadata.ts": "f3a5f8129c0acf4ab41a463b326e412e6b2da8b73edcb7dbea6cd0c9ee1cca69",
+    "qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json": "c709f629e3615600977c2c0b088e07121d3e1d9b7f6c383d6bbb512810ee5541",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8",
     "src/surface-push/issuer.ts": "0ea6654a7fff5db40f14f7ec439b064191611510a5b2db162a3e796e746e887d",
@@ -207,8 +207,8 @@
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
-    "delta_sha256": "c5f23fd82f518310169f3a62945162d6625348cc128c54843b1f3d284af1926e",
-    "effective_source_map_sha256": "1579fae6ad1e03907c747516883e7aeef68404026501170e090b8bca0bc53b24",
+    "delta_sha256": "79d4ee6e074ec648b820c6333fd608ca70f35bb1622df4f238cccc191025c88d",
+    "effective_source_map_sha256": "a9f3dcb45b4a5d98862e10d99d3112abd1ddd6c64b31b032424fcccd714cf6a7",
     "kind": "BASELINE_PLUS_PINNED_DELTA"
   },
   "status": "NOT_AUTHORIZED",
