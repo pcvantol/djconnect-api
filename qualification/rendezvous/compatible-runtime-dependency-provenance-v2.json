@@ -1,0 +1,73 @@
+{
+  "scope": "PUBLIC_SOFTWARE_PROVENANCE_ONLY",
+  "kind": "EXACT_COMPATIBLE_RUNTIME_DEPENDENCY_SUCCESSOR",
+  "base_source": "8c77962ffb5975117f1c8b5bae3453389d28568d",
+  "dependency_lock_sha256": "9b0aebbdd761facd33da545660e60ea8d71ee01c8fd5353aef26a559b632f0de",
+  "packages": [
+    {
+      "path": "node_modules/@noble/hashes",
+      "version": "1.8.0",
+      "integrity": "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="
+    },
+    {
+      "path": "node_modules/asn1js",
+      "version": "3.1.0",
+      "integrity": "sha512-HWYi1THkOqguCiO+vwj09ZkQFD2kKEsejYHAYCtX0D80WVdoDnvRc9IukXX/jeb0T9NRWJnRtqwdbHltnFjwXA=="
+    },
+    {
+      "path": "node_modules/bytestreamjs",
+      "version": "2.0.1",
+      "integrity": "sha512-U1Z/ob71V/bXfVABvNr/Kumf5VyeQRBEm6Txb0PQ6S7V5GpBM3w4Cbqz/xPDicR5tN0uvDifng8C+5qECeGwyQ=="
+    },
+    {
+      "path": "node_modules/cbor",
+      "version": "10.0.12",
+      "integrity": "sha512-exQDevYd7ZQLP4moMQcZkKCVZsXLAtUSflObr3xTh4xzFIv/xBCdvCd6L259kQOUP2kcTC0jvC6PpZIf/WmRXA=="
+    },
+    {
+      "path": "node_modules/nofilter",
+      "version": "3.1.0",
+      "integrity": "sha512-l2NNj07e9afPnhAhvgVrCD/oy2Ai1yfLpuo3EpiO1jFTsB4sFz6oIfAfSZyQzVpkZQ9xS8ZS5g1jCBgq4Hwo0g=="
+    },
+    {
+      "path": "node_modules/pkijs",
+      "version": "3.4.2",
+      "integrity": "sha512-LIy5RqLEzlliax2ANQNWvDLvhJ2CtlpJahiSvKtXnpMdKHhXXoLdpdnWqae/uaTyF3U5l5ARweW0kZp9B0s2VA=="
+    },
+    {
+      "path": "node_modules/pvtsutils",
+      "version": "1.3.6",
+      "integrity": "sha512-PLgQXQ6H2FWCaeRak8vvk1GW462lMxB5s3Jm673N82zI4vqtVUPuZdffdZbPDFRoU8kAhItWFtPCWiPpp4/EDg=="
+    },
+    {
+      "path": "node_modules/pvutils",
+      "version": "1.2.0",
+      "integrity": "sha512-BbubeCEyTuQjVMakvJQ/Sxbc93F2pwmbsxONT/ZRrwU7Ua38d8unYTwXpTVLAKJ4BDuH9IGztCjQcd/N/39Dvg=="
+    },
+    {
+      "path": "node_modules/tslib",
+      "version": "2.8.1",
+      "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
+    }
+  ],
+  "changed_artifact": {
+    "name": "pkijs",
+    "version": "3.4.2",
+    "npm_integrity": "sha512-LIy5RqLEzlliax2ANQNWvDLvhJ2CtlpJahiSvKtXnpMdKHhXXoLdpdnWqae/uaTyF3U5l5ARweW0kZp9B0s2VA==",
+    "archive_files_sha256": {
+      "LICENSE": "d27a2aa238102924ea75da808f79253484347d824b9b7b077837e4232f9493f5",
+      "build/index.es.js": "0a521f0565059b7854c891a865b1cd93158dcd468835371a5487b48e1b97e5d2",
+      "build/index.js": "af0c7e2946796d269bb8745e3d64cdecdea67429c6f2e81fc1daf39aa797eb2d",
+      "package.json": "35e1f5a973e47e5e1512605d30cffb45e07f21866c054df4a50a4297e9ea5307",
+      "README.md": "96a4f356ed7702878945c6aa0e61e51528f119587806fcafa5c0f3f728fdaff7",
+      "build/index.d.ts": "6e215007eac827c9f252e369f33917fd831adf921559fe7e75773e30c21fed39"
+    },
+    "source_build_equivalence": "NOT_PROVEN; exact official npm archive matches installed bytes"
+  },
+  "unchanged_provenance": {
+    "dependency-provenance-v1.json": "59279d2dc3f602dc86388874f17d140b408f2cfb7c08ee315ce87df6452815ff",
+    "core-dependency-provenance-v1.json": "3a707ed5efc2c19429d45ed3a785751d90cb39b6bae79abd2bef7d1dff424f9d"
+  },
+  "asn1_major": "3.1.0 retained; no second ASN.1 major in runtime dependency graph",
+  "no_activation": true
+}

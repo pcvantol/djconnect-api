@@ -1,0 +1,25 @@
+# Compatible runtime dependency maintenance
+
+Source successor to dependency PR145, based on protected main8c77962ffb5975117f1c8b5bae3453389d28568d (including the separate setup-python update). PKI.js3.4.1 becomes3.4.2 and Wrangler4.151.0 becomes4.151.3. ASN.1 remains exactly3.1.0; no new dependency override, install-script permission, Worker configuration, migration, native profile or runtime gate is introduced.
+
+## Actual incompatible candidate and bounded correction
+
+The original bot candidate56c78ae installs top-level asn1js4.0.0 while PKI.js3.4.2 requires and installs its own asn1js3.1.0. The existing CMS receipt verifier intentionally checks parsed extension values against the imported ASN.1 classes. In an isolated exact-lock install without scripts, a valid synthetic KeyUsage extension decoded by PKI.js is a BitString of its own ASN.1 major, but fails the existing top-level BitString instanceof predicate. The protected-base control and the compatible3.1.0/3.4.2 candidate both satisfy that same predicate. No certificate acceptance predicate is weakened to accommodate the mixed graph.
+
+Original CI40070686240 separately rejected changed package bytes against the immutable source plan;40070686547 stopped product qualification at preparation. The original browser result also failed and its exclusive cause is not established by those failures. No failed run is retried unchanged or described as passing. This maintenance therefore requires genuinely new source/dependency observations rather than replacing the old hashes blindly.
+
+The official PKI.js3.4.2 npm archive matches its registry/lock SHA512 integrity and all six installed package files. The new compatible-runtime-dependency-provenance-v2.json binds all nine original transitive runtime package versions/integrities and the actual changed archive files. The two historical provenance records and all historical shared/product/module evidence remain byte-unchanged. Npm ci uses ignore-scripts; the actual runtime-only audit reports zero vulnerabilities, not an all-toolchain audit or GitHub alert-closure claim.
+
+## New qualification and immutable evidence
+
+Actual fresh local results on this dependency graph:229 API/surface cases with coverage and strict root/surface types;49 rendezvous composition cases with dedicated strict types;1571 full shared crypto/state/framing cases with isolated strict types;128 real compiled-product checks including100 forbidden RPCs rejected and no egress;1591 actual fixed-QA derivative cases with strict types. The historical40408 software profile remains historical and does not acquire a new native admission.
+
+The source package retains the original106-input896ccdc baseline and explicitly derives117 tracked inputs with26 pinned cumulative changes,66 shared inputs,96 root inputs and19 module inputs. The extra tracked input is the new versioned dependency provenance. All32 installed inputs remain accounted for; exactly node_modules/pkijs/build/index.es.js may change from its pinned original hash to the independently matched patch hash. Every other installed hash remains equal. The validator rejects an unlisted installed change or a forged original hash; missing/extra/noop/foreign-source negative controls remain required. All22 service gates remain OPEN and activation_allowed remainsfalse.
+
+Preliminary proof assembly rejected an incorrect module/path normalization. The first36-case preparation run subsequently failed one stale116-input expectation after the deliberate117-input graph addition. These attempts are retained as failures/interruption, not PASS. The corrected complete preparation run and its two additional installed-input negatives must actually finish before final qualification. Exact committed local120-second window/private40381 negative checks and CI/independent source reviews attach separately; no result is predicted by this source document.
+
+## Delivery and operational boundary
+
+The prior source/final receipts qualify their original SHAs only. This maintenance needs its own exact reviews, normal protected delivery, own-main release artifact/formal/durable readback and separate Finalization. Only afterward may the owning Core writer bind the actual final source/artifact/TAR and current rollback into a new central operational manifest. Existing direct human production authority does not bypass those joins.
+
+Public surface dispatch and rendezvous/fixed-QA admission remain compiled closed; actual Activity profiles remain empty. Core/Apple original-purpose clock repair, actual Activity content/export/display rights, signer/operator enrollment, device/HA/receiver acceptance and all native/provider effects remain separate. No real key, real token, provider traffic, database mutation, production deployment or remote Activity start is performed by this source increment.

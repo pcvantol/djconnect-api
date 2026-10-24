@@ -10,26 +10,27 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SUPPLYING_SHA = '896ccdc69447c231d04da3a6af4f27ea1f763697'
 
-DELTA_PATH = 'docs/rendezvous/trusted-fixture-clock-source-delta-v1.json'
-DELTA_SHA256 = 'b262e8b82769ce783f03acb58de68f3974b194255c70064ed878e4f6e6c73546'
-DELTA_PROOFS = (('docs/rendezvous/trusted-fixture-clock-shared-observations-v1.json',
-  'bbc78b9984d3e984cb322f9732c2c547fb36f573dd21849a13be5973a9b4b6b2',
+DELTA_PATH = 'docs/rendezvous/compatible-runtime-source-delta-v2.json'
+DELTA_SHA256 = 'aedacf5a90d2afea96700beb4f75faca84667d96799f0a926c88fdb4482815b7'
+DELTA_PROOFS = (('docs/rendezvous/compatible-runtime-shared-observations-v2.json',
+  '511344684dfa6da59cbfe071ffc62e6297aaeb4652d36f60cb2e1dc7d338d444',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
- ('docs/push/surface-runtime-product-observations-v1.json',
-  'c12c554ae95580d1e1de471784c5261bc47581879e9a8aea164c8183d26f5681',
+ ('docs/rendezvous/compatible-runtime-product-observations-v2.json',
+  'a66cf07a903eced40c4c3bd917ab5287b50bd026057919fc7610028d5993cad0',
   'source_hashes',
-  95,
+  96,
   'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
- ('docs/push/surface-runtime-rendezvous-module-observations-v1.json',
-  'dc22de8c903920a9022d42185e5ebae4c2b7d248fa6c9669a3dcbbdda1251624',
+ ('docs/rendezvous/compatible-runtime-module-observations-v2.json',
+  'cb27c06ac9e99d02864cd91149ae04dd1c53f8620b5c37dda1b90162f71cd183',
   'source_sha256',
   19,
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
-DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/assertion-key-state.check.mjs', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'src/index.ts', 'src/rendezvous/composition.ts'))
-DELTA_ADDITIONS = frozenset(('src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
-SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': 'b262e8b82769ce783f03acb58de68f3974b194255c70064ed878e4f6e6c73546', 'effective_source_map_sha256': 'fed5b9b87d1b3554ec33346ee90a6bc0151dd852dfc7156427ab3270c08010ad', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
+DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/assertion-key-state.check.mjs', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs', 'src/index.ts', 'src/rendezvous/composition.ts'))
+DELTA_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v2.json', 'src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
+INSTALLED_DEPENDENCY_DELTA = {'node_modules/pkijs/build/index.es.js': {'before': '5f5c08540929f01ee75373b9f317753aeb6a7239241658473bb37826e2f85a50', 'after': '0a521f0565059b7854c891a865b1cd93158dcd468835371a5487b48e1b97e5d2'}}
+SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': 'aedacf5a90d2afea96700beb4f75faca84667d96799f0a926c88fdb4482815b7', 'effective_source_map_sha256': '2d046caae0928d11cf193cdc908a4acc1ceaa12de9f6e6e736841e743578aba9', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
 PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
   'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',
@@ -137,7 +138,7 @@ def merge_sources(shared, module, root, *, with_closed_issuer=False):
     sources = {}
     excluded = set()
     for index, recorded in enumerate((shared, module, root)):
-        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 95 if with_closed_issuer else 85)[index])
+        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 96 if with_closed_issuer else 85)[index])
         for name, expected in recorded.items():
             require(isinstance(name, str) and isinstance(expected, str)
                     and len(expected) == 64 and all(c in '0123456789abcdef' for c in expected))
@@ -150,7 +151,7 @@ def merge_sources(shared, module, root, *, with_closed_issuer=False):
             safe_path(path)
             require(path not in sources or sources[path] == expected)
             sources[path] = expected
-    require(len(excluded) == 32 and len(sources) == (116 if with_closed_issuer else 106))
+    require(len(excluded) == 32 and len(sources) == (117 if with_closed_issuer else 106))
     return sources
 
 
@@ -217,7 +218,15 @@ def baseline():
     old_root = decode(blob(PROOFS[2][0]))[PROOFS[2][2]]
     installed = lambda values: {key: value for key, value in values.items()
                               if key.startswith('node_modules/')}
-    require(installed(fresh[1]) == installed(old_root))
+    expected_installed = dict(installed(old_root))
+    # Only this separately verified PKI patch may replace one original installed input.
+    require(set(INSTALLED_DEPENDENCY_DELTA) == {'node_modules/pkijs/build/index.es.js'})
+    for name, change in INSTALLED_DEPENDENCY_DELTA.items():
+        require(set(change) == {'before', 'after'} and expected_installed.get(name) == change['before']
+            and change['before'] != change['after'] and isinstance(change['after'], str)
+            and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        expected_installed[name] = change['after']
+    require(installed(fresh[1]) == expected_installed)
     require(merge_sources(fresh[0], fresh[2], fresh[1], with_closed_issuer=True) == effective)
     references[DELTA_PATH] = DELTA_SHA256
     return effective, references

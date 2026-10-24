@@ -26,7 +26,7 @@ export async function sourceSnapshot(){
  const checked=spawnSync('python3',['scripts/validate_rendezvous_deployment_plan.py'],{cwd:repo,encoding:'utf8',timeout:30000});
  need(checked.status===0&&JSON.parse(checked.stdout).activation_allowed===false);
  const plan=JSON.parse(await readFile(join(repo,'docs/rendezvous/deployment-preparation-v1.json')));
- const rootPath='docs/push/surface-runtime-product-observations-v1.json';
+ const rootPath='docs/rendezvous/compatible-runtime-product-observations-v2.json';
  const rootRaw=await readFile(join(repo,rootPath));
  need(plan.reference_hashes[rootPath]===sha(rootRaw));
  const root=JSON.parse(rootRaw);
