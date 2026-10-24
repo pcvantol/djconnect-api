@@ -10,10 +10,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SUPPLYING_SHA = '896ccdc69447c231d04da3a6af4f27ea1f763697'
 
-DELTA_PATH = 'docs/rendezvous/compatible-runtime-source-delta-v2.json'
-DELTA_SHA256 = 'aedacf5a90d2afea96700beb4f75faca84667d96799f0a926c88fdb4482815b7'
-DELTA_PROOFS = (('docs/rendezvous/compatible-runtime-shared-observations-v2.json',
-  '511344684dfa6da59cbfe071ffc62e6297aaeb4652d36f60cb2e1dc7d338d444',
+DELTA_PATH = 'docs/rendezvous/compatible-runtime-source-delta-v3.json'
+DELTA_SHA256 = '0fe4663154cfebb311bbbd31169085465c703cccd700180d53164c88f5a0cfe4'
+DELTA_PROOFS = (('docs/rendezvous/compatible-runtime-shared-observations-v3.json',
+  '95d58b142a9cdfd3f8b537a7f6643eb9ebe349d236783628fb4d3d05fba1a54c',
   'source_sha256',
   66,
   'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
@@ -27,11 +27,11 @@ DELTA_PROOFS = (('docs/rendezvous/compatible-runtime-shared-observations-v2.json
   'source_sha256',
   19,
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
-DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/assertion-key-state.check.mjs', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs', 'src/index.ts', 'src/rendezvous/composition.ts'))
+DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/assertion-key-state.check.mjs', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/run_challenge_budget_workerd.mjs', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs', 'src/index.ts', 'src/rendezvous/composition.ts'))
 DELTA_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v2.json', 'src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
 REFERENCE_DELTA = {'THIRD_PARTY_NOTICES.md': {'before': '6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e', 'after': '45352df32785a2e44c173ea1350dab839dd01a4296011cf9bcac1f906f80561b'}, 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md': {'before': 'd01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442', 'after': '1a7db9d1fbbd6be80a5b1653d963cef8e44cb8faea0c8a58dfc6014c41c966f0'}}
 INSTALLED_DEPENDENCY_DELTA = {'node_modules/pkijs/build/index.es.js': {'before': '5f5c08540929f01ee75373b9f317753aeb6a7239241658473bb37826e2f85a50', 'after': '0a521f0565059b7854c891a865b1cd93158dcd468835371a5487b48e1b97e5d2'}}
-SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': 'aedacf5a90d2afea96700beb4f75faca84667d96799f0a926c88fdb4482815b7', 'effective_source_map_sha256': '2d046caae0928d11cf193cdc908a4acc1ceaa12de9f6e6e736841e743578aba9', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
+SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': '0fe4663154cfebb311bbbd31169085465c703cccd700180d53164c88f5a0cfe4', 'effective_source_map_sha256': '808aaa60ed2cf4f263c3fd16d669a518c54512a324d9fdda9db61754f094732d', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
 PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
   'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',

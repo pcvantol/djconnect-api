@@ -74,10 +74,10 @@
     "docs/rendezvous/assertion-crypto-shared-observations-v1.json": "d1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b",
     "docs/rendezvous/sharp-0355-composition-observations-v1.json": "d0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531",
     "docs/rendezvous/sharp-0355-build-observations-v1.json": "cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089",
-    "docs/rendezvous/compatible-runtime-shared-observations-v2.json": "511344684dfa6da59cbfe071ffc62e6297aaeb4652d36f60cb2e1dc7d338d444",
+    "docs/rendezvous/compatible-runtime-shared-observations-v3.json": "95d58b142a9cdfd3f8b537a7f6643eb9ebe349d236783628fb4d3d05fba1a54c",
     "docs/rendezvous/compatible-runtime-product-observations-v2.json": "a66cf07a903eced40c4c3bd917ab5287b50bd026057919fc7610028d5993cad0",
     "docs/rendezvous/compatible-runtime-module-observations-v2.json": "cb27c06ac9e99d02864cd91149ae04dd1c53f8620b5c37dda1b90162f71cd183",
-    "docs/rendezvous/compatible-runtime-source-delta-v2.json": "aedacf5a90d2afea96700beb4f75faca84667d96799f0a926c88fdb4482815b7"
+    "docs/rendezvous/compatible-runtime-source-delta-v3.json": "0fe4663154cfebb311bbbd31169085465c703cccd700180d53164c88f5a0cfe4"
   },
   "schema_version": 1,
   "secret_names": [
@@ -141,7 +141,7 @@
     "qualification/rendezvous/provider-unavailable.check.mjs": "9102e3f587efd77e17fe19212d02cfc9e6d4e93df66e8e3eadd4f2b5b31e68b5",
     "qualification/rendezvous/run_provider_unavailable_workerd.mjs": "2b1161ed65db3a30ccffb3a541e4de6d72b23a0dc8029b83a93bdcc2135bf98a",
     "qualification/rendezvous/challenge-budget.check.mjs": "769eaa07fc9660a95c2d72e8e0e95feee8cbc2cf71bdd7356ffc5ad75d244e35",
-    "qualification/rendezvous/run_challenge_budget_workerd.mjs": "da97ee84cb04663f5ed2df1ce859e51a80f43d9edcc864659be13f36a89fc2a7",
+    "qualification/rendezvous/run_challenge_budget_workerd.mjs": "183f0c0c8037d37970e36f6ad6478f6957eff0c9bd4511328741beefc50d5641",
     "qualification/rendezvous/partition-capacity.check.mjs": "c686ad7cc4f9c78d5d1508880b87ff49bc41b0bef687e6150a54a82429856ce4",
     "qualification/rendezvous/run_shared_key_workerd.mjs": "f9a37a667705d32e104813a04a0df6eaea3bd69e497b2b5ab4c89f58fc8fb8d9",
     "qualification/rendezvous/admission-partitions.check.mjs": "c73f8b37dfef991c71bf103e09c2d954c02ac6063df88fdfe4c9c196998525de",
@@ -207,8 +207,8 @@
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
-    "delta_sha256": "aedacf5a90d2afea96700beb4f75faca84667d96799f0a926c88fdb4482815b7",
-    "effective_source_map_sha256": "2d046caae0928d11cf193cdc908a4acc1ceaa12de9f6e6e736841e743578aba9",
+    "delta_sha256": "0fe4663154cfebb311bbbd31169085465c703cccd700180d53164c88f5a0cfe4",
+    "effective_source_map_sha256": "808aaa60ed2cf4f263c3fd16d669a518c54512a324d9fdda9db61754f094732d",
     "kind": "BASELINE_PLUS_PINNED_DELTA"
   },
   "status": "NOT_AUTHORIZED",
