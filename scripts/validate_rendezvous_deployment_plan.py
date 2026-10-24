@@ -29,6 +29,7 @@ DELTA_PROOFS = (('docs/rendezvous/compatible-runtime-shared-observations-v2.json
   'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
 DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/assertion-key-state.check.mjs', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs', 'src/index.ts', 'src/rendezvous/composition.ts'))
 DELTA_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v2.json', 'src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
+REFERENCE_DELTA = {'THIRD_PARTY_NOTICES.md': {'before': '6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e', 'after': '45352df32785a2e44c173ea1350dab839dd01a4296011cf9bcac1f906f80561b'}, 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md': {'before': 'd01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442', 'after': '1a7db9d1fbbd6be80a5b1653d963cef8e44cb8faea0c8a58dfc6014c41c966f0'}}
 INSTALLED_DEPENDENCY_DELTA = {'node_modules/pkijs/build/index.es.js': {'before': '5f5c08540929f01ee75373b9f317753aeb6a7239241658473bb37826e2f85a50', 'after': '0a521f0565059b7854c891a865b1cd93158dcd468835371a5487b48e1b97e5d2'}}
 SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': 'aedacf5a90d2afea96700beb4f75faca84667d96799f0a926c88fdb4482815b7', 'effective_source_map_sha256': '2d046caae0928d11cf193cdc908a4acc1ceaa12de9f6e6e736841e743578aba9', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
 
@@ -228,6 +229,13 @@ def baseline():
         expected_installed[name] = change['after']
     require(installed(fresh[1]) == expected_installed)
     require(merge_sources(fresh[0], fresh[2], fresh[1], with_closed_issuer=True) == effective)
+    # Version-label updates retain the unchanged license texts, with exact supplier fences.
+    require(set(REFERENCE_DELTA) == {'THIRD_PARTY_NOTICES.md', 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md'})
+    for name, change in REFERENCE_DELTA.items():
+        require(set(change) == {'before', 'after'} and references.get(name) == change['before']
+            and change['before'] != change['after'] and isinstance(change['after'], str)
+            and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        references[name] = change['after']
     references[DELTA_PATH] = DELTA_SHA256
     return effective, references
 

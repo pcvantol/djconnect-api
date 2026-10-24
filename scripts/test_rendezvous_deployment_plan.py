@@ -48,7 +48,7 @@ class PreparationTests(unittest.TestCase):
             with patch.object(v, 'ROOT', checkout):
                 self.rejects(self.plan)
             # Install only fixed, verified delta inputs; no fetching PR objects.
-            additions = (*v.DELTA_SOURCES, *v.DELTA_ADDITIONS, v.DELTA_PATH,
+            additions = (*v.DELTA_SOURCES, *v.DELTA_ADDITIONS, *v.REFERENCE_DELTA, v.DELTA_PATH,
                          *(record[0] for record in v.DELTA_PROOFS))
             for path in additions:
                 raw = (canonical / path).read_bytes()
@@ -353,6 +353,16 @@ class PreparationTests(unittest.TestCase):
         changed[name]['before'] = 'f' * 64
         with patch.object(v, 'INSTALLED_DEPENDENCY_DELTA', changed):
             self.rejects(self.plan)
+
+    def test_version_label_delta_cannot_replace_an_authority_reference(self):
+        for mutation in ('unlisted', 'forged-original'):
+            changed = copy.deepcopy(v.REFERENCE_DELTA)
+            if mutation == 'unlisted':
+                changed['wrangler.jsonc'] = {'before': self.plan['reference_hashes']['wrangler.jsonc'], 'after': 'f' * 64}
+            else:
+                changed['THIRD_PARTY_NOTICES.md']['before'] = 'f' * 64
+            with patch.object(v, 'REFERENCE_DELTA', changed):
+                self.rejects(self.plan)
 
 
 if __name__ == '__main__':

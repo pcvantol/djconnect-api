@@ -60,7 +60,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-## pkijs 3.4.1 (BSD-3-Clause)
+## pkijs 3.4.2 (BSD-3-Clause)
 
 Copyright (c) 2014, GlobalSign
 Copyright (c) 2015-2019, Peculiar Ventures
