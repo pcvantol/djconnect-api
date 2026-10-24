@@ -48,7 +48,7 @@ async function main(){
 	const pkg=await load('package.json'),lock=await load('package-lock.json');
 	assert.deepEqual(pkg.dependencies,inputs.dependencies);
 	for(const [name,version] of Object.entries(inputs.dependencies))assert.equal(lock.packages['node_modules/'+name].version,version);
-	for(const file of ['dependency-provenance-v1.json','core-dependency-provenance-v1.json']){
+	for(const file of ['compatible-runtime-dependency-provenance-v2.json']){
 		const provenance=await load('qualification/rendezvous/'+file);
 		for(const p of provenance.packages){
 			assert.equal(lock.packages[p.path]?.version,p.version);
@@ -56,7 +56,7 @@ async function main(){
 		}
 	}
 	const sources={};
-	for(const file of ['src/index.ts','src/rendezvous/perimeter.ts','src/rendezvous/coordinators.ts','src/rendezvous/trust.ts','package.json','package-lock.json','wrangler.jsonc','tsconfig.json','vitest.config.mts','rendezvous-build-inputs.json','scripts/qualify_rendezvous_product_build.mjs'])sources[file]=sha(await readFile(join(repo,file)));
+	for(const file of ['src/index.ts','src/rendezvous/perimeter.ts','src/rendezvous/coordinators.ts','src/rendezvous/trust.ts','package.json','package-lock.json','wrangler.jsonc','tsconfig.json','vitest.config.mts','rendezvous-build-inputs.json','scripts/qualify_rendezvous_product_build.mjs','qualification/rendezvous/compatible-runtime-dependency-provenance-v2.json'])sources[file]=sha(await readFile(join(repo,file)));
 	phase='actual-product-dry-run';
 	const built=spawnSync(process.execPath,[join(repo,'node_modules/wrangler/bin/wrangler.js'),'deploy','--dry-run','--outdir',output,'--metafile',join(output,'metafile.json')],{cwd:repo,encoding:'utf8'});
 	await writeFile(join(output,'private-build.log'),built.stdout+built.stderr,{mode:0o600});

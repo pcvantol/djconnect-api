@@ -39,7 +39,7 @@ Their licenses and copyrights remain with their respective authors and
 contributors.
 
 The compiled, publicly disabled rendezvous candidate also bundles exactly pinned
-`cbor`10.0.12 (MIT), `asn1js`3.1.0 and `pkijs`3.4.1 (BSD-3-Clause), plus their
+`cbor`10.0.12 (MIT), `asn1js`3.1.0 and `pkijs`3.4.2 (BSD-3-Clause), plus their
 locked transitive dependencies. Unmodified licence texts and copyright notices
 are retained in [rendezvous dependency licences](docs/rendezvous/THIRD_PARTY_LICENSES_V1.md).
 The public Apple trust anchors are certificate data, not authentication secrets.

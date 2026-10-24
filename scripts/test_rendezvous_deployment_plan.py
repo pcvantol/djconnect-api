@@ -48,7 +48,7 @@ class PreparationTests(unittest.TestCase):
             with patch.object(v, 'ROOT', checkout):
                 self.rejects(self.plan)
             # Install only fixed, verified delta inputs; no fetching PR objects.
-            additions = (*v.DELTA_SOURCES, *v.DELTA_ADDITIONS, v.DELTA_PATH,
+            additions = (*v.DELTA_SOURCES, *v.DELTA_ADDITIONS, *v.REFERENCE_DELTA, v.DELTA_PATH,
                          *(record[0] for record in v.DELTA_PROOFS))
             for path in additions:
                 raw = (canonical / path).read_bytes()
@@ -164,7 +164,7 @@ class PreparationTests(unittest.TestCase):
                 else:
                     changed['changes'][name]['grant'] = True
                 self.rejects_changed_proof(v.DELTA_PATH, changed)
-        self.assertEqual(len(self.plan['source_hashes']), 116)
+        self.assertEqual(len(self.plan['source_hashes']), 117)
         for name in v.DELTA_SOURCES:
             changed = copy.deepcopy(delta)
             changed['changes'][name]['before'] = None
@@ -176,7 +176,7 @@ class PreparationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             v.merge_sources(maps[0], maps[2], maps[1])
         self.assertEqual(len(v.merge_sources(maps[0], maps[2], maps[1],
-                                           with_closed_issuer=True)), 116)
+                                       with_closed_issuer=True)), 117)
 
     def test_git_cannot_lazy_fetch_or_prompt(self):
         with patch.object(v.subprocess, 'run') as run:
@@ -337,6 +337,32 @@ class PreparationTests(unittest.TestCase):
     def test_wrong_schema_type_not_coerced(self):
         self.plan['schema_version'] = True
         self.rejects(self.plan)
+
+    def test_runtime_patch_cannot_change_an_unlisted_installed_input(self):
+        path, pin, field, _, _ = v.DELTA_PROOFS[1]
+        proof = v.pinned_working_proof(path, pin)
+        name = next(name for name in proof[field]
+                    if name.startswith('node_modules/')
+                    and name not in v.INSTALLED_DEPENDENCY_DELTA)
+        proof[field][name] = 'f' * 64
+        self.rejects_changed_proof(path, proof)
+
+    def test_runtime_patch_cannot_forge_the_original_installed_hash(self):
+        changed = copy.deepcopy(v.INSTALLED_DEPENDENCY_DELTA)
+        name = next(iter(changed))
+        changed[name]['before'] = 'f' * 64
+        with patch.object(v, 'INSTALLED_DEPENDENCY_DELTA', changed):
+            self.rejects(self.plan)
+
+    def test_version_label_delta_cannot_replace_an_authority_reference(self):
+        for mutation in ('unlisted', 'forged-original'):
+            changed = copy.deepcopy(v.REFERENCE_DELTA)
+            if mutation == 'unlisted':
+                changed['wrangler.jsonc'] = {'before': self.plan['reference_hashes']['wrangler.jsonc'], 'after': 'f' * 64}
+            else:
+                changed['THIRD_PARTY_NOTICES.md']['before'] = 'f' * 64
+            with patch.object(v, 'REFERENCE_DELTA', changed):
+                self.rejects(self.plan)
 
 
 if __name__ == '__main__':
