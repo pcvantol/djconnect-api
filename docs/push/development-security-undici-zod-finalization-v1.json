@@ -1,0 +1,685 @@
+{
+  "schema_version": 1,
+  "kind": "development_dependency_security_separate_finalization",
+  "at": "2026-10-24T19:14:22.654288+00:00",
+  "previous_finalization": "docs/push/joint-asn1-pki4-dependency-finalization-v1.json",
+  "source_PR": 151,
+  "source_candidate": "be66e7a483f50110076ee2e56ab2a8ef1993e899",
+  "qualified_source_main": "0196fdad8495973949f4f154cbdafbdcad726136",
+  "independent_source_review": {
+    "time": "2026-10-24T19:07:08.006971+00:00",
+    "scope": "ROOT_PERSONAL_EXACT_WHOLE_NINE_SOURCE_REVIEW",
+    "head": "be66e7a483f50110076ee2e56ab2a8ef1993e899",
+    "tree": "d07aec2efa23e1613772c3cfecc314b975d5d3b5",
+    "base": "b518b2f97bb6ddf2abe1e35c2553829f9d28d2cc",
+    "files": {
+      "docs/rendezvous/DEVELOPMENT_SECURITY_UNDICI_ZOD_V1.md": "e721383998b3ff0f1f18e7fe0634ec03f917c90ca15e93d8a7f1c2bf367f8490",
+      "docs/rendezvous/compatible-runtime-module-observations-v4.json": "5389556e1ee2ee1e1f1d90af1ac17f3346157121f21df4e031ed23011c9f69b6",
+      "docs/rendezvous/compatible-runtime-product-observations-v4.json": "5662c067ffa4f88bb9567e730922ab57fb466d3e1d149a2f15f5c388627b3436",
+      "docs/rendezvous/compatible-runtime-source-delta-v5.json": "79d4ee6e074ec648b820c6333fd608ca70f35bb1622df4f238cccc191025c88d",
+      "docs/rendezvous/deployment-preparation-v1.json": "b566c3d17c80cff7cd17dee7c6db824e97183c4afe3b7d0323d1960e02cf8d4c",
+      "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "qualification/rendezvous/local-native-runtime.mjs": "36f14feb77dc70faae99a75eeb73010205cb964b6761183770185f21bf0877c4",
+      "scripts/validate_rendezvous_deployment_plan.py": "1581cdbf79cd342bdf8ad6b1d78ae52006c0c267b5792aa252c4770371f7494a"
+    },
+    "only_two_dev_lock_nodes_changed": [
+      "node_modules/zod",
+      "node_modules/undici"
+    ],
+    "package_other_fields_equal": true,
+    "validator_function_AST_unchanged": true,
+    "local_runtime_helper_only_changes_exact_product_evidence_path": true,
+    "original_shared_crypto_evidence_byte_unchanged": true,
+    "actual_observation_source_joins": {
+      "compatible-runtime-product-observations-v4.json": {
+        "file_sha256": "5662c067ffa4f88bb9567e730922ab57fb466d3e1d149a2f15f5c388627b3436",
+        "source_joins": 114
+      },
+      "compatible-runtime-module-observations-v4.json": {
+        "file_sha256": "5389556e1ee2ee1e1f1d90af1ac17f3346157121f21df4e031ed23011c9f69b6",
+        "source_joins": 19
+      }
+    },
+    "production_native_enrollment_paid_or_installed_claim": "NOT_GRANTED",
+    "original_logs": "PERSONALLY_READ_TERMINAL_AND_HASH_JOINED",
+    "whole_SOURCE_GO": "BOUNDED_SOURCE_GO_EXACT_BE66_NINE_FILES",
+    "review_ready_packet_sha256": "7186ca283a257804d869b276217addbd08037552511a5a3600208b2d70b872c5",
+    "original_logs_hash_join": {
+      "final-api-tests.log": "c8707d11ef2b2c67c39c8a6e3c2e62d3cf39dc9083d578fd6551d9b43d811496",
+      "final-root-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "final-composition.log": "f24bb7d46daabd9a4c09d0abce94d2d9c2faa01968a388be8325bf15d475fc12",
+      "final-composition-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "final-product.log": "520921384f76a45c0ef3bb6f164bd383a98bb3717eaf73d694f974146f1675fe",
+      "final-preparation43.log": "ae8d7cf1adadaf833d891c52fd7815207d4c4b156833920499c7677d3370092f",
+      "final-full-npm-audit.json": "86c6c0667b1b871f4396b362cb1308f6c5df4d6554571a28891425e9855512e4",
+      "excess-encoding-counterproof.json": "54bce5d9f737a4634af9174fc4c161d0748b43b43ddc25e012fe2bd6c9720c46",
+      "official-installed-runtime-boundary-verification.json": "1c0156b11109545cf234fe98e03640c4c1bea713ef7f58b7fc059949a0ae78c5",
+      "zod-final-official-verification.json": "30a6ad4f5240ae7d713c1c45322a0963e687fa7a65381498d17d47d8f3bd957e",
+      "exact-final-lock-delta.json": "0b7e6d85073ba05a3ed7d297a6fc09f6408e811948870d5ee1fddcd41e6872fa"
+    },
+    "actual_closed_runtime_original": {
+      "log_sha256": "0e0d3f3e56fabf4aaf1024e1cb9e2e813ae893c7966ea63894caeff4da993c5a",
+      "pass": 16,
+      "fail": 0,
+      "skip": 0,
+      "scope": "CLOSED_PRIVATE_SOFTWARE_AND_GENUINE_NEGATIVES_NOT_NATIVE_ADMISSION"
+    },
+    "official_archives_SRI_and_installed_members": {
+      "undici": 210,
+      "zod": 840
+    },
+    "candidate_original_log_zip_sha256": "45a73740535dc62c3f58393bb4c874dfd51153a24954cb1ac0ab980ab994fd61",
+    "candidate_original_zip_members": [
+      {
+        "name": "0_host-and-private-worker.txt",
+        "bytes": 40903,
+        "sha256": "1e7f041ae94153486fe22da3ab61f6e25cb92afe525552dbd7443c63c88e304a"
+      },
+      {
+        "name": "host-and-private-worker/system.txt",
+        "bytes": 617,
+        "sha256": "67e79e320d492a267a9534906963e3fd8255899793d6d2d59ba4aae8f1d0037b"
+      },
+      {
+        "name": "host-and-private-worker/1_Set up job.txt",
+        "bytes": 2113,
+        "sha256": "39fa4649cc2563db8c2e40d954228e852dd262f634c3bc82b2f1518045006e7e"
+      },
+      {
+        "name": "host-and-private-worker/2_Run actions_checkout@3d3c42e5aac5ba805825da76410c181273ba90b1.txt",
+        "bytes": 20087,
+        "sha256": "8b12d3d19554817b69e07e931b6291fcbaf80687488194b01ea294a860c61e23"
+      },
+      {
+        "name": "host-and-private-worker/3_Run actions_setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1.txt",
+        "bytes": 1408,
+        "sha256": "512d50828429955e8400a15995732d52238cb10b874e45f4ffc1285c0fcd7403"
+      },
+      {
+        "name": "host-and-private-worker/4_Run npm ci.txt",
+        "bytes": 1284,
+        "sha256": "7fef64a7d2b3c4b01a68cac458a342f8372b9655451a9c43ddd2f4b66bf64e0c"
+      },
+      {
+        "name": "host-and-private-worker/5_Offline preparation and squash-safe source history.txt",
+        "bytes": 598,
+        "sha256": "e77b99e2f3734332e1d807cbee8f9333137e14fe506b817152c2e9d1bd85f49f"
+      },
+      {
+        "name": "host-and-private-worker/6_Private files and actual default-genuine workerd negatives.txt",
+        "bytes": 2014,
+        "sha256": "addf5ffdde3174e11d209652e5e452758c4033ded8037f3c4740f8a248216c29"
+      },
+      {
+        "name": "host-and-private-worker/7_Fixed private40381 source_profile_software-policy and actual genuine negatives.txt",
+        "bytes": 2649,
+        "sha256": "5c91f6297ac18684923b382668a28b622cda0ac8bbda33d017c457be3dae9d03"
+      },
+      {
+        "name": "host-and-private-worker/8_Fixed root sourceguard derivation refuses drift.txt",
+        "bytes": 814,
+        "sha256": "ed04d4ee5bc029e0dfa659120f7ccfa14e04e9c5d6103e47c59c7052c6068465"
+      },
+      {
+        "name": "host-and-private-worker/9_Immutable public receiver to actual local API interoperability.txt",
+        "bytes": 5238,
+        "sha256": "a6d3dd18ccd490e9573d348512183289d3fb1ef92dbcb49edfbe09a13eadad08"
+      },
+      {
+        "name": "host-and-private-worker/19_Post Run actions_setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1.txt",
+        "bytes": 462,
+        "sha256": "fecc048b3bbb13d8fc82d2a82ce66690a097aa0eb10c9545132821301bf94994"
+      },
+      {
+        "name": "host-and-private-worker/20_Post Run actions_checkout@3d3c42e5aac5ba805825da76410c181273ba90b1.txt",
+        "bytes": 4208,
+        "sha256": "b132146059becd9f6727618d1ab7ee35824ea4e36302c9e4cc8a144caa551283"
+      },
+      {
+        "name": "host-and-private-worker/21_Complete job.txt",
+        "bytes": 61,
+        "sha256": "df049e898e59df2906ff40cbc6cecf24c7bd0c22bf7f09878bb824be5a487586"
+      },
+      {
+        "name": "1_actual-browser-worker.txt",
+        "bytes": 160314,
+        "sha256": "1d8e7b222a0e2129dd7fb0132e58b095cc34acd32aed27d9a6f8b1b2ae26c626"
+      },
+      {
+        "name": "actual-browser-worker/system.txt",
+        "bytes": 615,
+        "sha256": "e3c46a3e0173b0163a52191cd2d7db5e7244288076edd7ee99a73a5a39e29f85"
+      },
+      {
+        "name": "actual-browser-worker/1_Set up job.txt",
+        "bytes": 2110,
+        "sha256": "c126b3a7b42bd6635f6bedab799483feac17dfbf799142e4f57fe05bb4439fe7"
+      },
+      {
+        "name": "actual-browser-worker/2_Run actions_checkout@3d3c42e5aac5ba805825da76410c181273ba90b1.txt",
+        "bytes": 20087,
+        "sha256": "2565ba5658030c431101e4536043911f77e205c0eca5b84f14483422b85e3f3c"
+      },
+      {
+        "name": "actual-browser-worker/3_Run actions_setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1.txt",
+        "bytes": 1408,
+        "sha256": "d67194dab3906c5781fb7933d7e0777e763b918ccbfd1e3cd52ed8fea1505e6c"
+      },
+      {
+        "name": "actual-browser-worker/4_Run npm ci.txt",
+        "bytes": 1284,
+        "sha256": "dfbdf468b9999014a4082455e29787bffdc66ed216d4a245dc35cd8885796634"
+      },
+      {
+        "name": "actual-browser-worker/5_Bound browser dependency mirror failover.txt",
+        "bytes": 848,
+        "sha256": "ce560e99b247337f66dfb56e56aa28da730995bea4ebcb11f5d35082bdc725a9"
+      },
+      {
+        "name": "actual-browser-worker/6_Real Chromium and WebKit crypto, QR and cancel against actual API.txt",
+        "bytes": 129870,
+        "sha256": "a558943de29ddfbc5f99bc5fda2b8cb782b1e263ef46b5b311f9d64f5947cdcc"
+      },
+      {
+        "name": "actual-browser-worker/11_Post Run actions_setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1.txt",
+        "bytes": 462,
+        "sha256": "b0900940547281274d16b4c7520b9dd1bb5f1f398d43065b13391a3077426afb"
+      },
+      {
+        "name": "actual-browser-worker/12_Post Run actions_checkout@3d3c42e5aac5ba805825da76410c181273ba90b1.txt",
+        "bytes": 4208,
+        "sha256": "dc00f08be0fb06bac485acab0e7329160bd6c1f3e6c7f81b21d239a0b8693db4"
+      },
+      {
+        "name": "actual-browser-worker/13_Complete job.txt",
+        "bytes": 61,
+        "sha256": "78682e3734f452c6b49050426e6f2b186aa5002add454f6854392a12a2438343"
+      }
+    ],
+    "limitations": [
+      "Source and qualification evidence review only; no reviewer provider/device/model/production effects",
+      "Normal protected Source+ownmain original qualification+separate Final remain required",
+      "All22 operational service gates remain OPEN; production94 unchanged"
+    ]
+  },
+  "independent_source_review_sha256": "014920d6ec4dd0d1e61b1516ac39eb9da4fd45d57849a66af5a52a8e95183756",
+  "local_terminal_evidence": {
+    "head": "be66e7a483f50110076ee2e56ab2a8ef1993e899",
+    "base": "b518b2f97bb6ddf2abe1e35c2553829f9d28d2cc",
+    "tree": "d07aec2efa23e1613772c3cfecc314b975d5d3b5",
+    "exact_files": {
+      "docs/rendezvous/DEVELOPMENT_SECURITY_UNDICI_ZOD_V1.md": "e721383998b3ff0f1f18e7fe0634ec03f917c90ca15e93d8a7f1c2bf367f8490",
+      "docs/rendezvous/compatible-runtime-module-observations-v4.json": "5389556e1ee2ee1e1f1d90af1ac17f3346157121f21df4e031ed23011c9f69b6",
+      "docs/rendezvous/compatible-runtime-product-observations-v4.json": "5662c067ffa4f88bb9567e730922ab57fb466d3e1d149a2f15f5c388627b3436",
+      "docs/rendezvous/compatible-runtime-source-delta-v5.json": "79d4ee6e074ec648b820c6333fd608ca70f35bb1622df4f238cccc191025c88d",
+      "docs/rendezvous/deployment-preparation-v1.json": "b566c3d17c80cff7cd17dee7c6db824e97183c4afe3b7d0323d1960e02cf8d4c",
+      "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "qualification/rendezvous/local-native-runtime.mjs": "36f14feb77dc70faae99a75eeb73010205cb964b6761183770185f21bf0877c4",
+      "scripts/validate_rendezvous_deployment_plan.py": "1581cdbf79cd342bdf8ad6b1d78ae52006c0c267b5792aa252c4770371f7494a"
+    },
+    "actual_results": {
+      "API": 238,
+      "composition": 49,
+      "compiledProduct": 128,
+      "forbiddenRPCDenials": 100,
+      "egress": 0,
+      "preparation": 43,
+      "finalFullAuditKnownVulnerabilities": 0,
+      "strictRootTypes": "PASS",
+      "strictCompositionTypes": "PASS"
+    },
+    "logs": {
+      "final-api-tests.log": "c8707d11ef2b2c67c39c8a6e3c2e62d3cf39dc9083d578fd6551d9b43d811496",
+      "final-root-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "final-composition.log": "f24bb7d46daabd9a4c09d0abce94d2d9c2faa01968a388be8325bf15d475fc12",
+      "final-composition-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "final-product.log": "520921384f76a45c0ef3bb6f164bd383a98bb3717eaf73d694f974146f1675fe",
+      "final-preparation43.log": "ae8d7cf1adadaf833d891c52fd7815207d4c4b156833920499c7677d3370092f",
+      "final-full-npm-audit.json": "86c6c0667b1b871f4396b362cb1308f6c5df4d6554571a28891425e9855512e4",
+      "excess-encoding-counterproof.json": "54bce5d9f737a4634af9174fc4c161d0748b43b43ddc25e012fe2bd6c9720c46",
+      "official-installed-runtime-boundary-verification.json": "1c0156b11109545cf234fe98e03640c4c1bea713ef7f58b7fc059949a0ae78c5",
+      "zod-final-official-verification.json": "30a6ad4f5240ae7d713c1c45322a0963e687fa7a65381498d17d47d8f3bd957e",
+      "exact-final-lock-delta.json": "0b7e6d85073ba05a3ed7d297a6fc09f6408e811948870d5ee1fddcd41e6872fa"
+    },
+    "proof_scope": "Existing shared1571 unchanged original scope, not rerun; all50WorkerRuntimeInputs byteidentical; official1050newarchive members verified",
+    "independent_review": "PENDING",
+    "native16": {
+      "pass": 16,
+      "fail": 0,
+      "skipped": 0,
+      "parent_exit": 0,
+      "duration_seconds": 127.180920416,
+      "original120s": true,
+      "log_sha256": "0e0d3f3e56fabf4aaf1024e1cb9e2e813ae893c7966ea63894caeff4da993c5a"
+    },
+    "no_operational_effect_grant": true,
+    "at": "2026-10-24T18:49:43.556191+00:00",
+    "source_clean": true
+  },
+  "local_terminal_evidence_sha256": "99b169016bc6b6b471eb9a22cf594004a776a121b130f450109cd750a83a860d",
+  "official_archive_evidence": {
+    "undici": {
+      "archive_sri": "sha512-03KrMbjIFDWQR5RNPrSw3bd1r12JpyFQl9/yxjUbJtqkjmllqC5lFjZh6ujeuJCKr8EOQvRW872Oy/az+nLYxg==",
+      "archive_sha256": "c98bd3881137c11341e8be8d2ec509ebf973b6f8b36d0a4c6d2afcda15e0d712",
+      "installed_archive_members_verified": 210,
+      "MIT_license_bytes_unchanged": true,
+      "all50WorkerRuntimeInstalledInputsUnchanged": true,
+      "only_lock_node_changed": "node_modules/undici",
+      "no_install_scripts_executed": true
+    },
+    "zod": {
+      "zod_archive_sha256": "312553620ac82cbb25d505100fbb41c1e219b3cd6979cf93c3a1b4dd5b79e039",
+      "zod_SRI": "sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==",
+      "installed_zod_members_verified": 840,
+      "full_npm_audit": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    }
+  },
+  "exact_two_lock_changes": {
+    "node_modules/zod": {
+      "before": {
+        "version": "4.4.3",
+        "resolved": "https://registry.npmjs.org/zod/-/zod-4.4.3.tgz",
+        "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==",
+        "dev": true,
+        "license": "MIT",
+        "funding": {
+          "url": "https://github.com/sponsors/colinhacks"
+        }
+      },
+      "after": {
+        "version": "4.6.6",
+        "resolved": "https://registry.npmjs.org/zod/-/zod-4.6.6.tgz",
+        "integrity": "sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==",
+        "dev": true,
+        "license": "MIT",
+        "funding": {
+          "url": "https://github.com/sponsors/colinhacks"
+        }
+      }
+    },
+    "node_modules/undici": {
+      "before": {
+        "version": "7.29.1",
+        "resolved": "https://registry.npmjs.org/undici/-/undici-7.29.1.tgz",
+        "integrity": "sha512-RYONW2MeafgYlkVOKYKkA/Ag7BmXqgIWCa8t1m0JcxrQg9pI9lEqRhAOruOBCbAohOa/gkCF+iPi9hrgvTzu6Q==",
+        "dev": true,
+        "license": "MIT",
+        "engines": {
+          "node": ">=20.18.1"
+        }
+      },
+      "after": {
+        "version": "7.30.1",
+        "resolved": "https://registry.npmjs.org/undici/-/undici-7.30.1.tgz",
+        "integrity": "sha512-03KrMbjIFDWQR5RNPrSw3bd1r12JpyFQl9/yxjUbJtqkjmllqC5lFjZh6ujeuJCKr8EOQvRW872Oy/az+nLYxg==",
+        "dev": true,
+        "license": "MIT",
+        "engines": {
+          "node": ">=20.18.1"
+        }
+      }
+    }
+  },
+  "counterproof": {
+    "scope": "LOCAL_LOOPBACK_SYNTHETIC_DEVELOPMENT_FETCH_NO_PROVIDER_OR_WORKER_ACTION",
+    "observations": [
+      {
+        "label": "old",
+        "module": "/Volumes/Shared Data/tmp/pcvantol/djc-api-undici-7301-20261024/old-official/index.js",
+        "exit": 1,
+        "signal": null,
+        "stdout": "fetch_rejected_caught\n",
+        "stderr": "node:events:505\n    throw er; // Unhandled 'error' event\n    ^\n\nResponseContentLengthMismatchError: Response body length does not match content-length header\n    at Parser.createError (/Volumes/Shared Data/tmp/pcvantol/djc-api-undici-7301-20261024/old-official/lib/dispatcher/client-h1.js:397:14)\n    at Parser.finish (/Volumes/Shared Data/tmp/pcvantol/djc-api-undici-7301-20261024/old-official/lib/dispatcher/client-h1.js:390:17)\n    at Socket.onHttpSocketEnd (/Volumes/Shared Data/tmp/pcvantol/djc-api-undici-7301-20261024/old-official/lib/dispatcher/client-h1.js:952:30)\n    at Socket.emit (node:events:526:24)\n    at endReadableNT (node:internal/streams/readable:2147:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)\nEmitted 'error' event on Readable instance at:\n    at emitErrorNT (node:internal/streams/destroy:170:8)\n    at emitErrorCloseNT (node:internal/streams/destroy:129:3)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {\n  code: 'UND_ERR_RES_CONTENT_LENGTH_MISMATCH'\n}\n\nNode.js v26.12.1\n"
+      },
+      {
+        "label": "patched",
+        "module": "/Volumes/Shared Data/tmp/pcvantol/djc-api-compatible-runtime-deps-20261024/node_modules/undici/index.js",
+        "exit": 0,
+        "signal": null,
+        "stdout": "fetch_rejected_caught\nsurvived\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "full_npm_audit": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 8,
+        "dev": 267,
+        "optional": 137,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 274
+      }
+    }
+  },
+  "actual_dependabot51_readback": {
+    "state": "open",
+    "fixed_at": null,
+    "url": "https://github.com/pcvantol/djconnect-api/security/dependabot/51"
+  },
+  "github_SBOM_readback": {
+    "raw_sha256": "2eb70e93124d176a38e81b89e13d6e769bb62f3609d7d0c8d39a810dc57ae152",
+    "undici": "7.30.1",
+    "zod": "4.6.6",
+    "scope": "Actual provider dependencygraph after source merge, separate from alert state"
+  },
+  "own_main_workflows": {
+    "Validate": {
+      "conclusion": "success",
+      "databaseId": 40123875546,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    "CodeQL": {
+      "conclusion": "success",
+      "databaseId": 40123875830,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    "AI-development projection": {
+      "conclusion": "success",
+      "databaseId": 40123875126,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    "TDE observe": {
+      "conclusion": "success",
+      "databaseId": 40123875192,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    "Fixed rendezvous QA build": {
+      "conclusion": "success",
+      "databaseId": 40123875319,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    "Local native experiment qualification": {
+      "conclusion": "success",
+      "databaseId": 40123875346,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    },
+    "API release artifact": {
+      "conclusion": "success",
+      "databaseId": 40123993467,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    "Post-Merge Release Evidence": {
+      "conclusion": "success",
+      "databaseId": 40123993623,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    }
+  },
+  "complete_run_inventory": [
+    {
+      "conclusion": "success",
+      "databaseId": 40123993623,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40123993467,
+      "event": "workflow_run",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40123875546,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40123875830,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40123875126,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40123875319,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40123875192,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40123875346,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "original_release_formal_durable": {
+    "artifacts": [
+      {
+        "files": {
+          "api-release-artifact-evidence.json": "d3e107edcd1e992d232e3c56c9718738d9c75fb875e0bb434a191c8c8511ad9a"
+        },
+        "id": 12572457592,
+        "name": "api-release-artifact-evidence",
+        "zip_sha256": "426f3ec185f9675af11226252b0acae24375c9d4e3388cb403d737fc54a3613a"
+      },
+      {
+        "files": {
+          "djconnect-api-release.tar.gz": "901c1ab01f7fb46d18516ec37105a9a305606eaa01c36a1d58119491ccb366d0"
+        },
+        "id": 12571983051,
+        "name": "djconnect-api-release-0196fdad8495973949f4f154cbdafbdcad726136",
+        "zip_sha256": "65f0103c183cb712ad5cd1b3d88fb9778e7c501952aba3fda5175d6ced26250e"
+      },
+      {
+        "files": {
+          "post-merge-release-evidence.json": "316ab2bded873545ae592ca35e9d019d8a32b121120ca552c7d80cb9ec8141c0"
+        },
+        "id": 12571829207,
+        "name": "post-merge-release-evidence",
+        "zip_sha256": "82b2bca51d6768f703016c1541557f2789677344b6366c9dc299d246eeeb03d9"
+      }
+    ],
+    "durable_asset_id": 673072904,
+    "durable_canonical_integrity": "PASS",
+    "durable_sha256": "e3e41a1399c231f75ea6f3a4e0944f441afc18e11364a52eb9f7ee36f985c8e8",
+    "formal": {
+      "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+      "evidence_digest": "faee8061769eb682b0fd098faeb0ceb0d7a6fedd67036f269f44942f3b94c4f3",
+      "findings": [],
+      "kind": "post_merge_release_evidence",
+      "main_parents": [
+        "b518b2f97bb6ddf2abe1e35c2553829f9d28d2cc"
+      ],
+      "main_sha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "merge_actor": "pcvantol",
+      "merge_strategy": "SQUASH",
+      "originating_pr": {
+        "base_ref": "main",
+        "changed_files": [
+          "docs/rendezvous/DEVELOPMENT_SECURITY_UNDICI_ZOD_V1.md",
+          "docs/rendezvous/compatible-runtime-module-observations-v4.json",
+          "docs/rendezvous/compatible-runtime-product-observations-v4.json",
+          "docs/rendezvous/compatible-runtime-source-delta-v5.json",
+          "docs/rendezvous/deployment-preparation-v1.json",
+          "package-lock.json",
+          "package.json",
+          "qualification/rendezvous/local-native-runtime.mjs",
+          "scripts/validate_rendezvous_deployment_plan.py"
+        ],
+        "head_sha": "be66e7a483f50110076ee2e56ab2a8ef1993e899",
+        "main_changed_files": [
+          "docs/rendezvous/DEVELOPMENT_SECURITY_UNDICI_ZOD_V1.md",
+          "docs/rendezvous/compatible-runtime-module-observations-v4.json",
+          "docs/rendezvous/compatible-runtime-product-observations-v4.json",
+          "docs/rendezvous/compatible-runtime-source-delta-v5.json",
+          "docs/rendezvous/deployment-preparation-v1.json",
+          "package-lock.json",
+          "package.json",
+          "qualification/rendezvous/local-native-runtime.mjs",
+          "scripts/validate_rendezvous_deployment_plan.py"
+        ],
+        "merge_actor": "pcvantol",
+        "merge_commit_sha": "0196fdad8495973949f4f154cbdafbdcad726136",
+        "merge_strategy": "SQUASH",
+        "merged_at": "2026-10-24T19:07:46Z",
+        "number": 151,
+        "state": "MERGED"
+      },
+      "post_merge": {
+        "build_validation": "PASS",
+        "ci": "PASS",
+        "coverage": "PASS",
+        "coverage_artifact_sha": "sha256:ce97cf753f7b936e24d0f4c5fd24114c4595242f8a3c0256e86316791178ea44",
+        "coverage_report_sha": "0196fdad8495973949f4f154cbdafbdcad726136",
+        "governance": "PASS",
+        "lint": "PASS",
+        "sha": "0196fdad8495973949f4f154cbdafbdcad726136",
+        "static_analysis": "PASS",
+        "tests": "PASS",
+        "workflow_run_ids": [
+          "40123875546"
+        ]
+      },
+      "pre_merge": {
+        "candidate_sha": "be66e7a483f50110076ee2e56ab2a8ef1993e899",
+        "owner_authorization": "PASS",
+        "required_checks": "PASS",
+        "risk_classification": "NORMAL_RISK",
+        "software_assurance": "PASS",
+        "trusted_delivery": "PASS",
+        "verification": "PASS",
+        "workflow_integrity": "PASS"
+      },
+      "provenance_result": "PASS",
+      "repository": "pcvantol/djconnect-api",
+      "repository_role": "active_source",
+      "schema_version": 1,
+      "source_qualified_pr_sha": "be66e7a483f50110076ee2e56ab2a8ef1993e899",
+      "timestamp": "2026-10-24T19:09:29.153Z"
+    },
+    "packaged_files": {
+      "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "LICENSES.sha256": "cdeffa56aff14864e5ec4e27d2f8396431954c7efaac479ea7c205d84636a217",
+      "THIRD_PARTY_NOTICES.md": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e",
+      "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+      "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+      "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+      "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+      "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+      "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+      "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+      "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+      "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+      "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536"
+    },
+    "release_artifact": {
+      "artifact_id": "12571983051",
+      "artifact_sha256": "901c1ab01f7fb46d18516ec37105a9a305606eaa01c36a1d58119491ccb366d0",
+      "candidate_sha": "0196fdad8495973949f4f154cbdafbdcad726136",
+      "kind": "api_worker_release_artifact",
+      "repository": "pcvantol/djconnect-api",
+      "schema_version": 1,
+      "timestamp": "2026-10-24T19:09:44Z"
+    },
+    "runs": {
+      "API release artifact": 40123993467,
+      "Post-Merge Release Evidence": 40123993623
+    },
+    "scope": "EXACT_SOURCE_ARTIFACT_FORMAL_NOT_DEPLOYMENT_OR_NATIVE_ACCEPTANCE",
+    "source_main": "0196fdad8495973949f4f154cbdafbdcad726136",
+    "worker_bytes": 1272984,
+    "worker_sha256": "d29f1e3de2b6c5ee1ca9ecb1ca0e4216c4e51ff541eb562aeda1a4a6c3d34e5c"
+  },
+  "original_release_receipt_sha256": "b6983b67caa923b4d7dfb90af70b9daf081e6fdd32ddda62f44428b6f0b328e4",
+  "historical_proofs": "All original crypto/runtime/license50 and prior versioned evidence retain exact bytes and their own scope; undici-only preliminary43PASS133.506s remains distinct from final two-patch43PASS146.202s",
+  "source_package": "Immutable106 + exact27 cumulative deltas =117tracked; unchanged50installedWorkerRuntimeInputs; original shared66 retained without a new-run claim",
+  "activation_allowed": false,
+  "public_surface_dispatch": false,
+  "Activity_profiles": [],
+  "all22servicegates": "OPEN",
+  "production": "No deployment/provider/key/enrollment/native/device effects by this source or documentary Final",
+  "final_status": "These exact two docs still require independent review/protected merge and actual own-main/original qualification"
+}
