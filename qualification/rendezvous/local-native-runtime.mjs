@@ -26,14 +26,14 @@ export async function sourceSnapshot(){
  const checked=spawnSync('python3',['scripts/validate_rendezvous_deployment_plan.py'],{cwd:repo,encoding:'utf8',timeout:30000});
  need(checked.status===0&&JSON.parse(checked.stdout).activation_allowed===false);
  const plan=JSON.parse(await readFile(join(repo,'docs/rendezvous/deployment-preparation-v1.json')));
- const rootPath='docs/rendezvous/compatible-runtime-product-observations-v2.json';
+ const rootPath='docs/rendezvous/compatible-runtime-product-observations-v3.json';
  const rootRaw=await readFile(join(repo,rootPath));
  need(plan.reference_hashes[rootPath]===sha(rootRaw));
  const root=JSON.parse(rootRaw);
  // The current immutable proof may add installed bytes, never replace source pins.
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/'))need(plan.source_hashes[name]===pin);
  const pins={...plan.source_hashes,...plan.reference_hashes,...root.source_hashes};
- const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===32);
+ const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===50);
  await checkSourcePins(pins,repo);
  for(const p of toolFiles)pins[p]=sha(await readFile(join(repo,p)));
  const head=gitRead(['rev-parse','HEAD']);need(head.status===0&&/^[0-9a-f]{40}\n$/.test(head.stdout));
@@ -66,7 +66,7 @@ export default {async fetch(request,env){
 }};`;
   await writeFile(join(scratch,'driver.ts'),driver,{mode:0o600});
   const aliases=Object.fromEntries(Object.entries(inputs.aliases).map(([k,v])=>[k,resolve(source,v)]));
-  if(stage)Object.assign(aliases,{cbor:join(repo,'node_modules/cbor/lib/cbor.js'),asn1js:join(repo,'node_modules/asn1js/build/index.es.js'),pkijs:join(repo,'node_modules/pkijs/build/index.es.js')});
+  if(stage)Object.assign(aliases,{cbor:join(repo,'node_modules/cbor/lib/cbor.js'),asn1js:createRequire(import.meta.url).resolve('asn1js'),pkijs:createRequire(import.meta.url).resolve('pkijs')});
   const config={name:'djc-private-native-local',main:join(scratch,'driver.ts'),compatibility_date:'2026-06-20',compatibility_flags:['nodejs_compat'],workers_dev:false,send_metrics:false,alias:aliases};
   await writeFile(join(scratch,'wrangler.json'),JSON.stringify(config),{mode:0o600});
   const built=spawnSync(process.execPath,[join(repo,'node_modules/wrangler/bin/wrangler.js'),'deploy','--dry-run','--config',join(scratch,'wrangler.json'),'--outdir',join(scratch,'build'),'--metafile',join(scratch,'meta.json')],{cwd:repo,encoding:'utf8',timeout:120000,env:{...process.env,WRANGLER_SEND_METRICS:'false'}});

@@ -354,6 +354,34 @@ class PreparationTests(unittest.TestCase):
         with patch.object(v, 'INSTALLED_DEPENDENCY_DELTA', changed):
             self.rejects(self.plan)
 
+    def test_major_graph_cannot_add_a_dependency_outside_reviewed_paths(self):
+        changed = copy.deepcopy(v.INSTALLED_DEPENDENCY_DELTA)
+        changed['node_modules/unreviewed/index.js'] = {'before': None, 'after': 'f' * 64}
+        with patch.object(v, 'INSTALLED_DEPENDENCY_DELTA', changed):
+            self.rejects(self.plan)
+
+    def test_removed_major_graph_input_cannot_reappear_in_current_proof(self):
+        path, pin, field, _, _ = v.DELTA_PROOFS[1]
+        proof = v.pinned_working_proof(path, pin)
+        name, change = next((name, change) for name, change in v.INSTALLED_DEPENDENCY_DELTA.items()
+                            if change['after'] is None)
+        proof[field][name] = change['before']
+        self.rejects_changed_proof(path, proof)
+
+    def test_added_major_graph_input_cannot_claim_an_original_hash(self):
+        changed = copy.deepcopy(v.INSTALLED_DEPENDENCY_DELTA)
+        name = next(name for name, change in changed.items() if change['before'] is None)
+        changed[name]['before'] = 'f' * 64
+        with patch.object(v, 'INSTALLED_DEPENDENCY_DELTA', changed):
+            self.rejects(self.plan)
+
+    def test_major_graph_input_cannot_be_removed_without_original_match(self):
+        changed = copy.deepcopy(v.INSTALLED_DEPENDENCY_DELTA)
+        name = next(name for name, change in changed.items() if change['after'] is None)
+        changed[name]['before'] = 'f' * 64
+        with patch.object(v, 'INSTALLED_DEPENDENCY_DELTA', changed):
+            self.rejects(self.plan)
+
     def test_version_label_delta_cannot_replace_an_authority_reference(self):
         for mutation in ('unlisted', 'forged-original'):
             changed = copy.deepcopy(v.REFERENCE_DELTA)
