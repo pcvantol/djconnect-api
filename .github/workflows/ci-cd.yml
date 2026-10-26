@@ -59,6 +59,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      - name: Check source-only enrollment contract and synthetic controls
+        run: npx tsc --noEmit --project qualification/surface-push/tsconfig.enrollment.json
+
       - name: Wrangler deploy dry-run
         run: npx wrangler deploy --dry-run
 
