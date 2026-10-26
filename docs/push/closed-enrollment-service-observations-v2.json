@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "scope": "CLOSED_ENROLLMENT_SERVICE_JOIN_OUTER_ABORT_SUCCESSOR_NOT_PUBLIC_NATIVE_OR_PROVIDER_GO",
+  "base_main_sha": "796a9bdfe6e94f0cfac04da1171102d052407347",
+  "at": "2026-10-26T23:56:22.419426+00:00",
+  "source_sha256": {
+    "src/surface-push/composition.ts": "c9221316839a98f1d0351f1b8fbaa283e89a232042efc89abf87aaa2ecfe0101",
+    "src/surface-push/enrollment.ts": "ed19d08cdb685214cdddb4cdc76e5699383e83f04192a7b053d8756ca62eaf0e",
+    "test/surface-enrollment.spec.ts": "4858e8c557505bd23f03d7d24cbc045af96575460cb4ab3be46af7ffcd7abe43"
+  },
+  "actual_checks": {
+    "Worker_cases_passed": 309,
+    "retained_cases": 280,
+    "new_service_guard_cases": 29,
+    "composition_cases_passed": 49,
+    "product_checks_passed": 128,
+    "forbidden_RPC_rejections": 100,
+    "outbound_calls": 0,
+    "preparation_cases_passed": 43,
+    "preparation_seconds": 108.822
+  },
+  "original_log_sha256": {
+    "full_worker": "98c00fb37f16615d7f33e6eff49ed815837a6f4ca9ddb8d6ac67be300ed18c20",
+    "compiled_product": "d34e3ca15f1e4449ea5de9ce78a8838405eef4faa3dc86197d2f978a85589ee6",
+    "composition": "e37d88637e50a931f1a0fe71bd14573967d6c3afe1e830f2d5efed5936863f6e",
+    "root_types": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "enrollment_types": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "preparation": "b40d555b0e9eb8605a5ba1ae30bb8eae7d961a7e7da966bfe7e800e1b702f883"
+  },
+  "causal_controls": [
+    "Paused original admin digest and public-key import; service retirement or request abort prevents mutation; observed retirement cannot be restored",
+    "Synchronous statement preparation triggers retirement/abort before each authorize/redeem/revoke batch; final no-await guard submits zero batches",
+    "After actual D1 batch completion retirement/abort suppresses positive receipt/credential while real committed state persists; no rollback fiction",
+    "Immutable DB/secret/options clock callback/currentness callback replacement or original clock rollback during import permanently retires factory",
+    "Pending request body retires/aborts before admin hash or any mutation",
+    "Composed internal service authorizes/redeems synthetic widget enrollment with no APNs key/provider call",
+    "Observed outer currentness retirement and explicit service close during original import remain closed; no claim to detect unobserved ABA",
+    "Capture original AbortSignal before handler await; final service currentness and cancellation guard after handler completion and directly before return. Three double-microtask Response-construction counterexamples reject publication while real D1 committed state persists."
+  ],
+  "source_graph": {
+    "fresh_product_observation": "docs/rendezvous/closed-enrollment-service-product-observations-v2.json",
+    "fresh_product_map_inputs": 116,
+    "effective_tracked_inputs": 119,
+    "cumulative_source_deltas": 29,
+    "installed_runtime_inputs": 50,
+    "installed_runtime_hashes_equal_previous": true,
+    "retained_shared_module_maps": "Original v4 crypto/shared and coordinator observations retained byte-identical historical evidence; no unchanged crypto/state rerun claimed"
+  },
+  "historical_failures": [
+    "Initial root/dedicated types emitted TS2304 catch-path signal reference; fixed; original failure retained externally.",
+    "Early narrower60-case run was42 retained enrollment plus18 initial service cases, not final306 fullsuite.",
+    "Frozen6fc whole-source review HOLD: missing post-handler outer cancellation check confirmed by3causal negative cases. Its earlier306/17/128 results remain historical, not source GO."
+  ],
+  "closed_defaults": {
+    "public_dispatch_enabled": false,
+    "issuer_admitted_profiles": [],
+    "activity_profiles": [],
+    "rendezvous_full_service_gates_open": 22
+  },
+  "qualification_limits": "No new native/provider positive acceptance, source review, protected Source/Final or deployment from these local observations. Exact committed closed-runtime negative checks are separate subsequent evidence.",
+  "predecessor_private_candidate": "6fc6284ae8c8cce217cec697c6101b97a048d013",
+  "predecessor_review_status": "HOLD_SERVICE_OUTER_ABORT_1_NOT_SOURCE_GO",
+  "outer_abort_counterproof": {
+    "frozen_predecessor": "3FAIL68SKIP on exact6fc private clone, aborted=true before positive response observed",
+    "private_fix_same_cases": "3PASS68SKIP, original committed database outcomes retained",
+    "full_current_suite": "309PASS0FAIL",
+    "old_log_sha256": "c7dd429251f9f4528e3755c2499291236b988d157eeda8b8d19eb899db2be92e",
+    "private_successor_log_sha256": "cfcd4a2a9574ceb92d877dc4da0cd8dd57541c034c48a9465e4a9eb7eeda170d",
+    "not_claimed": "Filtered68SKIP are not passing cases; no Root-executed probe, production/native/provider acceptance or post-submit rollback inferred"
+  }
+}

@@ -76,8 +76,8 @@
     "docs/rendezvous/sharp-0355-build-observations-v1.json": "cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089",
     "docs/rendezvous/compatible-runtime-shared-observations-v4.json": "5bee972aa2bc3a02fe44b8f92543a90d7f1d42791e4aed59490fc7ac855153e0",
     "docs/rendezvous/compatible-runtime-module-observations-v4.json": "5389556e1ee2ee1e1f1d90af1ac17f3346157121f21df4e031ed23011c9f69b6",
-    "docs/rendezvous/closed-enrollment-service-source-delta-v1.json": "1b608c3debde2539437d784acc52a532ab72cc14302c97e7d3a932969a1948aa",
-    "docs/rendezvous/closed-enrollment-service-product-observations-v1.json": "ad432c3e9f25b2c1004940ef35ee7a20fb7dd0f512a8d8b880dc77d459aaaa1e"
+    "docs/rendezvous/closed-enrollment-service-source-delta-v2.json": "8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5",
+    "docs/rendezvous/closed-enrollment-service-product-observations-v2.json": "82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15"
   },
   "schema_version": 1,
   "secret_names": [
@@ -204,13 +204,13 @@
     "src/surface-push/apns.ts": "fa760bb5c1e1dde207cfae3da29d08832dc3537d60c918370530469f53d24f29",
     "src/surface-push/handler.ts": "64a0f1b4ea3379cfe81c83676eaae38b14ba78e9e4a20d3409c60f519accfd44",
     "src/surface-push/provider.ts": "e7f7abe7bbc5cc2b1875db877a830be16024b8bc1ffd2c4c212a88a9bec23392",
-    "src/surface-push/composition.ts": "a0226eb2bf10dc9a2f436db8d8f83e241dc2cb6b0ce5bc316b441d50f6e30f04",
+    "src/surface-push/composition.ts": "c9221316839a98f1d0351f1b8fbaa283e89a232042efc89abf87aaa2ecfe0101",
     "src/surface-push/dispatch.ts": "1bfbb6f8003970a4cdfd4e0bd21a739d6dccbf6e10ee1411df13dada13ef3ce7"
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
-    "delta_sha256": "1b608c3debde2539437d784acc52a532ab72cc14302c97e7d3a932969a1948aa",
-    "effective_source_map_sha256": "cea15b75deb3c9c7e564d2ac5dd2d0749781b92ef4b0546665134588a866e98e",
+    "delta_sha256": "8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5",
+    "effective_source_map_sha256": "e2d0a139879729c728ab89f85534987bbc28f95e47de9c05389f801a8028e239",
     "kind": "BASELINE_PLUS_PINNED_DELTA"
   },
   "status": "NOT_AUTHORIZED",

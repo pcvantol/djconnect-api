@@ -298,4 +298,31 @@ describe("single use enrollment with actual D1 and synthetic authority",()=>{
   await expect(pending).rejects.toMatchObject({code:"surface_service_unavailable"});
   expect(await count("surface_enrollment_operator_operations")).toBe(0);expect(service.matches(config)).toBe(false);
  });
+
+ for(const action of ["operator/authorize","redeem","operator/revoke"] as const) {
+  it(`composed positive ${action} cannot escape after final outer-await abort`,async()=>{
+   const seed=action==="operator/authorize"?null:await authorized();
+   const value=seed?.value??input(),body=action==="redeem"?await proof(payload(value)):action==="operator/revoke"?revoke(value):value;
+   const control=new AbortController(),OriginalResponse=Response;let scheduled=0;
+   const service=createSurfaceService({env:{DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv,now:()=>clock});
+   vi.stubGlobal("Response",new Proxy(OriginalResponse,{construct(target,args){
+    const response=Reflect.construct(target,args,target);
+    if(typeof args[0]==="string") {
+     const data=JSON.parse(args[0]);
+     if(data.success===true&&(action==="operator/authorize"?typeof data.credential==="string":action==="redeem"?data.state==="enrolled":data.state==="revoked")) {
+      scheduled++;queueMicrotask(()=>queueMicrotask(()=>control.abort()));
+     }
+    }
+    return response;
+   }}));
+   let returned:Response|undefined,error:unknown;
+   try {try {returned=await call(r=>service.handle(r),action,body,action==="redeem"?seed!.receipt.credential:OPERATOR,control.signal);} catch(caught){error=caught;}}
+   finally {vi.stubGlobal("Response",OriginalResponse);service.close();}
+   expect(scheduled).toBe(1);expect(control.signal.aborted).toBe(true);
+   expect(returned,"An aborted composed request must not publish a positive credential/receipt").toBeUndefined();
+   expect(error).toMatchObject({code:"surface_operation_cancelled",status:409});
+   expect(await env.DB.prepare("SELECT state FROM surface_enrollment_authorizations").first("state")).toBe(action==="redeem"?"consumed":action==="operator/revoke"?"revoked":"available");
+   expect(await count("surface_push_delegations")).toBe(action==="redeem"?1:0);
+  });
+ }
 });

@@ -48,6 +48,7 @@ export function createSurfaceService(options: SurfaceServiceOptions): SurfaceSer
     return {
         matches(candidate) { try { return active() && same(candidate) && active(); } catch { return false; } },
         async handle(request, candidate = originalEnv) {
+            const signal = request.signal;
             guard(candidate);
             const now = () => { guard(candidate); return clock(); };
             // One lazy authorizer per immutable service identity. Revocation,
@@ -72,7 +73,9 @@ export function createSurfaceService(options: SurfaceServiceOptions): SurfaceSer
                 createSurfacePushHandler({ db: env.DB, encryptionKey: env.APNS_TOKEN_ENCRYPTION_KEY,
                     authorizeProvider, fetcher, now, activityProfiles: [] });
             const response = await handler(request);
-            guard(candidate); return response;
+            guard(candidate);
+            need(!signal.aborted, "surface_operation_cancelled", 409);
+            return response;
         },
         close() { closed = true; provider?.close(); provider = undefined; },
     };
