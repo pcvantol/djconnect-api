@@ -1,0 +1,146 @@
+{
+  "scope": "SYNTHETIC_EXPIRED_OFFLINE_PUBLIC_VECTOR_NOT_ENROLLED_NO_PRIVATE_KEY_PERSISTED",
+  "generator": "Node software ephemeral P256/P1363; independent canonical SHA256 math; actual API/Worker byte and signature cross-check required",
+  "original_reference_wall_ms": 1792497600000,
+  "authorization_request": {
+    "contract_version": 1,
+    "purpose": "surface_enrollment",
+    "action": "authorize",
+    "operation_id": "01a1592e-c600-7000-8000-000000000001",
+    "authorization_id": "synthetic-vector-authorization",
+    "consent": {
+      "nonce": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc",
+      "action_id": "synthetic-action",
+      "generation_id": "synthetic-generation",
+      "plan_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expires_at_ms": 1792498500000
+    },
+    "enrollment": {
+      "contract_version": 1,
+      "purpose": "surface_push",
+      "action": "enrol",
+      "operation_id": "01a1592e-c600-7000-8000-000000000002",
+      "delegation_id": "synthetic-vector-delegation",
+      "expected_revision": 0,
+      "approval_reference": "synthetic-not-human-consent",
+      "install_id": "synthetic-install",
+      "device_binding": "1111111111111111111111111111111111111111111111111111111111111111",
+      "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+      "grant_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+      "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+      "binding_id": "5555555555555555555555555555555555555555555555555555555555555555",
+      "public_key": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "1cXRWJcjy4qvsLMGBmniyfAPg6QJSxltr17Ds8W52pE",
+        "y": "kNaIfoWZ5uXSxqOqH9SnVI4WpK5bkvjZoVZ6ARTUGFk"
+      },
+      "policy": {
+        "token_role": "widget",
+        "platform": "ios",
+        "apns_environment": "sandbox",
+        "target": {
+          "app_bundle_id": "dev.synthetic.ios",
+          "extension_bundle_id": "dev.synthetic.ios.widget",
+          "widget_kind": "synthetic"
+        },
+        "activity_profile": null,
+        "external_content_allowed": false,
+        "original_grant_expires_at_ms": 1792498500000,
+        "max_operations": 4,
+        "max_events": 2,
+        "max_challenges": 1
+      }
+    }
+  },
+  "redemption_request": {
+    "payload": {
+      "contract_version": 1,
+      "purpose": "surface_enrollment",
+      "action": "redeem",
+      "authorization_id": "synthetic-vector-authorization",
+      "consent": {
+        "nonce": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc",
+        "action_id": "synthetic-action",
+        "generation_id": "synthetic-generation",
+        "plan_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "expires_at_ms": 1792498500000
+      },
+      "enrollment": {
+        "contract_version": 1,
+        "purpose": "surface_push",
+        "action": "enrol",
+        "operation_id": "01a1592e-c600-7000-8000-000000000002",
+        "delegation_id": "synthetic-vector-delegation",
+        "expected_revision": 0,
+        "approval_reference": "synthetic-not-human-consent",
+        "install_id": "synthetic-install",
+        "device_binding": "1111111111111111111111111111111111111111111111111111111111111111",
+        "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+        "grant_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+        "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+        "binding_id": "5555555555555555555555555555555555555555555555555555555555555555",
+        "public_key": {
+          "kty": "EC",
+          "crv": "P-256",
+          "x": "1cXRWJcjy4qvsLMGBmniyfAPg6QJSxltr17Ds8W52pE",
+          "y": "kNaIfoWZ5uXSxqOqH9SnVI4WpK5bkvjZoVZ6ARTUGFk"
+        },
+        "policy": {
+          "token_role": "widget",
+          "platform": "ios",
+          "apns_environment": "sandbox",
+          "target": {
+            "app_bundle_id": "dev.synthetic.ios",
+            "extension_bundle_id": "dev.synthetic.ios.widget",
+            "widget_kind": "synthetic"
+          },
+          "activity_profile": null,
+          "external_content_allowed": false,
+          "original_grant_expires_at_ms": 1792498500000,
+          "max_operations": 4,
+          "max_events": 2,
+          "max_challenges": 1
+        }
+      }
+    },
+    "signature": "vCwaZtRK00VlVbWl8rRpLoOa9nkb-bSb5JxjkEPR8YOzUphCAp6ceUZp4uUZODk68n_06fXkpWPxefPmMkO74Q"
+  },
+  "redemption_signing_bytes_utf8": "[\"djc-surface-enrollment/1\",\"POST\",\"/v1/push/surface/enrollment/redeem\",{\"action\":\"redeem\",\"authorization_id\":\"synthetic-vector-authorization\",\"consent\":{\"action_id\":\"synthetic-action\",\"expires_at_ms\":1792498500000,\"generation_id\":\"synthetic-generation\",\"nonce\":\"BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc\",\"plan_digest\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"},\"contract_version\":1,\"enrollment\":{\"action\":\"enrol\",\"approval_reference\":\"synthetic-not-human-consent\",\"binding_id\":\"5555555555555555555555555555555555555555555555555555555555555555\",\"contract_version\":1,\"delegation_id\":\"synthetic-vector-delegation\",\"device_binding\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"expected_revision\":0,\"grant_binding\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"install_id\":\"synthetic-install\",\"operation_id\":\"01a1592e-c600-7000-8000-000000000002\",\"owner_binding\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"policy\":{\"activity_profile\":null,\"apns_environment\":\"sandbox\",\"external_content_allowed\":false,\"max_challenges\":1,\"max_events\":2,\"max_operations\":4,\"original_grant_expires_at_ms\":1792498500000,\"platform\":\"ios\",\"target\":{\"app_bundle_id\":\"dev.synthetic.ios\",\"extension_bundle_id\":\"dev.synthetic.ios.widget\",\"widget_kind\":\"synthetic\"},\"token_role\":\"widget\"},\"public_key\":{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"1cXRWJcjy4qvsLMGBmniyfAPg6QJSxltr17Ds8W52pE\",\"y\":\"kNaIfoWZ5uXSxqOqH9SnVI4WpK5bkvjZoVZ6ARTUGFk\"},\"purpose\":\"surface_push\",\"source_binding\":\"4444444444444444444444444444444444444444444444444444444444444444\"},\"purpose\":\"surface_enrollment\"}]",
+  "expected_bindings": {
+    "nonce": "dc4bf80c77473d130fa0de86ba4018fe98bb214005e6a5891d12ba91446f9e81",
+    "action": "2bdb2b11a7b9728863fc78b117f3c6b81baa93c8d91f883084657e6f693b3061",
+    "consent": "aafa7acc419b82808d5d460be0491ea075dd4c5915d46193cfcbda89b5867bf5",
+    "request": "f26822e30b4cc1043a0cf17f4b685a273ed41f1bee59fb45c82fcc96b4eafcd0",
+    "key": "008782430a4f6a348bc50b799a476dc1cb6cbb6750855ce4232c852e80686013",
+    "scope": "bda9dc0c5a943325a7690e023cebdb56726968b4a39337a67221141779100b3c"
+  },
+  "expected_enrollment_response": {
+    "contract_version": 1,
+    "success": true,
+    "authorization_id": "synthetic-vector-authorization",
+    "enrollment_operation_id": "01a1592e-c600-7000-8000-000000000002",
+    "request_hash": "f26822e30b4cc1043a0cf17f4b685a273ed41f1bee59fb45c82fcc96b4eafcd0",
+    "consent_digest": "aafa7acc419b82808d5d460be0491ea075dd4c5915d46193cfcbda89b5867bf5",
+    "key_thumbprint": "008782430a4f6a348bc50b799a476dc1cb6cbb6750855ce4232c852e80686013",
+    "scope_digest": "bda9dc0c5a943325a7690e023cebdb56726968b4a39337a67221141779100b3c",
+    "expires_at_ms": 1792498500000,
+    "state": "enrolled",
+    "replayed": false
+  },
+  "expected_authorization_metadata": {
+    "contract_version": 1,
+    "success": true,
+    "authorization_id": "synthetic-vector-authorization",
+    "operation_id": "01a1592e-c600-7000-8000-000000000001",
+    "request_hash": "f26822e30b4cc1043a0cf17f4b685a273ed41f1bee59fb45c82fcc96b4eafcd0",
+    "consent_digest": "aafa7acc419b82808d5d460be0491ea075dd4c5915d46193cfcbda89b5867bf5",
+    "key_thumbprint": "008782430a4f6a348bc50b799a476dc1cb6cbb6750855ce4232c852e80686013",
+    "scope_digest": "bda9dc0c5a943325a7690e023cebdb56726968b4a39337a67221141779100b3c",
+    "expires_at_ms": 1792497900000,
+    "state": "authorized",
+    "credential_state": "available",
+    "replayed": false
+  },
+  "authorization_metadata_note": "Winning raw djce credential deliberately omitted; this is metadata, not a complete authorization reply or a credential. No Authorization header or private key retained."
+}
