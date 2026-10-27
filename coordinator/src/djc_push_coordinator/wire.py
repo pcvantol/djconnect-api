@@ -15,6 +15,11 @@ DESCRIPTOR = ("core_instance_id", "installation_id", "entry_id", "device_id", "c
               "device_enrollment_expires_at_unix_ms")
 CHILD = ("version", "state") + COORD + ("child_id", "child_revision", "B_body_sha256", "outcome")
 OUTCOMES = ("CURRENT", "RETIRED", "EXPIRED", "UNKNOWN", "COMMITTED_BUT_SUPPRESSED")
+# Types are contract-owned, never inferred from an identifier's suffix.
+# In particular auth_generation is an opaque credential-generation string.
+INTEGER_FIELDS = frozenset({"push_authority_revision", "parent_enrollment_generation",
+                            "policy_revision", "issued_at_unix_ms", "operation_deadline_unix_ms",
+                            "device_enrollment_expires_at_unix_ms", "child_revision"})
 
 
 class InvalidWire(ValueError):
@@ -60,7 +65,7 @@ def _fields(value):
         elif name == "state":
             if type(v) is not str:
                 _fail()
-        elif name.endswith(("_revision", "_generation", "_unix_ms")):
+        elif name in INTEGER_FIELDS:
             if type(v) is not int or not 1 <= v <= MAX:
                 _fail()
         elif name.endswith("sha256"):

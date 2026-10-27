@@ -338,6 +338,21 @@ os._exit(0)
 
 
 class WireCase(unittest.TestCase):
+    def test_opaque_auth_generation_is_valid_contract_data(self):
+        packet = json.loads((Path(__file__).parents[1] / "qualification/passive-vectors.json").read_text())
+        vector = next(v for v in packet["vectors"] if v["name"] == "current-ipados-data-not-capability")
+        data = json.loads(vector["canonical_utf8"])
+        data["auth_generation"] = "synthetic-auth-generation"
+        self.assertEqual(wire.role_state(CANON(data), wire.ROLE_PATHS[0])["auth_generation"], "synthetic-auth-generation")
+
+    def test_numeric_auth_generation_is_invalid_contract_data(self):
+        packet = json.loads((Path(__file__).parents[1] / "qualification/passive-vectors.json").read_text())
+        vector = next(v for v in packet["vectors"] if v["name"] == "current-ipados-data-not-capability")
+        data = json.loads(vector["canonical_utf8"])
+        for invalid in (1, True, None, "", "invalid/generation", "x" * 129):
+            with self.subTest(auth_generation=invalid), self.assertRaises(wire.InvalidWire):
+                wire.role_state(CANON(dict(data, auth_generation=invalid)), wire.ROLE_PATHS[0])
+
     def test_clock_does_not_supply_unqualified_utc_or_mac_fallback(self):
         with self.assertRaises(ClockUnavailable):
             LinuxBootClock.__new__(LinuxBootClock).utc_upper_ms()
