@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "kind": "uncomposed_native_proof_D1_DATA_journal_source_observations",
+  "at": "2026-10-27T04:11:22.945262+00:00",
+  "base": "cac088cefa09cab14f31021e21831d1d1868a0fb",
+  "plan_v2_sha256": "05385ec87a00a8c0ce5f2d882ec586a7979c658df4d937f8f852c8588bed3468",
+  "bounded_plan_review_sha256": "659dbaf2985084c5cf1414e8e3da66591b9fbfdfa2f7861c6022f24925249533",
+  "classification": "DATA_ONLY_NOT_ADMISSION",
+  "source_sha256": {
+    "src/surface-push/native-proof-data-journal.ts": "2655a02e7bf094d952160cbc5cbc904ec1d31664235e71d11f4176f0b9c95bf8",
+    "qualification/surface-push/native-proof-data-journal-schema.sql": "19ebdabe8e14cb6f5c7f90eadb41eb74c027e753cfb1b2034ce627e08c7c166f",
+    "test/native-proof-data-journal.spec.ts": "e1456f80bc230385f134c9416d623c938fb8b693c4b2b0f672c0e9db243d9926",
+    "qualification/surface-push/tsconfig.native-proof-data-journal.json": "6aaa8c9ce80a9874e4b1d1e83c4269fc549a43987c236903808e95c8967e01df",
+    ".github/workflows/native-proof-data-journal.yml": "e4f3b8bf3a75569551f6bcd4cdc4efa02b679086f7e4ec2bf4b80843f13a473a",
+    "docs/push/NATIVE_PROOF_DATA_JOURNAL_SOURCE_V1.md": "ba2536b16bccb1fae2e248576c2124f7d4af4b356e5c91699fa0f99b8ba33f80"
+  },
+  "actual_local_results": {
+    "worker_cases": 443,
+    "retained_worker_cases": 387,
+    "new_journal_cases": 56,
+    "worker_files": 11,
+    "worker_failures": 0,
+    "worker_skips": 0,
+    "final_changed_SQL_focused_cases": 56,
+    "final_changed_SQL_failures": 0,
+    "root_and_dedicated_types_and_diff_exit_codes": {
+      "root-types-final.log": 0,
+      "journal-types-final.log": 0,
+      "diff-check-final.log": 0
+    },
+    "first_primary_actual_D1_transactions": true,
+    "product_checks": 128,
+    "forbidden_RPC_denials": 100,
+    "outbound_calls": 0
+  },
+  "historical_runs": {
+    "initial_focused": {
+      "cases": 55,
+      "passed": 55,
+      "failed": 0,
+      "scope": "before locally observed postcommit retirement guard/test"
+    },
+    "initial_dedicated_types": {
+      "exit_code": 1,
+      "diagnostics": 4,
+      "reason": "test snapshot generic result unknown; repaired before first Worker run; not PASS"
+    },
+    "full_worker_v1": {
+      "cases": 443,
+      "passed": 443,
+      "failed": 0,
+      "scope": "after local retirement guard; before final equivalent bound-only retirement SQL marker join",
+      "final_changed_SQL_qualification": "all56 journal cases PASS on final source"
+    }
+  },
+  "compiled_product": {
+    "baseline": "docs/rendezvous/closed-enrollment-service-product-observations-v2.json",
+    "fresh_observation_bytes_equal_baseline": true,
+    "observation_sha256": "82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15",
+    "bundle_sha256": "04970fbd1259b3e9e4a9ecc2de1a137efde95f4223cf42265097bb8c710b65c8",
+    "bundle_bytes": 1291545,
+    "new_module_in_shipping_graph": false,
+    "production_migrations_added": false,
+    "root_binding_config_dependencies_changed": false,
+    "public_dispatch": "COMPILED_OFF/503",
+    "issuer_profiles": [],
+    "activity_profiles": [],
+    "full_service_gates": "22 OPEN"
+  },
+  "causal_controls": [
+    "competing adapters reserve once",
+    "cross-job/cross-role operation and nonce aliases roll back all create writes",
+    "global same-key expectedrevision one winner",
+    "counter zero-row CAS loss preserves all job/claim/transcript rows",
+    "job zero-row CAS loss never advances counter",
+    "same key remains global across management data epochs and foreign scopes cannot reset it",
+    "trigger counter update then job CAS loss causes SQL invariant rollback including trigger update",
+    "ordinary statement failure rollback distinct from original identical-cause transport exception",
+    "RAM reservation consumed before input validation, closure or cancellation; no clone/restart/reply-cache recovery",
+    "postcommit close/abort/lost reply/observed local retirement suppress reply and preserve committed counter",
+    "independent SQL retirement race, exact original-job retirement and same-scope successor untouched",
+    "fixed deadline data, closed snapshots, UInt32 and safe revision limits"
+  ],
+  "logs_sha256": {
+    "focused-final-v1.log": "0641d887f86aef441dcd30f0b420eaa42b9b9d4b8f13b2c864453094b9d5a80f",
+    "root-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused-initial.log": "0ba7c094f15a0138fdd893a4cfab41f7cac9cdf5fe71beebb27fcfb8294982c6",
+    "journal-types-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused-initial.json": "66ed0325bbfd7c8f352d12c30b9050710a26137e87e73d0fb4b6b622a7b7f648",
+    "journal-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "full-worker-v1.log": "6d8eea0ff519a9a4c72e749b077be5a5f832f461723b6c0caf9381451dbc9e80",
+    "product-v1.log": "dc7e8fed408fa0f2980a2cb5b8cb9ae29220c447d8ea0f61421f57cd9108f255",
+    "focused-final-v1.json": "9f183d12e8bde76c632ada3d779077eae4255e8423a794cd3a9904e386dad888",
+    "diff-check-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "full-worker-v1.json": "25291f0183c042acd9a894f7df3361c8897161d7d5bd819f159b8bf24f07726c",
+    "root-types-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "not_qualified": [
+    "Actual native signature/attestation verification or native target identity",
+    "Genuine owner/operator admission, management principal/key custody or Profile entitlement",
+    "Qualified original clock mapping and current deadline validity",
+    "Physical powerloss/restore/backup rollback or deployed durable-before-SDK guarantee",
+    "Operational factory, runtime/DDL/provider selection or migration",
+    "Provider/device/live push delivery or production activation"
+  ],
+  "next": "Freeze exact whole-source packet for personal independent review; normal protected source/own-main and separate Final only after scoped reviews. No deploy/effect authorized here."
+}
