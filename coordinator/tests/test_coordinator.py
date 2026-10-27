@@ -338,6 +338,25 @@ os._exit(0)
 
 
 class WireCase(unittest.TestCase):
+    def test_role_state_rejects_malformed_types_before_semantic_operations(self):
+        packet = json.loads((Path(__file__).parents[1] / "qualification/passive-vectors.json").read_text())
+        vector = next(v for v in packet["vectors"] if v["name"] == "current-ipados-data-not-capability")
+        data = json.loads(vector["canonical_utf8"])
+        for key, invalid in (("device_platform", []), ("operation_deadline_unix_ms", "100")):
+            with self.subTest(field=key), self.assertRaises(wire.InvalidWire):
+                wire.role_state(CANON(dict(data, **{key: invalid})), wire.ROLE_PATHS[0])
+
+    def test_role_state_all_fields_have_controlled_wrong_type_rejections(self):
+        packet = json.loads((Path(__file__).parents[1] / "qualification/passive-vectors.json").read_text())
+        vector = next(v for v in packet["vectors"] if v["name"] == "current-ipados-data-not-capability")
+        data = json.loads(vector["canonical_utf8"])
+        for key, valid in data.items():
+            invalid_values = ("wrong-type", None, [], {}, True) if type(valid) is int else (0, None, [], {}, True)
+            for invalid in invalid_values:
+                with self.subTest(field=key, invalid=invalid), self.assertRaises(wire.InvalidWire):
+                    wire.role_state(CANON(dict(data, **{key: invalid})), wire.ROLE_PATHS[0])
+
+
     def test_opaque_auth_generation_is_valid_contract_data(self):
         packet = json.loads((Path(__file__).parents[1] / "qualification/passive-vectors.json").read_text())
         vector = next(v for v in packet["vectors"] if v["name"] == "current-ipados-data-not-capability")

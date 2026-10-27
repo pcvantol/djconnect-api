@@ -91,15 +91,16 @@ def role_state(raw: bytes, exact_path: str):
         _keys(v, ("version", "state") + COORD)
     elif state == "AUTHORITY_CURRENT":
         _keys(v, ("version", "state") + DESCRIPTOR)
+    else:
+        _fail()
+    _fields(v)  # Validate primitive types before hashing/lookup/comparison.
+    if state == "AUTHORITY_CURRENT":
         role = ROLES[ROLE_PATHS.index(exact_path)]
         mapping = {"ios": "ios", "ipados": "ios", "macos": "macos", "watchos": "watchos"}
         if (v["transport_role"] != role or v["client_id"] != v["device_id"]
                 or v["device_platform"] not in mapping or mapping[v["device_platform"]] != v["client_type"]
                 or v["operation_deadline_unix_ms"] > v["device_enrollment_expires_at_unix_ms"]):
             _fail()
-    else:
-        _fail()
-    _fields(v)
     return v  # DATA dict only. No SDK/task-owner/authority handle.
 
 

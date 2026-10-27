@@ -20,8 +20,8 @@
     "coordinator/src/djc_push_coordinator/coordinator.py": "68ed3e454523ad66360115f2380eeeeffb749469a2f40004401792812c145ec8",
     "coordinator/src/djc_push_coordinator/schema.sql": "1bc96a59564620aaffb6906c77d211ea3198a2f3ea04d5bf02da8fc128aca88c",
     "coordinator/src/djc_push_coordinator/sqlite_store.py": "f6f287a8a0407847646d7f6964c219f2d84c0a88243a61c89849a663692099c3",
-    "coordinator/src/djc_push_coordinator/wire.py": "282d7d8389ac97c65f2831aa8a80855a48c3edd2c92b4de724d2c79c40969b2e",
-    "coordinator/tests/test_coordinator.py": "c253b23c66b161dd5ee0635c9401081d32ed3e9c2c0e87641ac2ad5f8328a8a0",
+    "coordinator/src/djc_push_coordinator/wire.py": "e09e51220c1db1b008c2aea36b2e4e7ed29df7a2acd16ca8e6c21f1f01a11d36",
+    "coordinator/tests/test_coordinator.py": "11a62b6b87758397304f1d59dcc9c6e8a2b983e9175019fd55bb67596b92de98",
     "qualification/surface-push/native-proof-data-journal-schema.sql": "19ebdabe8e14cb6f5c7f90eadb41eb74c027e753cfb1b2034ce627e08c7c166f",
     "src/surface-push/native-proof-data-journal.ts": "2655a02e7bf094d952160cbc5cbc904ec1d31664235e71d11f4176f0b9c95bf8"
   }
