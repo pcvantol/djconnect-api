@@ -38,12 +38,14 @@ describe("uncomposed native proof canonical DATA codec in actual Worker runtime"
    if (parsed.data.proof_variant === "target_registration_assertion") expect(Object.isFrozen(parsed.data.native_target)).toBe(true);
   });
   it(`rejects an equal duplicate root key that JSON.parse would discard: ${label}`, () => {
-   const raw = v.canonical_transcript_utf8.replace("{", '{"contract_version":1,');
+   expect(v.canonical_transcript_utf8[0]).toBe("{");
+   const raw = '{"contract_version":1,' + v.canonical_transcript_utf8.slice(1);
    expect(JSON.parse(raw)).toEqual(v.transcript);
    rejects(() => decodeNativeProofTranscript(utf8(raw)), "duplicate_json_key");
   });
   it(`rejects an escaped equal duplicate key: ${label}`, () => {
-   const raw = v.canonical_transcript_utf8.replace("{", '{"contract_\\u0076ersion":1,');
+   expect(v.canonical_transcript_utf8[0]).toBe("{");
+   const raw = '{"contract_\\u0076ersion":1,' + v.canonical_transcript_utf8.slice(1);
    expect(JSON.parse(raw)).toEqual(v.transcript);
    rejects(() => decodeNativeProofTranscript(utf8(raw)), "duplicate_json_key");
   });
