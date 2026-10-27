@@ -1,0 +1,49 @@
+name: Push coordinator source qualification
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  software-assurance-governance:
+    name: Software Assurance governance
+    permissions:
+      contents: read
+    uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875
+    with:
+      execution_profile: balanced
+      owner: pcvantol/djconnect-api
+
+  coordinator-source:
+    name: CPython 3.14 native SQLite and closed-source controls
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0, existing repository pin
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+      - name: Verify reusable workflow pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check_reusable_workflow_refs.sh
+      - name: Qualify source only; no pip, native SDK or provider
+        env:
+          TMPDIR: ${{ runner.temp }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python coordinator/qualify.py
+      - name: Independent JavaScript synthetic byte parity
+        run: node coordinator/qualification/canonical-vectors.mjs

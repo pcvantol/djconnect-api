@@ -1,0 +1,9 @@
+[project]
+name = "djc-push-coordinator-source"
+version = "0.0.0"
+description = "Uncomposed single-executor source qualification; no live admission"
+requires-python = ">=3.14,<3.15"
+dependencies = []
+
+# No daemon, console script, production factory, installation or build backend.
+# Run qualification directly from this source tree with CPython 3.14.
