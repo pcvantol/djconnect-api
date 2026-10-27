@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "kind": "single_executor_native_SQLite_SOURCE_QUALIFICATION_separate_Finalization",
+  "source_PR": 161,
+  "source_base": "11a342108caea66ab9d69306b16d79bf81f6871b",
+  "source_candidate": "a147f2afe3af44a763e6ff84bd5712932f592532",
+  "qualified_source_main": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+  "tree": "91173f532c204ef36c0c60045d57affac4b32e35",
+  "candidate_test_merge": "024bc19161e822691c007c1e4175e9b9c75fb7d1",
+  "independent_whole14_review_sha256": "bae67d6df9792149c3622212ae61270046b228d6b56f0398e439903cdd4612a6",
+  "Apple_passive_review_sha256": "370bbdf9d086e75f7c28c700fc8550a767a25298638f6926303223c82779a651",
+  "Apple_scope": "Exact d1b passive wire/vector/JS unchanged in a147; not whole SQLite/security/native review",
+  "local_qualification": "38PASS CPython3.14.10/SQLite3.54.1 Darwin +3JS",
+  "hosted_qualification": "38PASS CPython3.14.9/SQLite3.45.1 Linux +3JS; no real clock/VFS qualification",
+  "original_failures": [
+    "99307a8 original29 passed but later independent causal probes found wrong auth_generation type and context substitution; original remains NO_GO",
+    "3b1 fixed auth_generation but malformed field types raised TypeError",
+    "d1b fixed types, final context-binding flaw still present",
+    "a147 exact immutable admission/fullSQLjoin and reentrancy fixes qualified38PASS; original failures retained"
+  ],
+  "candidate_runs": [
+    {
+      "conclusion": "success",
+      "databaseId": 40489929132,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Semgrep"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489928055,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Native proof transcript source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489928217,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Trusted Delivery"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489927770,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Push coordinator source qualification"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489927776,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Native proof DATA journal source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489927888,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Surface enrollment source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489928033,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489928825,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489927521,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489927464,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489927466,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40489927456,
+      "headSha": "a147f2afe3af44a763e6ff84bd5712932f592532",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "exact_OwnerAuthorization": 40490001468,
+  "TrustedDelivery": 40489928217,
+  "CodeQL_PR_aggregate": 122141423970,
+  "CodeQL_PR_annotations": 0,
+  "original_verification": {
+    "main": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+    "candidate": "a147f2afe3af44a763e6ff84bd5712932f592532",
+    "formal_sha256": "5478de0aaa47b4045ddc93b5c11da16c6617aab14d5b38b579b070b858bb811d",
+    "canonical_source_digest": "903a8b93b77c029d2579a3de612b2f2213d931fb3acc19744c9e9731d41cc473",
+    "durable_sha256": "d7503e3bbf7a05e410dd3b29ef9d868365cfb0ddae0a94e8a615a98d42fb3bff",
+    "durable_asset": 681289660,
+    "all12_durable_checks": "PASS",
+    "release_tar_sha256": "538fa808fc2a521ab24b36dcc6f5c467019bdf2154a64f998e93b9f8beb5e578",
+    "worker_sha256": "c82543035d9aa8c6dae74634f10a88a6fd87367807f3920932a46a6ec3cedd24",
+    "worker_bytes": 1291540,
+    "sidecars_sha256": {
+      "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+      "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+      "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+      "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+      "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+      "migrations/0011_surface_enrollment_authorizations.sql": "6fd3be56034da4a8d1bfcfa56b9286f3ccf4ce596e44ddf73cfc100852044c3b",
+      "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+      "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+      "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+      "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+      "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+      "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+      "THIRD_PARTY_NOTICES.md": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+      "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e"
+    },
+    "safe_unique_paths": true,
+    "licenses_verified": true,
+    "Worker_equal_Final160_except_one_source_SHA": true,
+    "coordinator_not_in_Worker_artifact": true,
+    "effects": "Offline original verification only; not deployment"
+  },
+  "source_original_packet_sha256": "b2811ec9ab91fecd80c67c5c2eaf430443728be43009fd8a00e1511c18017645",
+  "operational_default": "UNAVAILABLE",
+  "effects": "No deployment, production DDL, native SDK, signer/key/token, provider, install or real device action",
+  "at": "2026-10-27T10:53:35.677935+00:00",
+  "all13_original_source_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 40490962484,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490961810,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490764428,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Dependency Graph"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756698,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756562,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Surface enrollment source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490758058,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756712,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Native proof transcript source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756848,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Native proof DATA journal source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756583,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Push coordinator source qualification"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756090,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756029,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756024,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40490756017,
+      "headSha": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "original_main_Python_qualification": "38PASS CPython3.14.8/SQLite3.45.1 Linux +3JS; own main run40490756583",
+  "original_main_Python_log_sha256": "9b901c77ba0707f8604bf4277da7e22b37cd4fa8470b5ff04d2c2dfd0f65ae1b",
+  "source_main_formal_run": 40490962484,
+  "source_main_release_run": 40490961810,
+  "independent_original_join": {
+    "at": "2026-10-27T10:52:29.003304+00:00",
+    "scope": "Root personal original API Source161 local formal/durable/Worker release join; no deployment/native acceptance",
+    "candidate": "a147f2afe3af44a763e6ff84bd5712932f592532",
+    "protected": "81324d0d75b843de7f986d8bcfb44c87fdd9d542",
+    "tree": "91173f532c204ef36c0c60045d57affac4b32e35",
+    "source_parent": "11a342108caea66ab9d69306b16d79bf81f6871b",
+    "packet_sha256": "b2811ec9ab91fecd80c67c5c2eaf430443728be43009fd8a00e1511c18017645",
+    "decision": "ORIGINAL_DATA_SOURCE161_DELIVERY_NO_BLOCKERS_SEPARATE_FINAL_STILL_REQUIRED",
+    "checks": [
+      "All11 original packetfile actual hashes verified",
+      "Formal and durable canonical digest independently recomputed, all12 PASS and exactsourcecoverage",
+      "Exact merged/reviewed Git tree/parent personally checked",
+      "Ownlive originalformal/release/native3runs SUCCESS and current all13 live inventory separately recorded",
+      "Unique safe regular TAR paths, exact17 Git sidecars and LICENSES digestmanifest verified without extraction",
+      "Worker1291540bytes exactc8254303... and direct originalFinal160 TAR equality except one embeddedmainSHA",
+      "Coordinator Python package absent from Worker artifact; no installer/runtimepromotion inferred"
+    ],
+    "formal_raw_sha256": "5478de0aaa47b4045ddc93b5c11da16c6617aab14d5b38b579b070b858bb811d",
+    "durable_sha256": "d7503e3bbf7a05e410dd3b29ef9d868365cfb0ddae0a94e8a615a98d42fb3bff",
+    "tar_sha256": "538fa808fc2a521ab24b36dcc6f5c467019bdf2154a64f998e93b9f8beb5e578",
+    "worker_sha256": "c82543035d9aa8c6dae74634f10a88a6fd87367807f3920932a46a6ec3cedd24",
+    "source_review_sha256": "bae67d6df9792149c3622212ae61270046b228d6b56f0398e439903cdd4612a6",
+    "limits": "Owning-downloaded original JSON/TAR/providerasset metadata personally checked, not own rawartifactZIPdownload/digestclaim. No SourceFinal borrowedqualification, actualLinux/UTC/VFS/principal/key/native/provider admission or deployment."
+  },
+  "machine_scope": "Documentary Finalization of source-only software; actual runtime/key/clock/native/provider qualification remains OPEN",
+  "independent_original_join_sha256": "611a5630022ec611eff82790cfb03d72b66f029c111623d181a65700ac719b60",
+  "local_complete_source_tar_sha256": "9658a2caf6f072bf6827c897380339d0eb5ae14f2571ef24cce06eea13d968a6",
+  "status": "SOURCE161_ORIGINAL_QUALIFIED_SEPARATE_DOCUMENTARY_FINAL_REQUIRES_OWN_REVIEW_MERGE_AND_ORIGINAL_QUALIFICATION"
+}
