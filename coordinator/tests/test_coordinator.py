@@ -70,12 +70,13 @@ class StoreCase(unittest.IsolatedAsyncioTestCase):
     async def stage(self, name, rev, counter=None, prepare=noop):
         return await self.owner.step(self.admission, name, rev, U(), U(), H(U()), H("body"), prepare, counter)
 
-    async def complete_all(self):
+    async def complete_all(self, key=None):
+        key = H("key") if key is None else key
         self.begin()
         await self.stage("prepare_key", 1)
-        await self.stage("verify_key", 2, (H("key"), 0, None))
+        await self.stage("verify_key", 2, (key, 0, None))
         await self.stage("prepare_target", 3)
-        await self.stage("verify_target", 4, (H("key"), 1, 1))
+        await self.stage("verify_target", 4, (key, 1, 1))
         await self.stage("submit", 5)
 
     async def test_coherent_actual_sqlite_to_final_source_observation(self):
@@ -85,6 +86,64 @@ class StoreCase(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.store.inspect_data("jobs")[0]["phase"], "SUBMIT_SPENT")
         with self.assertRaises(Conflict):
             self.owner.observe_final_boundary(self.admission, lambda: b"retry")
+
+    async def test_final_context_substitution_cannot_use_original_handle(self):
+        await self.complete_all()
+        substituted = replace(self.admission, job=replace(self.job, context_sha256=H("different-context")))
+        with self.assertRaises(Conflict):
+            self.owner.observe_final_boundary(substituted, lambda: b"SUBSTITUTED")
+        self.assertEqual(self.owner.observations, [])
+        with self.assertRaises(Conflict):
+            self.owner.observe_final_boundary(self.admission, lambda: b"retry-original")
+
+    async def test_final_sql_job_substitution_before_build_is_rejected(self):
+        await self.complete_all()
+        self.store._db.execute("UPDATE jobs SET context_sha256=? WHERE job_id=?", (H("mutated"), self.job.job_id))
+        with self.assertRaises(Conflict):
+            self.owner.observe_final_boundary(self.admission, lambda: self.fail("build must not run"))
+        self.assertEqual(self.owner.observations, [])
+
+    async def test_final_handle_binds_all_original_job_and_clock_coordinates(self):
+        self.admission = replace(self.admission, policy=replace(self.admission.policy, max_jobs=100, max_stage_reservations=100))
+        mutations = {
+            "context": lambda a: replace(a, job=replace(a.job, context_sha256=H("substituted"))),
+            "parent": lambda a: replace(a, job=replace(a.job, parent_id=U())),
+            "parent_generation": lambda a: replace(a, job=replace(a.job, parent_generation=2)),
+            "pairing_epoch": lambda a: replace(a, job=replace(a.job, pairing_epoch="substituted")),
+            "principal_epoch": lambda a: replace(a, job=replace(a.job, principal_epoch=2)),
+            "key_scope": lambda a: replace(a, job=replace(a.job, key_scope_sha256=H("substituted-scope"))),
+            "deadline": lambda a: replace(a, job=replace(a.job, deadline_ms=90)),
+            "continuous_cutoff": lambda a: replace(a, original_continuous_cutoff_ns=99),
+            "clock_domain": lambda a: replace(a, clock_domain="substituted-domain"),
+        }
+        for name, mutation in mutations.items():
+            self.job = replace(self.job, job_id=U())
+            self.admission = replace(self.admission, job=self.job)
+            await self.complete_all(key=H(self.job.job_id))
+            with self.subTest(coordinate=name), self.assertRaises(Conflict):
+                self.owner.observe_final_boundary(mutation(self.admission), lambda: self.fail("substituted build"))
+        self.assertEqual(self.owner.observations, [])
+
+    async def test_final_sql_parent_retirement_during_build_is_rejected(self):
+        await self.complete_all()
+        def build():
+            # Bypass the owner's in-memory fence to test real SQL revalidation.
+            self.store.retire_parent(self.parent)
+            return b"LATE"
+        with self.assertRaises(Conflict):
+            self.owner.observe_final_boundary(self.admission, build)
+        self.assertEqual(self.owner.observations[0]["state"], "SPENT")
+
+    async def test_reentrant_build_updates_only_its_own_observation_record(self):
+        await self.complete_all()
+        first = self.admission
+        self.job = replace(self.job, job_id=U())
+        self.admission = replace(self.admission, job=self.job)
+        await self.complete_all(key=H("second-key"))
+        def build():
+            return self.owner.observe_final_boundary(self.admission, lambda: b"SECOND")
+        self.assertEqual(self.owner.observe_final_boundary(first, build), b"SECOND")
+        self.assertEqual([r["state"] for r in self.owner.observations], ["SOURCE_OBSERVATION_ONLY"] * 2)
 
     async def test_production_missing_before_open_or_effect(self):
         for method in (ProductionCoordinator().enroll, ProductionCoordinator().submit):

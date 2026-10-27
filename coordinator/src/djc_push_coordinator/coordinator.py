@@ -63,7 +63,7 @@ class _SourceCoordinator:
         self._last_continuous = -1
         self._last_utc_upper = -1
         self.observations: list[dict] = []
-        self._submission_handles: set[str] = set()
+        self._submission_handles: dict[str, _SyntheticAdmission] = {}
 
     def _guard(self, admission: _SyntheticAdmission):
         try:
@@ -116,7 +116,7 @@ class _SourceCoordinator:
             self.store.complete_stage(admission.job, token, counter)
             self._guard(admission)
             if stage == "submit":
-                self._submission_handles.add(admission.job.job_id)
+                self._submission_handles[admission.job.job_id] = admission
         except BaseException:
             # Local fence survives even if SQL settlement cannot be acknowledged.
             self._retired.add(admission.job.parent_id)
@@ -144,19 +144,22 @@ class _SourceCoordinator:
             raise Unavailable("child expired after actual commit; suppress result")
 
     def observe_final_boundary(self, admission: _SyntheticAdmission, build):
-        if admission.job.job_id not in self._submission_handles:
+        original = self._submission_handles.pop(admission.job.job_id, None)
+        if original is None:
             raise Conflict("no original in-process submission handle; never rehydrate")
-        self._submission_handles.remove(admission.job.job_id)
+        if admission is not original:
+            raise Conflict("submission handle binds original immutable admission and witnesses")
         self._guard(admission)
-        row = next((r for r in self.store.inspect_data("jobs") if r["job_id"] == admission.job.job_id), None)
-        if row is None or row["phase"] != "SUBMIT_SPENT":
-            raise Conflict("submission requires durable once-spent stage")
+        self.store.validate_submission_data(original.job)
+        self._guard(original)
         # Local observation latch is consumed before synchronous construction.
         # A production sender is intentionally absent: this seam records DATA only.
         if any(o["job_id"] == admission.job.job_id for o in self.observations):
             raise Conflict("observation already spent")
-        self.observations.append({"job_id": admission.job.job_id, "state": "SPENT"})
+        observation = {"job_id": original.job.job_id, "state": "SPENT"}
+        self.observations.append(observation)
         payload = build()
-        self._guard(admission)  # AFTER synchronous construction, no await/RPC hop.
-        self.observations[-1]["state"] = "SOURCE_OBSERVATION_ONLY"
+        self.store.validate_submission_data(original.job)
+        self._guard(original)  # AFTER construction AND SQL join; no await/RPC hop.
+        observation["state"] = "SOURCE_OBSERVATION_ONLY"
         return payload

@@ -279,6 +279,15 @@ class NativeSQLiteStore:
             db.execute("UPDATE claims SET outcome='RETIRED' WHERE job_id IN (SELECT job_id FROM jobs WHERE parent_id=?) AND outcome='RESERVED'", (parent_id,))
         self._transaction(write)
 
+    def validate_submission_data(self, job: Job):
+        """One actual SQLite snapshot: exact immutable job AND live parent join."""
+        def read(db):
+            self._parent(db, job)
+            row = self._job(db, job)
+            if row["phase"] != "SUBMIT_SPENT":
+                raise Conflict("submission requires original durable once-spent stage")
+        self._transaction(read)
+
     def inspect_data(self, table: str):
         if table not in {"parents", "children", "jobs", "operations", "nonces", "claims", "key_counters"}:
             raise Conflict("unknown table")

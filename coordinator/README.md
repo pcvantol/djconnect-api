@@ -45,6 +45,11 @@ It never claims rollback of an acknowledged commit or repairs with a new UUID.
 Cancellation is checked after actual settlement and before final publication.
 Process-exit tests distinguish before/after COMMIT; they are not physical
 power-loss tests. Restart never reconstructs an in-process submission handle.
+The consumed private handle binds the exact original immutable admission,
+complete Job and original clock/policy witnesses, rather than only a job ID.
+Actual immutable SQLite job/status/parent joins are checked both before payload
+construction and again before the final local clock guard. A reentrant build
+callback updates only its own captured observation record.
 Actual restore acceptance and unknown-native-outcome recovery remain unqualified.
 
 ## Passive wire boundary

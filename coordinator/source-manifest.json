@@ -10,18 +10,18 @@
   "global_invariant_source": "Reviewed D1 once/CAS/global-counter recipe, reused semantics and new provider-specific tests, no D1 execution/authority substitution",
   "inputs_sha256": {
     ".github/workflows/push-coordinator-source.yml": "97adb949c8aaf82e43d77da284e0158d6570e0fb8020520387a9cda6ab9f3f33",
-    "coordinator/README.md": "7c594b9109571314aac67f7bcb53dcf49108fc0224e00d32b13dcefc3edc29ac",
+    "coordinator/README.md": "bf9613ca966abb2e64921fdb746e1c9677534568444ead6165809a97414556cf",
     "coordinator/pyproject.toml": "81552278748e5fc7163259e8262e8169292c69e41154531fee47fbd1d112233a",
     "coordinator/qualification/canonical-vectors.mjs": "59024ffa8db2177bb7b79dbc10f1b804b6c4b951a258b246714d9161ed878764",
     "coordinator/qualification/passive-vectors.json": "9d16df3fdf0f5841eac866b8ff4ff0db1ddb4e5c0b4fa88a6e884ff5d19874df",
     "coordinator/qualify.py": "f6d18e9aaac8f5a8b28f8054d9296ed5b59fa73fe65d40f30a2edf1d255880c7",
     "coordinator/src/djc_push_coordinator/__init__.py": "3e1b3ed0bc9c8e4c7754b13182d4cff48198436e3e9fdb3cfe7554ae1f15def8",
     "coordinator/src/djc_push_coordinator/clock.py": "f488432e781796c1dfdee11ddcef9f04ffd83a99c44d7fdb74171b086ddf0f5e",
-    "coordinator/src/djc_push_coordinator/coordinator.py": "68ed3e454523ad66360115f2380eeeeffb749469a2f40004401792812c145ec8",
+    "coordinator/src/djc_push_coordinator/coordinator.py": "4f902fc5da60f9e658ea3a7f0702c0e310995bd5c7c8505ad15399c97065f306",
     "coordinator/src/djc_push_coordinator/schema.sql": "1bc96a59564620aaffb6906c77d211ea3198a2f3ea04d5bf02da8fc128aca88c",
-    "coordinator/src/djc_push_coordinator/sqlite_store.py": "f6f287a8a0407847646d7f6964c219f2d84c0a88243a61c89849a663692099c3",
+    "coordinator/src/djc_push_coordinator/sqlite_store.py": "5dcf113c9e78b55be91ce4cc61041d4b6853d7bfeefdba49045ffca50453663c",
     "coordinator/src/djc_push_coordinator/wire.py": "e09e51220c1db1b008c2aea36b2e4e7ed29df7a2acd16ca8e6c21f1f01a11d36",
-    "coordinator/tests/test_coordinator.py": "11a62b6b87758397304f1d59dcc9c6e8a2b983e9175019fd55bb67596b92de98",
+    "coordinator/tests/test_coordinator.py": "cf0df0ee4bcf23d243634cd6f1bbc687ff4d887d41da166d0ad0ee6d292bb458",
     "qualification/surface-push/native-proof-data-journal-schema.sql": "19ebdabe8e14cb6f5c7f90eadb41eb74c027e753cfb1b2034ce627e08c7c166f",
     "src/surface-push/native-proof-data-journal.ts": "2655a02e7bf094d952160cbc5cbc904ec1d31664235e71d11f4176f0b9c95bf8"
   }
