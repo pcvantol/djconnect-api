@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "kind": "uncomposed_native_proof_DATA_journal_source_separate_finalization",
+  "at": "2026-10-27T04:35:36.258696+00:00",
+  "previous_finalization": "docs/push/native-proof-transcript-finalization-v1.json",
+  "source_PR": 159,
+  "source_base": "cac088cefa09cab14f31021e21831d1d1868a0fb",
+  "source_candidate": "24b4a7cba437fa513f7eb69832965fcbd5ec398d",
+  "qualified_source_main": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+  "source_tree": "3863e88e1eac6358e0bda17e170cdba399e265d5",
+  "candidate_test_merge": "53a2267603c697f16574ec54f25c01a1d6ce3a6b",
+  "reviewed_tested_merged_tree_equal": true,
+  "scope": "Uncomposed four-phase D1 DATA repository; DATA_ONLY_NOT_ADMISSION; disposable schema fixture only",
+  "independent_source_review_sha256": "62be649011c9d3dcda2dcc47ab222bf5a5af766cef70230569bedfea1afc3f25",
+  "independent_source_review": {
+    "timestamp": "2026-10-27T04:19:08.537478+00:00",
+    "candidate": "24b4a7cba437fa513f7eb69832965fcbd5ec398d",
+    "base": "cac088cefa09cab14f31021e21831d1d1868a0fb",
+    "tree": "3863e88e1eac6358e0bda17e170cdba399e265d5",
+    "packet_sha256": "b4f3ab4084345beaeac5b29fa4beba395757b039fb6b6d76f905a27e7a2be40d",
+    "files": {
+      ".github/workflows/native-proof-data-journal.yml": "e4f3b8bf3a75569551f6bcd4cdc4efa02b679086f7e4ec2bf4b80843f13a473a",
+      "docs/push/NATIVE_PROOF_DATA_JOURNAL_SOURCE_V1.md": "ba2536b16bccb1fae2e248576c2124f7d4af4b356e5c91699fa0f99b8ba33f80",
+      "docs/push/native-proof-data-journal-source-observations-v1.json": "4a162d226b63847fceb892b92d7aba93dc6117ad76a5cd5667624952a139f724",
+      "qualification/surface-push/native-proof-data-journal-schema.sql": "19ebdabe8e14cb6f5c7f90eadb41eb74c027e753cfb1b2034ce627e08c7c166f",
+      "qualification/surface-push/tsconfig.native-proof-data-journal.json": "6aaa8c9ce80a9874e4b1d1e83c4269fc549a43987c236903808e95c8967e01df",
+      "src/surface-push/native-proof-data-journal.ts": "2655a02e7bf094d952160cbc5cbc904ec1d31664235e71d11f4176f0b9c95bf8",
+      "test/native-proof-data-journal.spec.ts": "e1456f80bc230385f134c9416d623c938fb8b693c4b2b0f672c0e9db243d9926"
+    },
+    "decision": "BOUNDED_WHOLE_SEVEN_DATA_JOURNAL_SOURCE_NO_BLOCKERS_NORMAL_DELIVERY_PENDING",
+    "review": "Root personally read all249TS/279test/67SQL lines plus complete workflow/tsconfig/guide/observations; exact7Git hashes/tree/parent/clean/pathset and all12original log hashes verified. SQLmarkers enforce all-or-none partial update rollback; actualzero-rowCAS, globalkeycounter/scope/epoch, opaqueonce and finalretirement scope are DATA not admission.",
+    "actual_tests": "Owning full443PASS before final equivalent retirementSQL marker join; all56 targeted cases PASS on finalsource. Root personally inspected originalJSON summaries/hashes. Root/dedicated types0 reported with originalemptylogs bound; noRootWorker execution claim.",
+    "compiled_product": "Fresh128controls/100RPCdenials/noegress actualownerlog; bundle04970f... and observations82b008... exactprotectedbaseline; journalabsent actualmetafile; no productmigration/defaultfactory change",
+    "withdrawn_reviewer_prediction": "Root initially sent an incorrect JS-dollar-finalLF prediction before reading actualNodefalse output; promptly withdrawn, no sourceHOLD/fix. Separate owningactualD1countercheck10PASS/sourcebyteequal confirms rejection; allreceiptfilehashes verified. This was a review communication mistake, not a historical sourcefailure.",
+    "limits": [
+      "Uncomposed data ordering and SQLatomicity only",
+      "No physicalpowerloss/restore durability qualification",
+      "No genuine owner/operator/clock/native/provisioning/provider acceptance",
+      "No productionDDL/deploy or effects"
+    ],
+    "remaining": "Normal exactsourceCI/protectedsource/ownoriginalqualification and separateFinal; exactcommit review/delivery must remain bound to unchanged24b4 bytes."
+  },
+  "independent_original_join_sha256": "5e3cbe44c464f2e1fa471a530d1ca93a1035bfed96bc6ecefe8bf12f98bcd4c6",
+  "independent_original_join": {
+    "timestamp": "2026-10-27T04:32:01.617292+00:00",
+    "scope": "Personal original API Source159 formal/durable/local release join only; full main native/browser remains pending",
+    "candidate": "24b4a7cba437fa513f7eb69832965fcbd5ec398d",
+    "protected": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+    "tree": "3863e88e1eac6358e0bda17e170cdba399e265d5",
+    "packet_sha256": "544337a37324e161a20698aaa2fbb5507fb08ad2b4da247c4058b277e5d8ed1f",
+    "checks": [
+      "All12 packet-local original file hashes",
+      "Both original formal/durable canonical integrities and all12 PASS/sourcejoin",
+      "Durable actual bytes match provider asset680436716 digest",
+      "Exact17sidecars/licences match reviewed candidate Git tree, live protected tree equal",
+      "TAR originalhash and unique safe paths, files/directories only",
+      "Worker1291540bytes exacthash and embeddedprotectedmain",
+      "Worker byteequal prior Final158 except exactly one embedded sourceSHA"
+    ],
+    "formal_raw_sha256": "9f5a7d66f500b0d70a8dc4ee0f1c1318173c34ecc5d6580155e7e34fff949694",
+    "durable_sha256": "34813876b95dea8068cb850fddf11bd0cef81a18feca3a159f0aeffda2b80a9b",
+    "tar_sha256": "07fc4fbb5f543b432a41f1f670a200e96c6ed7a709f5ac11e74f8388ccbdd484",
+    "live_original_formal": "40449945078_COMPLETED_SUCCESS_EXACT7389",
+    "live_main_native_browser": "40449824212_IN_PROGRESS_EXACT7389_NOT_PASS",
+    "decision": "BOUNDED_ORIGINAL_SOURCE159_FORMAL_DURABLE_LOCAL_RELEASE_JOIN_NO_BLOCKERS_FULL_MAIN_PENDING",
+    "limitations": "Owning-API-downloaded local originals inspected; Root live formal/native-run metadata checked; no Root originalZIP download or all11 terminal claim. No deployment, SQL migration, owner/clock/native/provider admission."
+  },
+  "original_local_source_observations_sha256": "4a162d226b63847fceb892b92d7aba93dc6117ad76a5cd5667624952a139f724",
+  "local_source_qualification": {
+    "full_Worker_passed": 443,
+    "retained": 387,
+    "new_journal_cases": 56,
+    "final_equivalent_SQL_change_focused_passed": 56,
+    "root_and_dedicated_types_exit": 0,
+    "external_frozen_source_grammar_countercheck_passed": 10,
+    "countercheck_receipt_sha256": "649e11979a3eb96265b532839f4c8e7dd43b92e17dc57791e374d288c12f5c66"
+  },
+  "exact_candidate_CI": {
+    "eleven_workflows": "SUCCESS",
+    "check_contexts": {
+      "SUCCESS": 22,
+      "SKIPPED": 1
+    },
+    "OwnerAuthorization": 40449312901,
+    "OwnerAuthorization_scope": "HIGH_RISK authorized for exact24b4 only",
+    "TrustedDelivery": 40449194375,
+    "CodeQL_aggregate": 122007929631,
+    "CodeQL_aggregate_conclusion": "success",
+    "CodeQL_annotations": 0,
+    "Validate": 40449194539,
+    "actual_Worker_passed": 443,
+    "new_journal_cases": 56,
+    "composition": 49,
+    "compiled_product_checks": 128,
+    "forbidden_RPC_denials": 100,
+    "outbound_calls": 0,
+    "E2E_subset": {
+      "passed": 1,
+      "skipped": 39
+    },
+    "native_browser": 40449194183
+  },
+  "all_eleven_original_source_main_workflows": "SUCCESS owning-API actual GitHub terminal inventory",
+  "source_main_runs": [
+    {
+      "conclusion": "success",
+      "databaseId": 40449945078,
+      "event": "workflow_run",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449945078",
+      "workflowName": "Post-Merge Release Evidence"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449944716,
+      "event": "workflow_run",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449944716",
+      "workflowName": "API release artifact"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824571,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824571",
+      "workflowName": "Native proof DATA journal source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824376,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824376",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824646,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824646",
+      "workflowName": "Native proof transcript source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824609,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824609",
+      "workflowName": "Surface enrollment source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824968,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824968",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824546,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824546",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824206,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824206",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824289,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824289",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40449824212,
+      "event": "push",
+      "headSha": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+      "status": "completed",
+      "url": "https://github.com/pcvantol/djconnect-api/actions/runs/40449824212",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "source_main_terminal_inventory_sha256": "8e901c2cfe8e64ce22c9cb01e5900b90126bb6cd4bff959a9e71b5f2ae025ca3",
+  "source_main_CodeQL": {
+    "workflow": 40449824968,
+    "conclusion": "success",
+    "PR_style_aggregate_emitted_on_push": false
+  },
+  "original_delivery_verified": {
+    "at": "2026-10-27T04:29:50.986914+00:00",
+    "status": "ORIGINAL_MAIN_FORMAL_DURABLE_RELEASE_VERIFIED_NO_ACTIVATION",
+    "main": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+    "candidate": "24b4a7cba437fa513f7eb69832965fcbd5ec398d",
+    "tree": "3863e88e1eac6358e0bda17e170cdba399e265d5",
+    "formal_original_sha256": "9f5a7d66f500b0d70a8dc4ee0f1c1318173c34ecc5d6580155e7e34fff949694",
+    "formal_decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "formal_source_evidence_digest": "e93792f169ef1ef163219dc0c843ff812148938a52fcdc58ab1e9a7cf30efc05",
+    "durable_asset_id": 680436716,
+    "durable_actual_and_provider_sha256": "34813876b95dea8068cb850fddf11bd0cef81a18feca3a159f0aeffda2b80a9b",
+    "durable_canonical_integrity": "PASS",
+    "durable_checks": 12,
+    "release_artifact_id": "12709706993",
+    "tar_sha256": "07fc4fbb5f543b432a41f1f670a200e96c6ed7a709f5ac11e74f8388ccbdd484",
+    "worker_sha256": "70649e965381c5a4337a827445c7599d0c44d4fb5a45e29cc09399bab8a40931",
+    "worker_bytes": 1291540,
+    "worker_embeds_exact_main": true,
+    "exact_Git_packaged_sidecars": [
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md",
+      "migrations/0001_initial.sql",
+      "migrations/0002_install_tokens.sql",
+      "migrations/0003_encrypt_apns_tokens.sql",
+      "migrations/0004_bootstrap_proofs.sql",
+      "migrations/0005_install_token_revoke.sql",
+      "migrations/0006_privacy_safe_diagnostics.sql",
+      "migrations/0007_restrict_apns_push_contract.sql",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql",
+      "migrations/0009_surface_push.sql",
+      "migrations/0010_surface_delegations.sql",
+      "migrations/0011_surface_enrollment_authorizations.sql",
+      "package-lock.json",
+      "package.json",
+      "wrangler.jsonc"
+    ],
+    "unique_safe_TAR_paths": true,
+    "LICENSES_manifest": "PASS",
+    "no_deployment_remote_SQL_or_native_effects": true
+  },
+  "original_formal_findings": [],
+  "closed_release_comparison": {
+    "previous_final_main": "cac088cefa09cab14f31021e21831d1d1868a0fb",
+    "source_main": "7389d275aa7665aead2ceb29c173e8b46dcc884c",
+    "Worker_byte_equal_except_one_embedded_source_SHA": true,
+    "previous_worker_sha256": "eb20375c1c4906b135d34066e641d2349208fbfaa20b78b88650c7fcc9cf95d0",
+    "source_worker_sha256": "70649e965381c5a4337a827445c7599d0c44d4fb5a45e29cc09399bab8a40931",
+    "source_worker_bytes": 1291540,
+    "all_TAR_members_regular_file_or_directory_and_nonabsolute": true
+  },
+  "original_metadata_sha256": {
+    "release-artifacts-metadata.json": "6a0d7e1e73f6db91dfdeada62dbaf876d96e47a069acb3b7de2477ec75e95dd5",
+    "release-closed-baseline-comparison.json": "8bfe70561443e333f970850d80d3cb1aeaf72ed3a8d4d4bb1321d61fea06f405",
+    "formal-artifacts-metadata.json": "e611ef20a08824038800f1b19dd0106721a3523c12a42dfbf74b0ff0569d0555",
+    "durable-original.json": "34813876b95dea8068cb850fddf11bd0cef81a18feca3a159f0aeffda2b80a9b",
+    "durable-asset-metadata.json": "575042148b3de5b7a3c900325ffbb73d863eaa22f13841845742f685aecdd615",
+    "release-run-metadata.json": "e509935b118186cbc62bc94daafac6b0374bc1a044a29e340ddc254f9cb934e0",
+    "durable-release-metadata.json": "031f32191c389e77bdabdaac5776446be215582c5548108d2991f31b2d5c778d",
+    "formal-run-metadata.json": "356be0ad902ce116c53215cd2cb014022f436d7c26d7e30a129ca22e80f76c7a",
+    "original-delivery-local-verification.json": "0075a5f9facab718de2d683079447b3fba602d41f7fb0ab87f591f4a00288293",
+    "release-original/api-release-artifact-evidence/api-release-artifact-evidence.json": "70318ee711d48def0779d97ba6f310605639df686f38d3ec54a35bf39c9fec2a",
+    "formal-original/post-merge-release-evidence/post-merge-release-evidence.json": "9f5a7d66f500b0d70a8dc4ee0f1c1318173c34ecc5d6580155e7e34fff949694"
+  },
+  "fresh_compiled_product": {
+    "baseline": "docs/rendezvous/closed-enrollment-service-product-observations-v2.json",
+    "fresh_observation_bytes_equal_baseline": true,
+    "observation_sha256": "82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15",
+    "bundle_sha256": "04970fbd1259b3e9e4a9ecc2de1a137efde95f4223cf42265097bb8c710b65c8",
+    "bundle_bytes": 1291545,
+    "new_module_in_shipping_graph": false,
+    "production_migrations_added": false,
+    "root_binding_config_dependencies_changed": false,
+    "public_dispatch": "COMPILED_OFF/503",
+    "issuer_profiles": [],
+    "activity_profiles": [],
+    "full_service_gates": "22 OPEN"
+  },
+  "history": {
+    "original_source_and_proposal_pins_preserved": true,
+    "reviewer_LF_prediction": "Incorrect prediction explicitly withdrawn after actual Node false readback; review communication error, no source failure/HOLD/patch",
+    "external_grammar_countercheck": "Separate actual10 on unchanged frozen24b4, not added to56 or443",
+    "initial_dedicated_types": "Four test snapshot generic unknown diagnostics; repaired before first Worker run, not PASS",
+    "initial_focused": "55PASS before added observed-local-retirement case, distinct from final56",
+    "local_main_readback_audit": "Initially expected a PR aggregate on push; actual main emits none. Corrected evidence expectation, no main aggregate success fabricated or source change."
+  },
+  "not_qualified": [
+    "Real owner/operator/Core admission and Profile entitlement",
+    "Qualified original clock/current cutoff provider",
+    "Actual native attestation/key identity/provisioning/acquisition",
+    "Selected provider physical power-loss/restore/backup rollback and durable-before-SDK guarantee",
+    "Real registration/push/provider/device acceptance or production activation"
+  ],
+  "no_effects": {
+    "production_or_remote_SQL": true,
+    "SDK_key_token_custody_provider_HA_device": true,
+    "deployment": true
+  },
+  "next": "Fresh exact independent review of these two documents, normal protected Final merge and own original main qualification before separate Final delivery claim"
+}
