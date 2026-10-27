@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "uncomposed_native_proof_transcript_DATA_source_observations",
+  "at": "2026-10-27T02:30:53.668019+00:00",
+  "base": "ee110e21b103cfeabab02b9a4128d21b9141fe55",
+  "scope": "Pure inner DATA codec/equality/digest only; no real admission/native proof or lifecycle",
+  "source_sha256": {
+    "src/surface-push/native-proof-transcript.ts": "897cd0c8c84794ad78c9a9b9b28fc2ef7982ae5027b3d2ff352bfa123968356b",
+    "test/native-proof-transcript.spec.ts": "c44e5cb41ecdc31ce1902efe8d41514537726dba824ca793f845a917a8532ce6",
+    "qualification/surface-push/native-proof-transcript-vectors-v1.json": "82e0fb2a68f163c9e2cab2d7596c145d3e913de7cf7cb8d7b128ca3238e36350",
+    "qualification/surface-push/tsconfig.native-proof-transcript.json": "3f14a6de864fe179ca1a69e0994e29ff27e76d75a66b5a29af78ff7c22b863c1",
+    ".github/workflows/native-proof-transcript.yml": "688c467f353e239abdc8fcf769857a1de4640777bed975b3949000e431d6952b",
+    "docs/push/NATIVE_PROOF_TRANSCRIPT_SOURCE_V1.md": "f607725b9b05a4fd645655d4fc3d3fadd61d9d9f01c18a01ce4d1a37c8a178f1"
+  },
+  "original_logs_sha256": {
+    "initial-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "initial-worker.log": "799a699503f8b82901c3c9d9b6a35f5e07aa2ff3d5ac3c5de90881c0b6316732",
+    "transcript-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "full-worker-r1.log": "4a9fc14996c72a75ee090e495412d688f8d455d537177dfad445b95166396ac9",
+    "root-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "product-r1.log": "e38a3347a6eafbf688b944737ceecf0a81ac8f65179bfb24e7d64e356adc719d"
+  },
+  "actual_local_results": {
+    "Worker_cases": 387,
+    "retained_Worker_cases": 309,
+    "new_cases": 78,
+    "files": 10,
+    "explicit_Worker_user_agent_and_disposable_D1_check": true,
+    "root_types_exit": 0,
+    "dedicated_source_and_test_types_exit": 0,
+    "product_checks": 128,
+    "forbidden_RPC_denials": 100,
+    "outbound_calls": 0
+  },
+  "historical_first_focused_run": {
+    "new_cases": 77,
+    "status": "PASS_before_explicit_runtime_marker_added_not_final78"
+  },
+  "compiled_product_before_after": {
+    "source_inputs": 116,
+    "all116_source_hashes_equal": true,
+    "bundle_sha256": "04970fbd1259b3e9e4a9ecc2de1a137efde95f4223cf42265097bb8c710b65c8",
+    "bundle_bytes": 1291545,
+    "observation_sha256": "82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15",
+    "actual_fresh_observations_equal_historical_v2": true,
+    "new_codec_in_compiled_product_graph": false,
+    "baseline": "docs/rendezvous/closed-enrollment-service-product-observations-v2.json",
+    "public_dispatch": "COMPILED_OFF/503",
+    "issuer_profiles": [],
+    "activity_profiles": [],
+    "full_service_gates": "22 OPEN",
+    "root_binding_migration_mutations": false
+  },
+  "not_qualified": [
+    "Whole Core prepared-response8192byte envelope",
+    "Actual owner/operator bridge or native-verifier admission",
+    "Original cross-domain wall/monotonic clock provider",
+    "Real nonce/key/counter/CAS/lifecycle/retirement state",
+    "Full native DER/CBOR/Mac ACL and provisioning/acquisition",
+    "Provider/native delivery or production acceptance"
+  ],
+  "next": "Freeze exact source, independent whole-delta review, normal protected source delivery/own-main and separate Final; no product graph refresh or existing rendezvous crypto broadening",
+  "effects": "No new runtime dependencies/configuration/remote SQL/provider/key/token/SDK/HA/device/deployment effects"
+}
