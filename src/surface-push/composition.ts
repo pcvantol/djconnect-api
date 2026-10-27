@@ -1,6 +1,8 @@
 /** Server composition only; public admission is a separate compiled gate. */
 import type { AppEnv } from "../types";
 import { createSurfaceIssuer } from "./issuer";
+import { createSurfaceEnrollment } from "./enrollment";
+import { ENROLLMENT_PREFIX } from "./enrollment-wire";
 import { createSurfacePushHandler } from "./handler";
 import { createSurfaceProvider, type SurfaceProvider } from "./provider";
 import { need } from "./wire";
@@ -24,20 +26,29 @@ export function createSurfaceService(options: SurfaceServiceOptions): SurfaceSer
     const time = originalNow ?? Date.now, transport = originalFetch ?? fetch;
     let closed = false, highWater = 0, provider: SurfaceProvider | undefined;
     const same = (candidate: AppEnv) => fields.every(name => candidate[name] === env[name]);
-    const active = () => !closed && options.env === originalEnv && options.now === originalNow &&
-        options.fetcher === originalFetch && options.isCurrent === originalCurrent &&
-        (originalCurrent?.() ?? true) && !closed && same(originalEnv);
+    const active = () => {
+        let valid = false;
+        try { valid = !closed && options.env === originalEnv && options.now === originalNow &&
+            options.fetcher === originalFetch && options.isCurrent === originalCurrent &&
+            (originalCurrent?.() ?? true) && !closed && same(originalEnv); } catch { valid = false; }
+        if (!valid) closed = true; // Once observed retired, this service generation stays retired.
+        return valid;
+    };
     const guard = (candidate: AppEnv = originalEnv) => {
         need(active() && same(candidate) && active(), "surface_service_unavailable", 503);
     };
     const clock = () => {
-        guard(); const value = time();
-        need(Number.isSafeInteger(value) && value >= highWater && value >= 0, "surface_clock_unqualified", 503);
+        guard(); let value: number;
+        try { value = time(); } catch(error) { closed = true; throw error; }
+        const qualified = Number.isSafeInteger(value) && value >= highWater && value >= 0;
+        if (!qualified) closed = true;
+        need(qualified, "surface_clock_unqualified", 503);
         guard(); highWater = value; return value;
     };
     return {
         matches(candidate) { try { return active() && same(candidate) && active(); } catch { return false; } },
         async handle(request, candidate = originalEnv) {
+            const signal = request.signal;
             guard(candidate);
             const now = () => { guard(candidate); return clock(); };
             // One lazy authorizer per immutable service identity. Revocation,
@@ -55,11 +66,16 @@ export function createSurfaceService(options: SurfaceServiceOptions): SurfaceSer
             };
             const path = new URL(request.url).pathname;
             const issuer = path === "/v1/push/surface/issuer" || path.startsWith("/v1/push/surface/issuer/");
-            const handler = issuer ? createSurfaceIssuer({ env, now, admittedProfiles: [] }) :
+            const enrollment = path === ENROLLMENT_PREFIX.slice(0, -1) || path.startsWith(ENROLLMENT_PREFIX);
+            const handler = enrollment ? createSurfaceEnrollment({ env, now,
+                isCurrent: () => { guard(candidate); return true; } }) :
+                issuer ? createSurfaceIssuer({ env, now, admittedProfiles: [] }) :
                 createSurfacePushHandler({ db: env.DB, encryptionKey: env.APNS_TOKEN_ENCRYPTION_KEY,
                     authorizeProvider, fetcher, now, activityProfiles: [] });
             const response = await handler(request);
-            guard(candidate); return response;
+            guard(candidate);
+            need(!signal.aborted, "surface_operation_cancelled", 409);
+            return response;
         },
         close() { closed = true; provider?.close(); provider = undefined; },
     };

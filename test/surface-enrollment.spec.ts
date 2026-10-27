@@ -8,6 +8,7 @@ import { base64Url } from "../src/crypto";
 import type { AppEnv } from "../src/types";
 import { canonical } from "../src/surface-push/wire";
 import { createSurfaceEnrollment } from "../src/surface-push/enrollment";
+import { createSurfaceService } from "../src/surface-push/composition";
 import { authorize, redeem, bindings, ENROLLMENT_PREFIX, redemptionBytes, type Authorization, type Redemption } from "../src/surface-push/enrollment-wire";
 import { bytes, publicKey } from "../src/surface-push/issuer-wire";
 import { dispatchSurfaceRequest } from "../src/surface-push/dispatch";
@@ -172,4 +173,156 @@ describe("single use enrollment with actual D1 and synthetic authority",()=>{
   expect((await call(handler(),"operator/authorize",'{"contract_version":1,"contract_version":1}',OPERATOR)).status).toBe(400);
   expect(await count("surface_enrollment_authorizations")).toBe(0);
  });
+
+ // Causal controls use actual D1 and synthetic software authority only.
+ for (const stage of ["admin-digest","public-key-import"] as const) for (const stop of ["retire","abort"] as const) {
+  it(`original service ${stop} during ${stage} cannot reach mutation`,async()=>{
+   let current=true,release!:()=>void,entered!:()=>void;
+   const waiting=new Promise<void>(r=>release=r),started=new Promise<void>(r=>entered=r);
+   const control=new AbortController(),options={env:{DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv,now:()=>clock,isCurrent:()=>current};
+   const h=createSurfaceEnrollment(options);let captured=false;
+   const pause=async()=>{if(!captured){captured=true;entered();await waiting;}};
+   if(stage==="admin-digest") {
+    const original=crypto.subtle.digest.bind(crypto.subtle);
+    vi.spyOn(crypto.subtle,"digest").mockImplementation(async(...args)=>{const value=await original(...args);await pause();return value;});
+   } else {
+    const original=crypto.subtle.importKey.bind(crypto.subtle);
+    vi.spyOn(crypto.subtle,"importKey").mockImplementation(async(...args)=>{const value=await original(...args);await pause();return value;});
+   }
+   const value=input(),pending=call(h,"operator/authorize",value,OPERATOR,control.signal);
+   await started;if(stop==="retire")current=false;else control.abort();release();
+   const response=await pending;expect(response.status).toBe(stop==="retire"?503:409);
+   expect(await response.json()).not.toHaveProperty("credential");
+   expect(await count("surface_enrollment_authorizations")).toBe(0);
+   expect(await count("surface_enrollment_operator_operations")).toBe(0);
+   if(stop==="retire") {current=true;expect((await call(h,"operator/authorize",value,OPERATOR)).status).toBe(503);}
+  });
+ }
+ for(const action of ["operator/authorize","redeem","operator/revoke"] as const) for(const stop of ["retire","abort"] as const) {
+  it(`last no-await guard prevents ${action} batch after ${stop} during statement binding`,async()=>{
+   const seed=action==="operator/authorize"?null:await authorized();
+   const value=seed?.value??input(),body=action==="redeem"?await proof(payload(value)):action==="operator/revoke"?revoke(value):value;
+   const control=new AbortController();let current=true,batches=0,changed=false;
+   const db=new Proxy(env.DB,{get(target,name){
+    if(name==="prepare")return (...args:Parameters<D1Database["prepare"]>)=>{
+     if(!changed&&args[0].startsWith(action==="redeem"?"UPDATE surface_enrollment_authorizations SET state='consumed'":"INSERT OR IGNORE INTO surface_enrollment_operator_operations")) {
+      changed=true;if(stop==="retire")current=false;else control.abort();
+     }
+     return target.prepare(...args);
+    };
+    if(name==="batch")return (...args:Parameters<D1Database["batch"]>)=>{batches++;return target.batch(...args);};
+    const member=Reflect.get(target,name);return typeof member==="function"?member.bind(target):member;
+   }});
+   const h=createSurfaceEnrollment({env:{DB:db,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv,now:()=>clock,isCurrent:()=>current});
+   const response=await call(h,action,body,action==="redeem"?seed!.receipt.credential:OPERATOR,control.signal);
+   expect(changed).toBe(true);expect(response.status).toBe(stop==="retire"?503:409);expect(batches).toBe(0);
+   expect(await count("surface_push_delegations")).toBe(0);
+   expect(await count("surface_enrollment_operator_operations")).toBe(seed?1:0);
+   if(seed)expect(await env.DB.prepare("SELECT state FROM surface_enrollment_authorizations").first("state")).toBe("available");
+  });
+ }
+ for(const action of ["operator/authorize","redeem","operator/revoke"] as const) for(const stop of ["retire","abort"] as const) {
+  it(`submitted ${action} commit remains real after ${stop}; no positive result or rollback fiction`,async()=>{
+   const seed=action==="operator/authorize"?null:await authorized();
+   const value=seed?.value??input(),body=action==="redeem"?await proof(payload(value)):action==="operator/revoke"?revoke(value):value;
+   const control=new AbortController();let current=true,batches=0;
+   const db=new Proxy(env.DB,{get(target,name){
+    if(name==="batch")return async(...args:Parameters<D1Database["batch"]>)=>{
+     batches++;const result=await target.batch(...args);if(stop==="retire")current=false;else control.abort();return result;
+    };
+    const member=Reflect.get(target,name);return typeof member==="function"?member.bind(target):member;
+   }});
+   const h=createSurfaceEnrollment({env:{DB:db,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv,now:()=>clock,isCurrent:()=>current});
+   const response=await call(h,action,body,action==="redeem"?seed!.receipt.credential:OPERATOR,control.signal);
+   expect(response.status).toBe(stop==="retire"?503:409);expect(batches).toBe(1);
+   expect(await response.json()).not.toHaveProperty("credential");
+   expect(await env.DB.prepare("SELECT state FROM surface_enrollment_authorizations").first("state")).toBe(action==="redeem"?"consumed":action==="operator/revoke"?"revoked":"available");
+   expect(await count("surface_push_delegations")).toBe(action==="redeem"?1:0);
+  });
+ }
+ it("internal closed service routes enrollment without any provider key or provider call",async()=>{
+  const transport=vi.fn(async()=>new Response("{}"));
+  const config={DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv;
+  const service=createSurfaceService({env:config,now:()=>clock,fetcher:transport});
+  try {
+   const h=(r:Request)=>service.handle(r),x=await authorized(h);
+   expect((await call(h,"redeem",await proof(payload(x.value)),x.receipt.credential)).status).toBe(200);
+   expect(await count("surface_push_delegations")).toBe(1);expect(transport).not.toHaveBeenCalled();
+  } finally {service.close();}
+ });
+ it("observed outer service retirement cannot be reversed by a currentness ABA",async()=>{
+  let current=true;const config={DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv;
+  const service=createSurfaceService({env:config,now:()=>clock,isCurrent:()=>current});
+  expect(service.matches(config)).toBe(true);current=false;expect(service.matches(config)).toBe(false);
+  current=true;expect(service.matches(config)).toBe(false);
+  await expect(call(r=>service.handle(r),"operator/authorize",input(),OPERATOR)).rejects.toMatchObject({code:"surface_service_unavailable"});
+  expect(await count("surface_enrollment_authorizations")).toBe(0);service.close();
+ });
+
+ for(const change of ["db","secret","clock-callback","current-callback","clock-value"] as const) {
+  it(`immutable ${change} cannot be replaced while public key import is suspended`,async()=>{
+   let release!:()=>void,entered!:()=>void;const waiting=new Promise<void>(r=>release=r),started=new Promise<void>(r=>entered=r);
+   const config={DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv;
+   const originalClock=()=>clock,originalCurrent=()=>true,options={env:config,now:originalClock,isCurrent:originalCurrent};
+   const h=createSurfaceEnrollment(options),original=crypto.subtle.importKey.bind(crypto.subtle);let paused=false;
+   vi.spyOn(crypto.subtle,"importKey").mockImplementation(async(...args)=>{const result=await original(...args);if(!paused){paused=true;entered();await waiting;}return result;});
+   const value=input(),pending=call(h,"operator/authorize",value,OPERATOR);await started;
+   if(change==="db")config.DB={} as D1Database;
+   if(change==="secret")config.DJCONNECT_RELAY_SECRET="synthetic-replacement-secret";
+   if(change==="clock-callback")options.now=()=>clock;
+   if(change==="current-callback")options.isCurrent=()=>true;
+   if(change==="clock-value")clock=NOW-1;
+   release();expect((await pending).status).toBe(503);expect(await count("surface_enrollment_authorizations")).toBe(0);
+   config.DB=env.DB;config.DJCONNECT_RELAY_SECRET=OPERATOR;options.now=originalClock;options.isCurrent=originalCurrent;clock=NOW;
+   expect((await call(h,"operator/authorize",value,OPERATOR)).status).toBe(503);
+  });
+ }
+ for(const stop of ["retire","abort"] as const) {
+  it(`pending original body ${stop} cannot enter admin or DB work`,async()=>{
+   let deliver!:()=>void;const control=new AbortController();let current=true;
+   const body=new ReadableStream<Uint8Array>({start(c){deliver=()=>{c.enqueue(new TextEncoder().encode(canonical(input())));c.close();};}});
+   const h=createSurfaceEnrollment({env:{DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv,now:()=>clock,isCurrent:()=>current});
+   const digest=vi.spyOn(crypto.subtle,"digest");
+   const pending=h(new Request("https://api.djconnect.dev"+ENROLLMENT_PREFIX+"operator/authorize",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+OPERATOR},body,signal:control.signal}));
+   if(stop==="retire")current=false;else control.abort();deliver();
+   expect((await pending).status).toBe(stop==="retire"?503:409);expect(digest).not.toHaveBeenCalled();
+   expect(await count("surface_enrollment_operator_operations")).toBe(0);
+  });
+ }
+ it("closed outer service during original enrollment import cannot submit a batch",async()=>{
+  let release!:()=>void,entered!:()=>void;const waiting=new Promise<void>(r=>release=r),started=new Promise<void>(r=>entered=r);
+  const original=crypto.subtle.importKey.bind(crypto.subtle);let paused=false;
+  vi.spyOn(crypto.subtle,"importKey").mockImplementation(async(...args)=>{const result=await original(...args);if(!paused){paused=true;entered();await waiting;}return result;});
+  const config={DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv,service=createSurfaceService({env:config,now:()=>clock});
+  const pending=call(r=>service.handle(r),"operator/authorize",input(),OPERATOR);await started;service.close();release();
+  await expect(pending).rejects.toMatchObject({code:"surface_service_unavailable"});
+  expect(await count("surface_enrollment_operator_operations")).toBe(0);expect(service.matches(config)).toBe(false);
+ });
+
+ for(const action of ["operator/authorize","redeem","operator/revoke"] as const) {
+  it(`composed positive ${action} cannot escape after final outer-await abort`,async()=>{
+   const seed=action==="operator/authorize"?null:await authorized();
+   const value=seed?.value??input(),body=action==="redeem"?await proof(payload(value)):action==="operator/revoke"?revoke(value):value;
+   const control=new AbortController(),OriginalResponse=Response;let scheduled=0;
+   const service=createSurfaceService({env:{DB:env.DB,DJCONNECT_RELAY_SECRET:OPERATOR} as AppEnv,now:()=>clock});
+   vi.stubGlobal("Response",new Proxy(OriginalResponse,{construct(target,args){
+    const response=Reflect.construct(target,args,target);
+    if(typeof args[0]==="string") {
+     const data=JSON.parse(args[0]);
+     if(data.success===true&&(action==="operator/authorize"?typeof data.credential==="string":action==="redeem"?data.state==="enrolled":data.state==="revoked")) {
+      scheduled++;queueMicrotask(()=>queueMicrotask(()=>control.abort()));
+     }
+    }
+    return response;
+   }}));
+   let returned:Response|undefined,error:unknown;
+   try {try {returned=await call(r=>service.handle(r),action,body,action==="redeem"?seed!.receipt.credential:OPERATOR,control.signal);} catch(caught){error=caught;}}
+   finally {vi.stubGlobal("Response",OriginalResponse);service.close();}
+   expect(scheduled).toBe(1);expect(control.signal.aborted).toBe(true);
+   expect(returned,"An aborted composed request must not publish a positive credential/receipt").toBeUndefined();
+   expect(error).toMatchObject({code:"surface_operation_cancelled",status:409});
+   expect(await env.DB.prepare("SELECT state FROM surface_enrollment_authorizations").first("state")).toBe(action==="redeem"?"consumed":action==="operator/revoke"?"revoked":"available");
+   expect(await count("surface_push_delegations")).toBe(action==="redeem"?1:0);
+  });
+ }
 });
