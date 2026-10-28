@@ -1,0 +1,54 @@
+name: Worker DO registry source conformance
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  software-assurance-governance:
+    name: Software Assurance governance
+    permissions:
+      contents: read
+    uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875
+    with:
+      execution_profile: balanced
+      owner: pcvantol/djconnect-api
+  registry-source:
+    name: Actual Worker SQLite DO registry source only
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - name: Verify reusable workflow pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check_reusable_workflow_refs.sh
+      - run: npm ci
+      - name: Strict registry source types
+        run: node_modules/.bin/tsc -p coordinator/worker-do/qualification/tsconfig.json --noEmit
+      - name: Actual local SQLite DO conformance
+        env:
+          TMPDIR: ${{ runner.temp }}
+          WRANGLER_LOG_PATH: ${{ runner.temp }}/worker-do-registry.log
+        run: node_modules/.bin/vitest run --config coordinator/worker-do/qualification/vitest.config.mts --reporter=json --outputFile="${{ runner.temp }}/worker-do-registry-tests.json"
+      - name: Locked source package and actual Wrangler configuration
+        env:
+          WRANGLER_LOG_PATH: ${{ runner.temp }}/worker-do-registry-package.log
+        run: node coordinator/worker-do/build-source.mjs "${{ runner.temp }}/worker-do-registry-package"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: worker-do-registry-source-conformance
+          path: |
+            ${{ runner.temp }}/worker-do-registry-tests.json
+            ${{ runner.temp }}/worker-do-registry-package/source-package.json
+          if-no-files-found: error

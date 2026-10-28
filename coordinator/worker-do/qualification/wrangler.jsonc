@@ -1,0 +1,11 @@
+{
+  "$schema":"../../../node_modules/wrangler/config-schema.json",
+  "name":"djc-worker-do-registry-source-only",
+  "main":"../worker.ts",
+  "compatibility_date":"2026-08-22",
+  "compatibility_flags":["nodejs_compat"],
+  "workers_dev":false,
+  "send_metrics":false,
+  "durable_objects":{"bindings":[{"name":"REGISTRY_DATA","class_name":"PrincipalRegistryData"}]},
+  "exports":{"PrincipalRegistryData":{"type":"durable-object","storage":"sqlite"}}
+}
