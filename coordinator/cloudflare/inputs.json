@@ -1,0 +1,17 @@
+{
+  "classification":"SOURCE_QUALIFICATION_ONLY_NO_LIVE_FACTORY",
+  "base":"2d8637e634f5b2db84151e66027204db885d4369",
+  "package_lock_sha256":"4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+  "wrangler_version":"4.151.3",
+  "wrangler_schema_sha256":"6002683c70faa4b5dbb2954d3c150600cd856b33bf1a3d7f94ff7ee63ef2d88f",
+  "local_workerd_max_compatibility_date":"2026-08-22",
+  "registry_repository":"docker.io/library/node",
+  "registry_tag_read":"26-slim",
+  "registry_index_digest":"sha256:94816674c62774da0d099a947bf4613b9e1972a2733abd0d0cd80e795f8411d0",
+  "linux_amd64_base_manifest_digest":"sha256:84f8a721625927ef3ccdf94509ecaea463a266d23f1b01a184061e84d3a6574d",
+  "application_image_digest":null,
+  "actual_container_runtime_qualification":null,
+  "container_cli_readback":"Unauthorized: You do not have access to Cloudflare Containers. Deploying containers requires the Workers Paid plan.",
+  "account_identifiers_and_credentials_recorded":false,
+  "production_routes_bindings_migrations_secrets_changed":false
+}

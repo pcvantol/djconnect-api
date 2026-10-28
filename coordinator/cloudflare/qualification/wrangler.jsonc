@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../node_modules/wrangler/config-schema.json",
+  "name": "djc-coordinator-local-source-qualification",
+  "main": "worker.ts",
+  "compatibility_date": "2026-08-22",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "durable_objects": {"bindings":[{"name":"SOURCE_STATE","class_name":"CoordinatorSourceState"}]},
+  "exports": {"CoordinatorSourceState":{"type":"durable-object","storage":"sqlite"}}
+}

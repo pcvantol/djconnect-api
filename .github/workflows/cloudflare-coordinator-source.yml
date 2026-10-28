@@ -1,0 +1,59 @@
+name: Cloudflare coordinator source conformance
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  software-assurance-governance:
+    name: Software Assurance governance
+    permissions:
+      contents: read
+    uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875
+    with:
+      execution_profile: balanced
+      owner: pcvantol/djconnect-api
+
+  local-source:
+    name: Real local DO transactions and separate Node source executor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TMPDIR: ${{ runner.temp }}
+      WRANGLER_LOG_PATH: ${{ runner.temp }}/cloudflare-source-wrangler.log
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - name: Verify reusable workflow pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check_reusable_workflow_refs.sh
+      - run: npm ci
+      - name: Strict source types
+        run: node_modules/.bin/tsc -p coordinator/cloudflare/qualification/tsconfig.json --noEmit
+      - name: Actual local SQLite DO and fixed outbound boundary
+        run: node_modules/.bin/vitest run --config coordinator/cloudflare/qualification/vitest.config.mts --reporter=json --outputFile="${{ runner.temp }}/cloudflare-source-tests.json"
+      - name: Actual separate Node CPU clock and DO transaction composition
+        run: node coordinator/cloudflare/qualification/node-loopback.mjs "${{ runner.temp }}/cloudflare-node-source"
+      - name: Retain exact source-only observations
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: cloudflare-source-conformance
+          path: |
+            ${{ runner.temp }}/cloudflare-source-tests.json
+            ${{ runner.temp }}/cloudflare-node-source/node-loopback-summary.json
+            ${{ runner.temp }}/cloudflare-node-source/node-package/source-package.json
+          if-no-files-found: error
