@@ -28,9 +28,6 @@ jobs:
     name: Real local DO transactions and separate Node source executor
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      TMPDIR: ${{ runner.temp }}
-      WRANGLER_LOG_PATH: ${{ runner.temp }}/cloudflare-source-wrangler.log
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
@@ -45,8 +42,14 @@ jobs:
       - name: Strict source types
         run: node_modules/.bin/tsc -p coordinator/cloudflare/qualification/tsconfig.json --noEmit
       - name: Actual local SQLite DO and fixed outbound boundary
+        env:
+          TMPDIR: ${{ runner.temp }}
+          WRANGLER_LOG_PATH: ${{ runner.temp }}/cloudflare-source-wrangler.log
         run: node_modules/.bin/vitest run --config coordinator/cloudflare/qualification/vitest.config.mts --reporter=json --outputFile="${{ runner.temp }}/cloudflare-source-tests.json"
       - name: Actual separate Node CPU clock and DO transaction composition
+        env:
+          TMPDIR: ${{ runner.temp }}
+          WRANGLER_LOG_PATH: ${{ runner.temp }}/cloudflare-source-wrangler.log
         run: node coordinator/cloudflare/qualification/node-loopback.mjs "${{ runner.temp }}/cloudflare-node-source"
       - name: Retain exact source-only observations
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9

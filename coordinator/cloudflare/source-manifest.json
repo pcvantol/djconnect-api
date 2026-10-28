@@ -21,6 +21,6 @@
     "coordinator/cloudflare/qualification/wrangler.jsonc": "60113b134da117d03309fac4159bc174f21abb6efe8844d3dc2a836b6047e58c",
     "coordinator/cloudflare/rpc.ts": "f35a4f139cdbe9703eed90ce340d8d9f2542d10819e161616bc6edb9d0504d11",
     "coordinator/cloudflare/state.ts": "461b1e45f2251c56865804eda44ebc0697ac3a888525c7e97e0a64ab5f9a7052",
-    ".github/workflows/cloudflare-coordinator-source.yml": "6199f9af93c5428260756ced4c962fb3fd9433d2d39b6acae31bd9603ae37e68"
+    ".github/workflows/cloudflare-coordinator-source.yml": "a53e0e5cac01e489ded6d9c59a2333528d75f4245144c3a3d8a8080f8729f6c5"
   }
 }
