@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "classification": "EXACT_PRIVATE_POP_BYTE_SCALAR_CONTRACT_CANDIDATE_NOT_NORMATIVE_NOT_IMPLEMENTED",
+  "at": "2026-10-29T12:13:39.117128+00:00",
+  "parent_candidate_sha256": "4bb4bc3f7a1ed638baabccac68b580339f87c80e61a94f6f959cebafd15131ec",
+  "Root_review_sha256": "ab9218ce577df9e4b1621f65f38c5d2ae1c86a555a678fc6e2dc956fa2fe4b3a",
+  "change_from_parent_draft": "Replace ambiguous visible backslash-n and illustrative field order/JWK string with the exact choices below. Parent draft has never been normative or implemented; no V1 migration/interpretation change.",
+  "domain": {
+    "ascii": "DJC-CORE-INSTALL-PRINCIPAL-POSSESSION-CANDIDATE-V1",
+    "ascii_hex": "444a432d434f52452d494e5354414c4c2d5052494e434950414c2d504f5353455353494f4e2d43414e4449444154452d5631",
+    "has_separator_in_domain_field": false,
+    "separator_hex": "0a",
+    "separator_bytes": 1,
+    "signing_input": "ASCII(domain) || byte0x0a || exact canonical body UTF8",
+    "body_trailing_newline": false,
+    "forbidden": [
+      "literal backslash+n as separator",
+      "CRLF",
+      "twoLF",
+      "BOM",
+      "caller-selected domain",
+      "domain reused from af201/Source153/native transcripts"
+    ]
+  },
+  "body": {
+    "member_order": [
+      "audience",
+      "challenge_id",
+      "challenge_nonce_sha256",
+      "core_installation_binding_sha256",
+      "core_instance_id",
+      "expected_registry_revision",
+      "installation_id",
+      "operator_admission_binding_sha256",
+      "original_authorization_deadline_unix_ms",
+      "policy_sha256",
+      "principal_epoch",
+      "principal_id",
+      "public_key_jwk",
+      "public_key_pin_sha256",
+      "registration_operation_id",
+      "registry_identity_sha256",
+      "registry_restore_policy_sha256",
+      "version"
+    ],
+    "rule": "Exactly these18 keys; recursively lexicographic ASCII object-key order including nested JWK, compact UTF8 JSON without whitespace/newline/BOM; strict duplicate-key parser before canonical byte equality. This is not JSON.stringify insertion order or a JWS/JWT envelope.",
+    "version": 1,
+    "audience": "djc-private-principal-registry/1",
+    "new_JWK_field": "public_key_jwk is a nested object; parent illustrative public_key_jwk_canonical string is NOT this candidate field",
+    "operation_ids": "Original canonical lowercase UUIDv4 registration_operation_id and challenge_id; no UUIDv7-family fallback",
+    "opaque_identifiers": "core_instance_id,installation_id,principal_id: ASCII [A-Za-z0-9._:-]{1,128}, no Unicode normalization/alias",
+    "hashes": "Exactly declared *_sha256 fields use64 lowercase hex characters; hash equality is data binding only.",
+    "integers": "principal_epoch1..9007199254740990; expected_registry_revision0..9007199254740990; original_authorization_deadline_unix_ms1..9007199254740991; canonical decimal integers only, no -0/exponent/fraction/infinity",
+    "max_body_utf8_bytes": 4096,
+    "nulls_arrays_unknown_fields": "Rejected",
+    "hash_fields": [
+      "challenge_nonce_sha256",
+      "operator_admission_binding_sha256",
+      "core_installation_binding_sha256",
+      "public_key_pin_sha256",
+      "policy_sha256",
+      "registry_identity_sha256",
+      "registry_restore_policy_sha256"
+    ]
+  },
+  "JWK": {
+    "nested_type": "Exact object, never JSON string",
+    "keys_in_exact_order": [
+      "crv",
+      "kty",
+      "x",
+      "y"
+    ],
+    "literals": {
+      "crv": "P-256",
+      "kty": "EC"
+    },
+    "coordinates": "x/y canonical unpadded base64url, exactly43chars decoding32bytes each; roundtrip and actual P-256 point import required",
+    "extra_members": "Reject private d, alg,kid,use,key_ops and every other extra member",
+    "pin_bytes": "UTF8(compact lexicographic JSON of exact four-member JWK), no domain/LF/string wrapper",
+    "pin": "lowercase hex SHA256(pin_bytes), equals independently snapshotted expected transcript value. No RFC7638/Source153 authority or cross-family admission inferred."
+  },
+  "signature": {
+    "algorithm": "ECDSA P-256 SHA-256 over signing_input bytes; no caller prehash/double-hash",
+    "wire": "Exactly64 bytes r||s, unsigned big-endian32 each with leading zeros retained; canonical unpadded base64url86chars with exact decode/roundtrip",
+    "curve_order_q_hex": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+    "scalar_rule": "1 <= r < q and 1 <= s < q before cryptographic verification",
+    "high_low_S_policy": "Accept either in-range s representative if ECDSA verify succeeds; do not require low-S or normalize signature as operation identity. High/low aliases represent the SAME original operation/nonce/body and cannot mint state or renew a deadline. No private signing or normalization performed here.",
+    "DER": "Never parse DER or convert formats as verification fallback. Wrong-length encodings reject. A64-byte input is interpreted only as r||s, never guessed by first byte.",
+    "crypto_exception": "Operational crypto failure, not invalid-proof fallback or successful admission"
+  },
+  "original_expected_comparison": {
+    "required": "Original expected canonical transcript is required as separately supplied pre-await DATA snapshot from owning original preparation; never reconstruct expected from the presented proof",
+    "procedure": [
+      "Copy inputs into privately owned immutable snapshots before async parsing/import/digest/verify",
+      "Strict-parse and validate expected body and proof body with the exact schema/canonical byte policy",
+      "Require full byte equality of proof body to original expected body before crypto; hash-only matching does not replace this",
+      "Recompute and compare exact nested JWK pin; import only that expected original public point for verify",
+      "Verify exact fixed-domain signing input and signature scalar/wire policy",
+      "Keep original operation/challenge/nonce/body identity in DATA output; no read/crypto result consumes once state, creates principal, validates deadline or establishes operator/install authority"
+    ],
+    "output_classification": "KEY_POSSESSION_DATA_ONLY",
+    "expected_input_is_not_authority": "Supplying a matching expected object or public key does not independently qualify that context; actual operator/custody/install/clock/restore/withdrawal admissions remain separate"
+  },
+  "conformance_scope": {
+    "encoding_fixture": "Expired, explicitly synthetic labels; not an actual Core/principal/authorization or PoP receipt",
+    "scalar_cases": "Ten fixed64-byte syntax/range cases; in-range is not signature-valid",
+    "negative_body_cases": 13,
+    "runtime_reference_check": "Separate RFC public-vector verification may validate runtime r||s/highS/lowS behavior. That is not a valid signature over this candidate body or actual workerd/registration qualification.",
+    "no_key_generation_signing_or_provisioning": true,
+    "no_existing_suite_rerun": true
+  },
+  "primary_references": [
+    {
+      "url": "https://www.w3.org/TR/webcrypto/",
+      "scope": "ECDSA fixed-width r||s algorithm representation; referenced draft status retained"
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc7518",
+      "scope": "ES256 fixed32+32 octets"
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc7515",
+      "scope": "AppendixA.3 public example inputs/signature only"
+    },
+    {
+      "url": "https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/examples/ecdsa_prime.pdf",
+      "scope": "P-256 subgroup order"
+    }
+  ],
+  "actual_identity_and_permission": {
+    "operator": null,
+    "custodian": null,
+    "installation": null,
+    "principal": null,
+    "epoch": null,
+    "approved_preparation": null,
+    "registration": null
+  },
+  "source_changed": false,
+  "normative": false,
+  "positive_factory": false,
+  "effects": false
+}

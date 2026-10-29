@@ -1,0 +1,30 @@
+{
+  "classification": "CORE_INSTALL_POSSESSION_CRYPTO_DATA_LIBRARY_ONLY",
+  "base": "25bbf79d74afa105b667b9934c2536fe79d9ee51",
+  "byte_contract_sha256": "69801f4dc741ed1f18289ebce9e380778bbefa005cd443c6aebcc32a103392e5",
+  "bounded_design_review_sha256": "29542fb0e9c096cb9cb023177708e56ddad306dc803eb91da9822349cdc85b80",
+  "esbuild_version": "0.28.1",
+  "inputs_sha256": {
+    "coordinator/principal-possession/README.md": "e691b5846c35fdcbf30db118d75f7a14908e9118f30515d590cdc4ed1d4d698a",
+    "coordinator/principal-possession/build-source.mjs": "aa58a558027c453b900fb7fb3c3937595177fe5ec21e0a87dc15767fadb7198a",
+    "coordinator/principal-possession/byte-contract-r1.json": "69801f4dc741ed1f18289ebce9e380778bbefa005cd443c6aebcc32a103392e5",
+    "coordinator/principal-possession/possession-data.ts": "bca90cf8cafa4200fa7495b3d28fda37c10a4b94031b4c39317add9f82c9687d",
+    "coordinator/principal-possession/public-vectors.json": "ab4ce0f5d69e87f2294a4abef26d73312b69f6667de025cb9771cc3e7d86f54d",
+    "coordinator/principal-possession/qualification/possession.check.ts": "d83bf9e371c7235233bf56cb416048a29a03ecb0cf8ef5188cfa96be5831e4ac",
+    "coordinator/principal-possession/qualification/tsconfig.json": "b965eac3f62f191625e54245773ae34842cdced00c0c76d0a9ff73a6380f354f",
+    "coordinator/principal-possession/qualification/vitest.config.mts": "3a4efe06081f28f80d255c4e59d806373de5f5e0f8737f907c97e6d8f515f252",
+    ".github/workflows/principal-possession-data.yml": "e3131a4476b6f7cabbabc2aa4f28fbea476a9c0a19aa137b16c454ba1bee4524",
+    "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
+    "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+    "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
+    "worker-configuration.d.ts": "2ec5f6aebdf8f39db18c9f05fa40223a739372802e7b76f1885541146919e13d",
+    "coordinator/worker-do/qualification/wrangler.jsonc": "136fd9b2cdac6e5fafcff91109844d49adacd1ece79db6f857c758d51ee577a6",
+    "coordinator/worker-do/worker.ts": "8a007aca2501c7a9f685a10b59db2117d4fa8563a484729bc6703aa261d6a4ca",
+    "coordinator/worker-do/registry.ts": "de457d315db7746be016a202c35a5eb3e4de4064d7a37d688dd68c29968a187b",
+    "coordinator/worker-do/model.ts": "32721b4275b62ee75600a2c50537cbc2214bd9cba8369ed10acebc4669b2f094",
+    "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8",
+    "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
+    "scripts/check_reusable_workflow_refs.sh": "c81261d27ba9c2dcfbee8a4e3671b20fe476cd01b8ec17c162019ff7b153e046",
+    "coordinator/principal-possession/qualification/check-package.mjs": "130e16afb0ec969157e10b08718eda67720524bd665762bce2ce11e08fcc045f"
+  }
+}
