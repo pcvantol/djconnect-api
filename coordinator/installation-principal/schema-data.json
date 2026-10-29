@@ -1,0 +1,217 @@
+{
+  "R1": {
+    "audience": "literal djc-private-principal-registry/1",
+    "challenge_id": "uuid4",
+    "challenge_nonce_sha256": "sha256",
+    "core_installation_binding_sha256": "sha256",
+    "core_instance_id": "opaque",
+    "expected_registry_revision": "counter",
+    "installation_id": "opaque",
+    "operator_admission_binding_sha256": "sha256",
+    "original_authorization_deadline_unix_ms": "utc_ms",
+    "policy_sha256": "sha256",
+    "principal_epoch": "positive_counter",
+    "principal_id": "opaque",
+    "public_key_jwk": "public_P256_point",
+    "public_key_pin_sha256": "sha256",
+    "registration_operation_id": "uuid4",
+    "registry_identity_sha256": "sha256",
+    "registry_restore_policy_sha256": "sha256",
+    "version": "literal1"
+  },
+  "outcomes": {
+    "COMMITTED": {
+      "committed_revision": "positive_counter",
+      "result_sha256": "sha256",
+      "tag": "literal COMMITTED"
+    },
+    "NOT_FOUND_DATA": {
+      "tag": "literal NOT_FOUND_DATA"
+    },
+    "REJECTED_NO_EFFECT": {
+      "reason": "enum INVALID_INPUT|UNTRUSTED_AUTHORITY|STALE_CONTEXT|CAPACITY|DEADLINE|CONFLICT",
+      "tag": "literal REJECTED_NO_EFFECT"
+    },
+    "RESERVED": {
+      "tag": "literal RESERVED"
+    },
+    "RETIRED": {
+      "committed_revision": "positive_counter",
+      "tag": "literal RETIRED",
+      "withdrawal_operation_id": "uuid4"
+    },
+    "UNKNOWN": {
+      "cause_class": "enum LOST_ACK|INTERRUPTED_EFFECT|UNCERTAIN_PERSISTENCE",
+      "tag": "literal UNKNOWN"
+    }
+  },
+  "records": {
+    "bootstrap_admission_context": {
+      "challenge_id": "uuid4",
+      "challenge_nonce_sha256": "sha256",
+      "clock_policy_sha256": "sha256",
+      "core_installation_binding_sha256": "sha256",
+      "custody_operation_id": "uuid4",
+      "custody_public_receipt_sha256": "sha256",
+      "expected_registry_revision": "counter",
+      "generation_preparation_sha256": "sha256",
+      "independent_installation_association_sha256": "sha256",
+      "kind": "literal bootstrap-admission-context/1",
+      "operator_authority_record_sha256": "sha256",
+      "original_authorization_deadline_unix_ms": "utc_ms",
+      "policy_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "registry_identity_sha256": "sha256",
+      "registry_restore_policy_sha256": "sha256",
+      "subject_sha256": "sha256",
+      "version": "literal1"
+    },
+    "bootstrap_proof_preparation": {
+      "admission_context_sha256": "sha256",
+      "custody_operation_id": "uuid4",
+      "custody_public_receipt_sha256": "sha256",
+      "expected_transcript": "exact_R1_canonical_body_string",
+      "kind": "literal bootstrap-proof-preparation/1",
+      "original_signing_deadline_unix_ms": "utc_ms",
+      "registration_operation_id": "uuid4",
+      "signing_attempt_limit": "literal1",
+      "subject_sha256": "sha256",
+      "version": "literal1"
+    },
+    "custody_generation_preparation": {
+      "attempt_limit": "literal1",
+      "core_installation_binding_sha256": "sha256",
+      "core_instance_id": "opaque",
+      "custody_epoch": "positive_counter",
+      "custody_operation_id": "uuid4",
+      "custody_policy_sha256": "sha256",
+      "custody_restore_policy_sha256": "sha256",
+      "expected_local_revision": "counter",
+      "installation_id": "opaque",
+      "kind": "literal custody-generation-preparation/1",
+      "operator_admission_binding_sha256": "sha256",
+      "original_generation_deadline_unix_ms": "utc_ms",
+      "version": "literal1"
+    },
+    "custody_public_receipt": {
+      "core_instance_id": "opaque",
+      "custody_epoch": "positive_counter",
+      "custody_operation_id": "uuid4",
+      "custody_policy_sha256": "sha256",
+      "generation_preparation_sha256": "sha256",
+      "installation_id": "opaque",
+      "kind": "literal custody-public-receipt/1",
+      "local_committed_revision": "positive_counter",
+      "public_key_jwk": "public_P256_point",
+      "public_key_pin_sha256": "sha256",
+      "version": "literal1"
+    },
+    "device_pair_join": {
+      "join_revision": "positive_counter",
+      "kind": "literal installation-device-pair-join/2",
+      "original_pair_authority_record_sha256": "sha256",
+      "original_pair_binding_sha256": "sha256",
+      "original_pair_expires_at_unix_ms": "utc_ms",
+      "original_pair_operation_id": "uuid4",
+      "principal_record_sha256": "sha256",
+      "purpose_policy_sha256": "sha256",
+      "subject_sha256": "sha256",
+      "version": "literal2"
+    },
+    "installation_principal_record": {
+      "accepted_independent_authority_bundle_sha256": "sha256",
+      "bootstrap_preparation_sha256": "sha256",
+      "challenge_id": "uuid4",
+      "crypto_possession_body_sha256": "sha256",
+      "crypto_signing_input_sha256": "sha256",
+      "kind": "literal installation-principal-record/2",
+      "original_authorization_deadline_unix_ms": "utc_ms",
+      "public_key_pin_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "registry_committed_revision": "positive_counter",
+      "subject_sha256": "sha256",
+      "version": "literal2"
+    },
+    "installation_principal_subject": {
+      "core_installation_binding_sha256": "sha256",
+      "core_instance_id": "opaque",
+      "custody_epoch": "positive_counter",
+      "custody_operation_id": "uuid4",
+      "custody_public_receipt_sha256": "sha256",
+      "installation_id": "opaque",
+      "kind": "literal installation-principal-subject/2",
+      "policy_sha256": "sha256",
+      "principal_epoch": "positive_counter",
+      "principal_id": "opaque",
+      "public_key_pin_sha256": "sha256",
+      "version": "literal2"
+    },
+    "operation_status": {
+      "kind": "literal operation-status/1",
+      "ledger_revision": "counter",
+      "operation_id": "uuid4",
+      "operation_kind": "enum custody_generation|bootstrap_signing|registry_admission|withdrawal",
+      "outcome": "closed_variant",
+      "preparation_sha256": "sha256",
+      "version": "literal1"
+    },
+    "original_admission_intent": {
+      "admission_context_sha256": "sha256",
+      "bootstrap_preparation_sha256": "sha256",
+      "challenge_id": "uuid4",
+      "challenge_nonce_sha256": "sha256",
+      "expected_registry_revision": "counter",
+      "kind": "literal original-admission-intent/2",
+      "original_authorization_deadline_unix_ms": "utc_ms",
+      "registration_operation_id": "uuid4",
+      "subject_sha256": "sha256",
+      "version": "literal2",
+      "withdrawal_policy_sha256": "sha256"
+    },
+    "original_admission_retirement_tombstone": {
+      "kind": "literal original-admission-retirement/2",
+      "original_admission_intent_sha256": "sha256",
+      "registration_challenge_id": "uuid4",
+      "registration_challenge_nonce_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "registry_committed_revision": "positive_counter",
+      "subject_sha256": "sha256",
+      "version": "literal2",
+      "withdrawal_operation_id": "uuid4",
+      "withdrawal_preparation_sha256": "sha256"
+    },
+    "original_operation_withdrawal_preparation": {
+      "kind": "literal original-operation-withdrawal/2",
+      "original_admission_intent_sha256": "sha256",
+      "original_withdrawal_deadline_unix_ms": "utc_ms",
+      "registration_challenge_id": "uuid4",
+      "registration_challenge_nonce_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "registry_identity_sha256": "sha256",
+      "registry_restore_policy_sha256": "sha256",
+      "subject_sha256": "sha256",
+      "version": "literal2",
+      "withdrawal_authority_record_sha256": "sha256",
+      "withdrawal_challenge_id": "uuid4",
+      "withdrawal_challenge_nonce_sha256": "sha256",
+      "withdrawal_operation_id": "uuid4",
+      "withdrawal_policy_sha256": "sha256"
+    },
+    "withdrawal_preparation": {
+      "challenge_id": "uuid4",
+      "challenge_nonce_sha256": "sha256",
+      "expected_registry_revision": "counter",
+      "kind": "literal installation-principal-withdrawal/2",
+      "original_withdrawal_deadline_unix_ms": "utc_ms",
+      "principal_record_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "registry_identity_sha256": "sha256",
+      "registry_restore_policy_sha256": "sha256",
+      "subject_sha256": "sha256",
+      "version": "literal2",
+      "withdrawal_authority_record_sha256": "sha256",
+      "withdrawal_operation_id": "uuid4",
+      "withdrawal_policy_sha256": "sha256"
+    }
+  }
+}

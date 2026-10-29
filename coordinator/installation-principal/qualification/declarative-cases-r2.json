@@ -1,0 +1,390 @@
+{
+  "at": "2026-10-29T15:05:14.340901+00:00",
+  "classification": "DECLARATIVE_ADVERSARIAL_CONFORMANCE_DESIGN_NOT_EXECUTED_TESTS",
+  "candidate_sha256": "7b44758c5f7bba76dd3f61b042a776330ee25697523d3bd05248a5697f76db4b",
+  "baseline": "Original immutable typed records and independently accepted context from candidate; no actual identity/key/nonce supplied. These are exact mutation/interleaving expectations for later source conformance, NOT passing tests or live admission receipts.",
+  "cases": [
+    {
+      "id": "C01",
+      "boundary": "codec",
+      "target": "custody_public_receipt.public_key_jwk.d",
+      "mutation_or_interleaving": "add private d member",
+      "required_outcome": "REJECT_CLOSED_SCHEMA",
+      "retained_invariant": "No import/signing/admission/onceallocation"
+    },
+    {
+      "id": "C02",
+      "boundary": "codec",
+      "target": "any.version",
+      "mutation_or_interleaving": "replace integer with string, exponent or -0 canonical alias",
+      "required_outcome": "REJECT_CLOSED_SCHEMA_OR_CANONICAL",
+      "retained_invariant": "No typecoercion/familyfallback"
+    },
+    {
+      "id": "C03",
+      "boundary": "codec",
+      "target": "bootstrap_proof_preparation.expected_transcript",
+      "mutation_or_interleaving": "insert duplicate JSON key, CRLF, whitespace, BOM or trailingLF",
+      "required_outcome": "REJECT_UNCHANGED_R1",
+      "retained_invariant": "Do not normalize or silently rebuild"
+    },
+    {
+      "id": "C04",
+      "boundary": "codec",
+      "target": "custody_public_receipt.kind",
+      "mutation_or_interleaving": "replace custody-public-receipt/1 with registry record kind",
+      "required_outcome": "REJECT_CLOSED_SCHEMA",
+      "retained_invariant": "Hashdomain+kind/versionnotinterchangeable"
+    },
+    {
+      "id": "C05",
+      "boundary": "codec",
+      "target": "outer and expected_transcript",
+      "mutation_or_interleaving": "32769byteouter or4097byteR1 body",
+      "required_outcome": "REJECT_SIZE_BOUND",
+      "retained_invariant": "Before expensive parse/import"
+    },
+    {
+      "id": "J01",
+      "boundary": "join",
+      "target": "custody_public_receipt.custody_operation_id",
+      "mutation_or_interleaving": "substitute another original operation with same publicJWK",
+      "required_outcome": "REJECT_ORIGINAL_CORRELATION",
+      "retained_invariant": "Samepublickey doesnot make samecustodyreceipt"
+    },
+    {
+      "id": "J02",
+      "boundary": "join",
+      "target": "custody_public_receipt.generation_preparation_sha256",
+      "mutation_or_interleaving": "change installation/policy/deadline in original generationprep",
+      "required_outcome": "REJECT_ORIGINAL_CORRELATION",
+      "retained_invariant": "No recapture after keyeffect"
+    },
+    {
+      "id": "J03",
+      "boundary": "join",
+      "target": "installation_principal_subject.custody_epoch/principal_epoch",
+      "mutation_or_interleaving": "copy localepoch/revision into registryepoch as if authoritative",
+      "required_outcome": "NO_ADMISSION_WITHOUT_INDEPENDENT_PREPARATION",
+      "retained_invariant": "Counters are typed DATA domains, not authority"
+    },
+    {
+      "id": "J04",
+      "boundary": "join",
+      "target": "bootstrap_admission_context.custody_public_receipt_sha256",
+      "mutation_or_interleaving": "use second receipt with sameJWK but differentinstallation/operation",
+      "required_outcome": "REJECT_CONTEXT_OR_SUBJECT_MATCH",
+      "retained_invariant": "Fulloriginalrelation notkey-onlymatch"
+    },
+    {
+      "id": "J05",
+      "boundary": "join",
+      "target": "expected_transcript.operator_admission_binding_sha256",
+      "mutation_or_interleaving": "retain original contextdigest but replace subject/receipt in outerproof",
+      "required_outcome": "REJECT_FULL_CONTEXT_COMPARISON",
+      "retained_invariant": "Do not verify signature then trust callerouterfields"
+    },
+    {
+      "id": "J06",
+      "boundary": "join",
+      "target": "bootstrap_admission_context",
+      "mutation_or_interleaving": "add expected_transcript_sha256/selfdigest/futureprincipalrecordhash",
+      "required_outcome": "REJECT_UNKNOWN_FIELD",
+      "retained_invariant": "Keep hashdependencies acyclic; no placeholderreplacement"
+    },
+    {
+      "id": "J07",
+      "boundary": "join",
+      "target": "expected_transcript core_instance_id/installation_id/principal_id/principal_epoch",
+      "mutation_or_interleaving": "change one while reusing valid signature",
+      "required_outcome": "REJECT_ORIGINAL_BODY_OR_SIGNATURE",
+      "retained_invariant": "Originalexpectedbody remainsindependentlysnapshotted"
+    },
+    {
+      "id": "J08",
+      "boundary": "join",
+      "target": "expected_transcript registry_identity_sha256/registry_restore_policy_sha256/expected_registry_revision",
+      "mutation_or_interleaving": "change one or accept restored equalrow",
+      "required_outcome": "REJECT_ORIGINAL_CONTEXT_OR_UNQUALIFIED_CURRENTNESS",
+      "retained_invariant": "Equalhash doesnot prove currentregistry"
+    },
+    {
+      "id": "A01",
+      "boundary": "authority",
+      "target": "management authority bundle",
+      "mutation_or_interleaving": "correct signature+matchingrecords, no independently acceptedoperator/installassociation",
+      "required_outcome": "NO_ADMISSION",
+      "retained_invariant": "CryptoDATA remains DATA"
+    },
+    {
+      "id": "A02",
+      "boundary": "authority",
+      "target": "bootstrap signer prerequisite",
+      "mutation_or_interleaving": "require activeprincipalepoch before first proof",
+      "required_outcome": "REJECT_CIRCULAR_IMPLEMENTATION",
+      "retained_invariant": "BOOTSTRAP_POSSESSION uses independentlyapprovedproposedepoch, noactiveepochfabrication"
+    },
+    {
+      "id": "A03",
+      "boundary": "authority",
+      "target": "operational signer prerequisite",
+      "mutation_or_interleaving": "reuse bootstrapgrant or proposedepoch for ordinarysignature/A/B",
+      "required_outcome": "DENY_OPERATIONAL_PURPOSE",
+      "retained_invariant": "Only actualactivecurrentepoch and independentlyscopedpurpose"
+    },
+    {
+      "id": "T01",
+      "boundary": "time",
+      "target": "original_signing_deadline_unix_ms",
+      "mutation_or_interleaving": "newsigningdeadline later than originalauthorizationdeadline or originalsigningpreparation",
+      "required_outcome": "REJECT_EXTENSION",
+      "retained_invariant": "Bound eachlinkedoperation independently; minimum originalcutoffs, no freshdeadline fromchallenge/reply"
+    },
+    {
+      "id": "T02",
+      "boundary": "time",
+      "target": "any original authority",
+      "mutation_or_interleaving": "withdrawal/expiry/clockuncertainty occurs duringcrypto/signing/SQLawait",
+      "required_outcome": "DENY_LATE_POSITIVE_RESULT",
+      "retained_invariant": "Retire synchronously, finaloriginalguard/CAS; lateanswercannotrevive"
+    },
+    {
+      "id": "O01",
+      "boundary": "once",
+      "target": "custodygeneration committedreservation",
+      "mutation_or_interleaving": "loseACK/cancel before caller learns commit",
+      "required_outcome": "UNKNOWN_NO_GENERATION_RETRY",
+      "retained_invariant": "Retain originalconsumedclaim; no newkey/epoch/pathscan"
+    },
+    {
+      "id": "O02",
+      "boundary": "once",
+      "target": "localkey publication",
+      "mutation_or_interleaving": "partialwrite/filefsync/publication/parentfsync uncertain",
+      "required_outcome": "UNKNOWN_CLOSED",
+      "retained_invariant": "No deleting/importing/regenerating/backupadoption as repair"
+    },
+    {
+      "id": "O03",
+      "boundary": "once",
+      "target": "registrychallenge/proofoperation",
+      "mutation_or_interleaving": "stage2fails/expires after stage1publicreceipt",
+      "required_outcome": "PRESERVE_STAGE1_AND_STAGE2_ORIGINAL_OUTCOMES",
+      "retained_invariant": "No keyremint, no mutatedgenerationprep, no renewedchallenge"
+    },
+    {
+      "id": "O04",
+      "boundary": "once",
+      "target": "bootstrap signature",
+      "mutation_or_interleaving": "valid highS and lowS or duplicateparallel submissions",
+      "required_outcome": "SAME_ORIGINAL_OPERATION_ONLY",
+      "retained_invariant": "One signingattempt; atmostone registryCASwinner, noexpiryrenewal"
+    },
+    {
+      "id": "O05",
+      "boundary": "once",
+      "target": "registry transaction",
+      "mutation_or_interleaving": "actualSQLabort before atomicadmissioncommit",
+      "required_outcome": "NO_PARTIAL_REGISTRY_RECORD_NONCE_REVISION_RESERVE",
+      "retained_invariant": "Core signattemptmayalreadybeconsumed; no distributedrollbackclaim"
+    },
+    {
+      "id": "O06",
+      "boundary": "once",
+      "target": "registry transaction",
+      "mutation_or_interleaving": "committhenlostreply",
+      "required_outcome": "UNKNOWN_TO_CALLER_ORIGINAL_COMMITTED_TRUTH",
+      "retained_invariant": "Originalstatus/reconcile only; no newop/challenge/nonce"
+    },
+    {
+      "id": "O07",
+      "boundary": "status",
+      "target": "NOT_FOUND_DATA",
+      "mutation_or_interleaving": "stale/restorelookup missesoriginaloperation",
+      "required_outcome": "NO_REISSUE_PERMISSION",
+      "retained_invariant": "Notfound is observation, notno-effectproof"
+    },
+    {
+      "id": "O08",
+      "boundary": "status",
+      "target": "UNKNOWN",
+      "mutation_or_interleaving": "map genericexception to REJECTED_NO_EFFECT",
+      "required_outcome": "REJECT_STATUS_RECLASSIFICATION",
+      "retained_invariant": "Consumed/ambiguous effectnotreleased byerrorhandling"
+    },
+    {
+      "id": "W01",
+      "boundary": "withdrawal",
+      "target": "fullregistrationcapacity",
+      "mutation_or_interleaving": "withdrawexactoriginalepoch withreservedterminalcapacity andlostCorekey",
+      "required_outcome": "INDEPENDENT_MATCHED_WITHDRAWAL_REMAINS_AVAILABLE",
+      "retained_invariant": "No freshordinaryslot/lostsignerrequired; hostexhaustion remainsqualifiedseparately"
+    },
+    {
+      "id": "W02",
+      "boundary": "withdrawal",
+      "target": "localretirement thenremoteunknown",
+      "mutation_or_interleaving": "lostwithdrawalreply or lateroldproof",
+      "required_outcome": "LOCAL_RETIRED_REMOTE_UNKNOWN",
+      "retained_invariant": "No rollback/revival/newchallenge"
+    },
+    {
+      "id": "W03",
+      "boundary": "epoch",
+      "target": "successor proposal",
+      "mutation_or_interleaving": "replace keyunder sameprincipalepoch or auto incrementonrestart/loss",
+      "required_outcome": "CONFLICT_OR_NO_AUTHORITY",
+      "retained_invariant": "Explicitnewboundedepochadmission andretirementpolicy required"
+    },
+    {
+      "id": "D01",
+      "boundary": "devicejoin",
+      "target": "sameinstallationprincipal",
+      "mutation_or_interleaving": "bindanotherdevice without originalpairauthority or Bpurpose/session/nativewitness",
+      "required_outcome": "DENY_MISSING_ORIGINAL_JOIN",
+      "retained_invariant": "Installprincipal alonegrantsnoA/B; Source1382DATA notnativegeneration"
+    },
+    {
+      "id": "R01",
+      "boundary": "restore",
+      "target": "matchingkeyfile+localSQLsnapshot",
+      "mutation_or_interleaving": "restoreoldkey/operation/epoch withmatchinghashes",
+      "required_outcome": "NO_POSITIVE_CURRENTNESS",
+      "retained_invariant": "IndependentS4restore/withdrawalorigin stillrequired"
+    },
+    {
+      "id": "R02",
+      "boundary": "restart",
+      "target": "startup/statusGET",
+      "mutation_or_interleaving": "allocate freshoperation/key/challenge oradoptorphanreceipt",
+      "required_outcome": "DENY_SIDE_EFFECT",
+      "retained_invariant": "Read/constructor paths remaininert"
+    },
+    {
+      "id": "W04",
+      "boundary": "withdrawal",
+      "target": "withdrawal_preparation.challenge_id/challenge_nonce_sha256/withdrawal_policy_sha256",
+      "mutation_or_interleaving": "reuse bootstrapnonce or replace independent withdrawalpolicy",
+      "required_outcome": "DENY_ORIGINAL_WITHDRAWAL_CONTEXT_MISMATCH",
+      "retained_invariant": "Separate withdrawaloriginalonce/policy; no lostCorekey requirement"
+    },
+    {
+      "id": "W05",
+      "boundary": "original-operation withdrawal",
+      "target": "accepted originalintent before firstADMIT",
+      "mutation_or_interleaving": "independent admittedwithdrawal targets exactsubject+originalregistration/challenge, no principalresulthash",
+      "required_outcome": "COMMITTED_ORIGINAL_RETIREMENT_TOMBSTONE",
+      "retained_invariant": "Pendingintent+nonce permanentlyterminal; lateADMIT finalCASloses"
+    },
+    {
+      "id": "W06",
+      "boundary": "original-operation withdrawal",
+      "target": "ADMIT committed+lostreply+lostCorekey",
+      "mutation_or_interleaving": "operator lacks resultdigest and statusGET unavailable but has originalacceptedintent",
+      "required_outcome": "RETIRE_EXACT_ORIGINAL_COMMITTED_PRINCIPAL_AND_CHILDREN",
+      "retained_invariant": "No lostkey/resultreceipt required; server internallyresolves originaloperation"
+    },
+    {
+      "id": "W07",
+      "boundary": "race",
+      "target": "withdrawal vs heldproofverification",
+      "mutation_or_interleaving": "hold originalproof thenwithdrawal commits before ADMIT",
+      "required_outcome": "DENY_LATE_ADMIT_AT_FINAL_TRANSACTION",
+      "retained_invariant": "No preawaitread or validcrypto bypasses terminalfence"
+    },
+    {
+      "id": "W08",
+      "boundary": "race",
+      "target": "ADMIT wins before withdrawal",
+      "mutation_or_interleaving": "ADMIT commit acknowledgment lost; withdrawalserializes next",
+      "required_outcome": "ADMIT_THEN_RETIRED_ORIGINAL_ONLY",
+      "retained_invariant": "No crossstore rollbackclaim or successorretirement"
+    },
+    {
+      "id": "W09",
+      "boundary": "unknown",
+      "target": "withdrawal commits thenACKlost",
+      "mutation_or_interleaving": "duplicateexactwithdrawal, delayedproof and unavailable statuslookup",
+      "required_outcome": "UNKNOWN_TO_CALLER_ORIGINAL_TERMINAL_TRUTH",
+      "retained_invariant": "No reissue/secondwithdrawalcapacityallocation/proofrevival"
+    },
+    {
+      "id": "W10",
+      "boundary": "target",
+      "target": "neworiginalwithdrawalvariant",
+      "mutation_or_interleaving": "add null/guessedprincipal_record_sha256 or mismatchedsubject/challenge/prepdigest",
+      "required_outcome": "REJECT_CLOSED_VARIANT_OR_EXACT_TARGET",
+      "retained_invariant": "No fallback/wildcard/lookupchosenfuturetarget"
+    },
+    {
+      "id": "W11",
+      "boundary": "capacity",
+      "target": "fullordinarybudget withpendingintent",
+      "mutation_or_interleaving": "withdrawbeforeADMIT or viaknowncommittedvariant",
+      "required_outcome": "USE_SAME_ORIGINAL_RESERVED_TERMINAL_BUDGET",
+      "retained_invariant": "No variantdouble-spend/unboundedfreshoperationallocation"
+    },
+    {
+      "id": "W12",
+      "boundary": "restore",
+      "target": "original intent absent from stale/unavailableledger",
+      "mutation_or_interleaving": "treat NOT_FOUND as proof nooriginaladmission possible",
+      "required_outcome": "DENY_REISSUE_OR_POSITIVE_CURRENTNESS",
+      "retained_invariant": "Qualifiedoriginalreconcile/externalretirement needed; no falseabsenceproof"
+    },
+    {
+      "id": "W13",
+      "boundary": "target",
+      "target": "successorepoch alreadydifferent",
+      "mutation_or_interleaving": "withdrawoldoriginalintent matches neither successoroperation nor subject",
+      "required_outcome": "FENCE_ONLY_EXACT_OLD_INTENT_ORIGINAL_NONCE",
+      "retained_invariant": "Never wildcardretire successor; oldproofstillclosed"
+    },
+    {
+      "id": "W14",
+      "boundary": "reservation",
+      "target": "prepareintent/reserves commit withlostACK",
+      "mutation_or_interleaving": "Core has no original acknowledged release ofsigningpreparation",
+      "required_outcome": "NO_SIGNING_OR_REPREPARATION_FROM_UNKNOWN",
+      "retained_invariant": "Retain originalreservation, independentreconcileonly"
+    },
+    {
+      "id": "W15",
+      "boundary": "revision",
+      "target": "original-operationwithdraw afterADMITadvancedrevision",
+      "mutation_or_interleaving": "caller stillknows onlyoriginalpre-ADMITrevision",
+      "required_outcome": "TARGET_EXACT_INTENT_SERVER_CAS_CURRENT_STATE",
+      "retained_invariant": "Newvariant has no callerexpectedcurrentrevision; cannotbe blockedbylostresultrevision"
+    },
+    {
+      "id": "C06",
+      "boundary": "predecode",
+      "target": "outerdocument",
+      "mutation_or_interleaving": "depth5 or token257 even ifunknownschema",
+      "required_outcome": "REJECT_BEFORE_GENERIC_JSON_PARSE",
+      "retained_invariant": "Fixed scanner stack/counters; no recursion/mutablecallerobject"
+    },
+    {
+      "id": "C07",
+      "boundary": "predecode",
+      "target": "escaped expected_transcript",
+      "mutation_or_interleaving": "separatelydecodedR1 depth5/token129/body4097bytes",
+      "required_outcome": "REJECT_BEFORE_R1_GENERIC_JSON_PARSE",
+      "retained_invariant": "Bounded4096buffer; outerstringescapesdo notbypass nestedscan"
+    },
+    {
+      "id": "C08",
+      "boundary": "predecode",
+      "target": "escaped stringquotes/braces",
+      "mutation_or_interleaving": "put bracket/escapedquotecharacters insideboundedprimitive strings",
+      "required_outcome": "LEXICALLY_COUNT_REAL_JSON_STRUCTURE_ONLY_THEN_SCHEMA_REJECT_OR_ACCEPT",
+      "retained_invariant": "No naivebracecount treatingstringsasstructure; invalidescapesreject"
+    }
+  ],
+  "positive_design_expectation": "A fully matching original record chain with independently admitted authority and currentness can yield DATA codec success only. A live admitted result additionally needs actual source/adapters/onceCAS/runtimequalification and effectapproval; none exist here.",
+  "source168_reuse": "Existing65crypto tests are not rerun or claimed to qualify these new joins/statuses/ledgers.",
+  "cases_executed": 0,
+  "actual_effects": false,
+  "prior_vectors_sha256": "c5a9691fd595730471324523669119bd4cf9fe0780a78e444bb1a7473544de61",
+  "revision": "privateR2"
+}
