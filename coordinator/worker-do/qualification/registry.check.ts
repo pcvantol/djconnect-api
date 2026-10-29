@@ -147,6 +147,65 @@ it('finite record and operation budgets do not prune replay/retirement state',as
   expect((await call(s,'retire',retirement({...record,principal_id:'other'},2,3))).ok).toBe(false);
   expect(await rows(s,'registry_operations')).toHaveLength(2);expect(await rows(s,'registry_retired')).toHaveLength(1);
 });
+it('retirement capacity: registration needs room for its own later retirement',async()=>{
+  const s=await setup(1,1);
+  expect((await call(s,'register',registration())).ok).toBe(false);
+  expect(await rows(s,'registry_records')).toHaveLength(0);
+  expect(await rows(s,'registry_operations')).toHaveLength(0);
+  expect((await rows(s,'registry_meta'))[0].revision).toBe(0);
+  // Refusal does not consume the operation/nonce: a negative tombstone still fits.
+  expect((await call(s,'retire',retirement(record,0,1))).ok).toBe(true);
+});
+it('retirement capacity: full admission still permits every stored live epoch to retire through a new stub',async()=>{
+  const s=await setup(4,4),other={...record,principal_id:'other'};
+  expect((await call(s,'register',registration())).ok).toBe(true);
+  expect((await call(s,'register',registration(other,1,2))).ok).toBe(true);
+  const again=env.REGISTRY_DATA.get(s.id);
+  expect((await call(again,'register',registration({...record,principal_id:'third'},2,3))).ok).toBe(false);
+  expect((await call(again,'retire',retirement({...record,principal_id:'unknown'},2,3))).ok).toBe(false);
+  expect(await rows(again,'registry_operations')).toHaveLength(2);
+  expect((await call(again,'retire',retirement(record,2,3))).ok).toBe(true);
+  expect((await call(again,'retire',retirement(other,3,4))).ok).toBe(true);
+  expect((await call(again,'read',lookup())).ok).toBe(false);
+  expect((await call(again,'read',lookup(other))).ok).toBe(false);
+  expect(await rows(again,'registry_operations')).toHaveLength(4);
+  expect(await rows(again,'registry_retired')).toHaveLength(2);
+});
+it('retirement capacity: an unknown tombstone cannot spend another principal retirement slot',async()=>{
+  const s=await setup(3,3);
+  expect((await call(s,'register',registration())).ok).toBe(true);
+  expect((await call(s,'retire',retirement({...record,principal_id:'unknown'},1,2))).ok).toBe(true);
+  expect((await call(s,'retire',retirement({...record,principal_id:'another'},2,3))).ok).toBe(false);
+  expect((await call(s,'retire',retirement(record,2,3))).ok).toBe(true);
+  expect(await rows(s,'registry_records')).toHaveLength(1);
+  expect(await rows(s,'registry_operations')).toHaveLength(3);
+  expect(await rows(s,'registry_retired')).toHaveLength(2);
+});
+it('retirement capacity: SQL abort preserves the reserved slot and exact operation for retry',async()=>{
+  const s=await setup(1,2);expect((await call(s,'register',registration())).ok).toBe(true);
+  await runInDurableObject(s,(_i,state)=>{
+    state.storage.sql.exec("CREATE TRIGGER retirement_abort BEFORE INSERT ON registry_retired BEGIN SELECT RAISE(ABORT,'retirement SQL fault'); END").toArray();
+  });
+  expect((await call(s,'retire',retirement())).ok).toBe(false);
+  expect((await rows(s,'registry_meta'))[0].revision).toBe(1);
+  expect(await rows(s,'registry_operations')).toHaveLength(1);
+  await runInDurableObject(s,(_i,state)=>{state.storage.sql.exec('DROP TRIGGER retirement_abort').toArray();});
+  expect((await call(s,'retire',retirement({...record,principal_id:'unknown'}))).ok).toBe(false);
+  expect((await call(s,'retire',retirement())).ok).toBe(true);
+});
+it('retirement capacity: post-sync failure and lost registration reply retain capacity for retirement',async()=>{
+  const s=await setup(1,2),wire=JSON.stringify({classification:SOURCE,action:'register',input:registration()});
+  await runInDurableObject(s,async(instance,state)=>{
+    const original=state.storage.sync.bind(state.storage);
+    const spy=vi.spyOn(state.storage,'sync').mockImplementation(async()=>{await original();throw Error('lost registration acknowledgement');});
+    try{expect(JSON.parse(await instance.sourceCommand(wire)).ok).toBe(false);}finally{spy.mockRestore();}
+  });
+  const again=env.REGISTRY_DATA.get(s.id);
+  expect((await call(again,'retire',retirement({...record,principal_id:'unknown'}))).ok).toBe(false);
+  expect((await call(again,'retire',retirement())).ok).toBe(true);
+  expect((await call(again,'read',lookup())).ok).toBe(false);
+  expect(await rows(again,'registry_operations')).toHaveLength(2);
+});
 it('a new stub sees original retired state without returning a positive authority lease',async()=>{
   const s=await setup();await call(s,'register',registration());await call(s,'retire',retirement());
   const again=env.REGISTRY_DATA.get(s.id);expect((await call(again,'read',lookup())).ok).toBe(false);
