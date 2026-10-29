@@ -51,7 +51,14 @@ skipped epoch, replay-result cache, retry repair, nonce pruning or TTL cleanup e
 
 Global revision CAS and finite explicitly supplied fixture record/operation budgets
 apply inside the same transaction as records, heads and once rows. Capacity refuses
-new work rather than evicting replay evidence. A lost reply or failure after commit
+new work rather than evicting replay evidence. The lifetime operation budget includes
+one reserved retirement operation for every stored unretired epoch. Registration
+therefore needs two free slots: its insertion and its eventual retirement. An unknown
+principal/epoch tombstone may use only unreserved capacity; it cannot spend another
+epoch's retirement slot. A matching retirement consumes its own slot. Counts are
+derived from persistent rows inside the same mutation transaction, including after a
+lost registration reply. No mutable in-memory credit, new schema or quota reset is used.
+A lost reply or failure after commit
 returns no positive result and is never described as rollback. Read results are
 point-in-time `STORED_SOURCE_DATA`, not ACTIVE authority, a renewed validity lease,
 native eligibility or a shipping signature. Original expiry numbers remain DATA;
@@ -90,6 +97,18 @@ See [pricing](https://developers.cloudflare.com/durable-objects/platform/pricing
 and [limits](https://developers.cloudflare.com/durable-objects/platform/limits/).
 No account upgrade, remote namespace, runtime assumption or invoice prediction is
 made by this source package. Production policy/count/read limits still need admission.
+
+For the configured lifetime counts, let O be retained operations and L stored epochs
+without a retirement tombstone. Admission preserves O + L <= max_operations. A new
+registration increases O and L by one; retiring a stored live epoch increases O and
+decreases L by one; other tombstones only increase O. max_records counts all retained
+record rows, including retired ones. Neither limit is a daily request allowance.
+These are source DATA limits, with no chosen production defaults. Application budget
+reservation does not guarantee storage availability, caller authorization, successful
+persistence, restored-store freshness or provider effects. A previously saturated
+journal is not repaired by this check: restore/admission still requires separate
+qualification without deleting once rows or inventing capacity. A new test stub is
+not evidence of actual process restart, eviction or remote restore.
 
 ## Remaining real facts
 

@@ -19,9 +19,17 @@ export class PrincipalRegistryData extends DurableObject {
     if(expectedRevision!==undefined)need(m.revision===expectedRevision,'registry revision CAS');
     return m;
   }
-  #reserve(m:Row,op:unknown,nonce:unknown,kind:string):number {
+  #reserve(m:Row,op:unknown,nonce:unknown,kind:string,retiring?:{principal_id:string;principal_epoch:number}):number {
     operation(op);hash(nonce);
-    need(Number(this.#sql('SELECT count(*) AS n FROM registry_operations')[0].n)<Number(m.max_operations),'operation capacity');
+    const used=Number(this.#sql('SELECT count(*) AS n FROM registry_operations')[0].n);
+    // Every stored unretired epoch keeps one operation slot for its own retirement.
+    // Counts and reservation share the mutation transaction; no in-memory credit or pruning.
+    const pending=Number(this.#sql(`SELECT count(*) AS n FROM registry_records r
+      WHERE NOT EXISTS(SELECT 1 FROM registry_retired t WHERE t.principal=r.principal AND t.epoch=r.epoch)`)[0].n);
+    const released=retiring && this.#sql(`SELECT 1 FROM registry_records r WHERE r.principal=? AND r.epoch=?
+      AND NOT EXISTS(SELECT 1 FROM registry_retired t WHERE t.principal=r.principal AND t.epoch=r.epoch)`,
+      retiring.principal_id,retiring.principal_epoch).length===1 ? 1 : 0;
+    need(Number(m.max_operations)-used>=1+pending+(kind==='register'?1:0)-released,'operation capacity including retirement');
     const next=Number(m.revision)+1;integer(next);
     this.#sql('INSERT INTO registry_operations VALUES(?,?,?,?)',op,nonce,kind,next);
     this.#sql('UPDATE registry_meta SET revision=? WHERE id=1',next);return next;
@@ -78,7 +86,8 @@ export class PrincipalRegistryData extends DurableObject {
     id(input.principal_id);integer(input.principal_epoch);let revision=0;
     this.ctx.storage.transactionSync(()=>{
       const m=this.#meta(input.restore,input.expected_revision);
-      revision=this.#reserve(m,input.operation_id,input.nonce_sha256,'retire');
+      revision=this.#reserve(m,input.operation_id,input.nonce_sha256,'retire',{
+        principal_id:input.principal_id as string,principal_epoch:input.principal_epoch as number});
       // Negative tombstone also works before registration. No time-based deletion/reopening.
       this.#sql('INSERT INTO registry_retired VALUES(?,?,?)',input.principal_id as string,input.principal_epoch as number,revision);
       this.#sql('INSERT INTO registry_heads VALUES(?,?) ON CONFLICT(principal) DO UPDATE SET epoch=max(epoch,excluded.epoch)',input.principal_id as string,input.principal_epoch as number);
