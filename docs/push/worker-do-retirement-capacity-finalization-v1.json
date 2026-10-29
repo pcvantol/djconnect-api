@@ -1,0 +1,400 @@
+{
+  "schema_version": 1,
+  "classification": "SEPARATE_DOCUMENTARY_FINALIZATION_OF_SOURCE166_NOT_OPERATIONAL_ACTIVATION",
+  "source_PR": 166,
+  "reviewed_candidate": "c91e40998398458bab76553a75e68af171f2127d",
+  "protected_main": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+  "tree": "9e99f8485746157acfaa71525690160a3604ee5b",
+  "parent": "a52a1dc9bece4a934a01e71dc1eb201759729225",
+  "direct_human_merge_grant": "Ja, merge PR #166",
+  "source_changes": {
+    "scope": "four files: registry source, causal tests, guide and manifest input hashes",
+    "capacity_invariant": "retained operations + stored unretired epochs <= max_operations",
+    "registration_cost": 2,
+    "matching_retirement_net_cost": 0,
+    "other_tombstone_cost": 1,
+    "schema_changed": false,
+    "replay_pruning": false,
+    "root_Worker_config_dependencies_or_wire_changed": false
+  },
+  "source_review_sha256": "e0899d542321ceb7ef0a9d83d4b46b395bec45a886634700f97435ceaf774565",
+  "local_qualification": {
+    "original_module": "a52a1dc9bece4a934a01e71dc1eb201759729225",
+    "selected_new_cases_before": {
+      "passed": 0,
+      "failed": 5,
+      "unselected_skipped": 31
+    },
+    "all_cases_after": {
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0
+    },
+    "strict_types": "PASS",
+    "locked_source_packaging": "PASS"
+  },
+  "candidate_CI": {
+    "all13_workflows": [
+      {
+        "conclusion": "success",
+        "databaseId": 40806681402,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "CodeQL",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680527,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Push coordinator source qualification",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680578,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Trusted Delivery",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806679909,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "AI-development projection",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680432,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Worker DO registry source conformance",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680498,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Native proof transcript source",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680633,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Surface enrollment source",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680616,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Native proof DATA journal source",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806681106,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Semgrep",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680092,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Fixed rendezvous QA build",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680302,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "TDE observe",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680533,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Validate",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 40806680566,
+        "event": "pull_request",
+        "headSha": "c91e40998398458bab76553a75e68af171f2127d",
+        "name": "Local native experiment qualification",
+        "status": "completed"
+      }
+    ],
+    "registry": {
+      "head": "c91e40998398458bab76553a75e68af171f2127d",
+      "run": 40806680432,
+      "artifact": 12868875316,
+      "zip_sha256": "8c80e64de88b1acbb559b46a4c12376d5353794dab57a4b91dbe1f6050dcd26f",
+      "actual_tests": "36PASS0FAIL0SKIP",
+      "package_byte_equal_local": true,
+      "package_sha256": "a5c08a6bc1710bf11cce5e73b8aa5de6f145942929f2aa4d5641b796e86ea4db",
+      "scope": "Candidate source CI, not deployment or real restart/restore"
+    },
+    "test_merge_join": {
+      "candidate": "c91e40998398458bab76553a75e68af171f2127d",
+      "base": "a52a1dc9bece4a934a01e71dc1eb201759729225",
+      "test_merge": "9e6d10052d79ce9f737c38ea6da40271481750e1",
+      "tree": "9e99f8485746157acfaa71525690160a3604ee5b",
+      "parents": [
+        "a52a1dc9bece4a934a01e71dc1eb201759729225",
+        "c91e40998398458bab76553a75e68af171f2127d"
+      ],
+      "equal_candidate_tree": true
+    },
+    "owner_authorization": "SUCCESS/notrequiredLOWorNORMALrisk via TrustedDelivery40806680578"
+  },
+  "original_main_CI": [
+    {
+      "conclusion": "success",
+      "databaseId": 40831277693,
+      "event": "workflow_run",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "API release artifact",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831277936,
+      "event": "workflow_run",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Post-Merge Release Evidence",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831088556,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "CodeQL",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831087691,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "AI-development projection",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831087985,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Push coordinator source qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831088131,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Native proof transcript source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831087644,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "TDE observe",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831088120,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Surface enrollment source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831088067,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Native proof DATA journal source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831087645,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Fixed rendezvous QA build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831088024,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Worker DO registry source conformance",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831088070,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Validate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40831087620,
+      "event": "push",
+      "headSha": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "name": "Local native experiment qualification",
+      "status": "completed"
+    }
+  ],
+  "original_main_registry": {
+    "main": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+    "candidate": "c91e40998398458bab76553a75e68af171f2127d",
+    "run": 40831088024,
+    "artifact": 12878073455,
+    "provider_and_download_zip_sha256": "1340b2b5b332f06169b7085bcc2947c9b4ccb26f95d1e4e26044f85c770b5cb0",
+    "actual_main_tests": "36PASS0FAIL0SKIP",
+    "package_equal_local_and_candidate": true,
+    "package_sha256": "a5c08a6bc1710bf11cce5e73b8aa5de6f145942929f2aa4d5641b796e86ea4db",
+    "effects": "Own main source qualification; no deployment"
+  },
+  "original_release_verification": {
+    "main": "81510409ea6b72f79bf744abf941e27fc17fdea7",
+    "candidate": "c91e40998398458bab76553a75e68af171f2127d",
+    "formal_sha256": "8dc9a2959f30f3a85c80ea3eb5d3c13e9f1b1db4f59b9bb564ac4b2f31aa2085",
+    "canonical_source_digest": "5d7b2d078832af2fe7d17a7ad0171f238ff16ddc467618348084adc3f13b1abd",
+    "durable_sha256": "b8bb39b5da7f45573ce9bef6ccff81f4675ef33f1194145e4438b9da7f08fad4",
+    "durable_asset": 687636363,
+    "all12_durable_checks": "PASS",
+    "release_tar_sha256": "9ae7f6fe0c4a240cb772638d5f736b55e42d965a305d56d02951bb8f7d4d7f2c",
+    "worker_sha256": "ae79e64c45f0517aa9d3cb2cddb221f75fd5545b958ff597b0d1a71d8595c2db",
+    "worker_bytes": 1291540,
+    "sidecars_sha256": {
+      "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e",
+      "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+      "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+      "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+      "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+      "migrations/0011_surface_enrollment_authorizations.sql": "6fd3be56034da4a8d1bfcfa56b9286f3ccf4ce596e44ddf73cfc100852044c3b",
+      "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+      "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+      "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+      "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+      "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+      "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "THIRD_PARTY_NOTICES.md": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+      "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536"
+    },
+    "safe_unique_paths": true,
+    "licenses_verified": true,
+    "Worker_equal_prior_except_one_source_SHA": true,
+    "prior_source_SHA": "a52a1dc9bece4a934a01e71dc1eb201759729225",
+    "coordinator_not_in_Worker_artifact": true,
+    "effects": "Offline original verification only; not deployment"
+  },
+  "original_downloaded_ZIPs": [
+    {
+      "artifact_id": 12878652781,
+      "name": "djconnect-api-release-81510409ea6b72f79bf744abf941e27fc17fdea7",
+      "provider_and_download_zip_sha256": "6f7f5ba98beb9d9b9af06c83be05f39b97ee9ae7a3a9fa397ac5913da1f8dc47",
+      "members": [
+        "djconnect-api-release.tar.gz"
+      ]
+    },
+    {
+      "artifact_id": 12878279487,
+      "name": "api-release-artifact-evidence",
+      "provider_and_download_zip_sha256": "b1c2d6a13683d3d5a03f81ae20d2b6ea7267f89a4782a6eab82837d3fe895467",
+      "members": [
+        "api-release-artifact-evidence.json"
+      ]
+    },
+    {
+      "artifact_id": 12878309532,
+      "name": "post-merge-release-evidence",
+      "provider_and_download_zip_sha256": "8e6fd74dd497f1a0d1b2faf2b00105e80a08823df546a5a031fed33830c0edc9",
+      "members": [
+        "post-merge-release-evidence.json"
+      ]
+    }
+  ],
+  "original_packet_sha256": "7664de0f7e2fe9083ea3c55bb0fcec39ed90f002fae51b339e461a1b492c8153",
+  "original_packet_member_hashes": {
+    "artifact-download-verification.json": "57056ae00b98e96b8cee0e158cd94fd8b191d9f42dc15c23b9e6fc67c4656527",
+    "artifact-provider-metadata.json": "2128f1509aeaeb978694dad360c48f1b64bb78f5249375683a7f605bdd64b1c9",
+    "durable-asset-metadata.json": "a77366a87f455d3d608274787f6020d89f6f79bc6831340ddc7abf30aa65481c",
+    "durable-original.json": "b8bb39b5da7f45573ce9bef6ccff81f4675ef33f1194145e4438b9da7f08fad4",
+    "durable-release-metadata.json": "a6c00345c5d48559dcec90791f855918c8656dbc932e73693f14dc3918127473",
+    "formal-original/post-merge-release-evidence/download.zip": "8e6fd74dd497f1a0d1b2faf2b00105e80a08823df546a5a031fed33830c0edc9",
+    "formal-original/post-merge-release-evidence/post-merge-release-evidence.json": "8dc9a2959f30f3a85c80ea3eb5d3c13e9f1b1db4f59b9bb564ac4b2f31aa2085",
+    "formal-run-metadata.json": "135d334ad30c80014b0b407cd31751382d64eda18763492077f599a4cadcc424",
+    "main-runs-complete.json": "1cc20e8842e86d81d307c09c32ea5cedb5e3daa42d7bc823a8cf2cdec489d91a",
+    "main-source-conformance/artifact.zip": "1340b2b5b332f06169b7085bcc2947c9b4ccb26f95d1e4e26044f85c770b5cb0",
+    "main-source-conformance/provider-metadata.json": "60f589ca337035b8088598e7f07b78d6ce0e6a2c2c63b7bd1714f4063c4eba12",
+    "main-source-conformance/verification.json": "9d21166d9444f31969c3aba7f4f159a8279c9ba638f198bf5f5ebb6d3c4131be",
+    "main-source-conformance/worker-do-registry-package/source-package.json": "a5c08a6bc1710bf11cce5e73b8aa5de6f145942929f2aa4d5641b796e86ea4db",
+    "main-source-conformance/worker-do-registry-tests.json": "1aeab66357d8dbccc9e89ffeab0bcb1ce2f4e30c1330d08a4e5da8927c148a83",
+    "merge-tree-join.json": "eeb0167f2db23661f7562c949987f169a32391c8cff2c681e1b4c319ba58740d",
+    "original-delivery-local-verification.json": "75ffc7233f5c8d192e6601802a1d7743b465d9950e723c195f3a44ed43a6e45e",
+    "registry-main-run-metadata.json": "b8114e43c3306052f44130a92862ee4be174a603e705b36504d0b8b5797bb5cd",
+    "release-original/api-release-artifact-evidence/api-release-artifact-evidence.json": "25dedfe525289af770c9e17141f77561d6193ee626ea42efebb5bdb2b3d47a52",
+    "release-original/api-release-artifact-evidence/download.zip": "b1c2d6a13683d3d5a03f81ae20d2b6ea7267f89a4782a6eab82837d3fe895467",
+    "release-original/djconnect-api-release-81510409ea6b72f79bf744abf941e27fc17fdea7/djconnect-api-release.tar.gz": "9ae7f6fe0c4a240cb772638d5f736b55e42d965a305d56d02951bb8f7d4d7f2c",
+    "release-original/djconnect-api-release-81510409ea6b72f79bf744abf941e27fc17fdea7/download.zip": "6f7f5ba98beb9d9b9af06c83be05f39b97ee9ae7a3a9fa397ac5913da1f8dc47",
+    "release-run-metadata.json": "9329a044e1f1d212db5ac8372dfec30a862d099569b985bba25c53ae48dcbf8d"
+  },
+  "independent_original_join": {
+    "receipt_sha256": "9150116ae7bd5a56342b9dfc2d7f26a61b486edbfceedb602968438c7bf2d8be",
+    "decision": "ORIGINAL_SOURCE166_DELIVERY_NO_BLOCKERS",
+    "scope": "Root personally recomputed owning-downloaded original bytes; own live workflow/artifact/durable metadata; not own ZIP download",
+    "checks": [
+      "All frozen packet member hashes exact",
+      "Formal/durable canonical integrity and all12 PASS/exact coverage source",
+      "Git reviewed/protected tree and parent exact",
+      "All13 own live main workflows SUCCESS",
+      "All three original ZIPs match own live provider hashes and member bytes",
+      "36actual DO tests original report and equal candidate source-package",
+      "Safe unique regular TAR/17 Git sidecars/LICENSES exact",
+      "Worker equal original Final165 except one embedded releaseSHA; registry absent root artifact"
+    ]
+  },
+  "limitations": [
+    "Application lifetime operation budget; no production defaults or host quota guarantee",
+    "Existing saturated or older restored journal not repaired",
+    "New test stub does not prove actual restart, eviction or remote restore",
+    "No genuine registrar/custodian, principal/key epoch/PoP, Core purpose ACK, clock/native/provider authority supplied by this source",
+    "Standalone source production factory remains unavailable; no-store503; ordinary Worker has no registry namespace binding",
+    "No provisioning, key action, account upgrade, enrollment, provider, native or deployment effect"
+  ],
+  "this_separate_Final": {
+    "scope": "two documentary additions only",
+    "exact_review": "required separately",
+    "protected_merge": "requires its own concrete human grant",
+    "own_main_original_qualification": "required after merge; not borrowed from Source166"
+  }
+}
