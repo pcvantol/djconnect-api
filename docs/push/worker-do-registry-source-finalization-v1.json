@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "kind": "worker_SQLite_DO_registry_SOURCE_QUALIFICATION_separate_Finalization",
+  "source_PR": 164,
+  "source_base": "2d8637e634f5b2db84151e66027204db885d4369",
+  "source_candidate": "a82b4c62c9cdeea306a8bf362adca570c7614d23",
+  "qualified_source_main": "22b10e218d4330211c362fe106c00d61e8168fce",
+  "tree": "4bdb19f2fd8ef9d6e02802ae3c893aa5950b5786",
+  "candidate_test_merge": "ebd8c9b567dc9093674d79ae4905baaeec22ccc0",
+  "independent_whole11_review_sha256": "08032187814f6890f0f7eba2c28e734fb481b8ca0ecb57d007cb49409f733437",
+  "Core_owning_join_sha256": "39b9c478a95df770d889fcae5071bef5143a3b8afa695f313e36fb6866257347",
+  "Core_passive_contract_sha256": "af201f6a74f358b09460f3cea026b6104aef93d54d8ac9ea05bac32d43874492",
+  "source_manifest_sha256": "3f625ab5fe52f616660823f98409d4604830be014b9059f9226665a893b8238d",
+  "local_qualification": "31 actual local workerd/SQLite DO tests PASS, 0FAIL, 0SKIP, process0; strict source/root types and actual Wrangler parser/source package PASS",
+  "candidate_workflows": [
+    {
+      "id": 40732910223,
+      "name": "Push coordinator source qualification",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 7,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910223/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910223/logs",
+      "workflow_id": 398122763
+    },
+    {
+      "id": 40732910142,
+      "name": "Native proof DATA journal source",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 11,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910142/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910142/logs",
+      "workflow_id": 397822098
+    },
+    {
+      "id": 40732910497,
+      "name": "Trusted Delivery",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 213,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910497/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910497/logs",
+      "workflow_id": 312068847
+    },
+    {
+      "id": 40732910450,
+      "name": "Validate",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 413,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910450/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910450/logs",
+      "workflow_id": 299333886
+    },
+    {
+      "id": 40732910147,
+      "name": "Surface enrollment source",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 24,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910147/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910147/logs",
+      "workflow_id": 397583577
+    },
+    {
+      "id": 40732910708,
+      "name": "Worker DO registry source conformance",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 1,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910708/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910708/logs",
+      "workflow_id": 399675064
+    },
+    {
+      "id": 40732910762,
+      "name": "Semgrep",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 232,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910762/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910762/logs",
+      "workflow_id": 303298588
+    },
+    {
+      "id": 40732910365,
+      "name": "Native proof transcript source",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 16,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910365/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910365/logs",
+      "workflow_id": 397760628
+    },
+    {
+      "id": 40732910975,
+      "name": "CodeQL",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 393,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910975/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732910975/logs",
+      "workflow_id": 303298589
+    },
+    {
+      "id": 40732909193,
+      "name": "AI-development projection",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 232,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909193/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909193/logs",
+      "workflow_id": 347489996
+    },
+    {
+      "id": 40732909291,
+      "name": "TDE observe",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 270,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909291/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909291/logs",
+      "workflow_id": 321625289
+    },
+    {
+      "id": 40732909500,
+      "name": "Fixed rendezvous QA build",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 84,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909500/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909500/logs",
+      "workflow_id": 391755203
+    },
+    {
+      "id": 40732909318,
+      "name": "Local native experiment qualification",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 133,
+      "jobs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909318/jobs",
+      "logs_url": "https://api.github.com/repos/pcvantol/djconnect-api/actions/runs/40732909318/logs",
+      "workflow_id": 389732930
+    }
+  ],
+  "exact_OwnerAuthorization": 40733390558,
+  "TrustedDelivery": 40732910497,
+  "CodeQL_PR_aggregate": 122974347951,
+  "CodeQL_PR_annotations": 0,
+  "candidate_registry_CI": {
+    "candidate": "a82b4c62c9cdeea306a8bf362adca570c7614d23",
+    "run_id": 40732910708,
+    "artifact_id": 12834829632,
+    "provider_and_zip_sha256": "60dd924311cfd08b020267693f4ec4ec11811147bafea0ef0619d2e31c7c3090",
+    "files_sha256": {
+      "worker-do-registry-tests.json": "4aed7051654e3d60ec867175cd43ecd67b65ca7bc19f7e5c3af2159fc217b35b",
+      "worker-do-registry-package/source-package.json": "fb0d8e9e6059184e1c96e6404bbb035d67e9d4493e8568a05dfbf84545e3b4ca"
+    },
+    "actual_hosted_DO_tests": "31PASS0FAIL0SKIP",
+    "hosted_local_source_package_byte_equal": true,
+    "effects": "Offline source evidence verification; not deployed or real registry admission"
+  },
+  "all13_original_source_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 40772581738,
+      "event": "workflow_run",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Post-Merge Release Evidence",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772581183,
+      "event": "workflow_run",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "API release artifact",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772288926,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "CodeQL",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772287471,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "AI-development projection",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772288305,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Native proof DATA journal source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772288259,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Native proof transcript source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772288184,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Push coordinator source qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772288491,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Surface enrollment source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772288234,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Worker DO registry source conformance",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772287497,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Fixed rendezvous QA build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772287529,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "TDE observe",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772288295,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Validate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40772287465,
+      "event": "push",
+      "headSha": "22b10e218d4330211c362fe106c00d61e8168fce",
+      "name": "Local native experiment qualification",
+      "status": "completed"
+    }
+  ],
+  "original_main_registry_CI": {
+    "main": "22b10e218d4330211c362fe106c00d61e8168fce",
+    "candidate": "a82b4c62c9cdeea306a8bf362adca570c7614d23",
+    "run_id": 40772288234,
+    "artifact_id": 12853615578,
+    "provider_and_download_zip_sha256": "deeb33ff3b9e14f08913614d9c0bfbb604523639c2f8426ffe7c1bff86489ae8",
+    "files_sha256": {
+      "worker-do-registry-tests.json": "713fe188cb1a85527c72165657644aa9586fc7bda9fa7c9cb78646f43a57b2a2",
+      "worker-do-registry-package/source-package.json": "fb0d8e9e6059184e1c96e6404bbb035d67e9d4493e8568a05dfbf84545e3b4ca"
+    },
+    "actual_main_conformance": "31PASS0FAIL0SKIP, strict types/source package workflow success",
+    "source_package_equal_reviewed_candidate_and_local": true,
+    "effects": "Original source-only qualification, not real principal admission or deployment"
+  },
+  "source_main_formal_run": 40772581738,
+  "source_main_release_run": 40772581183,
+  "original_verification": {
+    "main": "22b10e218d4330211c362fe106c00d61e8168fce",
+    "candidate": "a82b4c62c9cdeea306a8bf362adca570c7614d23",
+    "formal_sha256": "1bd35844da3ce9a233d7f6e71cd3f7f64e23c29b405b9260f757a47ae1707df1",
+    "canonical_source_digest": "d7060962c834a62e44ff3a537cc94ceda16c93166199a4f05be0cb2b67bb3d7c",
+    "durable_sha256": "697237735c57d448e81bfef53211846a3c9aa4dedc09d4c6ea956e5cc5985808",
+    "durable_asset": 686406309,
+    "all12_durable_checks": "PASS",
+    "release_tar_sha256": "9c77d51070ba4784264526dc85ecb5475c568e951a1fb95222f519059a03aafe",
+    "worker_sha256": "5935a7e6a419d3252b0cb23ab362574775bd1821a28c62664f0199a6893de0fe",
+    "worker_bytes": 1291540,
+    "sidecars_sha256": {
+      "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e",
+      "migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+      "migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+      "migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+      "migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+      "migrations/0011_surface_enrollment_authorizations.sql": "6fd3be56034da4a8d1bfcfa56b9286f3ccf4ce596e44ddf73cfc100852044c3b",
+      "migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+      "migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+      "migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+      "migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+      "migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+      "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "THIRD_PARTY_NOTICES.md": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+      "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536"
+    },
+    "safe_unique_paths": true,
+    "licenses_verified": true,
+    "Worker_equal_prior_except_one_source_SHA": true,
+    "prior_source_SHA": "2d8637e634f5b2db84151e66027204db885d4369",
+    "coordinator_not_in_Worker_artifact": true,
+    "effects": "Offline original verification only; not deployment"
+  },
+  "source_original_packet_sha256": "c4ca86c42064eb1a46c799ba68706cf0ed2d55d2d78abf0a9f2f8d7de9ecbd7e",
+  "independent_original_join": {
+    "at": "2026-10-28T21:37:45.398557+00:00",
+    "decision": "ORIGINAL_SOURCE164_QUALIFIED_ROOT_PERSONALLY_JOINED",
+    "candidate": "a82b4c62c9cdeea306a8bf362adca570c7614d23",
+    "protected": "22b10e218d4330211c362fe106c00d61e8168fce",
+    "tree": "4bdb19f2fd8ef9d6e02802ae3c893aa5950b5786",
+    "parent": "2d8637e634f5b2db84151e66027204db885d4369",
+    "whole11_review_sha256": "08032187814f6890f0f7eba2c28e734fb481b8ca0ecb57d007cb49409f733437",
+    "packet_sha256": "c4ca86c42064eb1a46c799ba68706cf0ed2d55d2d78abf0a9f2f8d7de9ecbd7e",
+    "all13_original_main_live_SUCCESS_attempt1": true,
+    "provider_artifact_digests_live_matched_owner_downloaded_4ZIPs": true,
+    "original_registry_main": "31PASS0FAIL0SKIP",
+    "formal_raw_sha256": "1bd35844da3ce9a233d7f6e71cd3f7f64e23c29b405b9260f757a47ae1707df1",
+    "formal_canonical_digest": "d7060962c834a62e44ff3a537cc94ceda16c93166199a4f05be0cb2b67bb3d7c",
+    "durable_asset": 686406309,
+    "durable_actual_provider_sha256": "697237735c57d448e81bfef53211846a3c9aa4dedc09d4c6ea956e5cc5985808",
+    "all12": "PASS",
+    "release_tar_sha256": "9c77d51070ba4784264526dc85ecb5475c568e951a1fb95222f519059a03aafe",
+    "root_offline_verification_sha256": "71d801de5d8f3b21d203461495d218832352fc2e653d93cc17a469a28fcf12cb",
+    "Worker_bytes_equal_previous_except_releaseSHA": true,
+    "registry_absent_root_Worker_artifact": true,
+    "scope": "Owningdownloaded originals personally read/hash/canonical/provider/live run metadata and exactGit joins; Root did not redownload ZIPs. No rerun of old/test/source/prod; Final requires separate original qualification.",
+    "positive_registration": "Actual registrar/Coreinstall bootstrap NONE, privateDATA only; no native/keys/provider/deployGO"
+  },
+  "independent_original_join_sha256": "24455af0a2e3ed9aadc19557a65a66645c000575d44b83cef723c85844a33cf3",
+  "prior_failure_and_scope_preservation": [
+    "Source163 Container proposal and workflow-file failure remain separate history; no denied merge retry or alternate-method bypass.",
+    "WorkerDO first25 source cases passed on narrower private DTO; final31 is separately qualified, not a relabelled earlier run.",
+    "Source164 first merge-method request returned405 because repository forbids merge commits. Actual settings allow squash only; normal expected-head squash followed direct human approval.",
+    "No Source161 native SQLite or Source163 Container-source conformance is reused as new registry-store PASS. Prior Final162 Worker used only for exact byte comparison."
+  ],
+  "operational_default": "UNAVAILABLE",
+  "actual_positive_registrar_auth": null,
+  "actual_independent_Core_install_bootstrap": null,
+  "public_registry_route_or_namespace_created": false,
+  "account_upgrade_or_Container": false,
+  "production_deployed": false,
+  "effects": "Protected source delivery only. No real registration, registrar/PoP/custody, key, native SDK, provider, resources, device or deployment action.",
+  "machine_scope": "Documentary source-only Final; no new registry/client wire or product acceptance. Requires own exact review, protected merge authority and original Final qualification.",
+  "status": "SOURCE164_ORIGINAL_QUALIFIED_SEPARATE_DOCUMENTARY_FINAL_REQUIRES_OWN_REVIEW_MERGE_AND_ORIGINAL_QUALIFICATION",
+  "at": "2026-10-28T21:39:48.608226+00:00"
+}
