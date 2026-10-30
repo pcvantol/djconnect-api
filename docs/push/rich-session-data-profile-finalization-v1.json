@@ -1,0 +1,461 @@
+{
+  "schema_version": 1,
+  "classification": "SEPARATE_DOCUMENTARY_FINALIZATION_OF_SOURCE170_NOT_ACTIVATION",
+  "source_PR": 170,
+  "reviewed_candidate": "02c1c471de2f56645d59e137dccb1b170f0e173e",
+  "protected_source_main": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+  "protected_source_parent": "bd746b0602926720a57b518907b60c66289fcc14",
+  "source_tree": "76f5bdc2139903d3fa5394386075873f4460ce66",
+  "candidate_test_merge": "ce7080a7604c350410dddb8c93b6c557feea9bd9",
+  "candidate_testmerge_protected_tree_equal": true,
+  "exact_human_source_merge_answer": "Ja, merge PR #170",
+  "source_scope": "Uncomposed rich Session raw-fragment DATA codec with conservative supplied-UTC projection and reference update/end JSON; production factory closed",
+  "contract_sha256": "2a4a4a4f49e0f6d5a1015169ff63b27091f80d6d857423940a0381d955bbb499",
+  "original_Apple_receipt_sha256": "497f7e3483a1023bcbd49de3cb449c2996db3efe7a8b650dfbf9b51ea2d53cc7",
+  "original_Apple_inventory_files": 34,
+  "original_Apple_encoder_cases": 28,
+  "source_manifest_sha256": "d328f21875db074b70ca1ffd4a03278443de0e89961046aa64715279f027b665",
+  "source_whole48_exact_review_sha256": "e407f8272f5afd6943d2b82f6c203b648e4082230db16a0c7925d227ceb90804",
+  "source_original_join_packet_sha256": "a96e572164237158d85365888563f658140175cf76ad7de7b93978c1d63fa18c",
+  "independent_original_source_closure_sha256": "4c0c7ea74001404511950f47913307d93a53bf2d556e52bbecdfca0d8d175160",
+  "independent_original_source_closure": {
+    "time_utc": "2026-10-30T09:47:09.197607+00:00",
+    "verdict": "ORIGINAL_QUALIFIED_BOUNDED_API_SOURCE170",
+    "reviewer": "Root personally independent read-only; no executorGO adoption",
+    "protected": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+    "candidate": "02c1c471de2f56645d59e137dccb1b170f0e173e",
+    "tree": "76f5bdc2139903d3fa5394386075873f4460ce66",
+    "soleparent": "bd746b0602926720a57b518907b60c66289fcc14",
+    "whole_exact_source_review": "e407f8272f5afd6943d2b82f6c203b648e4082230db16a0c7925d227ceb90804",
+    "original_packet_sha256": "a96e572164237158d85365888563f658140175cf76ad7de7b93978c1d63fa18c",
+    "personal_checks": [
+      "All frozenpacket file hashes recomputed",
+      "All4 original ZIP providerdigests and every extracted member bytejoin",
+      "Ownmain117PASS0FAIL0SKIP report; all41packaged module/contract/fixture/provenance files byteequal correctedPR originalCI",
+      "Originalformal canonical8301/exact170+02c+f4cf+48filedelta,parentbd/premerge/postmerge/sourcejoin findings empty",
+      "Actual durableproviderdigest/innerintegrity/sourcejoin/internal-api/all12PASS",
+      "Exact actualAPI policy Core733ecc/SHA2734b55b validate_record findings empty",
+      "OwncoverageZIPafb51/providerdigest/actualXML369cc8 and41Bf4cfmarker, validate41032765100",
+      "OwnreleaseTAR0aca/providerZIP/releaseevidence artifactid/TARhash/sourceSHA joins",
+      "OriginalparentbdTARcf2b/providerZIP67b5 actual memberjoin; all19regularfile names/types retained,18otherfilesbyteequal includinglicenses",
+      "Actual ordinaryWorker1291540B SHA33ffd268: byteequal parent except exactlyone embedded releaseSHA",
+      "Freshlive all15ownmain workflows attempt1SUCCESS, exactPR170merge,5artifactproviders/heads/runjoins and durableassetdigest",
+      "Reviewed/protected Git treeequal andsoleparentbd;169/ce2hold not incorporated"
+    ],
+    "live_ownmain_runs": [
+      {
+        "id": 41033030913,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41033030195,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765484,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765555,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765519,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765718,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765204,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765125,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032764433,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765055,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765004,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032764577,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032764614,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032765100,
+        "attempt": 1,
+        "conclusion": "success"
+      },
+      {
+        "id": 41032764448,
+        "attempt": 1,
+        "conclusion": "success"
+      }
+    ],
+    "live_original_artifacts": [
+      {
+        "id": 12965849156,
+        "run": 41033030913,
+        "digest": "b3429fb9777320b29b6089e64d817f9898c4913a5e8161553a3affce447f4d71"
+      },
+      {
+        "id": 12967200267,
+        "run": 41032765519,
+        "digest": "71933ef40eef91f2eb9bc39637a56a4c03a55c49c1d64f653e67859ed61d7b76"
+      },
+      {
+        "id": 12966244289,
+        "run": 41033030195,
+        "digest": "319da019f7b7f384ff723d86392ef47e04c285a373b1450faede774edf55f84b"
+      },
+      {
+        "id": 12966652970,
+        "run": 41033030195,
+        "digest": "cd4c33b5a0045366cc260969a08861a53dc49da84882ab3a9e3e3a6eac015247"
+      },
+      {
+        "id": 12966498942,
+        "run": 41032765100,
+        "digest": "afb51bb6483d37ee7d36add7c995313b96484d95f524e7a0dea259db16c48ea6"
+      }
+    ],
+    "formal_digest": "8301aaed8641bdfb7c9e7ec06ed5415951d3e842134821683978ef9402f2f2e0",
+    "durable_sha256": "20228062bf3098fd1ccbc26bb84f1d7c122ba45c7fe18ae6455d80aa5e6b14ff",
+    "policy_ref": "733ecc2836d40611b2b7472308a7175a6130c91a",
+    "policy_sha256": "2734b55b79eb9393261c0e47b15648641d1012c4d96118f337bebd14d90cd5fc",
+    "scope": "Pureclosed rich DATA codec/source only. No actual authenticatedrich start/read/artwork, signer/custody/clock/rights/native factory, provider or iPhone/APNs acceptance. No deployment.",
+    "Final": "Separate documentary Final requires its own exactreview/CI/protectedmerge/formal/durable/coverageoriginalclosure.",
+    "Root_source_or_provider_effect": false,
+    "API169_exact_human_hold": "UNCHANGED"
+  },
+  "source_PR_checks": {
+    "all15_workflows": "SUCCESS exact02c",
+    "OwnerAuthorization": {
+      "run": 41027007584,
+      "risk": "HIGH_RISK",
+      "conclusion": "SUCCESS",
+      "human_merge_authorization": false
+    },
+    "TrustedDelivery": 41026788676,
+    "Validate": 41026788560,
+    "rich_codec": 41026788513,
+    "rich_artifact": 12964211307
+  },
+  "original_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 41033030913,
+      "event": "workflow_run",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41033030195,
+      "event": "workflow_run",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765484,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Surface enrollment source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765555,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Push coordinator source qualification"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765519,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Rich Session raw DATA profile"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765718,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765204,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Principal possession crypto DATA"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765125,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Worker DO registry source conformance"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032764433,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765055,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Native proof DATA journal source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765004,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Native proof transcript source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032764577,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032764614,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032765100,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41032764448,
+      "event": "push",
+      "headSha": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "source_original_verification": {
+    "main": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+    "head": "02c1c471de2f56645d59e137dccb1b170f0e173e",
+    "tree": "76f5bdc2139903d3fa5394386075873f4460ce66",
+    "own_main_tests": {
+      "passed": 117,
+      "failed": 0,
+      "skipped": 0
+    },
+    "main_package_files_exact_PR_package": 41,
+    "module_sha256": "6c880f9cb3fee0c3f4b1825ef200d0f166e819eecb489ef973154e3278f9af69",
+    "formal_digest": "8301aaed8641bdfb7c9e7ec06ed5415951d3e842134821683978ef9402f2f2e0",
+    "durable_asset": 691590498,
+    "durable_sha256": "20228062bf3098fd1ccbc26bb84f1d7c122ba45c7fe18ae6455d80aa5e6b14ff",
+    "required12": "ALL_PASS",
+    "release_tar_sha256": "0aca8cd859a387f0674bec0472491c02defb853ebb1afaa1b4a7e305b712e02b",
+    "ordinary_Worker_sha256": "33ffd268c0d866418f7c1bedcf1c3e4cce9e5e7e32aed3f9b51075816bd70dc2",
+    "ordinary_Worker_bytes": 1291540,
+    "Worker_equal_parent_except_one_release_SHA": true,
+    "all_other_tar_member_bytes_equal_parent": {
+      "release/LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "release/package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "release/docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e",
+      "release/migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+      "release/migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+      "release/migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+      "release/migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+      "release/migrations/0011_surface_enrollment_authorizations.sql": "6fd3be56034da4a8d1bfcfa56b9286f3ccf4ce596e44ddf73cfc100852044c3b",
+      "release/migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+      "release/migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+      "release/migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+      "release/migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+      "release/migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+      "release/migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+      "release/package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "release/THIRD_PARTY_NOTICES.md": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+      "release/wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+      "release/LICENSES.sha256": "cdeffa56aff14864e5ec4e27d2f8396431954c7efaac479ea7c205d84636a217"
+    },
+    "deployment": false,
+    "activation": false,
+    "canonical_formal_digest_verified": true,
+    "canonical_durable_integrity_verified": true,
+    "coverage_artifact": {
+      "id": 12966498942,
+      "digest": "sha256:afb51bb6483d37ee7d36add7c995313b96484d95f524e7a0dea259db16c48ea6",
+      "main": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+      "validate_run": 41032765100
+    }
+  },
+  "original_coverage_verification": {
+    "artifact": 12966498942,
+    "run": 41032765100,
+    "main": "f4cfcd1cbbc9a01fa42d0901fed944679acd4505",
+    "provider_zip_sha256": "afb51bb6483d37ee7d36add7c995313b96484d95f524e7a0dea259db16c48ea6",
+    "members": {
+      "coverage/cobertura-coverage.xml": "369cc82194895ef1e19dd535376ab5b92ccf025285716ab3cc9fb3377644ba1c",
+      "coverage-main-sha.txt": "88180521eb27a748327cc3f9ffa80734bf9cb247368a86e15faf46c5da0c4ce6"
+    }
+  },
+  "qualification_history": {
+    "predecessor": "735975fe05e3e304bd27bb769afc1baa839d9196",
+    "predecessor_module_sha256": "9dc6e7ba01cc04b89f01e9d9bf57ea0cf8b67b6355faa11e2fd21fb0a9cfcda2",
+    "P2_review_finding_sha256": "11459894c4fa9e88f0e59819e9723535723d6a935aba4ed00deb97e0a9438a30",
+    "same117_old": {
+      "passed": 93,
+      "failed": 24,
+      "skipped": 0
+    },
+    "same117_corrected": {
+      "passed": 117,
+      "failed": 0,
+      "skipped": 0
+    },
+    "old7_ESM_probe_negative_violations": 6,
+    "corrected7_ESM_probe_negative_violations": 0,
+    "independent12_ESM_probe_old_invalid_acceptances": 7,
+    "independent12_ESM_probe_corrected_invalid_acceptances": 0,
+    "old87_pass_report_is_not_corrected_head_GO": true,
+    "source_review_did_not_rerun117": true
+  },
+  "source_original_files_sha256": {
+    "12965849156/artifact-metadata.json": "5f28809eedef16bb5e72b34171233122b1cf97e28484eb2f60528d8722bef3b2",
+    "12965849156/download.zip": "b3429fb9777320b29b6089e64d817f9898c4913a5e8161553a3affce447f4d71",
+    "12965849156/post-merge-release-evidence.json": "6264959e590aba7b7d3e5792d40005dc81f87b06b080e9d9fb2e1ae6fc4e22f2",
+    "12966244289/artifact-metadata.json": "10a8ce63b166deafc9fd93ff46a03ac2734373f3f00bc6f2a3734f63141381c0",
+    "12966244289/djconnect-api-release.tar.gz": "0aca8cd859a387f0674bec0472491c02defb853ebb1afaa1b4a7e305b712e02b",
+    "12966244289/download.zip": "319da019f7b7f384ff723d86392ef47e04c285a373b1450faede774edf55f84b",
+    "12966498942/coverage/cobertura-coverage.xml": "369cc82194895ef1e19dd535376ab5b92ccf025285716ab3cc9fb3377644ba1c",
+    "12966498942/coverage-main-sha.txt": "88180521eb27a748327cc3f9ffa80734bf9cb247368a86e15faf46c5da0c4ce6",
+    "12966498942/download.zip": "afb51bb6483d37ee7d36add7c995313b96484d95f524e7a0dea259db16c48ea6",
+    "12966498942/original-download-verification.json": "700272e8cea3eb9e18073b185a0a435511b44bfb3b89723d11f29f3ed0f154ca",
+    "12966652970/api-release-artifact-evidence.json": "47c7e8133c651443874978d9b91e9683a0fa8cadfb74b1f970d3c164740ac0f2",
+    "12966652970/artifact-metadata.json": "8f0de81c3c6da4f5b9d44f7717e11345af578f76c69192a355f397942046c978",
+    "12966652970/download.zip": "cd4c33b5a0045366cc260969a08861a53dc49da84882ab3a9e3e3a6eac015247",
+    "12967200267/artifact-metadata.json": "361cdfd0f7135444b268cb24321bd85f08e6a567c869401a3280aec25c11079b",
+    "12967200267/download.zip": "71933ef40eef91f2eb9bc39637a56a4c03a55c49c1d64f653e67859ed61d7b76",
+    "12967200267/rich-profile-data-package/apple-fixtures/attributes_original_uuid.json": "f3a40f9865cc311e0dbb7009c8d460b68192e6e7e85e1ad8f402db10b065b132",
+    "12967200267/rich-profile-data-package/apple-fixtures/attributes_unicode_codec_only.json": "2335b95cffc97e0b86636798ed10498c9bcb92dbf93325caa18cbf94fb94e348",
+    "12967200267/rich-profile-data-package/apple-fixtures/encoder-fixture-receipt.json": "497f7e3483a1023bcbd49de3cb449c2996db3efe7a8b650dfbf9b51ea2d53cc7",
+    "12967200267/rich-profile-data-package/apple-fixtures/manifest.json": "4f9baa00789cf42c90896e9f4a11e919f5e7e72d7e68552a912edbc0374f4c5a",
+    "12967200267/rich-profile-data-package/apple-fixtures/rich_bytes_2800.json": "089f91ba1bff7d09973e6e00ee17bb6a6e231849ff1e9cfd5226c65ca87b2369",
+    "12967200267/rich-profile-data-package/apple-fixtures/rich_bytes_2801.json": "1c3b36734573fd94082a876d43932e015b6fc2f26fb5b153640dc72513e5b4e3",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_empty_rich_codec_only.input.json": "8bc88f76d35d9ae0a07d901660800041cf057725c71902393275e8811f0b62b2",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_empty_rich_codec_only.json": "3377cee63e2a21d51b1b7499d91effe461311f368ff28544add926396083052a",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_legacy_missing_playbackState.input.json": "9dbf47aeadd4d0abf5b20b0c2ef738583aa16bbfe75b49eaa96c2c8b43ad04d4",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_legacy_missing_playbackState.json": "f842e10e0693b377bf700cabc3e572612bbbd758a567d0d026b3f52a2539d135",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_minimal_micro_fraction.json": "0316b429f32b25b7c1e0cc4c445a919473a4850e7e4b860d2b21913f8d2b09a0",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_minimal_negative_fraction.json": "ec737627dd2ffe7fec7e3814edb3c037422ecce31e4cc49820f306bb1b2b0577",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_minimal_positive_fraction.json": "17d5c1f409c713dc03d9f48db2d224e73ed838dc58e5667d3c36d3fe0ad3e586",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_minimal_recent_fraction.json": "44ed6080dc83f78eac69d020a074087ed2068b7537f0da0dbed9a804d890617a",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_minimal_reference_epoch.json": "2c6760299a23b5476ed4e6793de39f8513f4d792ace57849c01d029334c5ee43",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_minimal_unix_epoch.json": "074a5e54b31748632c2406bcf7469721c914ed51ced8d254db327806cd48a470",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_optional_null.input.json": "2f72f014d4bec07e7007fa2407dbfb01ea022bec9f19afafadf868155b7f030f",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_optional_null.json": "9397f8078201593feb362c73254e4607085cc68f759b2ae0144a90f0e460692c",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_both.json": "ca6a3ce305d5777226108dd5cf469ecedf9d116afcb4348b01725f6c0e110974",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_contribution_only.json": "13203235bd43a08a717512c5355c12b4f28c8d501b06e877e11ba5391d66c993",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_playback_idle.json": "b77d5d878a6d9ad6e8154f854916ee2af87d1499293d734f2f905d10864c06d4",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_playback_only.json": "007ccee3a249097f638aba18bcd31910b227e9b222bad42b6cf35c033e812257",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_playback_paused.json": "638f698dcefa988617f3d2d08678056fdca3541c991f60ea836b9354856982e7",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_playback_playing.json": "112e047605071dd8cbb36b2162fb624cd2c3b23b575d351a639a47054ed45e5c",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_playback_stopped.json": "47809a5c8a44c816ca11c13812dc83ab9b7fe501c2083a15f6cef504f99e59a3",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_rich_unicode_escaping.json": "acd3bee71dc8d8dca60bd1a72428a290f417cd8c2f6edc4f6f793e492eb274d9",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_same_pin_extended_deadline_codec_only.input.json": "2919eabb2cc336c7dab75adbe50c64fe298b146b0f7363eb74a0dd288bae4158",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_same_pin_extended_deadline_codec_only.json": "5bf215032d17c4bf268ab021f2500e4a6969a6065c7f471f16566191b5f40ed6",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_theme_brand.json": "fb6830f77f101b98a1be02f95bda8adc69596740f8e22a1574b28cd82b43471e",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_theme_chill.json": "af42ee2a2384f390a319cd072b2781df4282da9d1a02ffa83cc031ef80fa29c3",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_theme_energy.json": "c9ae0c3cf89184f4d2cef534765eace8f1a931a81ef7d0224857d40c180e5761",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_theme_groove.json": "04d33b77f7f2ae4f3d23aef33b73df3deb9ba82f79f961521db8766ec9805af2",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_theme_party.json": "191b7538570dd4f778aba16f5055b33d81a68161c22b06de85827e1a473074ab",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_unknown_key_codec_only.input.json": "81841ca278090f1ead6309bb8f0792cc49bc13e05f8d2c6c290b4d5eb95c6e05",
+    "12967200267/rich-profile-data-package/apple-fixtures/state_unknown_key_codec_only.json": "4ff440a52c06d5e71cf6a227e5459f7db89c95f530fec54df792434335d7a4a8",
+    "12967200267/rich-profile-data-package/contract-v1.md": "2a4a4a4f49e0f6d5a1015169ff63b27091f80d6d857423940a0381d955bbb499",
+    "12967200267/rich-profile-data-package/metafile.json": "8a1737b65fec74387ad90525e4b890ec8eb21907a3be0a0c8f0400e63633294c",
+    "12967200267/rich-profile-data-package/package-check.json": "49b37e6fe8d832c5a2b7e2b32ee19df91a7795527df9b5eae35d513cda1b2a90",
+    "12967200267/rich-profile-data-package/profile-data.mjs": "6c880f9cb3fee0c3f4b1825ef200d0f166e819eecb489ef973154e3278f9af69",
+    "12967200267/rich-profile-data-package/source-package.json": "65918b9e35fecd5c51df4292788b207863f0fbc7e2bf518939519447f64101e2",
+    "12967200267/rich-profile-data-package/utc-rational-cases.json": "e401dd1343091f94699fe3bf6d50db52cba4642ce5f956737c90a8e03ae4eeb2",
+    "12967200267/rich-profile-data-tests.json": "827ce7b1312db358b7e74801573e5cd67450b8189031c0b8a317ccfa20bfc758",
+    "durable-original.json": "20228062bf3098fd1ccbc26bb84f1d7c122ba45c7fe18ae6455d80aa5e6b14ff",
+    "main-native-watch.log": "b4b3f6fe1f88a2ee75fb91e8eb9ec35d6428820171b21b41d340235c1f636664",
+    "main-runs-complete.json": "128039c59b95dc3864caa0d8cd707f7526dadd175655a2e1e333a831f2e88415",
+    "original-source-join-packet-r2.json": "a96e572164237158d85365888563f658140175cf76ad7de7b93978c1d63fa18c",
+    "original-verification.json": "5bdfbc2428cde0d9b88d0e172f2ab1c6812d6f54086a6bf4ac205d9435647be6"
+  },
+  "unresolved_runtime_boundaries": [
+    "Actual independently selected owner/operator/install admission and service-purpose key custody",
+    "Actual current clock/boot/field-rights and native identity/proof admission",
+    "Authenticated rich initial-start, permission/read and artwork producer/composition",
+    "Correct track/asset/sequence/expiry/licence-bound AppGroup artwork staging",
+    "Actual WidgetKit invalidation and separate host/background/Activity refresh opportunity",
+    "Provider/device delivery and rich widget/Live Activity product acceptance"
+  ],
+  "unchanged_boundaries": [
+    "PR169 explicit human hold and unpushed registryce2 remain separate",
+    "Old profile/version/token families and shipping root Worker composition unchanged",
+    "external_relay:false is not relaxed by codec success",
+    "No status-only substitute for one rich widget and one rich Live Activity"
+  ],
+  "effects": {
+    "deployment": false,
+    "activation": false,
+    "new_provisioning": false,
+    "key_or_token_operation": false,
+    "provider_or_SDK_mutation": false,
+    "actual_native_admission": false
+  },
+  "separate_Final_requirement": "These two new documents need their own exact independent review, normal CI/protected merge and ownmain original qualification; source170 receipts are evidence of source170 only."
+}
