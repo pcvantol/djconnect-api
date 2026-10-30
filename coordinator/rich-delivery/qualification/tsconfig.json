@@ -1,0 +1,1 @@
+{"extends":"../../../tsconfig.json","compilerOptions":{"types":["node","vite/client"]},"include":["../../../worker-configuration.d.ts","../../../node_modules/@cloudflare/vitest-pool-workers/types/cloudflare-test.d.ts","../**/*.ts","../../rich-session/profile-data.ts"],"exclude":[]}
