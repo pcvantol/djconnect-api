@@ -18,7 +18,7 @@ function map(x:unknown,empty=false){object(x);const entries=Object.entries(x);ne
 function https(x:unknown){str(x,2048);need(utf8(x)<=2048);let url:URL;try{url=new URL(x);}catch{throw new RichDataError();}need(url.protocol==='https:'&&url.hostname.length>0&&!url.username&&!url.password);}
 interface Parsed {value:Record<string,unknown>;spans:WeakMap<object,{start:number;end:number}>}
 /** Bounded strict parser with exact object spans. It never reserializes a received fragment. */
-function parse(text:string,maxBytes:number):Parsed {
+function parse(text:string,maxBytes:number,integerPaths:readonly(readonly string[])[]=[]):Parsed {
   need(typeof text==='string'&&text.length<=maxBytes,'byte_limit');need(utf8(text)<=maxBytes,'byte_limit');need(text.charCodeAt(0)!==0xfeff);
   let at=0,tokens=0;const spans=new WeakMap<object,{start:number;end:number}>();
   const ws=()=>{while(/[\x20\t\r\n]/.test(text[at]??'x'))at++;};
@@ -27,18 +27,24 @@ function parse(text:string,maxBytes:number):Parsed {
     while(at<text.length){const c=text[at++];if(c==='\\'){need(at<text.length);const e=text[at++];if(e==='u'){need(/^[a-fA-F0-9]{4}$/.test(text.slice(at,at+4)));at+=4;}else need('"\\/bfnrt'.includes(e));}
       else if(c==='"'){end=true;break;}else need(c.charCodeAt(0)>=32);}
     need(end);let s:string;try{s=JSON.parse(text.slice(start,at)) as string;}catch{throw new RichDataError();}unicode(s);return s;};
-  const value=(depth:number):unknown=>{need(depth<=8,'byte_limit');ws();token();const start=at,c=text[at];
+  const value=(depth:number,path:readonly string[]):unknown=>{need(depth<=8,'byte_limit');ws();token();const start=at,c=text[at];
     if(c==='"')return string();
     if(c==='{'){at++;ws();const result:Record<string,unknown>=Object.create(null);
-      if(text[at]!=='}')while(true){ws();token();const key=string();need(!Object.hasOwn(result,key));ws();need(text[at++]===':');result[key]=value(depth+1);ws();const end=text[at++];if(end==='}')break;need(end===',');}
+      if(text[at]!=='}')while(true){ws();token();const key=string();need(!Object.hasOwn(result,key));ws();need(text[at++]===':');result[key]=value(depth+1,[...path,key]);ws();const end=text[at++];if(end==='}')break;need(end===',');}
       else at++;
       spans.set(result,{start,end:at});return result;
     }
-    if(c==='['){at++;ws();const result:unknown[]=[];if(text[at]!==']')while(true){result.push(value(depth+1));ws();const end=text[at++];if(end===']')break;need(end===',');}else at++;return result;}
+    if(c==='['){at++;ws();const result:unknown[]=[];if(text[at]!==']')while(true){result.push(value(depth+1,[...path,String(result.length)]));ws();const end=text[at++];if(end===']')break;need(end===',');}else at++;return result;}
     const m=/^(?:-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?|true|false|null)/.exec(text.slice(at));need(m);at+=m[0].length;
-    if(m[0]==='true')return true;if(m[0]==='false')return false;if(m[0]==='null')return null;const number=Number(m[0]);finite(number);return number;
+    if(m[0]==='true')return true;if(m[0]==='false')return false;if(m[0]==='null')return null;
+    if(integerPaths.some(p=>p.length===path.length&&p.every((key,i)=>key===path[i]))){
+      // Check the ORIGINAL token before Number can round a fraction or underflow to zero.
+      need(/^(?:0|[1-9][0-9]*)$/.test(m[0])&&m[0].length<=16);const exact=BigInt(m[0]);
+      need(exact<=BigInt(Number.MAX_SAFE_INTEGER));return Number(exact);
+    }
+    const number=Number(m[0]);finite(number);return number;
   };
-  const result=value(0);ws();need(at===text.length);object(result);return{value:result,spans};
+  const result=value(0,[]);ws();need(at===text.length);object(result);return{value:result,spans};
 }
 function decode64(input:unknown):string {
   need(typeof input==='string'&&input.length>0&&input.length<=5462,'byte_limit');need(/^[A-Za-z0-9_-]+$/.test(input));
@@ -56,7 +62,7 @@ function nowPlaying(x:unknown){fields(x,['item_id','subject_uri','track','artist
   need(typeof x.subject_uri==='string'&&/^spotify:track:[A-Za-z0-9]{22}$/.test(x.subject_uri));str(x.track,640);str(x.artist,256,true);str(x.album,256,true);https(x.source_url);map(x.attribution);need(x.usage_basis==='spotify_temporary_passive_metadata');return interval(x.observed_at,x.expires_at);}
 interface Contents {attributes:Readonly<Record<string,unknown>>;state:Readonly<Record<string,unknown>>;attributesText:string;stateText:string;richBytes:number;richEligibleShape:boolean}
 function contents(attributesText:string,stateText:string):Contents {
-  const a=parse(attributesText,4096),s=parse(stateText,4096);need(utf8(attributesText)+utf8(stateText)<=4096,'byte_limit');fields(a.value,['presentationID']);need(typeof a.value.presentationID==='string');unicode(a.value.presentationID);
+  const a=parse(attributesText,4096),s=parse(stateText,4096,[['rich','sequence']]);need(utf8(attributesText)+utf8(stateText)<=4096,'byte_limit');fields(a.value,['presentationID']);need(typeof a.value.presentationID==='string');unicode(a.value.presentationID);
   const state=s.value;fields(state,['observedAt','expiresAt'],['theme','rich']);finite(state.observedAt);finite(state.expiresAt);need(state.expiresAt>state.observedAt&&state.expiresAt-state.observedAt<=120);
   if(Object.hasOwn(state,'theme'))need(['brand','chill','groove','energy','party'].includes(state.theme as string));
   let richBytes=0,richEligibleShape=false;
@@ -96,7 +102,7 @@ export interface RichCarrierData {
 const originals=new WeakMap<Readonly<RichCarrierData>,Contents>();
 /** Shape/budget DATA only: never actual source/native rights or clock admission. */
 export function decodeRichCarrier(text:unknown):Readonly<RichCarrierData>{
-  need(typeof text==='string');const c=parse(text,16384).value;
+  need(typeof text==='string');const c=parse(text,16384,[['schema_version'],['source_observed_at_ms'],['source_expires_at_ms']]).value;
   fields(c,['schema_version','profile_id','attributes_utf8_b64u','content_state_utf8_b64u','source_observed_at_ms','source_expires_at_ms']);need(c.schema_version===1&&c.profile_id===PROFILE);
   integer(c.source_observed_at_ms);integer(c.source_expires_at_ms);need(c.source_observed_at_ms<c.source_expires_at_ms);
   const body=contents(decode64(c.attributes_utf8_b64u),decode64(c.content_state_utf8_b64u));

@@ -49,3 +49,31 @@ it('enforces full APNs4096 independently of allowed combined4096',()=>{const bas
 
 for(const c of utc.cases)it('exact rational UTC projection of '+c.original_observed_seconds,()=>{const v=projectOriginalUtcBoundsData(c.original_observed_seconds,c.original_expiry_seconds);expect(v).toMatchObject({classification:'CORE_UTC_PROJECTION_DATA_ONLY',source_observed_at_ms:c.expected_observed_ms,source_expires_at_ms:c.expected_expiry_ms});});
 it('rejects empty UTC projection, unsafe bound, negative/nonfinite/bool and no native-date conversion',()=>{for(const [a,b]of [[.0001,.0002],[-1,1],[0,Number.MAX_SAFE_INTEGER],[0,Infinity],[-0,1],[NaN,1],[true,2]])expect(()=>projectOriginalUtcBoundsData(a as number,b as number)).toThrow();});
+
+// Original JSON tokens: never construct these cases through Number/JSON.stringify.
+const rawIntegerCases:[string,string][]=[
+ ['schema_version','1.000000000000000000001'],['schema_version','0.999999999999999999999'],
+ ['schema_version','1.0'],['schema_version','1e0'],['schema_version','1E+0'],['schema_version','1000000000000000000001e-21'],
+ ['source_observed_at_ms','0.000000000000000000001'],['source_observed_at_ms','1e-9999'],['source_observed_at_ms','0e0'],['source_observed_at_ms','1.0'],
+ ['source_expires_at_ms','999.999999999999999999999'],['source_expires_at_ms','1000.000000000000000000001'],
+ ['source_expires_at_ms','1e3'],['source_expires_at_ms','1000.0'],['source_expires_at_ms','1000000000000000000001e-18'],
+ ['source_expires_at_ms','9007199254740991.00000000001'],['source_expires_at_ms','9007199254740990.99999999999'],
+ ['source_expires_at_ms','1e-9999'],['source_expires_at_ms','1e9999'],['source_expires_at_ms','9007199254740992'],
+ ['sequence','68.000000000000000000001'],['sequence','67.999999999999999999999'],['sequence','68.0'],
+ ['sequence','6.8e1'],['sequence','1e-9999'],['sequence','0e0'],['sequence','9007199254740991.000000001'],['sequence','9007199254740990.99999999999']
+];
+for(const [key,token]of rawIntegerCases)it('integer field rejects original noncanonical numeric token '+key+'='+token,()=>{
+ const s=key==='sequence'?state.replace('"sequence":68','"sequence":'+token):state;
+ const baseline=change(change(carrier(attr,s),'source_observed_at_ms',0),'source_expires_at_ms',2000);
+ const raw=key==='sequence'?baseline:baseline.replace(new RegExp('"'+key+'":-?[0-9]+'),'"'+key+'":'+token);
+ expect(()=>decodeRichCarrier(raw)).toThrow(RichDataError);
+});
+it('retains canonical zero/max-safe integers and literal version1 without fractional normalization',()=>{
+ const s=state.replace('"sequence":68','"sequence":9007199254740991');
+ const c=change(change(carrier(attr,s),'source_observed_at_ms',0),'source_expires_at_ms',Number.MAX_SAFE_INTEGER);
+ const d=decodeRichCarrier(c);expect(d.source_observed_at_ms).toBe(0);expect(d.source_expires_at_ms).toBe(Number.MAX_SAFE_INTEGER);expect(d.state.rich).toMatchObject({sequence:Number.MAX_SAFE_INTEGER});
+});
+it('preserves floating Foundation Date and uptime tokens outside the declared integer fields',()=>{
+ const raw='{"observedAt":1.25e-3,"expiresAt":1.25}';const d=decodeRichCarrier(carrier(attr,raw));expect(d.content_state_utf8).toBe(raw);expect(d.state.observedAt).toBe(.00125);
+ const s=state.replace(/"receivedUptime":[0-9.]+/,'"receivedUptime":1.2345e3');const rich=decodeRichCarrier(carrier(attr,s));expect(rich.content_state_utf8).toBe(s);expect(rich.state.rich).toMatchObject({receivedUptime:1234.5});
+});

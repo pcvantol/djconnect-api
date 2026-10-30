@@ -20,7 +20,11 @@ six fixed keys/version/profile, safe original source UTC integer bounds and
 canonical unpadded base64url of original Attributes/ContentState fragments.
 The dedicated bounded strict parser rejects duplicate/escaped duplicate keys,
 unknown closed fields, invalid UTF8/surrogates/BOM, nonfinite/bool numeric values,
-unsafe counters and oversized/deep/token-heavy syntax. Parsed objects are owned
+unsafe counters and oversized/deep/token-heavy syntax. The three outer integer
+fields and nested rich.sequence require original unsigned plain decimal integer
+tokens within the exact safe range BEFORE Number conversion. Fractions, exponent
+aliases and underflow cannot round into those domains; floating Date/uptime fields
+retain their separate fractional representation. Parsed objects are owned
 and deeply frozen; original strings and object spans retain escaping, Date
 numbers, optional omission, key order and exact nested rich byte count.
 
@@ -96,3 +100,12 @@ field/relay rights, native C0/boot/rate/restore/withdrawal and authenticated
 permission/read/artwork composition remain separate required inputs. WidgetKit
 invalidation does not prove host-app wake or Activity refresh, and calling a
 plaintext API relay a background read cannot override external_relay:false.
+
+The first exact735 review found integer-token rounding before validation. That
+candidate, its87-test evidence and original packaged module9dc6 are retained.
+The same117-test regression set records old code93PASS/24FAIL versus corrected
+code117PASS/0FAIL/0SKIP. Added cases use raw JSON token strings, not already
+rounded JavaScript numbers. The public package counterproof reproduces the
+original expiry/version/counter/underflow issue on actual old ESM; corrected
+packaged ESM is checked separately. No previous review or CI status transfers
+to the corrected head; independent exact re-review and fresh CI are required.
