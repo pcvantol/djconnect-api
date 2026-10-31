@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS host_wake_native_jobs (
  verification_claim TEXT,
  captured_at INTEGER NOT NULL,
  expires_at INTEGER NOT NULL,
- outcome TEXT NOT NULL CHECK(outcome IN('reserved','verified','rejected','expired','unknown','withdrawn')),
+ outcome TEXT NOT NULL CHECK(outcome IN('reserved','verifying','verified','rejected','expired','unknown','withdrawn')),
  -- One original semantic registration has one noncejob, including UNKNOWN.
  UNIQUE(authorization_id,core_purpose_id,operation_id,generation,revision),
  FOREIGN KEY(authorization_id,core_purpose_id) REFERENCES host_wake_issuer_once(authorization_id,core_purpose_id)
@@ -71,5 +71,10 @@ CREATE TABLE IF NOT EXISTS host_wake_native_verifications (
  challenge_id TEXT PRIMARY KEY REFERENCES host_wake_native_jobs(challenge_id),
  native_key_ref TEXT NOT NULL REFERENCES host_wake_native_enrollments(native_key_ref),
  verified_counter INTEGER NOT NULL CHECK(verified_counter>0),
- original_json TEXT NOT NULL
+ verified_at INTEGER NOT NULL,
+ original_json TEXT NOT NULL,
+ consumed_at INTEGER,
+ register_operation_id TEXT,
+ register_claim_id TEXT,
+ CHECK((consumed_at IS NULL AND register_operation_id IS NULL AND register_claim_id IS NULL) OR (consumed_at IS NOT NULL AND register_operation_id IS NOT NULL AND register_claim_id IS NOT NULL))
 );

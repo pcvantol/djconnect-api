@@ -4,7 +4,7 @@ import {need,integer} from '../host-app-wake/wire';
 import {decodeOperatorAuthorization,decodeNativeOriginal,decodeNativeChallenge,type OperatorAuthorizationData,type NativeOriginalData,type NativeChallengeData} from './wire';
 export interface AuthorizationRow {authorization_id:string;operation_id:string;request_hash:string;core_install_token_record_id:string;ha_install_id:string;authorization_json:string;issued_at:number;expires_at:number;outcome:'authorized'|'expired'|'withdrawn';accepted_at:number;original_request_expires_at:number}
 export interface IssuerRow {authorization_id:string;core_purpose_id:string;issuer_operation_id:string;claim_id:string;request_hash:string;original_json:string;private_purpose_id:string;issued_at:number;expires_at:number;accepted_at:number;original_request_expires_at:number;outcome:'reserved'|'issued'|'expired'|'unknown'|'withdrawn'}
-export interface NativeJobRow {challenge_id:string;authorization_id:string;core_purpose_id:string;operation_id:string;generation:string;revision:number;request_hash:string;original_json:string;challenge_json:string;proof_kind:NativeProofKind;verification_claim:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'verified'|'rejected'|'expired'|'unknown'|'withdrawn'}
+export interface NativeJobRow {challenge_id:string;authorization_id:string;core_purpose_id:string;operation_id:string;generation:string;revision:number;request_hash:string;original_json:string;challenge_json:string;proof_kind:NativeProofKind;verification_claim:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'verifying'|'verified'|'rejected'|'expired'|'unknown'|'withdrawn'}
 const LIVE=`SELECT 1 FROM host_wake_operator_authorizations a JOIN install_tokens i ON i.id=a.core_install_token_record_id AND i.ha_install_id=a.ha_install_id WHERE a.authorization_id=? AND a.outcome='authorized' AND a.issued_at<=? AND a.expires_at>? AND i.disabled=0`;
 /** Actual D1 once-history. No status read returns a credential or issues a grant.
  * SQL checks actual local install-token state, not remote Core RAM state. */
@@ -68,15 +68,22 @@ export class ReceivingStore {
   const row=await this.nativeJob(c.challenge_id);need(row&&row.authorization_id===id&&row.core_purpose_id===v.core_purpose_id&&row.request_hash===requestHash&&row.proof_kind===expectedKind,'host_wake_native_job_consumed_or_capacity',409);return row;
  }
  /** Durable once marker BEFORE native crypto awaits. UNKNOWN is deliberately
-  * retained after crash/lost reply; only the selected real verifier may later
-  * atomically publish a valid proof/counter receipt. This store has no positive
+  * terminal after a negative finish; only the same in-flight real verifier may
+  * atomically publish a valid proof/counter receipt from VERIFYING, never UNKNOWN.
+  * This store has no positive
   * enrollment/verification writer or generic boolean proof-admission method. */
  async claimNativeProof(id:string,principal:string,challenge:string,kind:NativeProofKind,claim:string,at:number):Promise<boolean>{
-  integer(at);const r=await this.db.prepare(`UPDATE host_wake_native_jobs SET outcome='unknown',verification_claim=?
+  integer(at);const r=await this.db.prepare(`UPDATE host_wake_native_jobs SET outcome='verifying',verification_claim=?
    WHERE challenge_id=? AND authorization_id=? AND proof_kind=? AND outcome='reserved' AND captured_at<=? AND expires_at>?
    AND EXISTS(${LIVE} AND i.id=?)
    AND EXISTS(SELECT 1 FROM host_wake_issuer_once s WHERE s.authorization_id=host_wake_native_jobs.authorization_id AND s.core_purpose_id=host_wake_native_jobs.core_purpose_id AND s.outcome='issued' AND s.expires_at>?)`)
    .bind(claim,challenge,id,kind,at,at,id,at,at,principal,at).run();return r.meta.changes===1;
+ }
+ /** Negative closure never needs a live/positive grant or a new budget row.
+  * Once an original proof becomes UNKNOWN it cannot be reclaimed or verified. */
+ async failNativeProof(id:string,challenge:string,claim:string,outcome:'unknown'|'rejected'|'expired'){
+  need(outcome==='unknown'||outcome==='rejected'||outcome==='expired');
+  await this.db.prepare(`UPDATE host_wake_native_jobs SET outcome=? WHERE authorization_id=? AND challenge_id=? AND verification_claim=? AND outcome='verifying'`).bind(outcome,id,challenge,claim).run();
  }
  /** Reserve-to-issued is performed only once. Persisted UNKNOWN/expiry cannot
   * be promoted by retry. No recovery of Source181's one-time credential. */

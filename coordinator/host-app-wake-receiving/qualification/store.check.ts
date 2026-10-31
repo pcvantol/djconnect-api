@@ -81,11 +81,12 @@ describe('actual D1 receiving once-history with real existing install-token tabl
   await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);await store.withdrawAuthorization('fixture-authorization');
   expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('withdrawn');expect(await store.isLive('fixture-authorization','existing-record',START)).toBe(false);
  });
- it('takes one durable native proof claim before crypto, retaining UNKNOWN on loss/retry',async()=>{
+ it('takes one durable native proof claim before crypto, separating in-flight VERIFYING from terminal UNKNOWN',async()=>{
   await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
   await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);
   const claims=await Promise.all(['claim-one','claim-two'].map(claim=>store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_assertion',claim,START)));expect(claims.filter(Boolean)).toHaveLength(1);
-  expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('unknown');expect(await store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_assertion','claim-three',START)).toBe(false);
+  expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('verifying');
+  const claim=(await store.nativeJob(c.challenge_id))!.verification_claim!;await store.failNativeProof('fixture-authorization',c.challenge_id,claim,'unknown');expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('unknown');expect(await store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_assertion','claim-three',START)).toBe(false);
  });
  it('does not change expected native proof kind or reuse a nonce for fallback',async()=>{
   await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
