@@ -23,6 +23,18 @@ export class WakeStore {
   return p;
  }
  async operation(purpose:string,operation:string):Promise<Operation|null>{return this.db.prepare('SELECT * FROM host_app_wake_operations WHERE purpose_id=? AND operation_id=?').bind(purpose,operation).first<Operation>();}
+ /** Called only after authentication and original-currentness verification.
+  * A slow first read/auth cannot disappear and acquire a new lease on replay.
+  * Retain the original deadline within the existing bounded history, without
+  * reserving a send or replacing an already stored smaller boundary. */
+ async expireWake(p:OriginalPurpose,i:Input,hash:string,claim:string,capturedAt:number,expiresAt:number,at:number):Promise<void>{
+  await this.db.prepare(`INSERT OR IGNORE INTO host_app_wake_operations
+   (purpose_id,operation_id,request_hash,kind,claim_id,generation,revision,accepted_at,expires_at,outcome)
+   SELECT ?,?,?,'wake',?,?,?,?,?,'expired'
+   WHERE EXISTS(SELECT 1 FROM host_app_wake_purposes WHERE purpose_id=? AND withdrawn=0 AND expires_at>?)
+   AND (SELECT COUNT(*) FROM host_app_wake_operations WHERE purpose_id=?)<?`)
+   .bind(p.purpose_id,i.operation_id,hash,claim,i.generation!,i.revision!,capturedAt,expiresAt,p.purpose_id,at,p.purpose_id,p.max_operations).run();
+ }
  async reserve(kind:'register'|'wake',p:OriginalPurpose,i:Input,hash:string,claim:string,at:number,expiresAt:number,sealed?:{ciphertext:string;nonce:string}):Promise<void>{
   // The entire claim/rotation transition is one SQLite transaction. Failed
   // generation/CAS claims consume bounded operation space, never provider calls.

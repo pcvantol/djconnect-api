@@ -100,7 +100,11 @@ export function createHostAppWakeService(ports:WakePorts){
      const sealed=await seal(input.apns_token!,key.call(ports),aad(p,input.generation!,input.revision!));guard(p,request.signal);
      await store.reserve('register',p,input,hash,claim,guard(p,request.signal),p.expires_at_ms,sealed);guard(p,request.signal);
     }else{
-     const expiresAt=Math.min(capturedAt+30000,p.expires_at_ms);need(guard(p,request.signal)<expiresAt,'host_wake_transport_expired',409);
+     const expiresAt=Math.min(capturedAt+30000,p.expires_at_ms),checkedAt=guard(p,request.signal);
+     if(checkedAt>=expiresAt){
+      await store.expireWake(p,input,hash,claim,capturedAt,expiresAt,checkedAt);guard(p,request.signal);
+      throw new WakeError('host_wake_transport_expired',409);
+     }
      await store.reserve('wake',p,input,hash,claim,capturedAt,expiresAt);guard(p,request.signal);
      const op=await store.operation(p.purpose_id,input.operation_id);guard(p,request.signal);
      if(op?.claim_id===claim&&op.outcome==='reserved')return send(p,input,await store.row(p.purpose_id),op,request.signal);

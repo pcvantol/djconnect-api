@@ -143,6 +143,38 @@ describe('separate host-app wake actual D1 candidate; no operative admission',()
   await call('wake',w,i.credential);expect(ports.fetcher).not.toHaveBeenCalled();at+=30000;
   expect(await (await call('wake',w,i.credential)).json()).toMatchObject({operation_state:'not_sent',transport_expires_at_ms:START+30000});expect(ports.authorizeProvider).toHaveBeenCalledOnce();
  });
+ it('original pre-auth transport lease survives slow actual D1 authentication and exact replay',async()=>{
+  const {i}=await registered();let delay=true;
+  const db=new Proxy(env.DB,{get(target,key){
+   if(key==='prepare')return (sql:string)=>{
+    const stmt=target.prepare(sql);if(!sql.includes('WHERE purpose_id=? AND credential_hash=?'))return stmt;
+    const wrap=(s:D1PreparedStatement):D1PreparedStatement=>new Proxy(s,{get(q,k){
+     if(k==='bind')return (...args:unknown[])=>wrap(q.bind(...args));
+     if(k==='first')return async(...args:unknown[])=>{const row=await q.first(...args as []);if(delay){delay=false;at+=30000;}return row;};
+     const v=Reflect.get(q,k);return typeof v==='function'?v.bind(q):v;
+    }});return wrap(stmt);
+   };
+   const v=Reflect.get(target,key);return typeof v==='function'?v.bind(target):v;
+  }});
+  const x=make({db}),w=wake();expect((await call('wake',w,i.credential,x.s)).status).toBe(409);
+  await call('wake',w,i.credential,x.s);expect(x.p.fetcher).not.toHaveBeenCalled();
+  expect(await (await call('status',base(w.operation_id),i.credential,x.s)).json()).toMatchObject({operation_state:'expired',transport_expires_at_ms:START+30000});
+ });
+ it('original pre-auth transport lease survives delayed body and exact replay',async()=>{
+  const {i}=await registered(),w=wake();let release!:()=>void;
+  const stream=new ReadableStream<Uint8Array>({start(c){release=()=>{at+=30000;c.enqueue(new TextEncoder().encode(JSON.stringify(w)));c.close();};}});
+  const request=new Request('https://local.test'+PREFIX+'wake',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+i.credential},body:stream});
+  const pending=service.handle(request);release();expect((await pending).status).toBe(409);
+  await call('wake',w,i.credential);expect(ports.fetcher).not.toHaveBeenCalled();
+  expect(await (await call('status',base(w.operation_id),i.credential)).json()).toMatchObject({operation_state:'expired',transport_expires_at_ms:START+30000});
+ });
+ it('slow unauthenticated request IDs cannot occupy authenticated expired-history capacity',async()=>{
+  const {i}=await registered(),w=wake();let release!:()=>void;
+  const stream=new ReadableStream<Uint8Array>({start(c){release=()=>{at+=30000;c.enqueue(new TextEncoder().encode(JSON.stringify(w)));c.close();};}});
+  const pending=service.handle(new Request('https://local.test'+PREFIX+'wake',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer djchw_'+'X'.repeat(43)},body:stream}));release();expect((await pending).status).toBe(401);
+  expect(await scalar("SELECT COUNT(*) n FROM host_app_wake_operations WHERE kind='wake'")).toBe(0);
+  await call('wake',w,i.credential);expect(ports.fetcher).toHaveBeenCalledOnce();
+ });
  it('64 actually reserved sends exhaust the original purpose without blocking withdrawal',async()=>{
   const x=make({admitOriginalPurpose:async()=>({...grant(),max_operations:128,max_wakes:64})});ports=x.p;service=x.s;const {i}=await registered();
   for(let n=0;n<65;n++){await call('wake',wake(),i.credential);at+=30000;}

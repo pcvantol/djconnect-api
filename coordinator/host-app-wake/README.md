@@ -87,6 +87,15 @@ be unsent by later withdrawal. A lost marker/provider reply is unknown and
 cannot become a retry. An uncertain final persistence/currentness response is
 reported as unknown. Provider acceptance is not native receipt or display. Each wake transport deadline is captured before request-body/authentication awaits and is at most thirty seconds, capped by the original wake-purpose expiry. The deadline is retained in SQLite and never recomputed on replay.
 
+A first request whose body/authentication already consumed that deadline is
+recorded terminally as `expired` after genuine authentication and original-scope
+checks, before the expiry rejection is returned. This bounded tombstone consumes
+no send budget, never replaces an existing deadline and prevents an exact replay
+from minting another window. Unauthenticated IDs cannot occupy that history.
+The original candidate missed this boundary; two actual-D1/body-delay controls
+demonstrated one later simulated outbound each before the correction. Those
+counterexamples remain preserved and are not reported as passing qualification.
+
 Original bounds are immutable: at most eight hours as a defensive API ceiling,
 256 active operations and 64 wakes per purpose. These are ceilings for the new
 wake scope, not a selected rich display duration. Actual smaller budgets must
