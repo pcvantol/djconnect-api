@@ -3,6 +3,7 @@ import {beforeAll,beforeEach,describe,it,expect,vi} from 'vitest';
 import cbor from 'cbor';import * as pki from 'pkijs';
 import issuerGuard from '../issuer-guard.sql?raw';
 import schema from '../schema.sql?raw';import eligibility from '../eligibility-view.sql?raw';import regGuard from '../registration-guard.sql?raw';import dispatchGuard from '../dispatch-guard.sql?raw';import hostSchema from '../../host-app-wake/schema.sql?raw';import installSchema from '../../../migrations/0002_install_tokens.sql?raw';
+import {TARGET_CAPABILITY_HEADER,TARGET_OPERATION_HEADER,TARGET_REQUEST_HASH_HEADER,decodeTargetReply} from '../target-transport';
 import {createReceivingService} from '../service';
 import {resolveAuthorization,decodeResolvedAuthorization,RESOLVE_PATH} from '../authorization-resolve';
 import {sha256Hex} from '../../../src/crypto';
@@ -102,7 +103,7 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
 
  async function targetRegister(token=vectors.native_token_hex,operation=o.operation_id){
   const w=clock(),issuer=(await store.issuer('authorization',o.core_purpose_id))!,backend=await bindSource181(sourceEnv,issuer,'record',w,async()=>new Response('not-used'),16);
-  try{return await backend.service.handle(new Request('https://local.test'+PREFIX+'register',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+capabilities.get(o.core_purpose_id)},body:JSON.stringify({version:SOURCE_VERSION,purpose_id:issuer.private_purpose_id,operation_id:operation,generation:o.generation,revision:o.revision,token_role:'host_app_wake',target:o.target,apns_environment:o.apns_environment,apns_token:token}),signal:w.signal}));}finally{backend.close();w.close();}
+  try{return await backend.service.handle(new Request('https://local.test'+PREFIX+'register',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+capabilities.get(o.core_purpose_id)},body:JSON.stringify({version:SOURCE_VERSION,purpose_id:issuer.private_purpose_id,operation_id:operation,generation:o.generation,revision:o.revision,token_role:'host_app_wake' as const,target:o.target,apns_environment:o.apns_environment,apns_token:token}),signal:w.signal}));}finally{backend.close();w.close();}
  }
  it('binds actual Source181 issue and register to the verified original native bytes and consumes proof in the same D1 ACK',async()=>{
   const w=clock();try{const result=await verified(w);expect(await commitVerifiedAssertion(result!,w)).toBe(true);}finally{w.close();}
@@ -257,6 +258,85 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
   await store.reserveIssuer('authorization','record',input.issuer_operation_id,'9'.repeat(64),original,'old-reserved-private','old-reserved-claim',at,at);
   await env.DB.prepare('UPDATE host_wake_issuer_once SET original_request_expires_at=? WHERE core_purpose_id=?').bind(Date.now()-1,original.core_purpose_id).run();
   const svc=receiving();try{const response=await svc.handle(privateRequest('issuer/status',input));expect(response.status).toBe(200);const result=await response.json() as Record<string,unknown>;expect(result.state).toBe('expired');expect(result.credential_state).toBe('unavailable');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_receiving_intents').first('n')).toBe(0);}finally{svc.close();}
+ });
+
+ function targetInput(kind:'register'|'wake'|'status'|'revoke',operation=o.operation_id){
+  const base={version:SOURCE_VERSION,purpose_id:'private-'+o.core_purpose_id,operation_id:operation};
+  return kind==='register'?{...base,generation:o.generation,revision:o.revision,token_role:'host_app_wake' as const,target:o.target,apns_environment:o.apns_environment,apns_token:vectors.native_token_hex}:kind==='wake'?{...base,generation:o.generation,revision:o.revision,event:'direct_rich_refresh' as const}:base;
+ }
+ function targetRequest(kind:'register'|'wake'|'status'|'revoke',value=targetInput(kind),overrides:Record<string,string>={}){
+  return new Request('https://local.test'+PREFIX+kind,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer djci_'+'A'.repeat(43),'x-djconnect-host-wake-authorization-id':'authorization','x-djconnect-host-wake-core-purpose-id':o.core_purpose_id,'x-djconnect-host-wake-issuer-operation-id':'issuer-'+o.core_purpose_id,[TARGET_CAPABILITY_HEADER]:capabilities.get(o.core_purpose_id)!,...(kind==='register'||kind==='wake'?{[TARGET_OPERATION_HEADER]:value.operation_id}:{}),...overrides},body:JSON.stringify(value)});
+ }
+ async function verifyFixtureProof(){const w=clock();try{expect(await commitVerifiedAssertion((await verified(w))!,w)).toBe(true);}finally{w.close();}}
+ async function softwareProviderConfig(){
+  const provider=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']) as CryptoKeyPair;
+  const bytes=new Uint8Array(await crypto.subtle.exportKey('pkcs8',provider.privateKey) as ArrayBuffer);return {...sourceEnv,APNS_PRIVATE_KEY:'-----BEGIN PRIVATE KEY-----\n'+b64(bytes)+'\n-----END PRIVATE KEY-----'} as AppEnv;
+ }
+ it('runs actual private target register, one synthetic provider transport, correlated status and negative revoke with unchanged Source181 bodies',async()=>{
+  await verifyFixtureProof();let calls=0;const config=await softwareProviderConfig(),svc=createReceivingService({env:config,capacity:16,now:()=>Date.now(),fetcher:async(url,init)=>{calls++;expect(String(url)).toBe('https://api.sandbox.push.apple.com/3/device/'+vectors.native_token_hex);expect(init?.body).toBe('{"aps":{"content-available":1}}');return new Response(null,{status:200});}});
+  try{
+   const input=targetInput('register'),registered=await svc.handle(targetRequest('register',input));expect(registered.status).toBe(200);expect(await registered.json()).toMatchObject({state:'registered',operation_state:'registered'});expect(calls).toBe(0);
+   expect(registered.headers.get(TARGET_REQUEST_HASH_HEADER)).toBe(await sha256Hex(canonical(['DJC-HOST-WAKE-API-REQUEST-V1','POST',PREFIX+'register',input])));
+   const wake=await svc.handle(targetRequest('wake',targetInput('wake','actual-fixture-wake-event')));expect(wake.status).toBe(200);expect(await wake.json()).toMatchObject({state:'registered',operation_state:'provider_accepted',provider_status:200});expect(calls).toBe(1);
+   const status=await svc.handle(targetRequest('status'));expect(status.status).toBe(200);expect(await status.json()).toMatchObject({state:'registered',operation_state:'registered'});
+   const negative=receiving({...env} as AppEnv,1);try{const revoke=await negative.handle(targetRequest('revoke'));expect(revoke.status).toBe(200);const out=await revoke.json() as Record<string,unknown>;expect(out.state).toBe('withdrawn');expect(out.operation_state).toBe('registered');expect(decodeTargetReply(out,input,o,input.purpose_id).state).toBe('withdrawn');expect((await negative.handle(targetRequest('status'))).status).toBe(200);}
+   finally{negative.close();}
+   expect(calls).toBe(1);expect((await store.issuer('authorization',o.core_purpose_id))?.outcome).toBe('withdrawn');expect(await env.DB.prepare('SELECT ciphertext FROM host_app_wake_purposes').first('ciphertext')).toBeNull();
+  }finally{svc.close();}
+ });
+ it('requires the actual djci plus the separate exact capability and rejects combined capability before allocating an intent',async()=>{
+  const svc=receiving();try{
+   const wrong=targetRequest('register',undefined,{[TARGET_CAPABILITY_HEADER]:'djchw_'+'Z'.repeat(43)});expect((await svc.handle(wrong)).status).toBe(401);
+   const combined=targetRequest('register',undefined,{[TARGET_CAPABILITY_HEADER]:capabilities.get(o.core_purpose_id)+', '+capabilities.get(o.core_purpose_id)});expect((await svc.handle(combined)).status).toBe(401);
+   const bearer=targetRequest('register');bearer.headers.set('authorization','Bearer '+capabilities.get(o.core_purpose_id));expect((await svc.handle(bearer)).status).toBe(401);
+   expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_receiving_intents').first('n')).toBe(0);
+  }finally{svc.close();}
+ });
+ it('binds target operation header before body and leaves a failed mismatch UNKNOWN without Source181 mutation',async()=>{
+  await verifyFixtureProof();const svc=receiving();try{
+   expect((await svc.handle(targetRequest('register',undefined,{[TARGET_OPERATION_HEADER]:'different-body-operation'}))).status).toBe(403);
+   expect(await env.DB.prepare('SELECT outcome FROM host_wake_receiving_intents').first('outcome')).toBe('unknown');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_app_wake_operations').first('n')).toBe(0);
+  }finally{svc.close();}
+ });
+ it('does not retry an original target operation after a lost/consumed HTTP attempt or manufacture a second proof consumption',async()=>{
+  await verifyFixtureProof();const svc=receiving();try{
+   expect((await svc.handle(targetRequest('register'))).status).toBe(200);const consumed=await env.DB.prepare('SELECT consumed_at FROM host_wake_native_verifications').first('consumed_at');
+   expect((await svc.handle(targetRequest('register'))).status).toBe(409);expect(await env.DB.prepare('SELECT consumed_at FROM host_wake_native_verifications').first('consumed_at')).toBe(consumed);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_app_wake_operations').first('n')).toBe(1);
+  }finally{svc.close();}
+ });
+ it('terminally closes an unsupported changed native token at its first target-register boundary',async()=>{
+  await verifyFixtureProof();const svc=receiving();try{
+   expect((await svc.handle(targetRequest('register',{...targetInput('register'),apns_token:'ab'.repeat(32)}))).status).toBe(403);expect((await store.issuer('authorization',o.core_purpose_id))?.outcome).toBe('withdrawn');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_app_wake_operations').first('n')).toBe(0);
+  }finally{svc.close();}
+ });
+ it('does not report a positive active target status after its actual native enrollment retires',async()=>{
+  await verifyFixtureProof();const svc=receiving();try{
+   expect((await svc.handle(targetRequest('register'))).status).toBe(200);await env.DB.prepare('UPDATE host_wake_native_enrollments SET disabled=1').run();expect((await svc.handle(targetRequest('status'))).status).toBe(503);
+  }finally{svc.close();}
+ });
+ it('retains prebody wake capture in the unchanged Source181 durable operation after delayed private authentication/body awaits',async()=>{
+  await verifyFixtureProof();const first=receiving();try{expect((await first.handle(targetRequest('register'))).status).toBe(200);}finally{first.close();}
+  const captured=Date.now();let time=captured,calls=0;const config=await softwareProviderConfig(),svc=createReceivingService({env:config,capacity:16,now:()=>time,fetcher:async()=>{calls++;return new Response(null,{status:200});}}),input=targetInput('wake','delayed-original-event');
+  let streamController:ReadableStreamDefaultController<Uint8Array>;const stream=new ReadableStream<Uint8Array>({start(c){streamController=c;}}),template=targetRequest('wake',input);
+  try{
+   const pending=svc.handle(new Request(template.url,{method:'POST',headers:template.headers,body:stream}));await Promise.resolve();time+=5000;streamController!.enqueue(new TextEncoder().encode(JSON.stringify(input)));streamController!.close();const response=await pending;expect(response.status).toBe(200);expect(calls).toBe(1);
+   const row=await env.DB.prepare('SELECT accepted_at,expires_at FROM host_app_wake_operations WHERE operation_id=?').bind(input.operation_id).first<{accepted_at:number;expires_at:number}>();expect(row!.accepted_at).toBe(captured);expect(row!.expires_at).toBe(captured+30000);
+  }finally{svc.close();}
+ });
+
+ it('never sends a second synthetic provider request after cancellation/lost reply for the same original wake event',async()=>{
+  await verifyFixtureProof();const first=receiving();try{expect((await first.handle(targetRequest('register'))).status).toBe(200);}finally{first.close();}
+  const controller=new AbortController();let calls=0;const config=await softwareProviderConfig(),svc=createReceivingService({env:config,capacity:16,now:()=>Date.now(),fetcher:async()=>{calls++;controller.abort();return new Response(null,{status:200});}}),input=targetInput('wake','lost-response-original-event'),template=targetRequest('wake',input);
+  try{
+   const result=await svc.handle(new Request(template,{signal:controller.signal}));expect(result.status).toBe(409);expect(calls).toBe(1);
+   await vi.waitFor(async()=>{const row=await env.DB.prepare('SELECT outcome FROM host_app_wake_operations WHERE operation_id=?').bind(input.operation_id).first<{outcome:string}>();expect(row?.outcome).toBe('unknown');},{timeout:1000,interval:5});
+   expect((await svc.handle(targetRequest('wake',input))).status).toBe(409);expect(calls).toBe(1);expect(await env.DB.prepare("SELECT COUNT(*) n FROM host_app_wake_operations WHERE operation_id=?").bind(input.operation_id).first('n')).toBe(1);
+  }finally{svc.close();}
+ });
+ it('revokes an existing child even when the separate early-negative fence table is actually at capacity',async()=>{
+  await verifyFixtureProof();const first=receiving();try{expect((await first.handle(targetRequest('register'))).status).toBe(200);}finally{first.close();}
+  expect(await new ReceivingStore(env.DB,1).withdrawIssuer('authorization','other-earlier-negative','record')).toBe(true);
+  const negative=receiving({...env} as AppEnv,1);try{expect((await negative.handle(targetRequest('revoke'))).status).toBe(200);expect((await store.issuer('authorization',o.core_purpose_id))?.outcome).toBe('withdrawn');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_child_withdrawals').first('n')).toBe(1);expect(await env.DB.prepare('SELECT ciphertext FROM host_app_wake_purposes').first('ciphertext')).toBeNull();}finally{negative.close();}
  });
 
 });

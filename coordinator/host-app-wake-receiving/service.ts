@@ -15,6 +15,7 @@ import {decodePrivateReply,privateBase,privateError,type PrivateState} from './s
 import {authenticateOperator} from './operator-auth';
 import {resolveAuthorization,RESOLVE_PATH} from './authorization-resolve';
 import {requireReceivingGuards} from './guard-schema';
+import {receiveTarget} from './target-transport';
 import {SERVER_PREFIX} from './server-wire';
 export interface ReceivingOptions {env:AppEnv;now:()=>number;fetcher:typeof fetch;capacity:number}
 const headers={'content-type':'application/json; charset=utf-8','cache-control':'no-store','referrer-policy':'no-referrer','x-content-type-options':'nosniff'};
@@ -107,6 +108,7 @@ export function createReceivingService(options:ReceivingOptions){
   clock();const path=new URL(request.url).pathname;
   if(path===RESOLVE_PATH)return json(await resolveAuthorization(request,env,clock));
   if(path===OPERATOR_AUTHORIZE||path===OPERATOR_WITHDRAW)return await operator(request,path===OPERATOR_AUTHORIZE?'authorize':'withdraw');
+  if(['register','wake','status','revoke'].some(kind=>path===SERVER_PREFIX+kind))return await receiveTarget(request,env,clock,fetcher,capacity);
   return await privateRoute(request);
  }catch(error){return error instanceof WakeError||error instanceof HttpError?privateError(error.code,error.status):privateError('host_wake_receiving_unavailable',503);}}});
 }

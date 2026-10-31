@@ -16,7 +16,7 @@ export async function bindSource181(env:AppEnv,issuer:IssuerRow,principal:string
  const savedIssuer=await window.run(()=>store.issuer(issuer.authorization_id,issuer.core_purpose_id));need(savedIssuer&&canonical(savedIssuer)===canonical(issuer),'host_wake_issuer_original',403);
  const auth=decodeOperatorAuthorization(JSON.parse(a.authorization_json));
  const scope=original({version:VERSION,purpose_id:issuer.private_purpose_id,token_role:'host_app_wake',owner_binding:o.owner_binding,device_binding:o.device_binding,source_binding:o.source_binding,target:o.target,apns_environment:o.apns_environment,platform:o.platform,issued_at_ms:o.original_wake_issued_at_ms,expires_at_ms:o.original_wake_expires_at_ms,display_expires_at_ms:o.original_display_expires_at_ms,max_operations:auth.max_operations,max_wakes:auth.max_reserved_sends});
- const snapshot=Object.fromEntries(fields.map(f=>[f,env[f]]));let closed=false,provider:SurfaceProvider|undefined;
+ const snapshot=Object.fromEntries(fields.map(f=>[f,env[f]]));let firstSourceClock=true,closed=false,provider:SurfaceProvider|undefined;
  const current=()=>{need(!closed&&fields.every(f=>env[f]===snapshot[f]),'host_wake_receiving_retired',503);window.check();};
  const live=async()=>{current();need(await window.run(()=>store.isLive(issuer.authorization_id,principal,window.check())),'host_wake_native_authority',403);current();};
  /** The stored signed-environment/enrollment receipts remain mandatory. This is
@@ -47,7 +47,8 @@ export async function bindSource181(env:AppEnv,issuer:IssuerRow,principal:string
     WHERE j.authorization_id=? AND j.core_purpose_id=? AND j.operation_id=? AND j.generation=? AND j.revision=? AND j.outcome='verified'
     AND j.original_json=? AND v.original_json=j.original_json AND v.native_key_ref=? AND v.verified_at>=j.captured_at AND v.verified_at<j.expires_at AND v.consumed_at IS NULL`)
     .bind(issuer.authorization_id,issuer.core_purpose_id,o.operation_id,o.generation,o.revision,issuer.original_json,auth.native_key_ref).first());need(row,'host_wake_actual_native_verification_required',403);current();
-  },now:()=>{current();return window.check();},encryptionKey:()=>{current();return env.APNS_TOKEN_ENCRYPTION_KEY;},
+  // One binding per delegated HTTP callback: inherit its first pre-await capture.
+  },now:()=>{current();const at=window.check();if(firstSourceClock){firstSourceClock=false;return window.capturedAt;}return at;},encryptionKey:()=>{current();return env.APNS_TOKEN_ENCRYPTION_KEY;},
   authorizeProvider:async()=>{current();provider??=createSurfaceProvider(env,()=>window.check());const token=await window.run(()=>provider!.authorizeProvider());current();return token;},
   fetcher:async(input,init)=>{current();const response=await window.run(()=>fetcher(input,init));current();return response;}
  });
