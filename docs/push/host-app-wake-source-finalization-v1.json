@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "scope": "SEPARATE_DOCUMENTARY_FINALIZATION_OF_SOURCE181_NOT_OWN_FINAL_QUALIFICATION",
+  "source_main": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+  "source_candidate": "6662873d9cb433e55d406397d3a04f8451652bfa",
+  "source_parent": "e39d5a7b03e1b8b194e4c8b0d0ad05a5f494ecb8",
+  "source_tree": "10a1c9a282b646ac710a31f97e83e4a341b1afb8",
+  "exact_source_review_SHA256": "83a808824e9938a58b8f68f060e1e5cc9a70141cdbdd6fd38455150c5c8973a8",
+  "Apple_client_compatibility_review_SHA256": "438492fccd108ff21b32fc4c33cf8d76098414405cb7eedbfd2fb50396f912dd",
+  "independent_original_source_closure_SHA256": "37e2b9ee831e9a2b31cc03a6b70ddda8f613253f7601408626ea5919e46850a4",
+  "original_source_join_packet_SHA256": "5a3074adb7063ece88701d9a66e8013d56e2b17ea3e3e64a23e419329c0f863d",
+  "source_files_added": 15,
+  "all_existing_source_entries_unchanged": 657,
+  "implementation": {
+    "role": "host_app_wake",
+    "event": "direct_rich_refresh",
+    "version": "djc-host-app-wake/1",
+    "new_root_import": false,
+    "public_admission": false,
+    "purpose_max_ms": 28800000,
+    "bounded_by_original_display_expiry": true,
+    "transport_max_ms": 30000,
+    "semantic_coalescing_min_ms": 30000,
+    "max_reserved_sends": 64,
+    "max_operations": 256,
+    "server_capacity_max": 4096,
+    "original_history_eviction": false,
+    "native_APNs_body": "{\"aps\":{\"content-available\":1}}",
+    "APNs_type": "background",
+    "APNs_priority": "5",
+    "topic": "Original admitted host application bundle",
+    "original_authority_and_native_registration_ports": "MANDATORY_NO_DEFAULT_OR_GENUINE_RUNTIME_INPUT_SUPPLIED"
+  },
+  "owner_causal_counterproof": {
+    "old_head": "b35f972bac4247dc390b83699c22e6429e6260c2",
+    "actual_failed_new_controls": 2,
+    "unexecuted_other_cases": 57,
+    "failure": "Slow first body or D1 authentication expired without history; identical replay gained a new transport lease and one simulated outbound in each case",
+    "old_full_source_review": "NO_GO_P2_RETAINED",
+    "corrected_head": "6662873d9cb433e55d406397d3a04f8451652bfa",
+    "corrected_local_tests": {
+      "passed": 60,
+      "failed": 0,
+      "skipped": 0
+    },
+    "correction": "After genuine authentication/currentness preserve first original expired deadline as terminal bounded history before409; no unauthenticated capacity claim or send-budget charge"
+  },
+  "own_source_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 41233948020,
+      "event": "workflow_run",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Post-Merge Release Evidence",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233947710,
+      "event": "workflow_run",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "API release artifact",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233756829,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "AI-development projection",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757055,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Reusable workflow guard regression",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757131,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Push coordinator source qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233756785,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Fixed rendezvous QA build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757100,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Surface enrollment source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757126,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Native proof DATA journal source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757071,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Principal possession crypto DATA",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757089,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Host app wake source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757067,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Native proof transcript source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757154,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Rich delivery adapter",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757119,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Rich Session raw DATA profile",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757039,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Worker DO registry source conformance",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233756814,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "TDE observe",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757918,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "CodeQL",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233757078,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Validate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41233756774,
+      "event": "push",
+      "headSha": "c8c3823735320c64285fb2ea0ecec1ece8861988",
+      "name": "Local native experiment qualification",
+      "status": "completed"
+    }
+  ],
+  "actual_main_lane_overlap": {
+    "Validate": {
+      "run": 41233757078,
+      "lanes": 4,
+      "all_success": true,
+      "peak_overlap": 4,
+      "attempt": 1
+    },
+    "native": {
+      "run": 41233756774,
+      "lanes": 5,
+      "all_success": true,
+      "peak_overlap": 3,
+      "attempt": 1
+    }
+  },
+  "own_source_host_wake": {
+    "run": 41233757089,
+    "artifact": 13054887090,
+    "passed": 60,
+    "failed": 0,
+    "skipped": 0,
+    "provider_zip_SHA256": "76ef2746ba9d64e5eceffebdba75016d864ad838aa5a1ef0cb5de7c87d6da158",
+    "module_SHA256": "bdbe838209d727792728d9041d288dc16af89fc6688a2bc91970938549554183",
+    "manifest_SHA256": "c495f868c32ee0da31d2bdb4a8755a31e76be4672cc6b9e117733611a8b2fec1",
+    "actual_original_authority_native_clock_or_APNs": false
+  },
+  "own_source_Linux": {
+    "run": 41233757131,
+    "tests": 38,
+    "python": {
+      "classification": "SOURCE_QUALIFICATION_ONLY",
+      "exit_code": 0,
+      "python": "3.14.9",
+      "sqlite": "3.45.1",
+      "platform": "Linux",
+      "native_provider_or_network_effects": false,
+      "Linux_clock_or_VFS_powerloss_qualified": false,
+      "input_count": 15
+    },
+    "JS": {
+      "classification": "SYNTHETIC_ENCODING_PARITY_ONLY",
+      "vectors": 3
+    }
+  },
+  "own_source_guard": {
+    "run": 41233757055,
+    "artifact": 13055185615,
+    "passed": 10,
+    "failed": 0
+  },
+  "own_source_possession": {
+    "run": 41233757071,
+    "artifact": 13054797336,
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0,
+    "module_SHA256": "226cb5de3f1f84d8b21a4b898326e7261a4580d8e14ade8931c96e024fb9def5"
+  },
+  "own_source_coverage": {
+    "run": 41233757078,
+    "artifact": 13054387605,
+    "provider_zip_SHA256": "84f285e062b4d9ff0c88522b06ea1c2d7c1f61ac5933dfd31f5b118f67b8f3ea",
+    "exact_main_marker": true
+  },
+  "own_source_formal": {
+    "run": 41233948020,
+    "canonical_digest": "d68c90c5797a3f509a5287a3a8cfde5637805c6468bb3b8b4035f34da00206da",
+    "findings": []
+  },
+  "own_source_durable": {
+    "asset": 696270639,
+    "provider_SHA256": "1b4634bd72713d197ddd57d5c6b69fd490127b8e73368c4faf66fe04f3385e51",
+    "canonical_integrity_verified": true,
+    "all12_checks": "PASS",
+    "source_formal_policy_joins": true
+  },
+  "own_source_release": {
+    "run": 41233947710,
+    "artifact": 13055205897,
+    "TAR_SHA256": "ddfa15bb883d742c4e78d666885af2c5a01e569a44a4cece028d0176320db5bf",
+    "Worker_SHA256": "e3137375500dd499752ea1c5b4540c10616d7f933f46d7163f9829bcdfa07835",
+    "Worker_bytes": 1291540,
+    "Worker_equals_parent_except_one_embedded_SHA": true,
+    "all18other_regular_members_equal": true
+  },
+  "original_source_files_rehashed": 55,
+  "limits": {
+    "runtime_dependency_changes": false,
+    "new_production_schema_migration": false,
+    "original_issuer_native_enrollment_signed_environment_clock_receiving": "Separate subsequent source and genuine inputs still required",
+    "provider_or_native_acceptance": false,
+    "deployment": false,
+    "activation": false,
+    "operational_rendezvous_gates_open": 22,
+    "separate_Final_own_review_CI_merge_and_original_qualification": "REQUIRED_AFTER_THIS_DOCUMENTARY_CANDIDATE"
+  },
+  "source_PR_CI": {
+    "workflows": 18,
+    "all": "SUCCESS",
+    "host_wake": 41232424400,
+    "required_HIGH_RISK_OwnerAuthorization": 41232639706,
+    "hosted_tests": 60,
+    "hosted_and_local_module_SHA256": "bdbe838209d727792728d9041d288dc16af89fc6688a2bc91970938549554183"
+  },
+  "source_PR": 181
+}
