@@ -14,7 +14,7 @@ function authorization(id='fixture-authorization',op='fixture-operator-operation
 let store:ReceivingStore;
 async function grant(){return store.authorize(authorization(),'a'.repeat(64),START,START);}
 async function issuer(hash='b'.repeat(64),claim='first-claim',captured=START,at=START){return store.reserveIssuer('fixture-authorization','existing-record','issuer-operation',hash,o,'private-API-purpose',claim,captured,at);}
-async function clear(){for(const table of ['host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();}
+async function clear(){for(const table of ['host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();}
 describe('actual D1 receiving once-history with real existing install-token table, fixture authority only',()=>{
  beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const statement of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(statement).run();});
  beforeEach(async()=>{await clear();await env.DB.prepare("INSERT INTO install_tokens (id,ha_install_id,token_hash,token_prefix) VALUES ('existing-record','existing-install','fixture-token-hash','djci_fixture')").run();store=new ReceivingStore(env.DB,2);});
@@ -60,17 +60,17 @@ describe('actual D1 receiving once-history with real existing install-token tabl
   await expect(issuer()).rejects.toThrow();await expect(store.reserveIssuer('fixture-authorization','rotated-record','issuer-op','b'.repeat(64),o,'private','claim',START,START)).rejects.toThrow('host_wake_principal');
  });
  it('never promotes UNKNOWN, withdrawn, or expired issuer history on a duplicate or finish',async()=>{
-  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'unknown',START);await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'unknown',START,'first-claim','b'.repeat(64),'existing-record');await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');
   expect((await issuer()).outcome).toBe('unknown');await store.withdrawAuthorization('fixture-authorization');expect((await store.issuer('fixture-authorization',o.core_purpose_id))?.outcome).toBe('withdrawn');
  });
  it('reserves one native nonce job, not a new nonce after duplicate/lost response',async()=>{
-  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');
   const first=await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);
   const retry=await store.reserveNativeJob('fixture-authorization','existing-record',o,{...c,nonce_b64url:'B'+'A'.repeat(42)},'c'.repeat(64),'app_attest_assertion',START);expect(retry.challenge_json).toBe(first.challenge_json);
   await expect(store.reserveNativeJob('fixture-authorization','existing-record',o,{...c,challenge_id:'33333333-3333-4333-8333-333333333333'},'c'.repeat(64),'app_attest_assertion',START)).rejects.toThrow();
  });
  it('records the authenticated original expired challenge before a fresh request can renew it',async()=>{
-  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');
   const first=await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START+30000);expect(first.outcome).toBe('expired');
   const retry=await store.reserveNativeJob('fixture-authorization','existing-record',o,{...c,captured_at_ms:START+30000,expires_at_ms:START+60000},'c'.repeat(64),'app_attest_assertion',START+30000);expect(retry.expires_at).toBe(START+30000);expect(retry.outcome).toBe('expired');
  });
@@ -78,27 +78,51 @@ describe('actual D1 receiving once-history with real existing install-token tabl
   await grant();await issuer();await expect(store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START)).rejects.toThrow();expect(await store.nativeJob(c.challenge_id)).toBeNull();
  });
  it('withdraws preallocated purposes and noncejobs without issuing a new row',async()=>{
-  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);await store.withdrawAuthorization('fixture-authorization');
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);await store.withdrawAuthorization('fixture-authorization');
   expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('withdrawn');expect(await store.isLive('fixture-authorization','existing-record',START)).toBe(false);
  });
  it('takes one durable native proof claim before crypto, separating in-flight VERIFYING from terminal UNKNOWN',async()=>{
-  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');
   await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);
   const claims=await Promise.all(['claim-one','claim-two'].map(claim=>store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_assertion',claim,START)));expect(claims.filter(Boolean)).toHaveLength(1);
   expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('verifying');
   const claim=(await store.nativeJob(c.challenge_id))!.verification_claim!;await store.failNativeProof('fixture-authorization',c.challenge_id,claim,'unknown');expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('unknown');expect(await store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_assertion','claim-three',START)).toBe(false);
  });
  it('does not change expected native proof kind or reuse a nonce for fallback',async()=>{
-  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');
   await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);
   expect(await store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_attestation','claim',START)).toBe(false);
   await expect(store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_attestation',START)).rejects.toThrow();
  });
  it('does not start proof verification after expiry or principal retirement',async()=>{
-  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START);
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');
   await store.reserveNativeJob('fixture-authorization','existing-record',o,c,'c'.repeat(64),'app_attest_assertion',START);
   expect(await store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_assertion','claim',START+30000)).toBe(false);
   await env.DB.prepare('UPDATE install_tokens SET disabled=1').run();expect(await store.claimNativeProof('fixture-authorization','existing-record',c.challenge_id,'app_attest_assertion','claim',START)).toBe(false);
+ });
+
+ it('original issuer claim: a concurrent loser cannot promote the genuine winner reservation',async()=>{
+  await grant();const claims=['winner-candidate-one','winner-candidate-two'];const rows=await Promise.all(claims.map(claim=>issuer('b'.repeat(64),claim)));const saved=rows[0];const loser=claims.find(c=>c!==saved.claim_id)!;
+  await Reflect.apply(store.finishIssuer,store,['fixture-authorization',o.core_purpose_id,'issued',START,loser,'b'.repeat(64),'existing-record']);
+  expect((await store.issuer('fixture-authorization',o.core_purpose_id))?.outcome).toBe('reserved');
+ });
+ it('original issuer claim: changed request or principal cannot promote a saved reservation',async()=>{
+  await grant();await issuer();
+  await Reflect.apply(store.finishIssuer,store,['fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','c'.repeat(64),'other-principal']);
+  expect((await store.issuer('fixture-authorization',o.core_purpose_id))?.outcome).toBe('reserved');
+ });
+
+ it.each([{hash:'c'.repeat(64),principal:'existing-record'},{hash:'b'.repeat(64),principal:'other-principal'}])('original issuer binding: refuses a wrong request OR principal %j',async ({hash,principal})=>{
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim',hash,principal);expect((await issuer()).outcome).toBe('reserved');
+ });
+ it('original issuer winner: only the original private winner/request/principal can finish, never UNKNOWN or replay',async()=>{
+  await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');expect((await issuer()).outcome).toBe('issued');
+  await store.finishIssuer('fixture-authorization',o.core_purpose_id,'unknown',START,'first-claim','b'.repeat(64),'existing-record');expect((await issuer()).outcome).toBe('issued');
+ });
+ it('original issuer negative closure remains possible after principal retirement, but positive finish does not',async()=>{
+  await grant();await issuer();await env.DB.prepare('UPDATE install_tokens SET disabled=1').run();
+  await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');expect((await store.issuer('fixture-authorization',o.core_purpose_id))?.outcome).toBe('reserved');
+  await store.finishIssuer('fixture-authorization',o.core_purpose_id,'unknown',START,'first-claim','b'.repeat(64),'existing-record');expect((await store.issuer('fixture-authorization',o.core_purpose_id))?.outcome).toBe('unknown');
  });
 
 });

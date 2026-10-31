@@ -78,3 +78,16 @@ CREATE TABLE IF NOT EXISTS host_wake_native_verifications (
  register_claim_id TEXT,
  CHECK((consumed_at IS NULL AND register_operation_id IS NULL AND register_claim_id IS NULL) OR (consumed_at IS NOT NULL AND register_operation_id IS NOT NULL AND register_claim_id IS NOT NULL))
 );
+CREATE TABLE IF NOT EXISTS host_wake_receiving_intents (
+ authorization_id TEXT NOT NULL,
+ core_purpose_id TEXT NOT NULL,
+ issuer_operation_id TEXT NOT NULL,
+ route TEXT NOT NULL,
+ claim_id TEXT NOT NULL,
+ request_hash TEXT,
+ captured_at INTEGER NOT NULL,
+ expires_at INTEGER NOT NULL,
+ outcome TEXT NOT NULL CHECK(outcome IN('reserved','completed','expired','unknown','withdrawn')),
+ PRIMARY KEY(authorization_id,core_purpose_id,issuer_operation_id,route),
+ FOREIGN KEY(authorization_id) REFERENCES host_wake_operator_authorizations(authorization_id)
+);

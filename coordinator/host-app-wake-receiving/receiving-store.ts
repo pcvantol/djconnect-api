@@ -5,6 +5,7 @@ import {decodeOperatorAuthorization,decodeNativeOriginal,decodeNativeChallenge,t
 export interface AuthorizationRow {authorization_id:string;operation_id:string;request_hash:string;core_install_token_record_id:string;ha_install_id:string;authorization_json:string;issued_at:number;expires_at:number;outcome:'authorized'|'expired'|'withdrawn';accepted_at:number;original_request_expires_at:number}
 export interface IssuerRow {authorization_id:string;core_purpose_id:string;issuer_operation_id:string;claim_id:string;request_hash:string;original_json:string;private_purpose_id:string;issued_at:number;expires_at:number;accepted_at:number;original_request_expires_at:number;outcome:'reserved'|'issued'|'expired'|'unknown'|'withdrawn'}
 export interface NativeJobRow {challenge_id:string;authorization_id:string;core_purpose_id:string;operation_id:string;generation:string;revision:number;request_hash:string;original_json:string;challenge_json:string;proof_kind:NativeProofKind;verification_claim:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'verifying'|'verified'|'rejected'|'expired'|'unknown'|'withdrawn'}
+export interface IntentRow {authorization_id:string;core_purpose_id:string;issuer_operation_id:string;route:string;claim_id:string;request_hash:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'completed'|'expired'|'unknown'|'withdrawn'}
 const LIVE=`SELECT 1 FROM host_wake_operator_authorizations a JOIN install_tokens i ON i.id=a.core_install_token_record_id AND i.ha_install_id=a.ha_install_id WHERE a.authorization_id=? AND a.outcome='authorized' AND a.issued_at<=? AND a.expires_at>? AND i.disabled=0`;
 /** Actual D1 once-history. No status read returns a credential or issues a grant.
  * SQL checks actual local install-token state, not remote Core RAM state. */
@@ -13,6 +14,33 @@ export class ReceivingStore {
  async authorization(id:string){return this.db.prepare('SELECT * FROM host_wake_operator_authorizations WHERE authorization_id=?').bind(id).first<AuthorizationRow>();}
  async issuer(id:string,corePurpose:string){return this.db.prepare('SELECT * FROM host_wake_issuer_once WHERE authorization_id=? AND core_purpose_id=?').bind(id,corePurpose).first<IssuerRow>();}
  async nativeJob(challenge:string){return this.db.prepare('SELECT * FROM host_wake_native_jobs WHERE challenge_id=?').bind(challenge).first<NativeJobRow>();}
+ async intent(id:string,purpose:string,operation:string,route:string){return this.db.prepare('SELECT * FROM host_wake_receiving_intents WHERE authorization_id=? AND core_purpose_id=? AND issuer_operation_id=? AND route=?').bind(id,purpose,operation,route).first<IntentRow>();}
+ /** Only actual authenticated private header scope may allocate this prebody
+  * latch. No unauthenticated body identity or guessed RAM child is trusted. */
+ async reserveIntent(id:string,principal:string,purpose:string,operation:string,route:string,claim:string,captured:number,at:number){
+  integer(captured);integer(at,captured);
+  await this.db.prepare(`INSERT OR IGNORE INTO host_wake_receiving_intents
+   (authorization_id,core_purpose_id,issuer_operation_id,route,claim_id,captured_at,expires_at,outcome)
+   SELECT ?,?,?,?,?,?,MIN(?,a.expires_at),CASE WHEN ?>=? OR CAST(unixepoch('subsec')*1000 AS INTEGER)>=MIN(?,a.expires_at) THEN 'expired' ELSE 'reserved' END
+   FROM host_wake_operator_authorizations a JOIN install_tokens i ON i.id=a.core_install_token_record_id AND i.ha_install_id=a.ha_install_id
+   WHERE a.authorization_id=? AND a.outcome='authorized' AND i.id=? AND i.disabled=0 AND a.issued_at<=? AND a.expires_at>?
+   AND (SELECT COUNT(*) FROM host_wake_receiving_intents WHERE authorization_id=?)<json_extract(a.authorization_json,'$.max_operations')
+   AND (SELECT COUNT(*) FROM host_wake_receiving_intents)<?`)
+   .bind(id,purpose,operation,route,claim,captured,captured+30000,at,captured+30000,captured+30000,id,principal,at,at,id,this.capacity).run();
+  const row=await this.intent(id,purpose,operation,route);need(row,'host_wake_intent_capacity_or_authority',409);return row;
+ }
+ async bindIntent(row:IntentRow,hash:string,at:number):Promise<boolean>{
+  const r=await this.db.prepare(`UPDATE host_wake_receiving_intents SET request_hash=?
+   WHERE authorization_id=? AND core_purpose_id=? AND issuer_operation_id=? AND route=? AND claim_id=?
+   AND outcome='reserved' AND request_hash IS NULL AND expires_at>? AND expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)
+   AND EXISTS(${LIVE})`).bind(hash,row.authorization_id,row.core_purpose_id,row.issuer_operation_id,row.route,row.claim_id,at,row.authorization_id,at,at).run();return r.meta.changes===1;
+ }
+ async finishIntent(row:IntentRow,outcome:'completed'|'unknown'|'expired'){
+  need(outcome==='completed'||outcome==='unknown'||outcome==='expired');
+  await this.db.prepare(`UPDATE host_wake_receiving_intents SET outcome=CASE WHEN expires_at<=CAST(unixepoch('subsec')*1000 AS INTEGER) THEN 'expired' ELSE ? END
+   WHERE authorization_id=? AND core_purpose_id=? AND issuer_operation_id=? AND route=? AND claim_id=? AND outcome='reserved'`)
+   .bind(outcome,row.authorization_id,row.core_purpose_id,row.issuer_operation_id,row.route,row.claim_id).run();
+ }
  /** Call only AFTER authenticating the actual selected custodian HMAC. The
   * original captured deadline remains in the row even after late auth. */
  async authorize(value:OperatorAuthorizationData,requestHash:string,captured:number,at:number){
@@ -33,6 +61,7 @@ export class ReceivingStore {
    this.db.prepare("UPDATE host_wake_operator_authorizations SET outcome='withdrawn' WHERE authorization_id=?").bind(id),
    this.db.prepare("UPDATE host_wake_issuer_once SET outcome='withdrawn' WHERE authorization_id=?").bind(id),
    this.db.prepare("UPDATE host_wake_native_jobs SET outcome='withdrawn' WHERE authorization_id=?").bind(id),
+   this.db.prepare("UPDATE host_wake_receiving_intents SET outcome='withdrawn' WHERE authorization_id=?").bind(id),
    this.db.prepare(`UPDATE host_app_wake_purposes SET withdrawn=1,ciphertext=NULL,nonce=NULL WHERE purpose_id IN (SELECT private_purpose_id FROM host_wake_issuer_once WHERE authorization_id=?)`).bind(id)
   ]);
  }
@@ -87,9 +116,15 @@ export class ReceivingStore {
  }
  /** Reserve-to-issued is performed only once. Persisted UNKNOWN/expiry cannot
   * be promoted by retry. No recovery of Source181's one-time credential. */
- async finishIssuer(id:string,purpose:string,outcome:'issued'|'unknown'|'expired',at:number){
-  integer(at);await this.db.prepare(`UPDATE host_wake_issuer_once SET outcome=CASE WHEN original_request_expires_at<=? OR expires_at<=? THEN 'expired' ELSE ? END
-   WHERE authorization_id=? AND core_purpose_id=? AND outcome='reserved'
-   AND EXISTS(${LIVE})`).bind(at,at,outcome,id,purpose,id,at,at).run();
+ async finishIssuer(id:string,purpose:string,outcome:'issued'|'unknown'|'expired',at:number,originalClaim:string,requestHash:string,principal:string){
+  integer(at);need(outcome==='issued'||outcome==='unknown'||outcome==='expired');
+  const authority=outcome==='issued'?`EXISTS(${LIVE} AND i.id=?)`:
+   `EXISTS(SELECT 1 FROM host_wake_operator_authorizations a WHERE a.authorization_id=? AND a.core_install_token_record_id=?)`;
+  const bindings=outcome==='issued'?[id,at,at,principal]:[id,principal];
+  await this.db.prepare(`UPDATE host_wake_issuer_once SET outcome=CASE
+   WHEN original_request_expires_at<=? OR expires_at<=? OR original_request_expires_at<=CAST(unixepoch('subsec')*1000 AS INTEGER) OR expires_at<=CAST(unixepoch('subsec')*1000 AS INTEGER)
+   THEN 'expired' ELSE ? END
+   WHERE authorization_id=? AND core_purpose_id=? AND outcome='reserved' AND claim_id=? AND request_hash=? AND ${authority}`)
+   .bind(at,at,outcome,id,purpose,originalClaim,requestHash,...bindings).run();
  }
 }

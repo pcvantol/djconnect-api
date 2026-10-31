@@ -18,10 +18,10 @@ export class RequestWindow {
  /** Every caller must still check before starting its next side effect. This
   * settles promptly if a body/crypto provider ignores cancellation; it does not
   * claim to cancel an already started SQL write or HTTP delivery. */
- async run<T>(work:()=>Promise<T>):Promise<T>{
-  this.check();const pending=work();let listener:()=>void=()=>{};
-  const aborted=new Promise<never>((_,reject)=>{listener=()=>reject(new WakeError('host_wake_cancelled',409));this.signal.addEventListener('abort',listener,{once:true});if(this.signal.aborted)listener();});
+ async run<T>(work:()=>Promise<T>,stageSignal?:AbortSignal):Promise<T>{
+  this.check();const signal=stageSignal?AbortSignal.any([this.signal,stageSignal]):this.signal;need(!signal.aborted,'host_wake_cancelled',409);const pending=work();let listener:()=>void=()=>{};
+  const aborted=new Promise<never>((_,reject)=>{listener=()=>reject(new WakeError('host_wake_cancelled',409));signal.addEventListener('abort',listener,{once:true});if(signal.aborted)listener();});
   try{const value=await Promise.race([pending,aborted]);this.check();return value;}
-  finally{this.signal.removeEventListener('abort',listener);}
+  finally{signal.removeEventListener('abort',listener);}
  }
 }

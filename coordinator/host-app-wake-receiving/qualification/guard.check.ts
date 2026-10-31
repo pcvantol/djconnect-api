@@ -20,7 +20,9 @@ async function initialize(){
  const {native_key_id_b64,native_token_sha256,core_purpose_id,operation_id,generation,revision,token_role,original_wake_issued_at_ms,original_wake_expires_at_ms,original_display_expires_at_ms,version,...scope}=o;
  const a=decodeOperatorAuthorization({version:RECEIVING_VERSION,method:'POST',route:OPERATOR_AUTHORIZE,action:'authorize',authorization_id:'authorization',operation_id:'operator-op',core_install_token_record_id:'record',ha_install_id:'install',native_key_ref:'native-record',...scope,max_original_purpose_ms:28800000,max_operations:256,max_reserved_sends:64,original_authorization_issued_at_ms:at,original_authorization_expires_at_ms:at+7200000});
  await env.DB.prepare("INSERT INTO install_tokens(id,ha_install_id,token_hash,token_prefix) VALUES ('record','install','fixture-only-token-hash','djci_fixture')").run();
- const r=new ReceivingStore(env.DB,10);await r.authorize(a,'a'.repeat(64),at,at);await r.reserveIssuer('authorization','record','issuer-op','b'.repeat(64),o,'private-purpose','internal-claim',at,at);await r.finishIssuer('authorization',o.core_purpose_id,'issued',at);
+ const r=new ReceivingStore(env.DB,10);await r.authorize(a,'a'.repeat(64),at,at);await r.reserveIssuer('authorization','record','issuer-op','b'.repeat(64),o,'private-purpose','internal-claim',at,at);// This fixture represents a historically issued purpose; the live issuer CAS
+ // correctly refuses to issue that expired transport request at today's DB clock.
+ await env.DB.prepare("UPDATE host_wake_issuer_once SET outcome='issued'").run();
  const c={...vectors.challenge,captured_at_ms:at,expires_at_ms:at+30000};await r.reserveNativeJob('authorization','record',o,c,'c'.repeat(64),'app_attest_assertion',at);
  await env.DB.prepare("UPDATE host_wake_native_jobs SET outcome='verified'").run();
  await env.DB.prepare(`INSERT INTO host_wake_native_enrollments(native_key_ref,native_key_id_b64,public_key_spki_b64,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,issued_at,expires_at,counter) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind('native-record',o.native_key_id_b64,'synthetic-not-a-public-key',o.target.host_bundle_id,o.target.installation_id,o.platform,o.apns_environment,o.identity_policy_sha256,o.deployment_policy_sha256,'e'.repeat(64),'f'.repeat(64),at,at+7200000,1).run();
@@ -33,7 +35,7 @@ async function initialize(){
 async function marker(){return wake.mark(p,{version:VERSION,purpose_id:p.purpose_id,operation_id:'wake-op',generation:o.generation,revision:o.revision},'wake-claim',Date.now());}
 describe('actual Source181 marker guarded atomically by local D1 eligibility, fixture authority only',()=>{
  beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const statement of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(statement).run();await env.DB.prepare(eligibility).run();await env.DB.prepare(registrationGuard).run();await env.DB.prepare(guard).run();});
- beforeEach(async()=>{for(const table of ['host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();await initialize();});
+ beforeEach(async()=>{for(const table of ['host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();await initialize();});
  it('allows exactly one marker with all locally current fixture rows matching, without any outbound call',async()=>{
   expect(await marker()).toBe(true);expect(await marker()).toBe(false);
  });
