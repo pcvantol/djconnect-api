@@ -35,7 +35,7 @@ async function initialize(){
 async function marker(){return wake.mark(p,{version:VERSION,purpose_id:p.purpose_id,operation_id:'wake-op',generation:o.generation,revision:o.revision},'wake-claim',Date.now());}
 describe('actual Source181 marker guarded atomically by local D1 eligibility, fixture authority only',()=>{
  beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const statement of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(statement).run();await env.DB.prepare(eligibility).run();await env.DB.prepare(registrationGuard).run();await env.DB.prepare(guard).run();});
- beforeEach(async()=>{for(const table of ['host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();await initialize();});
+ beforeEach(async()=>{for(const table of ['host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();await initialize();});
  it('allows exactly one marker with all locally current fixture rows matching, without any outbound call',async()=>{
   expect(await marker()).toBe(true);expect(await marker()).toBe(false);
  });

@@ -24,9 +24,10 @@ export class ReceivingStore {
    SELECT ?,?,?,?,?,?,MIN(?,a.expires_at),CASE WHEN ?>=? OR CAST(unixepoch('subsec')*1000 AS INTEGER)>=MIN(?,a.expires_at) THEN 'expired' ELSE 'reserved' END
    FROM host_wake_operator_authorizations a JOIN install_tokens i ON i.id=a.core_install_token_record_id AND i.ha_install_id=a.ha_install_id
    WHERE a.authorization_id=? AND a.outcome='authorized' AND i.id=? AND i.disabled=0 AND a.issued_at<=? AND a.expires_at>?
+   AND NOT EXISTS(SELECT 1 FROM host_wake_child_withdrawals WHERE authorization_id=a.authorization_id AND core_purpose_id=?)
    AND (SELECT COUNT(*) FROM host_wake_receiving_intents WHERE authorization_id=?)<json_extract(a.authorization_json,'$.max_operations')
    AND (SELECT COUNT(*) FROM host_wake_receiving_intents)<?`)
-   .bind(id,purpose,operation,route,claim,captured,captured+30000,at,captured+30000,captured+30000,id,principal,at,at,id,this.capacity).run();
+   .bind(id,purpose,operation,route,claim,captured,captured+30000,at,captured+30000,captured+30000,id,principal,at,at,purpose,id,this.capacity).run();
   const row=await this.intent(id,purpose,operation,route);need(row,'host_wake_intent_capacity_or_authority',409);return row;
  }
  async bindIntent(row:IntentRow,hash:string,at:number):Promise<boolean>{
@@ -70,11 +71,18 @@ export class ReceivingStore {
  async withdrawIssuer(id:string,purpose:string,principal:string){
   const owns=`EXISTS(SELECT 1 FROM host_wake_operator_authorizations a WHERE a.authorization_id=? AND a.core_install_token_record_id=?)`;
   await this.db.batch([
+   this.db.prepare(`INSERT OR IGNORE INTO host_wake_child_withdrawals(authorization_id,core_purpose_id)
+    SELECT ?,? WHERE ${owns} AND (SELECT COUNT(*) FROM host_wake_child_withdrawals)<?`)
+    .bind(id,purpose,id,principal,this.capacity),
    this.db.prepare(`UPDATE host_wake_issuer_once SET outcome='withdrawn' WHERE authorization_id=? AND core_purpose_id=? AND ${owns}`).bind(id,purpose,id,principal),
    this.db.prepare(`UPDATE host_wake_native_jobs SET outcome='withdrawn' WHERE authorization_id=? AND core_purpose_id=? AND ${owns}`).bind(id,purpose,id,principal),
    this.db.prepare(`UPDATE host_wake_receiving_intents SET outcome='withdrawn' WHERE authorization_id=? AND core_purpose_id=? AND ${owns}`).bind(id,purpose,id,principal),
    this.db.prepare(`UPDATE host_app_wake_purposes SET withdrawn=1,ciphertext=NULL,nonce=NULL WHERE purpose_id IN(SELECT private_purpose_id FROM host_wake_issuer_once WHERE authorization_id=? AND core_purpose_id=?) AND ${owns}`).bind(id,purpose,id,principal)
   ]);
+  // Existing issuer rows close without allocating a fence; a new unknown child
+  // at full fence capacity never receives a false terminal acknowledgement.
+  const [issuer,fence]=await Promise.all([this.issuer(id,purpose),this.db.prepare('SELECT 1 FROM host_wake_child_withdrawals WHERE authorization_id=? AND core_purpose_id=?').bind(id,purpose).first()]);
+  return issuer?.outcome==='withdrawn'||!!fence;
  }
  async isLive(id:string,principal:string,at:number){integer(at);return !!await this.db.prepare(LIVE+' AND i.id=?').bind(id,at,at,principal).first();}
  /** The original semantic purpose identity, not a transport operation UUID,
@@ -89,8 +97,8 @@ export class ReceivingStore {
   await this.db.prepare(`INSERT OR IGNORE INTO host_wake_issuer_once
    (authorization_id,core_purpose_id,issuer_operation_id,claim_id,request_hash,original_json,private_purpose_id,issued_at,expires_at,accepted_at,original_request_expires_at,outcome)
    SELECT ?,?,?,?,?,?,?,?,?,?,?,CASE WHEN ?>=? OR ?>=? THEN 'expired' ELSE 'reserved' END
-   WHERE EXISTS(${LIVE} AND i.id=?) AND (SELECT COUNT(*) FROM host_wake_issuer_once)<?`)
-   .bind(id,v.core_purpose_id,operation,claim,requestHash,canonical(v),privatePurpose,v.original_wake_issued_at_ms,v.original_wake_expires_at_ms,captured,captured+30000,at,captured+30000,at,v.original_wake_expires_at_ms,id,at,at,principal,this.capacity).run();
+   WHERE EXISTS(${LIVE} AND i.id=?) AND NOT EXISTS(SELECT 1 FROM host_wake_child_withdrawals WHERE authorization_id=? AND core_purpose_id=?) AND (SELECT COUNT(*) FROM host_wake_issuer_once)<?`)
+   .bind(id,v.core_purpose_id,operation,claim,requestHash,canonical(v),privatePurpose,v.original_wake_issued_at_ms,v.original_wake_expires_at_ms,captured,captured+30000,at,captured+30000,at,v.original_wake_expires_at_ms,id,at,at,principal,id,v.core_purpose_id,this.capacity).run();
   const row=await this.issuer(id,v.core_purpose_id);need(row&&row.request_hash===requestHash&&row.issuer_operation_id===operation,'host_wake_issuer_consumed_or_capacity',409);return row;
  }
  /** Caller receives an existing challenge, never a new nonce on duplicate,

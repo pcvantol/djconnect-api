@@ -1,11 +1,14 @@
 import {env} from 'cloudflare:test';
 import {beforeAll,beforeEach,describe,it,expect,vi} from 'vitest';
 import cbor from 'cbor';import * as pki from 'pkijs';
+import issuerGuard from '../issuer-guard.sql?raw';
 import schema from '../schema.sql?raw';import eligibility from '../eligibility-view.sql?raw';import regGuard from '../registration-guard.sql?raw';import dispatchGuard from '../dispatch-guard.sql?raw';import hostSchema from '../../host-app-wake/schema.sql?raw';import installSchema from '../../../migrations/0002_install_tokens.sql?raw';
+import {createReceivingService} from '../service';
 import {resolveAuthorization,decodeResolvedAuthorization,RESOLVE_PATH} from '../authorization-resolve';
 import {sha256Hex} from '../../../src/crypto';
 import {bindSource181} from '../source-backend';
 import type {AppEnv} from '../../../src/types';
+import {WakeStore} from '../../host-app-wake/store';
 import {VERSION as SOURCE_VERSION,PREFIX} from '../../host-app-wake/wire';
 import {ReceivingStore} from '../receiving-store';import {RequestWindow} from '../request-window';
 import {verifySavedAssertion,commitVerifiedAssertion} from '../native-assertion';
@@ -38,9 +41,9 @@ async function assertion(original=o,challenge=vectors.challenge,counter=1){
 }
 let c:{challenge_id:string;nonce_b64url:string;captured_at_ms:number;expires_at_ms:number};
 describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHETIC authority only',()=>{
- beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const sql of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(sql).run();for(const sql of [eligibility,regGuard,dispatchGuard])await env.DB.prepare(sql).run();});
+ beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const sql of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(sql).run();for(const sql of [eligibility,regGuard,dispatchGuard,issuerGuard])await env.DB.prepare(sql).run();});
  beforeEach(async()=>{
-  for(const table of ['host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();
+  for(const table of ['host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();
   capabilities=new Map();sourceEnv={...env,APNS_TEAM_ID:'ABCDEFGHIJ',APNS_KEY_ID:'KLMNOPQRST',APNS_PRIVATE_KEY:'synthetic-unused-provider-key-not-a-real-credential',APNS_TOPIC_IOS:'example.fixture.host',APNS_ENVIRONMENT:'sandbox',APNS_TOKEN_ENCRYPTION_KEY:btoa('0123456789abcdef0123456789abcdef')} as AppEnv;
   at=Date.now()-100;store=new ReceivingStore(env.DB,16);pair=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']) as CryptoKeyPair;
   const point=new Uint8Array(await crypto.subtle.exportKey('raw',pair.publicKey) as ArrayBuffer);spki=b64(new Uint8Array(await crypto.subtle.exportKey('spki',pair.publicKey) as ArrayBuffer));
@@ -147,6 +150,113 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
  it('does not pick a latest grant, create a replacement or expose a role after retirement',async()=>{
   const saved=(await store.authorization('authorization'))!,data=decodeOperatorAuthorization(JSON.parse(saved.authorization_json));await store.authorize({...data,authorization_id:'second-authorization',operation_id:'second-operator-operation'},'d'.repeat(64),Date.now(),Date.now());await expect(resolveAuthorization(resolveRequest(),sourceEnv,()=>Date.now())).rejects.toThrow('host_wake_authorization_unavailable');
   await store.withdrawAuthorization('second-authorization');await env.DB.prepare('UPDATE install_tokens SET disabled=1').run();await expect(resolveAuthorization(resolveRequest(),sourceEnv,()=>Date.now())).rejects.toThrow('host_wake_core_auth');
+ });
+
+ function privateRequest(route:string,value:Record<string,unknown>,overrides:Record<string,string>={}){
+  return new Request('https://local.test/v1/push/host-app-wake/'+route,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer djci_'+'A'.repeat(43),'x-djconnect-host-wake-authorization-id':'authorization','x-djconnect-host-wake-core-purpose-id':String(value.core_purpose_id),'x-djconnect-host-wake-issuer-operation-id':String(value.issuer_operation_id),...overrides},body:JSON.stringify(value)});
+ }
+ const serverInput=(purpose=o.core_purpose_id)=>({version:RECEIVING_VERSION,authorization_id:'authorization',core_purpose_id:purpose,issuer_operation_id:'issuer-'+purpose});
+ function receiving(config=sourceEnv,capacity=16){return createReceivingService({env:config,capacity,now:()=>Date.now(),fetcher:async()=>{throw Error('NO PROVIDER EFFECT PERMITTED IN HTTP QUALIFICATION');}});}
+ it('runs actual issuer/challenge/complete/status HTTP with real ECDSA and atomic counter, no provider or fixture-verdict callback',async()=>{
+  const svc=receiving(),original=decodeNativeOriginal({...o,core_purpose_id:'http-child',operation_id:'33333333-3333-4333-8333-333333333333'}),input=serverInput(original.core_purpose_id);
+  try{
+   const issue=await svc.handle(privateRequest('issuer/issue',{...input,original}));expect(issue.status).toBe(200);const issued=await issue.json() as Record<string,unknown>;expect(issued.credential_state).toBe('available');expect(issued.credential).toMatch(/^djchw_/);
+   const request={...input,challenge_id:'55555555-5555-4555-8555-555555555555'};
+   const challenge=await svc.handle(privateRequest('native/challenge',request));expect(challenge.status).toBe(200);const native=await challenge.json() as Record<string,unknown>;
+   const proof=await assertion(original,native.challenge as typeof c);
+   const complete=await svc.handle(privateRequest('native/complete',{...request,native_proof:proof}));expect(complete.status).toBe(200);expect((await complete.json() as Record<string,unknown>).state).toBe('native_verified');
+   const status=await svc.handle(privateRequest('native/status',request));expect(status.status).toBe(200);const out=await status.json() as Record<string,unknown>;expect(out.state).toBe('native_verified');expect(Object.hasOwn(out,'credential')).toBe(false);
+   expect(await env.DB.prepare('SELECT counter FROM host_wake_native_enrollments').first('counter')).toBe(1);expect((await store.nativeJob(request.challenge_id))?.outcome).toBe('verified');
+   const retry=await svc.handle(privateRequest('issuer/issue',{...input,original}));expect(retry.status).toBe(409);expect((await store.issuer('authorization',original.core_purpose_id))?.outcome).toBe('issued');
+  }finally{svc.close();}
+ });
+ it('never lets an existing issuer loser close the winning private reserved claim',async()=>{
+  const original=decodeNativeOriginal({...o,core_purpose_id:'reserved-http-child'}),input=serverInput(original.core_purpose_id);
+  const hash=await sha256Hex(canonical(['DJC-HOST-WAKE-API-REQUEST-V1','POST','/v1/push/host-app-wake/issuer/issue',{...input,original}]));
+  await store.reserveIssuer('authorization','record',input.issuer_operation_id,hash,original,'existing-private-child','retained-winning-claim',at,at);
+  const svc=receiving();try{const reply=await svc.handle(privateRequest('issuer/issue',{...input,original}));expect(reply.status).toBe(409);expect((await store.issuer('authorization',original.core_purpose_id))?.outcome).toBe('reserved');}finally{svc.close();}
+ });
+ it('closes a real child at full capacity without capability, encryption or provider configuration',async()=>{
+  const svc=receiving({...env} as AppEnv,1);try{
+   const result=await svc.handle(privateRequest('issuer/withdraw',serverInput()));expect(result.status).toBe(200);const body=await result.json() as Record<string,unknown>;expect(body.state).toBe('withdrawn');expect(Object.hasOwn(body,'credential')).toBe(false);
+   expect((await store.issuer('authorization',o.core_purpose_id))?.outcome).toBe('withdrawn');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_receiving_intents').first('n')).toBe(0);
+  }finally{svc.close();}
+ });
+ it('retains an early negative child fence before late issuer/body allocation, even for a changed transport operation',async()=>{
+  const purpose='early-withdrawn',svc=receiving();try{
+   expect((await svc.handle(privateRequest('issuer/withdraw',serverInput(purpose)))).status).toBe(404);
+   const original={...o,core_purpose_id:purpose};const result=await svc.handle(privateRequest('issuer/issue',{...serverInput(purpose),issuer_operation_id:'changed-issuer-operation',original}));expect(result.status).toBe(409);expect(await store.issuer('authorization',purpose)).toBeNull();expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_receiving_intents').first('n')).toBe(0);
+  }finally{svc.close();}
+ });
+ it('does not acknowledge unknown child closure when its bounded fence capacity is exhausted',async()=>{
+  const svc=receiving(sourceEnv,1);try{
+   expect((await svc.handle(privateRequest('issuer/withdraw',serverInput('first-early-child')))).status).toBe(404);
+   expect((await svc.handle(privateRequest('issuer/withdraw',serverInput('second-early-child')))).status).toBe(503);
+   expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_child_withdrawals').first('n')).toBe(1);
+  }finally{svc.close();}
+ });
+ it('rejects a challenge from another original child before claiming its proof',async()=>{
+  const other=decodeNativeOriginal({...o,core_purpose_id:'other-http-child'});await job(other,'44444444-4444-4444-8444-444444444444','A'.repeat(42)+'E','other-native-claim');
+  const svc=receiving();try{
+   const before=await store.nativeJob(c.challenge_id);const result=await svc.handle(privateRequest('native/complete',{...serverInput(other.core_purpose_id),challenge_id:c.challenge_id,native_proof:await assertion(o,c)}));expect(result.status).toBe(404);expect(await store.nativeJob(c.challenge_id)).toEqual(before);
+  }finally{svc.close();}
+ });
+ it('rejects a missing or substituted atomic receiving guard before any positive Source181 insertion',async()=>{
+  const svc=receiving(),original={...o,core_purpose_id:'without-guard'};await env.DB.prepare('DROP TRIGGER host_wake_receiving_registration_guard').run();
+  try{const result=await svc.handle(privateRequest('issuer/issue',{...serverInput(original.core_purpose_id),original}));expect(result.status).toBe(503);expect(await store.issuer('authorization',original.core_purpose_id)).toBeNull();}
+  finally{svc.close();await env.DB.prepare(regGuard).run();}
+ });
+ it('does not accept a replaced enrolled public key under an unchanged SDK identifier',async()=>{
+  const changed=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']) as CryptoKeyPair;await env.DB.prepare('UPDATE host_wake_native_enrollments SET public_key_spki_b64=?').bind(b64(new Uint8Array(await crypto.subtle.exportKey('spki',changed.publicKey) as ArrayBuffer))).run();
+  const issuer=(await store.issuer('authorization',o.core_purpose_id))!,w=clock();try{await expect(bindSource181(sourceEnv,issuer,'record',w,fetch,16)).rejects.toThrow('host_wake_native_policy_unavailable');}finally{w.close();}
+ });
+
+ async function operatorRequest(path:string,value:unknown,secret='synthetic-operator-http-key-not-production'){
+  const text=JSON.stringify(value),timestamp=String(Math.floor(Date.now()/1000)),key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const signature=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(timestamp+'.'+text));return new Request('https://local.test'+path,{method:'POST',headers:{'content-type':'application/json','x-djconnect-timestamp':timestamp,'x-djconnect-signature':[...new Uint8Array(signature)].map(b=>b.toString(16).padStart(2,'0')).join('')},body:text});
+ }
+ it('authenticates actual operator HMAC and persists/withdraws the same retained role without a provider dependency',async()=>{
+  const config={...env,DJCONNECT_RELAY_SECRET:'synthetic-operator-http-key-not-production'} as AppEnv,svc=receiving(config);
+  const a=decodeOperatorAuthorization(JSON.parse((await store.authorization('authorization'))!.authorization_json));
+  try{
+   const grant={...a,authorization_id:'operator-http-role',operation_id:'operator-http-operation'};const result=await svc.handle(await operatorRequest(OPERATOR_AUTHORIZE,grant));expect(result.status).toBe(200);expect((await store.authorization(grant.authorization_id))?.outcome).toBe('authorized');
+   const path='/v1/push/host-app-wake/operator/withdraw',withdraw={version:RECEIVING_VERSION,method:'POST',route:path,action:'withdraw',operation_id:'operator-http-withdrawal',authorization_id:grant.authorization_id};
+   expect((await svc.handle(await operatorRequest(path,withdraw))).status).toBe(200);expect((await store.authorization(grant.authorization_id))?.outcome).toBe('withdrawn');
+   expect((await svc.handle(await operatorRequest(OPERATOR_AUTHORIZE,grant))).status).toBe(200);expect((await store.authorization(grant.authorization_id))?.outcome).toBe('withdrawn');
+  }finally{svc.close();}
+ });
+ it('does not acknowledge a missing operator role or mutate under invalid HMAC/Bearer fallback',async()=>{
+  const config={...env,DJCONNECT_RELAY_SECRET:'synthetic-operator-http-key-not-production'} as AppEnv,svc=receiving(config);
+  try{
+   const path='/v1/push/host-app-wake/operator/withdraw',withdraw={version:RECEIVING_VERSION,method:'POST',route:path,action:'withdraw',operation_id:'unknown-withdrawal',authorization_id:'missing-role'};
+   expect((await svc.handle(await operatorRequest(path,withdraw))).status).toBe(404);
+   const request=await operatorRequest(path,{...withdraw,authorization_id:'authorization'});request.headers.set('authorization','Bearer '+config.DJCONNECT_RELAY_SECRET);expect((await svc.handle(request)).status).toBe(401);expect((await store.authorization('authorization'))?.outcome).toBe('authorized');
+  }finally{svc.close();}
+ });
+
+ it('blocks the actual delayed Source181 INSERT after negative closure; absent-guard control demonstrates the old gap',async()=>{
+  const original=decodeNativeOriginal({...o,core_purpose_id:'late-source-insert'});await store.reserveIssuer('authorization','record','late-source-issuer','8'.repeat(64),original,'late-source-private','late-source-claim',at,at);
+  const issuer=(await store.issuer('authorization',original.core_purpose_id))!,w=clock(),backend=await bindSource181(sourceEnv,issuer,'record',w,fetch,16),source=new WakeStore(env.DB);
+  try{
+   await store.withdrawIssuer('authorization',original.core_purpose_id,'record');
+   await env.DB.prepare('DROP TRIGGER host_wake_receiving_issuer_guard').run();
+   try{expect(await source.issue(backend.scope,'synthetic-noncredential-hash','before-guard-control',16,Date.now())).toBe(true);}
+   finally{await env.DB.prepare("DELETE FROM host_app_wake_purposes WHERE purpose_id='late-source-private'").run();await env.DB.prepare(issuerGuard).run();}
+   await expect(source.issue(backend.scope,'synthetic-noncredential-hash','after-guard-control',16,Date.now())).rejects.toThrow('host_wake_issuer_eligibility');expect(await env.DB.prepare("SELECT COUNT(*) n FROM host_app_wake_purposes WHERE purpose_id='late-source-private'").first('n')).toBe(0);
+  }finally{backend.close();w.close();}
+ });
+ it('retains the original ten-second body budget before operator authentication or grant allocation',async()=>{
+  let time=Date.now();const config={...env,DJCONNECT_RELAY_SECRET:'synthetic-unused-operator-key'} as AppEnv,svc=createReceivingService({env:config,capacity:16,now:()=>time,fetcher:fetch});
+  let controller:ReadableStreamDefaultController<Uint8Array>;const stream=new ReadableStream<Uint8Array>({start(value){controller=value;}});
+  try{const pending=svc.handle(new Request('https://local.test'+OPERATOR_AUTHORIZE,{method:'POST',headers:{'content-type':'application/json'},body:stream}));await Promise.resolve();time+=10001;controller!.enqueue(new TextEncoder().encode('{}'));controller!.close();const result=await pending;expect(result.status).toBe(409);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_operator_authorizations').first('n')).toBe(1);}
+  finally{svc.close();}
+ });
+
+ it('reports an abandoned issuer reservation expired at its original callback boundary, without a fresh pending window',async()=>{
+  const original=decodeNativeOriginal({...o,core_purpose_id:'old-reserved-http-child'}),input=serverInput(original.core_purpose_id);
+  await store.reserveIssuer('authorization','record',input.issuer_operation_id,'9'.repeat(64),original,'old-reserved-private','old-reserved-claim',at,at);
+  await env.DB.prepare('UPDATE host_wake_issuer_once SET original_request_expires_at=? WHERE core_purpose_id=?').bind(Date.now()-1,original.core_purpose_id).run();
+  const svc=receiving();try{const response=await svc.handle(privateRequest('issuer/status',input));expect(response.status).toBe(200);const result=await response.json() as Record<string,unknown>;expect(result.state).toBe('expired');expect(result.credential_state).toBe('unavailable');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_receiving_intents').first('n')).toBe(0);}finally{svc.close();}
  });
 
 });

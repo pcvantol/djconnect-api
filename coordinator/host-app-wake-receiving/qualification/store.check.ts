@@ -14,7 +14,7 @@ function authorization(id='fixture-authorization',op='fixture-operator-operation
 let store:ReceivingStore;
 async function grant(){return store.authorize(authorization(),'a'.repeat(64),START,START);}
 async function issuer(hash='b'.repeat(64),claim='first-claim',captured=START,at=START){return store.reserveIssuer('fixture-authorization','existing-record','issuer-operation',hash,o,'private-API-purpose',claim,captured,at);}
-async function clear(){for(const table of ['host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();}
+async function clear(){for(const table of ['host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();}
 describe('actual D1 receiving once-history with real existing install-token table, fixture authority only',()=>{
  beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const statement of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(statement).run();});
  beforeEach(async()=>{await clear();await env.DB.prepare("INSERT INTO install_tokens (id,ha_install_id,token_hash,token_prefix) VALUES ('existing-record','existing-install','fixture-token-hash','djci_fixture')").run();store=new ReceivingStore(env.DB,2);});

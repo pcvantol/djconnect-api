@@ -37,4 +37,10 @@ describe('six owning private API reply ports, synthetic independent Python vecto
  it('decodes only the closed versioned allowlisted private error body',()=>{
   expect(decodePrivateError(vectors.error.http_status,vectors.error.body)).toEqual(vectors.error.body);expect(()=>decodePrivateError(409,{...vectors.error.body,exception:'private-key-data'})).toThrow();expect(()=>decodePrivateError(409,{...vectors.error.body,error:'arbitrary_exception'})).toThrow();
  });
+ it.each(['owner_binding','source_binding','native_token_sha256'])('must join sent issuer original %s to the SAME retained original before accepting a positive ACK',async field=>{
+  const row=vectors.cases[0],changed={...row.request,original:{...row.request.original,[field]:'9'.repeat(64)}},input=decodeServer('issuer/issue',changed);
+  const requestHash=await sha256Hex(canonical(['DJC-HOST-WAKE-API-REQUEST-V1','POST','/v1/push/host-app-wake/issuer/issue',input]));
+  await expect(decodePrivateReply('issuer/issue',input,original,requestHash,{...row.reply,request_sha256:requestHash},'app_attest_assertion')).rejects.toThrow();
+ });
+
 });

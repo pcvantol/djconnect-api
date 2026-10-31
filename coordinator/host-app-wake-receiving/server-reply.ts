@@ -40,6 +40,7 @@ export async function decodePrivateReply(route:ServerRoute,input:ServerInput,ret
  const states=route==='issuer/issue'?['issued']:route==='issuer/status'?['pending','issued','withdrawn','expired','unknown']:route==='issuer/withdraw'?['withdrawn','expired','unknown']:route==='native/challenge'?['pending']:['pending','native_verified','withdrawn','expired','unknown'];need(typeof v.state==='string'&&states.includes(v.state));
  if(route.startsWith('native/')){need(retainedProofKind==='app_attest_assertion'||retainedProofKind==='app_attest_attestation');need(v.native_proof_kind===retainedProofKind);if(route==='native/complete')need(input.native_proof?.kind===retainedProofKind);}
  if(route==='issuer/issue'){
+  need(canonical(decodeNativeOriginal(input.original))===canonical(o));
   id(v.purpose_id);need(v.registration_mode==='single_original_no_rotation');need(v.credential_state==='available'&&typeof v.credential==='string'&&/^djchw_[A-Za-z0-9_-]{43}$/.test(v.credential)&&v.expires_at_ms===o.original_wake_expires_at_ms);proofKind(v.native_proof_kind);need(canonical(decodeNativeOriginal(v.original))===canonical(o));
  }else if(route==='issuer/status'){id(v.purpose_id);need(v.credential_state==='unavailable');}
  else if(route==='native/challenge'){

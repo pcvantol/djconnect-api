@@ -96,3 +96,11 @@ CREATE TABLE IF NOT EXISTS host_wake_receiving_intents (
  PRIMARY KEY(authorization_id,core_purpose_id,issuer_operation_id,route),
  FOREIGN KEY(authorization_id) REFERENCES host_wake_operator_authorizations(authorization_id)
 );
+
+-- A negative child closure can precede issuer insertion. It never creates an
+-- issuer/original/capability and remains a permanent no-reopen fence.
+CREATE TABLE IF NOT EXISTS host_wake_child_withdrawals (
+ authorization_id TEXT NOT NULL REFERENCES host_wake_operator_authorizations(authorization_id),
+ core_purpose_id TEXT NOT NULL,
+ PRIMARY KEY(authorization_id,core_purpose_id)
+);

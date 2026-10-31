@@ -22,10 +22,14 @@ export async function bindSource181(env:AppEnv,issuer:IssuerRow,principal:string
  /** The stored signed-environment/enrollment receipts remain mandatory. This is
   * actual configuration binding, not derivation from App Attest AAGUID or ios. */
  async function nativePolicy(){
-  await live();const row=await window.run(()=>db.prepare(`SELECT native_key_id_b64,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,assertion_policy_json FROM host_wake_native_enrollments WHERE native_key_ref=? AND disabled=0 AND issued_at<=? AND expires_at>?`).bind(auth.native_key_ref,window.check(),window.check()).first<Record<string,unknown>>());
+  await live();const row=await window.run(()=>db.prepare(`SELECT public_key_spki_b64,native_key_id_b64,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,assertion_policy_json FROM host_wake_native_enrollments WHERE native_key_ref=? AND disabled=0 AND issued_at<=? AND expires_at>?`).bind(auth.native_key_ref,window.check(),window.check()).first<Record<string,unknown>>());
   need(typeof o.native_key_id_b64==='string'&&/^[A-Za-z0-9+/]{43}=$/.test(o.native_key_id_b64)&&atob(o.native_key_id_b64).length===32&&btoa(atob(o.native_key_id_b64))===o.native_key_id_b64,'host_wake_native_policy_unavailable',503);
   need(row&&row.native_key_id_b64===o.native_key_id_b64&&row.host_bundle===o.target.host_bundle_id&&row.install_id===o.target.installation_id&&row.platform===o.platform&&row.environment===o.apns_environment&&row.identity_policy_sha256===o.identity_policy_sha256&&row.deployment_policy_sha256===o.deployment_policy_sha256,'host_wake_native_enrollment_unavailable',503);
   need(typeof row.enrollment_receipt_sha256==='string'&&/^[a-f0-9]{64}$/.test(row.enrollment_receipt_sha256)&&typeof row.signed_environment_receipt_sha256==='string'&&/^[a-f0-9]{64}$/.test(row.signed_environment_receipt_sha256),'host_wake_native_policy_unavailable',503);
+  need(typeof row.public_key_spki_b64==='string','host_wake_native_policy_unavailable',503);
+  const key=await window.run(()=>crypto.subtle.importKey('spki',Uint8Array.from(atob(row.public_key_spki_b64 as string),c=>c.charCodeAt(0)),{name:'ECDSA',namedCurve:'P-256'},true,['verify']));
+  const point=await window.run(()=>crypto.subtle.exportKey('raw',key));need(point instanceof ArrayBuffer,'host_wake_native_policy_unavailable',503);
+  const keyId=new Uint8Array(await window.run(()=>crypto.subtle.digest('SHA-256',point)));need(btoa(String.fromCharCode(...keyId))===o.native_key_id_b64,'host_wake_native_policy_unavailable',503);
   const policy=decodeSavedAssertionPolicy({host_bundle:o.target.host_bundle_id,assertion_policy_json:typeof row.assertion_policy_json==='string'?row.assertion_policy_json:null});
   need(policy.app_identifier===env.APNS_TEAM_ID+'.'+o.target.host_bundle_id&&env.APNS_TOPIC_IOS===o.target.host_bundle_id&&env.APNS_ENVIRONMENT===o.apns_environment,'host_wake_native_deployment_mismatch',503);current();
  }
