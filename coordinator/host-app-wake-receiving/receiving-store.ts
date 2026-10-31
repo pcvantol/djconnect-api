@@ -4,7 +4,7 @@ import {need,integer} from '../host-app-wake/wire';
 import {decodeOperatorAuthorization,decodeNativeOriginal,decodeNativeChallenge,type OperatorAuthorizationData,type NativeOriginalData,type NativeChallengeData} from './wire';
 export interface AuthorizationRow {authorization_id:string;operation_id:string;request_hash:string;core_install_token_record_id:string;ha_install_id:string;authorization_json:string;issued_at:number;expires_at:number;outcome:'authorized'|'expired'|'withdrawn';accepted_at:number;original_request_expires_at:number}
 export interface IssuerRow {authorization_id:string;core_purpose_id:string;issuer_operation_id:string;claim_id:string;request_hash:string;original_json:string;private_purpose_id:string;issued_at:number;expires_at:number;accepted_at:number;original_request_expires_at:number;outcome:'reserved'|'issued'|'expired'|'unknown'|'withdrawn'}
-export interface NativeJobRow {challenge_id:string;authorization_id:string;core_purpose_id:string;operation_id:string;generation:string;revision:number;request_hash:string;original_json:string;challenge_json:string;proof_kind:NativeProofKind;verification_claim:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'verifying'|'verified'|'rejected'|'expired'|'unknown'|'withdrawn'}
+export interface NativeJobRow {challenge_id:string;private_job_id:string;authorization_id:string;core_purpose_id:string;operation_id:string;generation:string;revision:number;request_hash:string;original_json:string;challenge_json:string;proof_kind:NativeProofKind;verification_claim:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'verifying'|'verified'|'rejected'|'expired'|'unknown'|'withdrawn'}
 export interface IntentRow {authorization_id:string;core_purpose_id:string;issuer_operation_id:string;route:string;claim_id:string;request_hash:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'completed'|'expired'|'unknown'|'withdrawn'}
 const LIVE=`SELECT 1 FROM host_wake_operator_authorizations a JOIN install_tokens i ON i.id=a.core_install_token_record_id AND i.ha_install_id=a.ha_install_id WHERE a.authorization_id=? AND a.outcome='authorized' AND a.issued_at<=? AND a.expires_at>? AND i.disabled=0`;
 /** Actual D1 once-history. No status read returns a credential or issues a grant.
@@ -65,6 +65,17 @@ export class ReceivingStore {
    this.db.prepare(`UPDATE host_app_wake_purposes SET withdrawn=1,ciphertext=NULL,nonce=NULL WHERE purpose_id IN (SELECT private_purpose_id FROM host_wake_issuer_once WHERE authorization_id=?)`).bind(id)
   ]);
  }
+ /** Scoped negative closure: one original Core push child only, never its
+  * display parent or another surface/child under the same operator grant. */
+ async withdrawIssuer(id:string,purpose:string,principal:string){
+  const owns=`EXISTS(SELECT 1 FROM host_wake_operator_authorizations a WHERE a.authorization_id=? AND a.core_install_token_record_id=?)`;
+  await this.db.batch([
+   this.db.prepare(`UPDATE host_wake_issuer_once SET outcome='withdrawn' WHERE authorization_id=? AND core_purpose_id=? AND ${owns}`).bind(id,purpose,id,principal),
+   this.db.prepare(`UPDATE host_wake_native_jobs SET outcome='withdrawn' WHERE authorization_id=? AND core_purpose_id=? AND ${owns}`).bind(id,purpose,id,principal),
+   this.db.prepare(`UPDATE host_wake_receiving_intents SET outcome='withdrawn' WHERE authorization_id=? AND core_purpose_id=? AND ${owns}`).bind(id,purpose,id,principal),
+   this.db.prepare(`UPDATE host_app_wake_purposes SET withdrawn=1,ciphertext=NULL,nonce=NULL WHERE purpose_id IN(SELECT private_purpose_id FROM host_wake_issuer_once WHERE authorization_id=? AND core_purpose_id=?) AND ${owns}`).bind(id,purpose,id,principal)
+  ]);
+ }
  async isLive(id:string,principal:string,at:number){integer(at);return !!await this.db.prepare(LIVE+' AND i.id=?').bind(id,at,at,principal).first();}
  /** The original semantic purpose identity, not a transport operation UUID,
   * is the primary once-key. A new HTTP retry cannot replace its deadline. */
@@ -87,13 +98,13 @@ export class ReceivingStore {
  async reserveNativeJob(id:string,principal:string,original:NativeOriginalData,challenge:NativeChallengeData,requestHash:string,expectedKind:NativeProofKind,at:number){
   const v=decodeNativeOriginal(original),c=decodeNativeChallenge(challenge,v);integer(at,c.captured_at_ms);need(expectedKind==='app_attest_attestation'||expectedKind==='app_attest_assertion');
   await this.db.prepare(`INSERT OR IGNORE INTO host_wake_native_jobs
-   (challenge_id,authorization_id,core_purpose_id,operation_id,generation,revision,request_hash,original_json,challenge_json,proof_kind,captured_at,expires_at,outcome)
-   SELECT ?,?,?,?,?,?,?,?,?,?,?,?,CASE WHEN ?>=? THEN 'expired' ELSE 'reserved' END
+   (challenge_id,private_job_id,authorization_id,core_purpose_id,operation_id,generation,revision,request_hash,original_json,challenge_json,proof_kind,captured_at,expires_at,outcome)
+   SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,CASE WHEN ?>=? THEN 'expired' ELSE 'reserved' END
    WHERE EXISTS(${LIVE} AND i.id=?)
    AND EXISTS(SELECT 1 FROM host_wake_issuer_once WHERE authorization_id=? AND core_purpose_id=? AND outcome='issued' AND original_json=? AND expires_at>?)
    AND (SELECT COUNT(*) FROM host_wake_native_jobs WHERE authorization_id=? AND core_purpose_id=?)<
     (SELECT json_extract(authorization_json,'$.max_operations') FROM host_wake_operator_authorizations WHERE authorization_id=?)`)
-   .bind(c.challenge_id,id,v.core_purpose_id,v.operation_id,v.generation,v.revision,requestHash,canonical(v),canonical(c),expectedKind,c.captured_at_ms,c.expires_at_ms,at,c.expires_at_ms,id,at,at,principal,id,v.core_purpose_id,canonical(v),at,id,v.core_purpose_id,id).run();
+   .bind(c.challenge_id,crypto.randomUUID(),id,v.core_purpose_id,v.operation_id,v.generation,v.revision,requestHash,canonical(v),canonical(c),expectedKind,c.captured_at_ms,c.expires_at_ms,at,c.expires_at_ms,id,at,at,principal,id,v.core_purpose_id,canonical(v),at,id,v.core_purpose_id,id).run();
   const row=await this.nativeJob(c.challenge_id);need(row&&row.authorization_id===id&&row.core_purpose_id===v.core_purpose_id&&row.request_hash===requestHash&&row.proof_kind===expectedKind,'host_wake_native_job_consumed_or_capacity',409);return row;
  }
  /** Durable once marker BEFORE native crypto awaits. UNKNOWN is deliberately

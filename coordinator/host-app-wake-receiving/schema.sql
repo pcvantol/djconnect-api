@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS host_wake_issuer_once (
 );
 CREATE TABLE IF NOT EXISTS host_wake_native_jobs (
  challenge_id TEXT PRIMARY KEY,
+ private_job_id TEXT NOT NULL UNIQUE,
  authorization_id TEXT NOT NULL,
  core_purpose_id TEXT NOT NULL,
  operation_id TEXT NOT NULL,
@@ -54,6 +55,8 @@ CREATE TABLE IF NOT EXISTS host_wake_native_enrollments (
  native_key_ref TEXT PRIMARY KEY,
  native_key_id_b64 TEXT NOT NULL UNIQUE,
  public_key_spki_b64 TEXT NOT NULL,
+ assertion_policy_json TEXT,
+ counter_claim TEXT,
  host_bundle TEXT NOT NULL,
  install_id TEXT NOT NULL,
  platform TEXT NOT NULL CHECK(platform IN('ios','ipados')),
@@ -69,9 +72,11 @@ CREATE TABLE IF NOT EXISTS host_wake_native_enrollments (
 );
 CREATE TABLE IF NOT EXISTS host_wake_native_verifications (
  challenge_id TEXT PRIMARY KEY REFERENCES host_wake_native_jobs(challenge_id),
+ private_job_id TEXT NOT NULL,
  native_key_ref TEXT NOT NULL REFERENCES host_wake_native_enrollments(native_key_ref),
  verified_counter INTEGER NOT NULL CHECK(verified_counter>0),
  verified_at INTEGER NOT NULL,
+ commit_claim TEXT,
  original_json TEXT NOT NULL,
  consumed_at INTEGER,
  register_operation_id TEXT,

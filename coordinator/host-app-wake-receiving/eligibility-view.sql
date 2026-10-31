@@ -28,7 +28,7 @@ SELECT s.private_purpose_id, j.challenge_id, j.operation_id AS semantic_operatio
    AND j.revision=p.revision
   )
   AND (
-   j.outcome='verified'
+   j.outcome='verified' AND v.private_job_id=j.private_job_id
    AND j.original_json=s.original_json
    AND v.original_json=j.original_json
    AND n.native_key_ref=json_extract(a.authorization_json,'$.native_key_ref')

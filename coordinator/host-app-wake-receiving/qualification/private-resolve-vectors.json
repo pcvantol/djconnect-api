@@ -1,0 +1,39 @@
+{
+  "classification": "SYNTHETIC_DATA_ONLY_NO_OPERATOR_ROLE_KEY_OR_DEVICE_AUTHORITY",
+  "request": {
+    "version": "djc-host-app-wake-receiving/1",
+    "scope": {
+      "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+      "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+      "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+      "target": {
+        "host_bundle_id": "example.fixture.host",
+        "installation_id": "fixture-native-install"
+      },
+      "platform": "ipados",
+      "apns_environment": "sandbox",
+      "native_key_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
+    }
+  },
+  "path": "/v1/push/host-app-wake/authorization/resolve",
+  "request_sha256": "097575c37f917f7d3377a092e667fdd93bae7c56f76696bff5db254a7ddef71d",
+  "scope_sha256": "cc95976c1fe8011962e671f6878bdcfa0292dc458ae07d940c4fb5986fd6f6dd",
+  "reply": {
+    "version": "djc-host-app-wake-receiving/1",
+    "resolution": "existing",
+    "authorization_id": "fixture-existing-operator-role",
+    "request_sha256": "097575c37f917f7d3377a092e667fdd93bae7c56f76696bff5db254a7ddef71d",
+    "scope_sha256": "cc95976c1fe8011962e671f6878bdcfa0292dc458ae07d940c4fb5986fd6f6dd",
+    "original_authorization_issued_at_ms": 1800000000000,
+    "original_authorization_expires_at_ms": 1800007200000,
+    "max_original_purpose_ms": 3600000,
+    "max_operations": 16,
+    "max_reserved_sends": 8,
+    "native_proof_kind": "app_attest_assertion",
+    "registration_mode": "single_original_no_rotation",
+    "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+  }
+}
