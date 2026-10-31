@@ -24,7 +24,7 @@
     "@vitest/coverage-istanbul": "~4.1.12",
     "typescript": "^7.0.2",
     "vitest": "~4.1.12",
-    "wrangler": "^4.151.3"
+    "wrangler": "^4.154.0"
   },
   "overrides": {
     "sharp": "0.35.5",
@@ -41,6 +41,6 @@
   "dependencies": {
     "asn1js": "4.0.0",
     "cbor": "10.0.12",
-    "pkijs": "4.0.0"
+    "pkijs": "4.0.1"
   }
 }
