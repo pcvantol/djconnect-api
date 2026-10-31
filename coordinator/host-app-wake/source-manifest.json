@@ -1,0 +1,29 @@
+{
+  "classification": "HOST_APP_WAKE_CANDIDATE_SOURCE_NOT_OPERATIVE_AUTHORITY_OR_PRODUCTION_ADMISSION",
+  "base": "e39d5a7b03e1b8b194e4c8b0d0ad05a5f494ecb8",
+  "esbuild_version": "0.28.1",
+  "inputs_sha256": {
+    ".github/workflows/host-app-wake-source.yml": "e0c9ec94e9b2bec4a6d88b61d2c5dc75a5ad9f5044da9da807a56c459db80dbd",
+    "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+    "coordinator/host-app-wake/README.md": "d899c15beaa1c5c16989ea17d03a49871dbbbab01941a142cb86dd74935453e1",
+    "coordinator/host-app-wake/build-source.mjs": "3ea8a5339a4a7781f4c5b5c9f142e5d616256a741693d09ba7eed80638cda918",
+    "coordinator/host-app-wake/index.ts": "1e4c84b1bceace1c401ec6f16da2b7d6db50d480b2f2b50842ff4ac63a30207b",
+    "coordinator/host-app-wake/qualification/check-package.mjs": "605ddf37ef1adacb676820ae78980e3298a103088a5b91f393033faf6d33f82b",
+    "coordinator/host-app-wake/qualification/host-wake.check.ts": "e5d1e79f0d9809dee7cb04013d7b4a64d30dd13fd38d1b8245aa3672c2bb5b70",
+    "coordinator/host-app-wake/qualification/tsconfig.json": "f1c305747173bfcb87d3251b6e70c4269792ae33f0079724690c4cbcb4c7a4dd",
+    "coordinator/host-app-wake/qualification/vitest.config.mts": "352889e3681538061264a2e7daadc823add82583aff83d837cb70b7234b41402",
+    "coordinator/host-app-wake/qualification/worker.ts": "d11984203d2423eebe79639c323bc35ea2505326549e609a771625fc42d827ce",
+    "coordinator/host-app-wake/qualification/wrangler.jsonc": "8e1c51161107992c444c49db765912e6d02e076f0a9a5913c06cb62c33a220c0",
+    "coordinator/host-app-wake/schema.sql": "671f6552232cde34847fdde28e207da43e3d1a58af72f33108c1dd86712715d7",
+    "coordinator/host-app-wake/service.ts": "d5fc50e6f2ba4450fad35c2057de174a5441cb1c989b8a82a5d926f0c8f44ad0",
+    "coordinator/host-app-wake/store.ts": "7c2ba2750216da5bb9f4c67f3925e036b4a953a6941a8e361ce17ee4c949e969",
+    "coordinator/host-app-wake/wire.ts": "4c1da6b524c312d36f5df226e59385eb0b4a041412dd14dc55b4b3f9b0747aae",
+    "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+    "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+    "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
+    "src/surface-push/crypto.ts": "1b2d5a85c8c8e568668c0239f7b9ab6d59d60ecc6079662a2a82d06bbac5546d",
+    "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
+    "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
+    "worker-configuration.d.ts": "2ec5f6aebdf8f39db18c9f05fa40223a739372802e7b76f1885541146919e13d"
+  }
+}
