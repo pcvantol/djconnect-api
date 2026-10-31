@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "scope": "SEPARATE_DOCUMENTARY_FINALIZATION_OF_SOURCE179_NOT_OWN_FINAL_QUALIFICATION",
+  "source_PR": 179,
+  "source_candidate": "9ba49fdd719fcc418c9722c05c8f58331adee544",
+  "source_main": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+  "source_tree": "d4836ac7736bd16db88f9587e521a96b6d3a91d1",
+  "source_parent": "6eeb87551fe490c37095b87a6a133ba08900c677",
+  "source_review_sha256": "488da0638b934d4aeda3595cf71002cf7959c39b01141db0b97d984fde5392b0",
+  "independent_original_source_closure_sha256": "0580663cd6dc12f5ef77e34716869ff3be9a346481ef998288877e96c8aeb056",
+  "independent_original_source_supplement_sha256": "14cbcc7456c18a22316e455123d5182f431f707318319a69ce3ca3edd21f9556",
+  "source_original_join_packet_sha256": "f83643155317a550181e7040ed95729e51e6ee87c315bebf2d58d2be1f3e7eb9",
+  "source_files": [
+    ".github/workflows/push-coordinator-source.yml",
+    "coordinator/source-manifest.json"
+  ],
+  "implementation": {
+    "setup_python_action": "6d4fd22b20465ccc0f7354476588e8df7c9ca0e0",
+    "setup_python_version_comment": "v7.1.0",
+    "manifest_workflow_sha256": "d1fb031429a38a574385ef0c5e7205b2b7958382180fb2743763e311dee9bf6e",
+    "other14inputs_and_manifest_noninput_fields_unchanged": true,
+    "python_selector": "3.14",
+    "runtime_and_dependency_changes": false
+  },
+  "local_source_tests": {
+    "python": "3.14.10",
+    "sqlite": "3.54.1",
+    "platform": "Darwin",
+    "tests_passed": 38,
+    "JS_synthetic_vectors": 3,
+    "measured_process_overlap_seconds": 0.074616625,
+    "old_manifest_new_workflow_negative": "Original qualifier rejected mismatched workflow input"
+  },
+  "source_PR_CI": {
+    "applicable_workflows": 17,
+    "all": "SUCCESS",
+    "Linux": 41203539090,
+    "Validate": 41203539117,
+    "native": 41203538804,
+    "TrustedDelivery": 41203539215,
+    "exact_OwnerAuthorization": 41203951437
+  },
+  "own_source_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 41205760751,
+      "event": "workflow_run",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Post-Merge Release Evidence",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205760483,
+      "event": "workflow_run",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "API release artifact",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606473,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "CodeQL",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606231,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Native proof transcript source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606159,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Push coordinator source qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606163,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Native proof DATA journal source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606202,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Rich delivery adapter",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606306,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Reusable workflow guard regression",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205605932,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "AI-development projection",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205605908,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Fixed rendezvous QA build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606165,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Surface enrollment source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606168,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Worker DO registry source conformance",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606171,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Rich Session raw DATA profile",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606188,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Principal possession crypto DATA",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205605931,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "TDE observe",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205605905,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Local native experiment qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41205606157,
+      "event": "push",
+      "headSha": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+      "name": "Validate",
+      "status": "completed"
+    }
+  ],
+  "own_source_Linux": {
+    "main": "dbd17e4f623e83029faf5d80888224574f5e94dc",
+    "run": 41205606159,
+    "passed_tests": 38,
+    "python_result": {
+      "classification": "SOURCE_QUALIFICATION_ONLY",
+      "exit_code": 0,
+      "python": "3.14.9",
+      "sqlite": "3.45.1",
+      "platform": "Linux",
+      "native_provider_or_network_effects": false,
+      "Linux_clock_or_VFS_powerloss_qualified": false,
+      "input_count": 15
+    },
+    "JS_result": {
+      "classification": "SYNTHETIC_ENCODING_PARITY_ONLY",
+      "vectors": 3
+    },
+    "original_log_sha256": "a0be5e591e3c7d6ce0941b93d79d69117d8c2d7124bdfa5ec0cbe6a02073f7fb"
+  },
+  "actual_source_main_lanes": {
+    "Validate": {
+      "run": 41205606157,
+      "all_lanes": "SUCCESS",
+      "lane_count": 4,
+      "actual_peak_overlap": 4,
+      "attempt": 1
+    },
+    "native": {
+      "run": 41205605905,
+      "all_lanes": "SUCCESS",
+      "lane_count": 5,
+      "actual_peak_overlap": 3,
+      "attempt": 1
+    }
+  },
+  "own_source_guard": {
+    "run": 41205606306,
+    "artifact": 13043822829,
+    "passed": 10,
+    "failed": 0
+  },
+  "own_source_possession": {
+    "run": 41205606188,
+    "artifact": 13043473354,
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0,
+    "module_sha256": "226cb5de3f1f84d8b21a4b898326e7261a4580d8e14ade8931c96e024fb9def5"
+  },
+  "own_source_coverage": {
+    "run": 41205606157,
+    "artifact": 13044436635,
+    "provider_zip_sha256": "a5ca79d56e8406f77b301184b96942c4dd992b39bd34109029daa71bc2add2a9",
+    "exact_main_marker": true
+  },
+  "own_source_formal": {
+    "run": 41205760751,
+    "canonical_digest": "136e291f92c7d74c39e55583ad55f1350cc02f6edea5bd1d301f0a3370355b2e",
+    "findings": []
+  },
+  "own_source_durable": {
+    "asset": 695463795,
+    "provider_sha256": "b0f5783e6bc51effb5dff1f56fba79df4af7c324cfaee5af7e3933f325910b7a",
+    "canonical_integrity_verified": true,
+    "all12_checks": "PASS"
+  },
+  "own_source_release": {
+    "run": 41205760483,
+    "artifact": 13043503554,
+    "TAR_sha256": "b70d1471ce0caa26b371dc16e1a2e0c3b1f6e75903c47003844023eb330edc68",
+    "Worker_sha256": "4e5e8a24520f6ce32b539546b1c08664005bee25b0f3a1355e869b45afd33891",
+    "Worker_bytes": 1291540,
+    "Worker_equal_parent_except_one_embedded_SHA": true,
+    "all18other_regular_members_equal": true
+  },
+  "original_source_files_rehashed": 46,
+  "limits": {
+    "deployed": false,
+    "activated": false,
+    "operational_gates_open": 22,
+    "runtime_dependency_changes": false,
+    "key_provider_native_or_installed_acceptance": false,
+    "other_sources_or_held169_174_175_163_requalified": false,
+    "separate_Final_own_review_CI_main_original_qualification": "REQUIRED_AFTER_THIS_DOCUMENTARY_CANDIDATE"
+  }
+}
