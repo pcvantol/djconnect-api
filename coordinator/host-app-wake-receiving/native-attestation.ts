@@ -38,7 +38,7 @@ export async function verifySavedAttestation(db:D1Database,env:AppEnv,authorizat
  const imported=await actualWindow.run(()=>crypto.subtle.importKey('spki',spkiBytes,{name:'ECDSA',namedCurve:'P-256'},true,['verify'])),point=await actualWindow.run(()=>crypto.subtle.exportKey('raw',imported));need(point instanceof ArrayBuffer,'host_wake_native_receipt_unavailable',503);
  const returnedId=new Uint8Array(await actualWindow.run(()=>crypto.subtle.digest('SHA-256',point)));need(btoa(String.fromCharCode(...returnedId))===p.native_key_id_b64,'host_wake_native_receipt_unavailable',503);
  const at=actualWindow.check();need(evidence.receiptCreated<=at&&at-evidence.receiptCreated<=300000&&evidence.statusCheckedAt<=at&&evidence.statusExpiresAt>at,'host_wake_native_status_unavailable',503);
- const receiptHash=await actualWindow.run(()=>sha256Hex(evidence.receipt)),expires=Math.min(saved.row.expires_at,evidence.expires);need(expires>actualWindow.check(),'host_wake_native_job_expired',409);
+ const receiptHash=await actualWindow.run(()=>sha256Hex(evidence.receipt)),expires=Math.min(saved.row.expires_at,evidence.expires,evidence.statusExpiresAt);need(expires>actualWindow.check(),'host_wake_native_job_expired',409);
  const aad=canonical([RECEIVING_VERSION,'native-attestation-receipt',p.native_key_ref,p.native_key_id_b64,saved.row.request_hash,saved.row.issued_at,saved.row.expires_at]);
  const sealed=await actualWindow.run(()=>seal(btoa(String.fromCharCode(...evidence.receipt)),env.APNS_TOKEN_ENCRYPTION_KEY,aad));actualWindow.check();
  const result=Object.freeze({kind:'host_wake_first_attestation_crypto_only' as const});verified.set(result,{db,job,principal,claim,policy:p,policyRow:saved.row,authorizationJSON:auth.authorization_json,spki:evidence.public_key_spki_b64,receiptHash,receiptCreated:evidence.receiptCreated,expires,statusChecked:evidence.statusCheckedAt,statusExpires:evidence.statusExpiresAt,ciphertext:sealed.ciphertext,nonce:sealed.nonce,capacity});return result;
@@ -50,7 +50,9 @@ export async function commitVerifiedAttestation(result:VerifiedAttestation,windo
  const material=verified.get(result);need(material,'host_wake_native_crypto_receipt_required',403);verified.delete(result);window.check();
  const {db,job,principal,claim,policy:p,policyRow:r,authorizationJSON,spki,receiptHash,receiptCreated,expires,statusChecked,statusExpires,ciphertext,nonce,capacity}=material,commit=crypto.randomUUID(),now="CAST(unixepoch('subsec')*1000 AS INTEGER)";
  // The insert guards abort this whole D1 transaction if the native nonce or
- // local ownership crosses its boundary between the conditional statements.
+ // local ownership or signed common-status freshness crosses its boundary
+ // between the conditional statements. The key lifetime is clipped to that
+ // original status interval; no background refresh or fresh lease is implied.
  await window.run(()=>db.batch([
   db.prepare(`UPDATE host_wake_native_pending_policies SET outcome='enrolled',enrollment_claim=?
    WHERE native_key_ref=? AND native_key_id_b64=? AND authorization_id=? AND policy_json=? AND outcome='pending' AND attestation_job_id=?
@@ -65,9 +67,9 @@ export async function commitVerifiedAttestation(result:VerifiedAttestation,windo
     AND s.native_proof_kind='app_attest_attestation' AND s.outcome='issued' AND s.original_json=j.original_json AND s.expires_at>${now})`)
    .bind(commit,p.native_key_ref,p.native_key_id_b64,p.authorization_id,r.policy_json,job.private_job_id,statusExpires,expires,p.native_key_ref,p.native_key_id_b64,capacity,job.private_job_id,job.challenge_id,claim,job.original_json,p.authorization_id,authorizationJSON,principal),
   db.prepare(`INSERT INTO host_wake_native_enrollments
-   (native_key_ref,native_key_id_b64,public_key_spki_b64,assertion_policy_json,native_policy_json,enrollment_job_id,enrollment_claim,receipt_ciphertext,receipt_nonce,receipt_created_at,common_status_checked_at,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,issued_at,expires_at,counter,counter_claim,disabled)
-   SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,${now},?,0,?,0 FROM host_wake_native_pending_policies p WHERE p.native_key_ref=? AND p.outcome='enrolled' AND p.enrollment_claim=?`)
-   .bind(p.native_key_ref,p.native_key_id_b64,spki,assertionPolicyForNative(p),r.policy_json,job.private_job_id,commit,ciphertext,nonce,receiptCreated,statusChecked,p.scope.target.host_bundle_id,p.scope.target.installation_id,p.scope.platform,p.scope.apns_environment,p.scope.identity_policy_sha256,p.scope.deployment_policy_sha256,receiptHash,p.signed_environment_receipt_sha256,expires,commit,p.native_key_ref,commit),
+   (native_key_ref,native_key_id_b64,public_key_spki_b64,assertion_policy_json,native_policy_json,enrollment_job_id,enrollment_claim,receipt_ciphertext,receipt_nonce,receipt_created_at,common_status_checked_at,common_status_expires_at,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,issued_at,expires_at,counter,counter_claim,disabled)
+   SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,${now},?,0,?,0 FROM host_wake_native_pending_policies p WHERE p.native_key_ref=? AND p.outcome='enrolled' AND p.enrollment_claim=?`)
+   .bind(p.native_key_ref,p.native_key_id_b64,spki,assertionPolicyForNative(p),r.policy_json,job.private_job_id,commit,ciphertext,nonce,receiptCreated,statusChecked,statusExpires,p.scope.target.host_bundle_id,p.scope.target.installation_id,p.scope.platform,p.scope.apns_environment,p.scope.identity_policy_sha256,p.scope.deployment_policy_sha256,receiptHash,p.signed_environment_receipt_sha256,expires,commit,p.native_key_ref,commit),
   db.prepare(`INSERT INTO host_wake_native_verifications(challenge_id,private_job_id,native_key_ref,verified_counter,verified_at,commit_claim,original_json)
    SELECT ?,?,?,0,${now},?,? FROM host_wake_native_enrollments n WHERE n.native_key_ref=? AND n.enrollment_claim=? AND n.enrollment_job_id=?`)
    .bind(job.challenge_id,job.private_job_id,p.native_key_ref,commit,job.original_json,p.native_key_ref,commit,job.private_job_id),
@@ -75,5 +77,5 @@ export async function commitVerifiedAttestation(result:VerifiedAttestation,windo
    AND EXISTS(SELECT 1 FROM host_wake_native_verifications v WHERE v.challenge_id=? AND v.private_job_id=? AND v.native_key_ref=? AND v.verified_counter=0 AND v.commit_claim=? AND v.original_json=?)`)
    .bind(job.challenge_id,job.private_job_id,claim,job.challenge_id,job.private_job_id,p.native_key_ref,commit,job.original_json)
  ]));
- return !!await window.run(()=>db.prepare(`SELECT 1 FROM host_wake_native_jobs j JOIN host_wake_native_verifications v ON v.challenge_id=j.challenge_id JOIN host_wake_native_enrollments n ON n.native_key_ref=v.native_key_ref WHERE j.challenge_id=? AND j.private_job_id=? AND j.verification_claim=? AND j.outcome='verified' AND v.commit_claim=? AND n.enrollment_claim=?`).bind(job.challenge_id,job.private_job_id,claim,commit,commit).first());
+ return !!await window.run(()=>db.prepare(`SELECT 1 FROM host_wake_native_jobs j JOIN host_wake_native_verifications v ON v.challenge_id=j.challenge_id JOIN host_wake_native_enrollments n ON n.native_key_ref=v.native_key_ref WHERE j.challenge_id=? AND j.private_job_id=? AND j.verification_claim=? AND j.outcome='verified' AND v.commit_claim=? AND n.enrollment_claim=? AND n.disabled=0 AND n.expires_at>${now} AND n.common_status_checked_at<=${now} AND n.common_status_expires_at>${now} AND n.expires_at<=n.common_status_expires_at`).bind(job.challenge_id,job.private_job_id,claim,commit,commit).first());
 }

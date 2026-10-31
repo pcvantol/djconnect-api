@@ -17,8 +17,8 @@ import schema from '../schema.sql?raw';import hostSchema from '../../host-app-wa
 import eligibility from '../eligibility-view.sql?raw';import registration from '../registration-guard.sql?raw';import dispatch from '../dispatch-guard.sql?raw';import issuer from '../issuer-guard.sql?raw';import firstJob from '../native-first-job-guard.sql?raw';import keyInsert from '../native-key-insert-guard.sql?raw';import firstProof from '../native-first-proof-guard.sql?raw';
 // MODEL ONLY: no Apple certificate/signature/receipt/status is qualified here.
 // This loader mock is absent from the production module's import graph.
-const modeled=vi.hoisted(()=>({spki:'',badSpki:'',badKey:false}));
-vi.mock('../native-apple-evidence.mjs',async original=>{const actual=await original<typeof import('../native-apple-evidence.mjs')>();return {...actual,verifyAppleAttestationEvidence:async()=>({scope:'APPLE_ATTESTATION_AND_RECEIPT_CRYPTO_STATUS_ONLY_NO_ENROLLMENT',public_key_spki_b64:modeled.badKey?modeled.badSpki:modeled.spki,receipt:new TextEncoder().encode('SYNTHETIC MODELED RECEIPT; NOT APPLE EVIDENCE'),receiptCreated:Date.now()-1,expires:Date.now()+3600000,attestationPathScope:'MODELED_NOT_QUALIFIED',receiptScope:'MODELED_NOT_QUALIFIED',statusCheckedAt:Date.now()-1,statusExpiresAt:Date.now()+60000})};});
+const modeled=vi.hoisted(()=>({spki:'',badSpki:'',badKey:false,statusExpires:0}));
+vi.mock('../native-apple-evidence.mjs',async original=>{const actual=await original<typeof import('../native-apple-evidence.mjs')>();return {...actual,verifyAppleAttestationEvidence:async()=>({scope:'APPLE_ATTESTATION_AND_RECEIPT_CRYPTO_STATUS_ONLY_NO_ENROLLMENT',public_key_spki_b64:modeled.badKey?modeled.badSpki:modeled.spki,receipt:new TextEncoder().encode('SYNTHETIC MODELED RECEIPT; NOT APPLE EVIDENCE'),receiptCreated:Date.now()-1,expires:Date.now()+3600000,attestationPathScope:'MODELED_NOT_QUALIFIED',receiptScope:'MODELED_NOT_QUALIFIED',statusCheckedAt:Date.now()-1,statusExpiresAt:modeled.statusExpires||Date.now()+60000})};});
 const secret='synthetic-operator-enrollment-only-not-a-real-secret',token='djci_'+'A'.repeat(43),challenge='88888888-8888-4888-8888-888888888888';
 let issuedCap:string;let keyId:string;let at:number,config:AppEnv,o:ReturnType<typeof decodeNativeOriginal>,policy:ReturnType<typeof decodeNativePolicy>,store:ReceivingStore,fetches:number;
 function service(capacity=16){return createReceivingService({env:config,capacity,now:()=>Date.now(),fetcher:async()=>{fetches++;throw Error('NO ACTUAL APPLE/SDK/PROVIDER NETWORK IN NEGATIVE QUALIFICATION');}});}
@@ -32,7 +32,7 @@ describe('MODELED Apple evidence ONLY: actual D1 first-enrollment transaction/on
  beforeEach(async()=>{
   for(const table of ['host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_pending_policies','host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();
   const pair=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']) as CryptoKeyPair,point=await crypto.subtle.exportKey('raw',pair.publicKey) as ArrayBuffer;
-  keyId=btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.digest('SHA-256',point))));modeled.spki=btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey('spki',pair.publicKey) as ArrayBuffer)));modeled.badKey=false;
+  keyId=btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.digest('SHA-256',point))));modeled.spki=btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey('spki',pair.publicKey) as ArrayBuffer)));modeled.badKey=false;modeled.statusExpires=0;
   const other=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']) as CryptoKeyPair;modeled.badSpki=btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey('spki',other.publicKey) as ArrayBuffer)));
   at=Date.now()-100;fetches=0;config={...env,DJCONNECT_RELAY_SECRET:secret,APNS_TEAM_ID:'ABCDEFGHIJ',APNS_TOPIC_IOS:'example.fixture.host',APNS_ENVIRONMENT:'sandbox',APNS_TOKEN_ENCRYPTION_KEY:btoa('0123456789abcdef0123456789abcdef')} as AppEnv;store=new ReceivingStore(env.DB,16);
   o=decodeNativeOriginal({...vectors.original,native_key_id_b64:keyId,original_wake_issued_at_ms:at,original_wake_expires_at_ms:at+3600000,original_display_expires_at_ms:at+7200000});
@@ -50,7 +50,7 @@ describe('MODELED Apple evidence ONLY: actual D1 first-enrollment transaction/on
  }
  it('MODEL ONLY: reaches the real zero-counter key/proof transaction, encrypted storage and exact original native_verified reply',async()=>{
   const svc=await staged();try{const response=await svc.handle(complete());expect(response.status).toBe(200);const body=await response.json() as Record<string,unknown>;expect(body.state).toBe('native_verified');expect(body.native_proof_kind).toBe('app_attest_attestation');expect(Object.hasOwn(body,'receipt')).toBe(false);
-   const n=await env.DB.prepare('SELECT * FROM host_wake_native_enrollments').first<Record<string,unknown>>();expect(n!.counter).toBe(0);expect(n!.native_key_id_b64).toBe(keyId);expect(n!.public_key_spki_b64).toBe(modeled.spki);expect(n!.receipt_ciphertext).not.toContain('SYNTHETIC');expect(n!.receipt_nonce).toBeTypeOf('string');expect((await nativePolicyRow(env.DB,policy.native_key_ref))?.outcome).toBe('enrolled');expect((await store.nativeJob(challenge))?.outcome).toBe('verified');expect(await env.DB.prepare('SELECT verified_counter FROM host_wake_native_verifications').first('verified_counter')).toBe(0);expect(fetches).toBe(0);
+   const n=await env.DB.prepare('SELECT * FROM host_wake_native_enrollments').first<Record<string,unknown>>();expect(n!.counter).toBe(0);expect(n!.expires_at).toBe(n!.common_status_expires_at);expect(Number(n!.common_status_checked_at)).toBeLessThanOrEqual(Number(n!.issued_at));expect(n!.native_key_id_b64).toBe(keyId);expect(n!.public_key_spki_b64).toBe(modeled.spki);expect(n!.receipt_ciphertext).not.toContain('SYNTHETIC');expect(n!.receipt_nonce).toBeTypeOf('string');expect((await nativePolicyRow(env.DB,policy.native_key_ref))?.outcome).toBe('enrolled');expect((await store.nativeJob(challenge))?.outcome).toBe('verified');expect(await env.DB.prepare('SELECT verified_counter FROM host_wake_native_verifications').first('verified_counter')).toBe(0);expect(fetches).toBe(0);
    expect((await svc.handle(complete())).status).toBe(409);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_native_enrollments').first('n')).toBe(1);
   }finally{svc.close();}
  });
@@ -97,6 +97,29 @@ describe('MODELED Apple evidence ONLY: actual D1 first-enrollment transaction/on
    expect((await svc.handle(request('native/challenge',{...input(),challenge_id:challenge}))).status).toBe(200);expect((await svc.handle(complete())).status).toBe(200);
    const response=await svc.handle(request('native/challenge',{...input(other.core_purpose_id),challenge_id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'}));expect(response.status).toBeGreaterThanOrEqual(400);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_native_jobs').first('n')).toBe(1);
   }finally{svc.close();}
+ });
+
+ it.each([1,2])('MODEL ONLY: rejects actual D1 commit when original common status expires after statement %s',async boundary=>{
+  const svc=await staged();modeled.statusExpires=Date.now()+500;const v=await branded();
+  const original=env.DB.batch.bind(env.DB);let afterDelay=0;
+  const hook=vi.spyOn(env.DB,'batch').mockImplementation(async statements=>{
+   const list=[...statements];list.splice(boundary,0,env.DB.prepare(`WITH RECURSIVE delay(n) AS (VALUES(0) UNION ALL SELECT n+1 FROM delay WHERE n<20000000) SELECT sum(n) FROM delay`));
+   try{return await original(list);}finally{afterDelay=Date.now();}
+  });
+  try{let accepted=false;try{accepted=await commitVerifiedAttestation(v.receipt,v.window);}catch(error){expect(String(error)).toMatch(/host_wake_native_(enrollment|first_proof)_context/);}
+   expect(afterDelay).toBeGreaterThanOrEqual(modeled.statusExpires);expect(accepted).toBe(false);
+   expect((await nativePolicyRow(env.DB,policy.native_key_ref))?.outcome).toBe('pending');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_native_enrollments').first('n')).toBe(0);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_native_verifications').first('n')).toBe(0);
+  }finally{hook.mockRestore();v.window.close();svc.close();}
+ });
+
+ it('MODEL ONLY: no positive writer readback after the same original status interval expires following the real atomic commit',async()=>{
+  const svc=await staged();modeled.statusExpires=Date.now()+500;const v=await branded(),original=env.DB.batch.bind(env.DB);
+  const hook=vi.spyOn(env.DB,'batch').mockImplementation(async statements=>{const result=await original(statements);await new Promise(resolve=>setTimeout(resolve,Math.max(1,modeled.statusExpires-Date.now()+10)));return result;});
+  try{expect(await commitVerifiedAttestation(v.receipt,v.window)).toBe(false);expect(Date.now()).toBeGreaterThanOrEqual(modeled.statusExpires);
+   const n=await env.DB.prepare('SELECT expires_at,common_status_expires_at FROM host_wake_native_enrollments').first<{expires_at:number;common_status_expires_at:number}>();expect(n).not.toBeNull();expect(n!.expires_at).toBe(modeled.statusExpires);expect(n!.common_status_expires_at).toBe(modeled.statusExpires);
+   // Durable history may exist, but is expired and cannot authorize an assertion.
+   const live=await env.DB.prepare("SELECT COUNT(*) n FROM host_wake_native_enrollments WHERE expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)").first('n');expect(live).toBe(0);
+  }finally{hook.mockRestore();v.window.close();svc.close();}
  });
 
 });

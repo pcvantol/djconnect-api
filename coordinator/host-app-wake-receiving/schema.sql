@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS host_wake_native_enrollments (
  receipt_nonce TEXT,
  receipt_created_at INTEGER,
  common_status_checked_at INTEGER,
+ common_status_expires_at INTEGER,
  counter_claim TEXT,
  host_bundle TEXT NOT NULL,
  install_id TEXT NOT NULL,

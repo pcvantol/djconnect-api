@@ -13,6 +13,9 @@ BEGIN
   AND j.proof_kind='app_attest_attestation' AND j.outcome='verifying' AND j.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)
   AND p.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER) AND a.outcome='authorized' AND a.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)
   AND i.disabled=0 AND s.native_proof_kind='app_attest_attestation' AND s.outcome='issued' AND s.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER) AND s.original_json=j.original_json
+  AND typeof(NEW.common_status_checked_at)='integer' AND typeof(NEW.common_status_expires_at)='integer'
+  AND NEW.common_status_checked_at>=0 AND NEW.common_status_checked_at<=NEW.issued_at
+  AND NEW.common_status_expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER) AND NEW.expires_at<=NEW.common_status_expires_at
   AND NEW.counter=0 AND NEW.disabled=0 AND NEW.issued_at<=CAST(unixepoch('subsec')*1000 AS INTEGER)
   AND NEW.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER) AND NEW.expires_at<=p.expires_at
   AND NEW.host_bundle=json_extract(p.policy_json,'$.scope.target.host_bundle_id') AND NEW.install_id=json_extract(p.policy_json,'$.scope.target.installation_id')

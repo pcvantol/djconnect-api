@@ -12,6 +12,9 @@ BEGIN
   WHERE j.challenge_id=NEW.challenge_id AND j.private_job_id=NEW.private_job_id AND j.original_json=NEW.original_json
   AND j.proof_kind='app_attest_attestation' AND j.outcome='verifying' AND j.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)
   AND NEW.verified_at>=j.captured_at AND NEW.verified_at<j.expires_at AND NEW.consumed_at IS NULL
+  AND n.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)
+  AND n.common_status_checked_at<=NEW.verified_at AND NEW.verified_at<n.common_status_expires_at
+  AND n.common_status_expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER) AND n.expires_at<=n.common_status_expires_at
   AND n.enrollment_job_id=j.private_job_id AND n.enrollment_claim=NEW.commit_claim AND n.counter=0 AND n.disabled=0
   AND p.outcome='enrolled' AND p.attestation_job_id=j.private_job_id AND p.enrollment_claim=NEW.commit_claim AND p.policy_json=n.native_policy_json
   AND p.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER) AND a.outcome='authorized' AND a.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)

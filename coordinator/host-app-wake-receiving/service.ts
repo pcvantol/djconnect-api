@@ -1,5 +1,6 @@
 /** SOURCE ONLY private receiving composition. Not imported by public root.
- * Existing enrolled-key assertions only; first enrollment remains unavailable. */
+ * Explicit pending-policy first attestation and saved-key assertions; genuine
+ * native acceptance and public/production composition remain separate. */
 import type {AppEnv} from '../../src/types';
 import {HttpError} from '../../src/http';
 import {sha256Hex,base64Url} from '../../src/crypto';
