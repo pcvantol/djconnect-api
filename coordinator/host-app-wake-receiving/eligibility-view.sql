@@ -10,7 +10,7 @@ SELECT s.private_purpose_id, j.challenge_id, j.operation_id AS semantic_operatio
   WHERE (
    1=1
    AND s.private_purpose_id=p.purpose_id
-   AND s.outcome='issued'
+   AND s.outcome='issued' AND s.native_proof_kind=j.proof_kind
    AND a.outcome='authorized'
    AND i.disabled=0
    AND a.issued_at<=CAST(unixepoch('subsec')*1000 AS INTEGER)
@@ -29,6 +29,7 @@ SELECT s.private_purpose_id, j.challenge_id, j.operation_id AS semantic_operatio
   )
   AND (
    j.outcome='verified' AND v.private_job_id=j.private_job_id
+   AND ((j.proof_kind='app_attest_assertion' AND v.verified_counter>0) OR(j.proof_kind='app_attest_attestation' AND v.verified_counter=0))
    AND j.original_json=s.original_json
    AND v.original_json=j.original_json
    AND n.native_key_ref=json_extract(a.authorization_json,'$.native_key_ref')
@@ -66,5 +67,6 @@ SELECT s.private_purpose_id, j.challenge_id, j.operation_id AS semantic_operatio
    AND json_extract(p.scope_json,'$.device_binding')=json_extract(j.original_json,'$.device_binding')
    AND json_extract(p.scope_json,'$.source_binding')=json_extract(j.original_json,'$.source_binding')
   )
+ AND (n.native_policy_json IS NOT NULL AND EXISTS(SELECT 1 FROM host_wake_native_pending_policies np WHERE np.native_key_ref=n.native_key_ref AND np.policy_json=n.native_policy_json AND np.authorization_id=a.authorization_id AND np.outcome='enrolled' AND np.expires_at>CAST(unixepoch('subsec')*1000 AS INTEGER)))
  AND (v.verified_at>=j.captured_at AND v.verified_at<j.expires_at)
  AND (j.operation_id=json_extract(j.original_json,'$.operation_id') AND j.generation=json_extract(j.original_json,'$.generation') AND j.revision=json_extract(j.original_json,'$.revision'));

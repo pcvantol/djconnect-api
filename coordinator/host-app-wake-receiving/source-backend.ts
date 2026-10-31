@@ -8,7 +8,7 @@ import {original,need,type Input,type OriginalPurpose,VERSION} from '../host-app
 import {ReceivingStore,type IssuerRow} from './receiving-store';
 import {decodeNativeOriginal,decodeOperatorAuthorization,nativeTokenSha256} from './wire';
 import {RequestWindow} from './request-window';
-import {decodeSavedAssertionPolicy} from './native-assertion';
+import {loadNativeState} from './native-state';
 const fields=['DB','APNS_TEAM_ID','APNS_KEY_ID','APNS_PRIVATE_KEY','APNS_TOKEN_ENCRYPTION_KEY','APNS_ENVIRONMENT','APNS_TOPIC_IOS'] as const;
 export async function bindSource181(env:AppEnv,issuer:IssuerRow,principal:string,window:RequestWindow,fetcher:typeof fetch,capacity:number){
  const db=env.DB,store=new ReceivingStore(db,capacity),o=decodeNativeOriginal(JSON.parse(issuer.original_json));
@@ -22,18 +22,15 @@ export async function bindSource181(env:AppEnv,issuer:IssuerRow,principal:string
  /** The stored signed-environment/enrollment receipts remain mandatory. This is
   * actual configuration binding, not derivation from App Attest AAGUID or ios. */
  async function nativePolicy(){
-  await live();const row=await window.run(()=>db.prepare(`SELECT public_key_spki_b64,native_key_id_b64,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,assertion_policy_json FROM host_wake_native_enrollments WHERE native_key_ref=? AND disabled=0 AND issued_at<=? AND expires_at>?`).bind(auth.native_key_ref,window.check(),window.check()).first<Record<string,unknown>>());
-  need(typeof o.native_key_id_b64==='string'&&/^[A-Za-z0-9+/]{43}=$/.test(o.native_key_id_b64)&&atob(o.native_key_id_b64).length===32&&btoa(atob(o.native_key_id_b64))===o.native_key_id_b64,'host_wake_native_policy_unavailable',503);
-  need(row&&row.native_key_id_b64===o.native_key_id_b64&&row.host_bundle===o.target.host_bundle_id&&row.install_id===o.target.installation_id&&row.platform===o.platform&&row.environment===o.apns_environment&&row.identity_policy_sha256===o.identity_policy_sha256&&row.deployment_policy_sha256===o.deployment_policy_sha256,'host_wake_native_enrollment_unavailable',503);
-  need(typeof row.enrollment_receipt_sha256==='string'&&/^[a-f0-9]{64}$/.test(row.enrollment_receipt_sha256)&&typeof row.signed_environment_receipt_sha256==='string'&&/^[a-f0-9]{64}$/.test(row.signed_environment_receipt_sha256),'host_wake_native_policy_unavailable',503);
-  need(typeof row.public_key_spki_b64==='string','host_wake_native_policy_unavailable',503);
-  const key=await window.run(()=>crypto.subtle.importKey('spki',Uint8Array.from(atob(row.public_key_spki_b64 as string),c=>c.charCodeAt(0)),{name:'ECDSA',namedCurve:'P-256'},true,['verify']));
-  const point=await window.run(()=>crypto.subtle.exportKey('raw',key));need(point instanceof ArrayBuffer,'host_wake_native_policy_unavailable',503);
-  const keyId=new Uint8Array(await window.run(()=>crypto.subtle.digest('SHA-256',point)));need(btoa(String.fromCharCode(...keyId))===o.native_key_id_b64,'host_wake_native_policy_unavailable',503);
-  const policy=decodeSavedAssertionPolicy({host_bundle:o.target.host_bundle_id,assertion_policy_json:typeof row.assertion_policy_json==='string'?row.assertion_policy_json:null});
-  need(policy.app_identifier===env.APNS_TEAM_ID+'.'+o.target.host_bundle_id&&env.APNS_TOPIC_IOS===o.target.host_bundle_id&&env.APNS_ENVIRONMENT===o.apns_environment,'host_wake_native_deployment_mismatch',503);current();
+  await live();const result=await loadNativeState(db,auth,env,window,o);
+  if(result.kind!==issuer.native_proof_kind){
+   need(issuer.native_proof_kind==='app_attest_attestation'&&result.key,'host_wake_native_authority',403);
+   const own=await window.run(()=>db.prepare(`SELECT 1 FROM host_wake_native_jobs j JOIN host_wake_native_verifications v ON v.challenge_id=j.challenge_id AND v.private_job_id=j.private_job_id JOIN host_wake_native_enrollments n ON n.native_key_ref=v.native_key_ref WHERE j.authorization_id=? AND j.core_purpose_id=? AND j.original_json=? AND j.proof_kind='app_attest_attestation' AND j.outcome='verified' AND v.verified_counter=0 AND n.native_key_ref=? AND n.enrollment_job_id=j.private_job_id AND n.enrollment_claim=v.commit_claim AND n.disabled=0`).bind(issuer.authorization_id,issuer.core_purpose_id,issuer.original_json,auth.native_key_ref).first());need(own,'host_wake_native_authority',403);
+  }
+  current();return {...result,kind:issuer.native_proof_kind};
  }
- await nativePolicy();
+ const selectedNative=await nativePolicy();
+
  const service=createHostAppWakeService({db,capacity,
   async admitOriginalPurpose(){await nativePolicy();const saved=await window.run(()=>store.issuer(issuer.authorization_id,issuer.core_purpose_id));need(saved&&saved.claim_id===issuer.claim_id&&saved.request_hash===issuer.request_hash&&saved.outcome==='reserved'&&saved.original_json===issuer.original_json&&saved.private_purpose_id===issuer.private_purpose_id,'host_wake_issuer_consumed',409);return scope;},
   /** Checks this original authenticated receiving context synchronously; it does
@@ -52,7 +49,7 @@ export async function bindSource181(env:AppEnv,issuer:IssuerRow,principal:string
   authorizeProvider:async()=>{current();provider??=createSurfaceProvider(env,()=>window.check());const token=await window.run(()=>provider!.authorizeProvider());current();return token;},
   fetcher:async(input,init)=>{current();const response=await window.run(()=>fetcher(input,init));current();return response;}
  });
- return Object.freeze({scope,service,proofKind:'app_attest_assertion' as const,
+ return Object.freeze({scope,service,proofKind:selectedNative.kind,
   close(){closed=true;service.close();provider?.close();},
   async assertLocal(){await nativePolicy();}
  });

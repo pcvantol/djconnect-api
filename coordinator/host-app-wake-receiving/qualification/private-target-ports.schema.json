@@ -570,6 +570,7 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
                 "host_wake_intent_consumed",
                 "host_wake_intent_capacity_or_authority",
                 "host_wake_authorization_consumed_or_capacity",
@@ -721,6 +722,8 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
                 "host_wake_receiving_unavailable",
                 "host_wake_authorization_unavailable",
                 "host_wake_native_enrollment_unavailable",
@@ -1268,6 +1271,7 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
                 "host_wake_intent_consumed",
                 "host_wake_intent_capacity_or_authority",
                 "host_wake_authorization_consumed_or_capacity",
@@ -1419,6 +1423,8 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
                 "host_wake_receiving_unavailable",
                 "host_wake_authorization_unavailable",
                 "host_wake_native_enrollment_unavailable",
@@ -1946,6 +1952,7 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
                 "host_wake_intent_consumed",
                 "host_wake_intent_capacity_or_authority",
                 "host_wake_authorization_consumed_or_capacity",
@@ -2097,6 +2104,8 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
                 "host_wake_receiving_unavailable",
                 "host_wake_authorization_unavailable",
                 "host_wake_native_enrollment_unavailable",
@@ -2624,6 +2633,7 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
                 "host_wake_intent_consumed",
                 "host_wake_intent_capacity_or_authority",
                 "host_wake_authorization_consumed_or_capacity",
@@ -2775,6 +2785,8 @@
             },
             "error": {
               "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
                 "host_wake_receiving_unavailable",
                 "host_wake_authorization_unavailable",
                 "host_wake_native_enrollment_unavailable",

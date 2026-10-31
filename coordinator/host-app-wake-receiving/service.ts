@@ -5,11 +5,15 @@ import {HttpError} from '../../src/http';
 import {sha256Hex,base64Url} from '../../src/crypto';
 import {canonical} from '../../src/surface-push/wire';
 import {integer,need,WakeError} from '../host-app-wake/wire';
-import {decodeNativeOriginal,decodeNativeChallenge,nativeSigningData,RECEIVING_VERSION,OPERATOR_AUTHORIZE,OPERATOR_WITHDRAW} from './wire';
+import {decodeNativeOriginal,decodeNativeChallenge,decodeOperatorAuthorization,nativeSigningData,RECEIVING_VERSION,OPERATOR_AUTHORIZE,OPERATOR_WITHDRAW} from './wire';
+import {loadNativeState} from './native-state';
 import {ReceivingStore,type IssuerRow,type NativeJobRow} from './receiving-store';
 import {receivePrivate,readBoundedPrivateBody,type PrivateIntake} from './private-intake';
 import {RequestWindow} from './request-window';
 import {bindSource181} from './source-backend';
+import {verifySavedAttestation,commitVerifiedAttestation} from './native-attestation';
+import {authorizeNativePolicy,withdrawNativePolicy} from './native-policy-store';
+import {OPERATOR_NATIVE_POLICY,OPERATOR_NATIVE_WITHDRAW} from './native-policy';
 import {verifySavedAssertion,commitVerifiedAssertion} from './native-assertion';
 import {decodePrivateReply,privateBase,privateError,type PrivateState} from './server-reply';
 import {authenticateOperator} from './operator-auth';
@@ -51,7 +55,7 @@ export function createReceivingService(options:ReceivingOptions){
     s=await issuerFor(i);const o=decodeNativeOriginal(JSON.parse(s.original_json));const reply=await decodePrivateReply(i.route,input,o,hash,privateBase(input,o,hash,'withdrawn'));w.check();return json(reply);
    }
    if(i.route==='issuer/issue'){
-    await requireReceivingGuards(db,w);const claim=crypto.randomUUID();ownIssuerClaim=claim;s=await w.run(()=>store.reserveIssuer(input.authorization_id,i.principal.id,input.issuer_operation_id,hash,input.original!,crypto.randomUUID(),claim,w.capturedAt,w.check()));
+    await requireReceivingGuards(db,w);const auth=await w.run(()=>store.authorization(input.authorization_id));need(auth,'host_wake_native_authority',403);const native=await loadNativeState(db,decodeOperatorAuthorization(JSON.parse(auth.authorization_json)),env,w,input.original);const claim=crypto.randomUUID();ownIssuerClaim=claim;s=await w.run(()=>store.reserveIssuer(input.authorization_id,i.principal.id,input.issuer_operation_id,hash,input.original!,crypto.randomUUID(),claim,w.capturedAt,w.check(),native.kind));
     need(s.claim_id===claim&&s.outcome==='reserved','host_wake_issuer_consumed',409);
     backend=await w.run(()=>bindSource181(env,s!,i.principal.id,w,fetcher,capacity));const issued=await w.run(()=>backend!.service.issueOriginal(undefined,w.signal));
     await w.run(()=>store.finishIssuer(s!.authorization_id,s!.core_purpose_id,'issued',w.check(),claim,hash,i.principal.id));s=await issuerFor(i);need(s.outcome==='issued'&&s.claim_id===claim,'host_wake_issuer_consumed',409);await backend.assertLocal();need(await w.run(()=>db.prepare("SELECT 1 FROM host_wake_issuer_once WHERE authorization_id=? AND core_purpose_id=? AND claim_id=? AND outcome='issued' AND expires_at>?").bind(s!.authorization_id,s!.core_purpose_id,claim,w.check()).first()),'host_wake_issuer_consumed',409);
@@ -70,11 +74,11 @@ export function createReceivingService(options:ReceivingOptions){
    }
    job=(await w.run(()=>store.nativeJob(input.challenge_id!)))??undefined;need(job&&job.authorization_id===input.authorization_id&&job.core_purpose_id===input.core_purpose_id&&job.original_json===s.original_json,'host_wake_history_unknown',404);
    if(i.route==='native/complete'){
-    need(state==='issued'&&job.proof_kind===input.native_proof!.kind,'host_wake_native_authority',403);await requireReceivingGuards(db,w);backend=await w.run(()=>bindSource181(env,s!,i.principal.id,w,fetcher,capacity));proofClaim=crypto.randomUUID();
+    need(state==='issued'&&job.proof_kind===s.native_proof_kind&&job.proof_kind===input.native_proof!.kind,'host_wake_native_authority',403);await requireReceivingGuards(db,w);backend=await w.run(()=>bindSource181(env,s!,i.principal.id,w,fetcher,capacity));proofClaim=crypto.randomUUID();
     need(await w.run(()=>store.claimNativeProof(input.authorization_id,i.principal.id,input.challenge_id!,input.native_proof!.kind,proofClaim!,w.check())),'host_wake_native_job_consumed',409);
-    const proof=await verifySavedAssertion(db,input.authorization_id,i.principal.id,input.challenge_id!,proofClaim,input.native_proof!,w);
+    const first=input.native_proof!.kind==='app_attest_attestation',proof=first?await verifySavedAttestation(db,env,input.authorization_id,i.principal.id,input.challenge_id!,proofClaim,input.native_proof!,w,fetcher,capacity):await verifySavedAssertion(db,input.authorization_id,i.principal.id,input.challenge_id!,proofClaim,input.native_proof!,w);
     if(!proof){await store.failNativeProof(input.authorization_id,input.challenge_id!,proofClaim,'rejected');need(false,'host_wake_native_proof_rejected',403);}
-    need(await commitVerifiedAssertion(proof,w),'host_wake_native_authority',403);job=(await w.run(()=>store.nativeJob(input.challenge_id!)))!;
+    need(await (proof.kind==='host_wake_first_attestation_crypto_only'?commitVerifiedAttestation(proof,w):commitVerifiedAssertion(proof,w)),'host_wake_native_authority',403);job=(await w.run(()=>store.nativeJob(input.challenge_id!)))!;
    }
    let result:PrivateState=state==='withdrawn'||job.outcome==='withdrawn'?'withdrawn':state==='expired'?'expired':state!=='issued'?'unknown':'pending';let verifiedAt:number|undefined;
    if(result==='pending'&&job.outcome==='verified'){
@@ -96,18 +100,20 @@ export function createReceivingService(options:ReceivingOptions){
    throw error;
   }finally{backend?.close();intake?.close();}
  }
- async function operator(request:Request,kind:'authorize'|'withdraw'){
+ async function operator(request:Request,kind:'authorize'|'withdraw'|'native_policy'|'native_policy_withdraw'){
   const w=new RequestWindow(clock,request.signal);try{
    const u=new URL(request.url);need(request.method==='POST'&&u.protocol==='https:'&&!request.url.includes('?')&&!request.url.includes('#'),'host_wake_operator_route',404);
    const {raw}=await readBoundedPrivateBody(request,w);const body=await w.run(()=>authenticateOperator(new Request(request.url,{method:request.method,headers:request.headers,body:raw,signal:w.signal}),env,kind));w.check();
-   if(kind==='withdraw'){need(await w.run(()=>store.authorization(body.authorization_id)),'host_wake_history_unknown',404);await w.run(()=>store.withdrawAuthorization(body.authorization_id));w.check();return json({version:RECEIVING_VERSION,authorization_id:body.authorization_id,outcome:'withdrawn'});}
-   need('native_key_ref' in body);const hash=await w.run(()=>sha256Hex(canonical(body)));const row=await w.run(()=>store.authorize(body,hash,w.capturedAt,w.check()));w.check();return json({version:RECEIVING_VERSION,authorization_id:row.authorization_id,outcome:row.outcome});
+   if(body.action==='native_policy'){const hash=await w.run(()=>sha256Hex(canonical(body))),row=await w.run(()=>authorizeNativePolicy(db,body,hash,w.capturedAt,w.check(),capacity));w.check();return json({version:RECEIVING_VERSION,native_key_ref:row.native_key_ref,outcome:row.outcome});}
+   if(body.action==='native_policy_withdraw'){await w.run(()=>withdrawNativePolicy(db,body.native_key_ref,capacity));w.check();return json({version:RECEIVING_VERSION,native_key_ref:body.native_key_ref,outcome:'withdrawn'});}
+   if(body.action==='withdraw'){need(await w.run(()=>store.authorization(body.authorization_id)),'host_wake_history_unknown',404);await w.run(()=>store.withdrawAuthorization(body.authorization_id));w.check();return json({version:RECEIVING_VERSION,authorization_id:body.authorization_id,outcome:'withdrawn'});}
+   need(body.action==='authorize');const hash=await w.run(()=>sha256Hex(canonical(body)));const row=await w.run(()=>store.authorize(body,hash,w.capturedAt,w.check()));w.check();return json({version:RECEIVING_VERSION,authorization_id:row.authorization_id,outcome:row.outcome});
   }finally{w.close();}
  }
  return Object.freeze({close(){closed=true;},async handle(request:Request):Promise<Response>{try{
   clock();const path=new URL(request.url).pathname;
   if(path===RESOLVE_PATH)return json(await resolveAuthorization(request,env,clock));
-  if(path===OPERATOR_AUTHORIZE||path===OPERATOR_WITHDRAW)return await operator(request,path===OPERATOR_AUTHORIZE?'authorize':'withdraw');
+  if(path===OPERATOR_AUTHORIZE||path===OPERATOR_WITHDRAW||path===OPERATOR_NATIVE_POLICY||path===OPERATOR_NATIVE_WITHDRAW)return await operator(request,path===OPERATOR_AUTHORIZE?'authorize':path===OPERATOR_WITHDRAW?'withdraw':path===OPERATOR_NATIVE_POLICY?'native_policy':'native_policy_withdraw');
   if(['register','wake','status','revoke'].some(kind=>path===SERVER_PREFIX+kind))return await receiveTarget(request,env,clock,fetcher,capacity);
   return await privateRoute(request);
  }catch(error){return error instanceof WakeError||error instanceof HttpError?privateError(error.code,error.status):privateError('host_wake_receiving_unavailable',503);}}});

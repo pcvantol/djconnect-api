@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS host_wake_issuer_once (
  authorization_id TEXT NOT NULL REFERENCES host_wake_operator_authorizations(authorization_id),
  core_purpose_id TEXT NOT NULL,
  issuer_operation_id TEXT NOT NULL UNIQUE,
+ native_proof_kind TEXT NOT NULL CHECK(native_proof_kind IN('app_attest_attestation','app_attest_assertion')),
  claim_id TEXT NOT NULL,
  request_hash TEXT NOT NULL,
  original_json TEXT NOT NULL,
@@ -56,6 +57,13 @@ CREATE TABLE IF NOT EXISTS host_wake_native_enrollments (
  native_key_id_b64 TEXT NOT NULL UNIQUE,
  public_key_spki_b64 TEXT NOT NULL,
  assertion_policy_json TEXT,
+ native_policy_json TEXT,
+ enrollment_job_id TEXT,
+ enrollment_claim TEXT,
+ receipt_ciphertext TEXT,
+ receipt_nonce TEXT,
+ receipt_created_at INTEGER,
+ common_status_checked_at INTEGER,
  counter_claim TEXT,
  host_bundle TEXT NOT NULL,
  install_id TEXT NOT NULL,
@@ -74,7 +82,7 @@ CREATE TABLE IF NOT EXISTS host_wake_native_verifications (
  challenge_id TEXT PRIMARY KEY REFERENCES host_wake_native_jobs(challenge_id),
  private_job_id TEXT NOT NULL,
  native_key_ref TEXT NOT NULL REFERENCES host_wake_native_enrollments(native_key_ref),
- verified_counter INTEGER NOT NULL CHECK(verified_counter>0),
+ verified_counter INTEGER NOT NULL CHECK(verified_counter>=0),
  verified_at INTEGER NOT NULL,
  commit_claim TEXT,
  original_json TEXT NOT NULL,
@@ -103,4 +111,21 @@ CREATE TABLE IF NOT EXISTS host_wake_child_withdrawals (
  authorization_id TEXT NOT NULL REFERENCES host_wake_operator_authorizations(authorization_id),
  core_purpose_id TEXT NOT NULL,
  PRIMARY KEY(authorization_id,core_purpose_id)
+);
+
+-- PENDING is a custodian policy, never an enrolled key or a positive proof.
+CREATE TABLE IF NOT EXISTS host_wake_native_pending_policies (
+ native_key_ref TEXT PRIMARY KEY,
+ native_key_id_b64 TEXT NOT NULL UNIQUE,
+ authorization_id TEXT NOT NULL REFERENCES host_wake_operator_authorizations(authorization_id),
+ operation_id TEXT NOT NULL UNIQUE,
+ request_hash TEXT NOT NULL,
+ policy_json TEXT NOT NULL,
+ issued_at INTEGER NOT NULL,
+ expires_at INTEGER NOT NULL,
+ outcome TEXT NOT NULL CHECK(outcome IN('pending','enrolled','withdrawn','expired')),
+ original_request_expires_at INTEGER NOT NULL,
+ enrollment_claim TEXT,
+ attestation_job_id TEXT UNIQUE,
+ CHECK(expires_at>issued_at)
 );

@@ -13,8 +13,8 @@ function authorization(id='fixture-authorization',op='fixture-operator-operation
 }
 let store:ReceivingStore;
 async function grant(){return store.authorize(authorization(),'a'.repeat(64),START,START);}
-async function issuer(hash='b'.repeat(64),claim='first-claim',captured=START,at=START){return store.reserveIssuer('fixture-authorization','existing-record','issuer-operation',hash,o,'private-API-purpose',claim,captured,at);}
-async function clear(){for(const table of ['host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();}
+async function issuer(hash='b'.repeat(64),claim='first-claim',captured=START,at=START){return store.reserveIssuer('fixture-authorization','existing-record','issuer-operation',hash,o,'private-API-purpose',claim,captured,at,'app_attest_assertion');}
+async function clear(){for(const table of ['host_wake_native_pending_policies','host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();}
 describe('actual D1 receiving once-history with real existing install-token table, fixture authority only',()=>{
  beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const statement of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(statement).run();});
  beforeEach(async()=>{await clear();await env.DB.prepare("INSERT INTO install_tokens (id,ha_install_id,token_hash,token_prefix) VALUES ('existing-record','existing-install','fixture-token-hash','djci_fixture')").run();store=new ReceivingStore(env.DB,2);});
@@ -46,18 +46,18 @@ describe('actual D1 receiving once-history with real existing install-token tabl
   expect((await issuer('b'.repeat(64),'second',START+30000,START+30000)).outcome).toBe('expired');expect((await issuer()).original_request_expires_at).toBe(START+30000);
  });
  it('does not recreate a used semantic purpose with a different issuer operation or tuple',async()=>{
-  await grant();await issuer();await expect(store.reserveIssuer('fixture-authorization','existing-record','another-operation','c'.repeat(64),o,'different-purpose','claim2',START,START)).rejects.toThrow();
+  await grant();await issuer();await expect(store.reserveIssuer('fixture-authorization','existing-record','another-operation','c'.repeat(64),o,'different-purpose','claim2',START,START,'app_attest_assertion')).rejects.toThrow();
   await expect(issuer('c'.repeat(64))).rejects.toThrow();
  });
  it.each(['owner_binding','device_binding','source_binding','paired_subject_binding_sha256','selected_ha_origin_sha256','identity_policy_sha256','deployment_policy_sha256'] as const)('refuses a changed original %s',async field=>{
-  await grant();await expect(store.reserveIssuer('fixture-authorization','existing-record','issuer-operation','b'.repeat(64),{...o,[field]:'f'.repeat(64)},'private-purpose','claim',START,START)).rejects.toThrow('host_wake_authorization_scope');
+  await grant();await expect(store.reserveIssuer('fixture-authorization','existing-record','issuer-operation','b'.repeat(64),{...o,[field]:'f'.repeat(64)},'private-purpose','claim',START,START,'app_attest_assertion')).rejects.toThrow('host_wake_authorization_scope');
  });
  it('refuses a different target/platform/environment or original window outside operator scope',async()=>{
-  await grant();for(const extra of [{target:{...o.target,installation_id:'other'}},{platform:'ios' as const},{apns_environment:'production' as const},{original_wake_issued_at_ms:START-1},{original_wake_expires_at_ms:END+1,original_display_expires_at_ms:END+1}])await expect(store.reserveIssuer('fixture-authorization','existing-record','issuer-op','b'.repeat(64),{...o,...extra},'private','claim',START,START)).rejects.toThrow();
+  await grant();for(const extra of [{target:{...o.target,installation_id:'other'}},{platform:'ios' as const},{apns_environment:'production' as const},{original_wake_issued_at_ms:START-1},{original_wake_expires_at_ms:END+1,original_display_expires_at_ms:END+1}])await expect(store.reserveIssuer('fixture-authorization','existing-record','issuer-op','b'.repeat(64),{...o,...extra},'private','claim',START,START,'app_attest_assertion')).rejects.toThrow();
  });
  it('rotation disables the exact prior principal; a new active row is not purpose lineage',async()=>{
   await grant();await env.DB.prepare('UPDATE install_tokens SET disabled=1').run();await env.DB.prepare("INSERT INTO install_tokens (id,ha_install_id,token_hash,token_prefix) VALUES ('rotated-record','existing-install','different-token-hash','djci_other')").run();
-  await expect(issuer()).rejects.toThrow();await expect(store.reserveIssuer('fixture-authorization','rotated-record','issuer-op','b'.repeat(64),o,'private','claim',START,START)).rejects.toThrow('host_wake_principal');
+  await expect(issuer()).rejects.toThrow();await expect(store.reserveIssuer('fixture-authorization','rotated-record','issuer-op','b'.repeat(64),o,'private','claim',START,START,'app_attest_assertion')).rejects.toThrow('host_wake_principal');
  });
  it('never promotes UNKNOWN, withdrawn, or expired issuer history on a duplicate or finish',async()=>{
   await grant();await issuer();await store.finishIssuer('fixture-authorization',o.core_purpose_id,'unknown',START,'first-claim','b'.repeat(64),'existing-record');await store.finishIssuer('fixture-authorization',o.core_purpose_id,'issued',START,'first-claim','b'.repeat(64),'existing-record');

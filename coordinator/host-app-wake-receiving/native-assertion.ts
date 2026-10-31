@@ -5,13 +5,15 @@ import cbor from 'cbor';
 import * as asn1js from 'asn1js';
 import * as pki from 'pkijs';
 import {canonical} from '../../src/surface-push/wire';
+import {currentNativePolicy} from './native-policy-store';
+import {decodeLaunchCategory} from './native-policy';
 import {exact,need} from '../host-app-wake/wire';
 import {decodeNativeOriginal,decodeNativeChallenge,nativeSigningData} from './wire';
 import {proof,type NativeProofData} from './server-wire';
 import {ReceivingStore,type NativeJobRow} from './receiving-store';
 import {RequestWindow} from './request-window';
 interface Enrollment {
- native_key_ref:string;native_key_id_b64:string;public_key_spki_b64:string;assertion_policy_json:string|null;
+ native_key_ref:string;native_key_id_b64:string;public_key_spki_b64:string;assertion_policy_json:string|null;native_policy_json:string|null;
  host_bundle:string;install_id:string;platform:string;environment:string;identity_policy_sha256:string;deployment_policy_sha256:string;
  enrollment_receipt_sha256:string;signed_environment_receipt_sha256:string;issued_at:number;expires_at:number;counter:number;disabled:number;
 }
@@ -34,12 +36,16 @@ function signature(raw:unknown):Uint8Array{
  const out=new Uint8Array(pki.createECDSASignatureFromCMS(seq,32));valid(out.length===64);return out;
 }
 export function decodeSavedAssertionPolicy(key:Pick<Enrollment,'host_bundle'|'assertion_policy_json'>){
- need(typeof key.assertion_policy_json==='string','host_wake_native_policy_unavailable',503);let p:unknown;
- try{p=JSON.parse(key.assertion_policy_json);}catch{need(false,'host_wake_native_policy_unavailable',503);}
- exact(p,['profile','app_identifier','bundle_version']);
- need(p.profile==='host_wake_apple_assertion_properties_v1'&&typeof p.app_identifier==='string'&&new RegExp('^[A-Z0-9]{10}\\.'+key.host_bundle.replaceAll('.','\\.')+'$').test(p.app_identifier)&&typeof p.bundle_version==='string'&&/^[0-9]{1,20}$/.test(p.bundle_version),'host_wake_native_policy_unavailable',503);
- need(canonical(p)===key.assertion_policy_json,'host_wake_native_policy_unavailable',503);return p as {profile:string;app_identifier:string;bundle_version:string};
+ need(typeof key.assertion_policy_json==='string','host_wake_native_policy_unavailable',503);
+ try{
+  const p:unknown=JSON.parse(key.assertion_policy_json);need(p!==null&&typeof p==='object'&&!Array.isArray(p));const r=p as Record<string,unknown>,v2=r.profile==='host_wake_apple_assertion_properties_v2';
+  exact(r,['profile','app_identifier','bundle_version',...(v2?['launch_validation_category_b64']:[])]);
+  need((r.profile==='host_wake_apple_assertion_properties_v1'||v2)&&typeof r.app_identifier==='string'&&new RegExp('^[A-Z0-9]{10}\\.'+key.host_bundle.replaceAll('.','\\.')+'$').test(r.app_identifier)&&typeof r.bundle_version==='string'&&(v2?/^[0-9]{1,20}(?:\.[0-9]{1,20}){0,2}$/:/^[0-9]{1,20}$/).test(r.bundle_version));
+  if(v2)decodeLaunchCategory(r.launch_validation_category_b64);need(canonical(r)===key.assertion_policy_json);
+  return r as {profile:string;app_identifier:string;bundle_version:string;launch_validation_category_b64?:string};
+ }catch{need(false,'host_wake_native_policy_unavailable',503);}
 }
+
 /** Reads its actual trusted enrollment/key and immutable original job from D1.
  * Fixed algorithm/key WebCrypto failures propagate; only malformed/false proof
  * returns null. A parsed DATA policy or key from a caller cannot enter this API. */
@@ -50,6 +56,7 @@ export async function verifySavedAssertion(db:D1Database,authorization:string,pr
  need(await window.run(()=>store.isLive(authorization,principal,window.check())),'host_wake_native_authority',403);
  const key=await window.run(()=>db.prepare(`SELECT n.* FROM host_wake_native_enrollments n JOIN host_wake_operator_authorizations a ON n.native_key_ref=json_extract(a.authorization_json,'$.native_key_ref') WHERE a.authorization_id=? AND n.disabled=0`).bind(authorization).first<Enrollment>());
  need(key,'host_wake_native_enrollment_unavailable',503);const p=decodeSavedAssertionPolicy(key),o=decodeNativeOriginal(JSON.parse(job.original_json)),c=decodeNativeChallenge(JSON.parse(job.challenge_json),o);
+ if(p.profile==='host_wake_apple_assertion_properties_v2'){const selected=await currentNativePolicy(db,authorization,key.native_key_ref,window,o);need(selected.row.outcome==='enrolled'&&selected.row.policy_json===key.native_policy_json,'host_wake_native_authority',403);}else need(key.native_policy_json===null,'host_wake_native_policy_unavailable',503);
  need(key.native_key_id_b64===o.native_key_id_b64&&key.host_bundle===o.target.host_bundle_id&&key.install_id===o.target.installation_id&&key.platform===o.platform&&key.environment===o.apns_environment&&key.identity_policy_sha256===o.identity_policy_sha256&&key.deployment_policy_sha256===o.deployment_policy_sha256&&key.issued_at<=window.check()&&key.expires_at>window.check(),'host_wake_native_policy_changed',403);
  need(/^[a-f0-9]{64}$/.test(key.enrollment_receipt_sha256)&&/^[a-f0-9]{64}$/.test(key.signed_environment_receipt_sha256)&&Number.isSafeInteger(key.counter)&&key.counter>=0&&key.counter<=0xffffffff,'host_wake_native_policy_unavailable',503);
  need(job.challenge_id===c.challenge_id&&job.captured_at===c.captured_at_ms&&job.expires_at===c.expires_at_ms&&job.operation_id===o.operation_id&&job.generation===o.generation&&job.revision===o.revision,'host_wake_native_saved_context',503);
@@ -58,7 +65,7 @@ export async function verifySavedAssertion(db:D1Database,authorization:string,pr
   const obj=closedMap(decode(bytes(input.bytes_b64)),['signature','authenticatorData']);const raw=obj.get('authenticatorData');valid(raw instanceof Uint8Array&&raw.length>=38&&raw.length<=2048);auth=raw;
   valid(auth[32]===0xc0);counter=new DataView(auth.buffer,auth.byteOffset,auth.byteLength).getUint32(33,false);valid(counter>key.counter);
   const props=closedMap(decode(auth.subarray(37)),['apple_bundle_version_01','apple_validation_category_01']);valid(props.get('apple_bundle_version_01')===p.bundle_version);
-  const category=props.get('apple_validation_category_01');valid(category instanceof Uint8Array&&equal(category,new Uint8Array([3,0,0,0])));
+  const category=props.get('apple_validation_category_01');valid(category instanceof Uint8Array&&equal(category,p.profile==='host_wake_apple_assertion_properties_v2'?bytes(p.launch_validation_category_b64!):new Uint8Array([3,0,0,0])));
   rawSig=signature(obj.get('signature'));
  }catch{return null;}
  // These inputs/algorithms are fixed and trusted. Their exceptions are internal
@@ -79,7 +86,7 @@ export async function commitVerifiedAssertion(result:VerifiedAssertion,window:Re
  const {db,job,key,principal,claim,counter,original}=saved;const commitClaim=crypto.randomUUID();window.check();const SQL_NOW="CAST(unixepoch('subsec')*1000 AS INTEGER)";
  await window.run(()=>db.batch([
   db.prepare(`UPDATE host_wake_native_enrollments SET counter=?,counter_claim=? WHERE native_key_ref=? AND counter=? AND disabled=0
-   AND issued_at<=${SQL_NOW} AND expires_at>${SQL_NOW} AND public_key_spki_b64=? AND assertion_policy_json=?
+   AND issued_at<=${SQL_NOW} AND expires_at>${SQL_NOW} AND public_key_spki_b64=? AND assertion_policy_json=? AND native_policy_json IS ?
    AND identity_policy_sha256=? AND deployment_policy_sha256=? AND enrollment_receipt_sha256=? AND signed_environment_receipt_sha256=?
    AND host_bundle=? AND install_id=? AND platform=? AND environment=? AND native_key_id_b64=?
    AND EXISTS(SELECT 1 FROM host_wake_native_jobs j JOIN host_wake_operator_authorizations a ON a.authorization_id=j.authorization_id
@@ -87,10 +94,10 @@ export async function commitVerifiedAssertion(result:VerifiedAssertion,window:Re
     JOIN host_wake_issuer_once s ON s.authorization_id=j.authorization_id AND s.core_purpose_id=j.core_purpose_id
     WHERE j.challenge_id=? AND j.private_job_id=? AND j.verification_claim=? AND j.outcome='verifying' AND j.original_json=? AND j.expires_at>${SQL_NOW}
     AND j.proof_kind='app_attest_assertion' AND a.authorization_id=? AND a.outcome='authorized' AND a.expires_at>${SQL_NOW}
-    AND i.id=? AND i.disabled=0 AND s.outcome='issued' AND s.expires_at>${SQL_NOW} AND s.original_json=j.original_json
+    AND i.id=? AND i.disabled=0 AND s.native_proof_kind='app_attest_assertion' AND s.outcome='issued' AND s.expires_at>${SQL_NOW} AND s.original_json=j.original_json
     AND json_extract(a.authorization_json,'$.native_key_ref')=host_wake_native_enrollments.native_key_ref)
    AND NOT EXISTS(SELECT 1 FROM host_wake_native_verifications WHERE challenge_id=?)`)
-   .bind(counter,commitClaim,key.native_key_ref,key.counter,key.public_key_spki_b64,key.assertion_policy_json,key.identity_policy_sha256,key.deployment_policy_sha256,key.enrollment_receipt_sha256,key.signed_environment_receipt_sha256,key.host_bundle,key.install_id,key.platform,key.environment,key.native_key_id_b64,job.challenge_id,job.private_job_id,claim,original,job.authorization_id,principal,job.challenge_id),
+   .bind(counter,commitClaim,key.native_key_ref,key.counter,key.public_key_spki_b64,key.assertion_policy_json,key.native_policy_json,key.identity_policy_sha256,key.deployment_policy_sha256,key.enrollment_receipt_sha256,key.signed_environment_receipt_sha256,key.host_bundle,key.install_id,key.platform,key.environment,key.native_key_id_b64,job.challenge_id,job.private_job_id,claim,original,job.authorization_id,principal,job.challenge_id),
   db.prepare(`INSERT OR IGNORE INTO host_wake_native_verifications(challenge_id,private_job_id,native_key_ref,verified_counter,verified_at,original_json,commit_claim)
    SELECT ?,?,?,?,${SQL_NOW},?,? FROM host_wake_native_enrollments n WHERE n.native_key_ref=? AND n.counter=? AND n.counter_claim=?
    AND EXISTS(SELECT 1 FROM host_wake_native_jobs WHERE challenge_id=? AND verification_claim=? AND outcome='verifying' AND expires_at>${SQL_NOW})`)

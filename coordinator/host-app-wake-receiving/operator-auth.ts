@@ -2,9 +2,10 @@
 import {requireAdminAuth} from '../../src/auth';
 import type {AppEnv} from '../../src/types';
 import {need} from '../host-app-wake/wire';
+import {decodeNativePolicy,decodeNativePolicyWithdrawal,OPERATOR_NATIVE_POLICY,OPERATOR_NATIVE_WITHDRAW} from './native-policy';
 import {boundedJson,decodeOperatorAuthorization,decodeOperatorWithdrawal,OPERATOR_AUTHORIZE,OPERATOR_WITHDRAW} from './wire';
-export async function authenticateOperator(request:Request,env:AppEnv,kind:'authorize'|'withdraw'){
- const path=kind==='authorize'?OPERATOR_AUTHORIZE:OPERATOR_WITHDRAW,url=new URL(request.url);
+export async function authenticateOperator(request:Request,env:AppEnv,kind:'authorize'|'withdraw'|'native_policy'|'native_policy_withdraw'){
+ const path=kind==='authorize'?OPERATOR_AUTHORIZE:kind==='withdraw'?OPERATOR_WITHDRAW:kind==='native_policy'?OPERATOR_NATIVE_POLICY:OPERATOR_NATIVE_WITHDRAW,url=new URL(request.url);
  need(request.method==='POST'&&url.pathname===path&&!url.search&&!url.hash,'host_wake_operator_route',404);
  need(!request.headers.has('origin')&&!request.headers.has('cookie'),'host_wake_server_transport',403);
  // requireAdminAuth also supports shared-secret Bearer. Do not admit that
@@ -15,7 +16,7 @@ export async function authenticateOperator(request:Request,env:AppEnv,kind:'auth
  await requireAdminAuth(authRequest,env);
  // Existing HMAC signs timestamp+'.'+exact body, not URL. These signed body
  // fields bind the actual method/path/action/version explicitly, after auth.
- const value=kind==='authorize'?decodeOperatorAuthorization(body.value):decodeOperatorWithdrawal(body.value);
+ const value=kind==='authorize'?decodeOperatorAuthorization(body.value):kind==='withdraw'?decodeOperatorWithdrawal(body.value):kind==='native_policy'?decodeNativePolicy(body.value):decodeNativePolicyWithdrawal(body.value);
  need(value.route===url.pathname&&value.method===request.method,'host_wake_operator_route_binding',403);
  return value;
 }

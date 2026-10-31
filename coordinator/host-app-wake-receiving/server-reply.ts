@@ -12,8 +12,8 @@ export const PRIVATE_ERRORS:Readonly<Record<number,readonly string[]>>=Object.fr
  400:['host_wake_invalid'],401:['host_wake_core_auth','host_wake_operator_hmac_required','auth_required'],
  403:['host_wake_principal_scope','host_wake_native_authority','host_wake_header_body_scope','host_wake_original_scope','host_wake_original_native_token','host_wake_native_proof_rejected'],
  404:['host_wake_receiving_route','host_wake_operator_route','host_wake_history_unknown'],
- 409:['host_wake_intent_consumed','host_wake_intent_capacity_or_authority','host_wake_authorization_consumed_or_capacity','host_wake_issuer_consumed_or_capacity','host_wake_issuer_consumed','host_wake_native_job_consumed_or_capacity','host_wake_native_job_consumed','host_wake_native_job_expired','host_wake_transport_expired','host_wake_body_timeout','host_wake_cancelled'],
- 413:['host_wake_size'],415:['host_wake_media'],503:['host_wake_receiving_unavailable','host_wake_authorization_unavailable','host_wake_native_enrollment_unavailable','host_wake_native_policy_unavailable','host_wake_native_attestation_unavailable','host_wake_native_deployment_mismatch']
+ 409:['host_wake_native_policy_consumed_or_capacity','host_wake_intent_consumed','host_wake_intent_capacity_or_authority','host_wake_authorization_consumed_or_capacity','host_wake_issuer_consumed_or_capacity','host_wake_issuer_consumed','host_wake_native_job_consumed_or_capacity','host_wake_native_job_consumed','host_wake_native_job_expired','host_wake_transport_expired','host_wake_body_timeout','host_wake_cancelled'],
+ 413:['host_wake_size'],415:['host_wake_media'],503:['host_wake_native_status_unavailable','host_wake_native_receipt_unavailable','host_wake_receiving_unavailable','host_wake_authorization_unavailable','host_wake_native_enrollment_unavailable','host_wake_native_policy_unavailable','host_wake_native_attestation_unavailable','host_wake_native_deployment_mismatch']
 });
 export function privateError(code:string,status:number){
  if(!PRIVATE_ERRORS[status]?.includes(code)){status=503;code='host_wake_receiving_unavailable';}

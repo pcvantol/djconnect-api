@@ -626,7 +626,8 @@
                 "host_wake_native_job_expired",
                 "host_wake_transport_expired",
                 "host_wake_body_timeout",
-                "host_wake_cancelled"
+                "host_wake_cancelled",
+                "host_wake_native_policy_consumed_or_capacity"
               ]
             }
           }
@@ -796,7 +797,9 @@
                 "host_wake_native_policy_unavailable",
                 "host_wake_native_attestation_unavailable",
                 "host_wake_native_deployment_mismatch",
-                "host_wake_authorization_unavailable"
+                "host_wake_authorization_unavailable",
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable"
               ]
             }
           }
@@ -2597,7 +2600,10 @@
           "maximum": 64
         },
         "native_proof_kind": {
-          "const": "app_attest_assertion"
+          "enum": [
+            "app_attest_assertion",
+            "app_attest_attestation"
+          ]
         },
         "registration_mode": {
           "const": "single_original_no_rotation"

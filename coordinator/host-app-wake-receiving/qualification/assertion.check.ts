@@ -1,10 +1,14 @@
 import {env} from 'cloudflare:test';
 import {beforeAll,beforeEach,describe,it,expect,vi} from 'vitest';
 import cbor from 'cbor';import * as pki from 'pkijs';
+import firstJobGuard from '../native-first-job-guard.sql?raw';
+import keyInsertGuard from '../native-key-insert-guard.sql?raw';
+import firstProofGuard from '../native-first-proof-guard.sql?raw';
 import issuerGuard from '../issuer-guard.sql?raw';
 import schema from '../schema.sql?raw';import eligibility from '../eligibility-view.sql?raw';import regGuard from '../registration-guard.sql?raw';import dispatchGuard from '../dispatch-guard.sql?raw';import hostSchema from '../../host-app-wake/schema.sql?raw';import installSchema from '../../../migrations/0002_install_tokens.sql?raw';
 import {TARGET_CAPABILITY_HEADER,TARGET_OPERATION_HEADER,TARGET_REQUEST_HASH_HEADER,decodeTargetReply} from '../target-transport';
 import {createReceivingService} from '../service';
+import {decodeNativePolicy,assertionPolicyForNative,OPERATOR_NATIVE_POLICY} from '../native-policy';
 import {resolveAuthorization,decodeResolvedAuthorization,RESOLVE_PATH} from '../authorization-resolve';
 import {sha256Hex} from '../../../src/crypto';
 import {bindSource181} from '../source-backend';
@@ -26,7 +30,7 @@ function combine(a:Uint8Array,b:Uint8Array){const c=new Uint8Array(a.length+b.le
 function clock(){return new RequestWindow(()=>Date.now(),new AbortController().signal);}
 async function job(original=o,id=vectors.challenge.challenge_id,nonce='A'.repeat(43),privateClaim=claim){
  const c={challenge_id:id,nonce_b64url:nonce,captured_at_ms:at,expires_at_ms:at+30000};
- await store.reserveIssuer('authorization','record','issuer-'+original.core_purpose_id,'b'.repeat(64),original,'private-'+original.core_purpose_id,'issuer-claim',at,at);
+ await store.reserveIssuer('authorization','record','issuer-'+original.core_purpose_id,'b'.repeat(64),original,'private-'+original.core_purpose_id,'issuer-claim',at,at,'app_attest_assertion');
  const issuer=(await store.issuer('authorization',original.core_purpose_id))!,w=clock(),backend=await bindSource181(sourceEnv,issuer,'record',w,async()=>new Response('not-used'),16);
  try{const issued=await backend.service.issueOriginal(undefined,w.signal);capabilities.set(original.core_purpose_id,issued.credential);}finally{backend.close();w.close();}
  await store.finishIssuer('authorization',original.core_purpose_id,'issued',Date.now(),'issuer-claim','b'.repeat(64),'record');
@@ -42,9 +46,9 @@ async function assertion(original=o,challenge=vectors.challenge,counter=1){
 }
 let c:{challenge_id:string;nonce_b64url:string;captured_at_ms:number;expires_at_ms:number};
 describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHETIC authority only',()=>{
- beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const sql of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(sql).run();for(const sql of [eligibility,regGuard,dispatchGuard,issuerGuard])await env.DB.prepare(sql).run();});
+ beforeAll(async()=>{for(const text of [installSchema,hostSchema,schema])for(const sql of text.replace(/--[^\n]*/g,'').split(';').filter(x=>x.trim()))await env.DB.prepare(sql).run();for(const sql of [eligibility,regGuard,dispatchGuard,issuerGuard,firstJobGuard,keyInsertGuard,firstProofGuard])await env.DB.prepare(sql).run();});
  beforeEach(async()=>{
-  for(const table of ['host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();
+  for(const table of ['host_wake_native_pending_policies','host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+table).run();
   capabilities=new Map();sourceEnv={...env,APNS_TEAM_ID:'ABCDEFGHIJ',APNS_KEY_ID:'KLMNOPQRST',APNS_PRIVATE_KEY:'synthetic-unused-provider-key-not-a-real-credential',APNS_TOPIC_IOS:'example.fixture.host',APNS_ENVIRONMENT:'sandbox',APNS_TOKEN_ENCRYPTION_KEY:btoa('0123456789abcdef0123456789abcdef')} as AppEnv;
   at=Date.now()-100;store=new ReceivingStore(env.DB,16);pair=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']) as CryptoKeyPair;
   const point=new Uint8Array(await crypto.subtle.exportKey('raw',pair.publicKey) as ArrayBuffer);spki=b64(new Uint8Array(await crypto.subtle.exportKey('spki',pair.publicKey) as ArrayBuffer));
@@ -54,6 +58,12 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
   await store.authorize(decodeOperatorAuthorization({version:RECEIVING_VERSION,method:'POST',route:OPERATOR_AUTHORIZE,action:'authorize',operation_id:'operator-op',authorization_id:'authorization',core_install_token_record_id:'record',ha_install_id:'install',native_key_ref:'native-record',...scope,max_original_purpose_ms:28800000,max_operations:256,max_reserved_sends:64,original_authorization_issued_at_ms:at-1,original_authorization_expires_at_ms:at+7200000}),'a'.repeat(64),at,at);
   await env.DB.prepare(`INSERT INTO host_wake_native_enrollments(native_key_ref,native_key_id_b64,public_key_spki_b64,assertion_policy_json,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,issued_at,expires_at,counter) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)`)
    .bind('native-record',o.native_key_id_b64,spki,canonical({profile:'host_wake_apple_assertion_properties_v1',app_identifier:app,bundle_version:'12345'}),o.target.host_bundle_id,o.target.installation_id,o.platform,o.apns_environment,o.identity_policy_sha256,o.deployment_policy_sha256,'e'.repeat(64),'f'.repeat(64),at,at+7200000).run();
+  // Trusted SYNTHETIC prior-enrollment fixture, not a first-Apple verifier
+  // result or production seed. The HTTP backend now requires a bound v2 policy;
+  // old unbound/QA rows cannot become native authority through API composition.
+  const nativePolicy=decodeNativePolicy({version:RECEIVING_VERSION,method:'POST',route:OPERATOR_NATIVE_POLICY,action:'native_policy',operation_id:'synthetic-prior-policy',authorization_id:'authorization',native_key_ref:'native-record',native_key_id_b64:o.native_key_id_b64,profile:'host_wake_apple_properties_attestation_v2',app_identifier:app,apns_team_id:'ABCDEFGHIJ',app_attest_environment:'development',bundle_version:'12345',launch_validation_category_b64:btoa(String.fromCharCode(3,0,0,0)),signed_host_artifact_sha256:'9'.repeat(64),signed_environment_receipt_sha256:'f'.repeat(64),scope,original_policy_issued_at_ms:at,original_policy_expires_at_ms:at+7200000});
+  await env.DB.prepare(`INSERT INTO host_wake_native_pending_policies(native_key_ref,native_key_id_b64,authorization_id,operation_id,request_hash,policy_json,issued_at,expires_at,outcome,original_request_expires_at) VALUES(?,?,?,?,?,?,?,?,'enrolled',?)`).bind('native-record',o.native_key_id_b64,'authorization',nativePolicy.operation_id,'9'.repeat(64),canonical(nativePolicy),at,at+7200000,at+30000).run();
+  await env.DB.prepare('UPDATE host_wake_native_enrollments SET native_policy_json=?,assertion_policy_json=?').bind(canonical(nativePolicy),assertionPolicyForNative(nativePolicy)).run();
   c=await job();
  });
  async function verified(w:RequestWindow){return verifySavedAssertion(env.DB,'authorization','record',c.challenge_id,claim,await assertion(o,c),w);}
@@ -174,7 +184,7 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
  it('never lets an existing issuer loser close the winning private reserved claim',async()=>{
   const original=decodeNativeOriginal({...o,core_purpose_id:'reserved-http-child'}),input=serverInput(original.core_purpose_id);
   const hash=await sha256Hex(canonical(['DJC-HOST-WAKE-API-REQUEST-V1','POST','/v1/push/host-app-wake/issuer/issue',{...input,original}]));
-  await store.reserveIssuer('authorization','record',input.issuer_operation_id,hash,original,'existing-private-child','retained-winning-claim',at,at);
+  await store.reserveIssuer('authorization','record',input.issuer_operation_id,hash,original,'existing-private-child','retained-winning-claim',at,at,'app_attest_assertion');
   const svc=receiving();try{const reply=await svc.handle(privateRequest('issuer/issue',{...input,original}));expect(reply.status).toBe(409);expect((await store.issuer('authorization',original.core_purpose_id))?.outcome).toBe('reserved');}finally{svc.close();}
  });
  it('closes a real child at full capacity without capability, encryption or provider configuration',async()=>{
@@ -236,7 +246,7 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
  });
 
  it('blocks the actual delayed Source181 INSERT after negative closure; absent-guard control demonstrates the old gap',async()=>{
-  const original=decodeNativeOriginal({...o,core_purpose_id:'late-source-insert'});await store.reserveIssuer('authorization','record','late-source-issuer','8'.repeat(64),original,'late-source-private','late-source-claim',at,at);
+  const original=decodeNativeOriginal({...o,core_purpose_id:'late-source-insert'});await store.reserveIssuer('authorization','record','late-source-issuer','8'.repeat(64),original,'late-source-private','late-source-claim',at,at,'app_attest_assertion');
   const issuer=(await store.issuer('authorization',original.core_purpose_id))!,w=clock(),backend=await bindSource181(sourceEnv,issuer,'record',w,fetch,16),source=new WakeStore(env.DB);
   try{
    await store.withdrawIssuer('authorization',original.core_purpose_id,'record');
@@ -255,7 +265,7 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
 
  it('reports an abandoned issuer reservation expired at its original callback boundary, without a fresh pending window',async()=>{
   const original=decodeNativeOriginal({...o,core_purpose_id:'old-reserved-http-child'}),input=serverInput(original.core_purpose_id);
-  await store.reserveIssuer('authorization','record',input.issuer_operation_id,'9'.repeat(64),original,'old-reserved-private','old-reserved-claim',at,at);
+  await store.reserveIssuer('authorization','record',input.issuer_operation_id,'9'.repeat(64),original,'old-reserved-private','old-reserved-claim',at,at,'app_attest_assertion');
   await env.DB.prepare('UPDATE host_wake_issuer_once SET original_request_expires_at=? WHERE core_purpose_id=?').bind(Date.now()-1,original.core_purpose_id).run();
   const svc=receiving();try{const response=await svc.handle(privateRequest('issuer/status',input));expect(response.status).toBe(200);const result=await response.json() as Record<string,unknown>;expect(result.state).toBe('expired');expect(result.credential_state).toBe('unavailable');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_receiving_intents').first('n')).toBe(0);}finally{svc.close();}
  });
