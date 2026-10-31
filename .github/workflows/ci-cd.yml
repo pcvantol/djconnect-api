@@ -26,77 +26,52 @@ jobs:
       execution_profile: balanced
       owner: pcvantol/djconnect-api
 
-  validate:
-    name: Validate
+  verify-workflow-pins:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
+    timeout-minutes: 2
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-
       - name: Verify reusable workflow pins
         env:
           GH_TOKEN: ${{ github.token }}
         run: bash scripts/check_reusable_workflow_refs.sh
 
+  checks:
+    name: Validate (${{ matrix.suite }})
+    needs: verify-workflow-pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        suite: [static, worker, product, composition]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version: 26
           cache: npm
-
       - name: Install dependencies
         run: npm ci
-
       - name: Dependency and tool freshness report
+        if: matrix.suite == 'static'
         run: |
           node --version
           npm --version
           npx wrangler --version
           npm run deps:report
-
       - name: Typecheck
+        if: matrix.suite == 'static'
         run: npx tsc --noEmit
-
       - name: Wrangler deploy dry-run
+        if: matrix.suite == 'static'
         run: npx wrangler deploy --dry-run
-
-      - name: Validate D1 migrations
-        run: npx wrangler d1 migrations apply djconnect_api --local
-
-      - name: Test
-        run: npm test -- --run
-
-      - name: Compiled rendezvous product and private RPC boundaries
-        run: npm run test:rendezvous-product
-
-      - name: Internal rendezvous product composition
-        run: npm run test:rendezvous-composition
-
-      - name: Generate post-merge coverage evidence
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          npm run test:coverage
-          printf '%s\n' "$GITHUB_SHA" > coverage-main-sha.txt
-
-      - name: Upload post-merge coverage evidence
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: api-cobertura-coverage
-          path: |
-            coverage/cobertura-coverage.xml
-            coverage-main-sha.txt
-          if-no-files-found: error
-
-      - name: Local E2E contract smoke
-        run: npm run test:e2e
-
-      - name: Postman contract smoke test
-        run: npm run postman:test
-
       - name: Secret pattern scan
+        if: matrix.suite == 'static'
         run: |
           set -euo pipefail
           matches="$(rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET=|APNS_PRIVATE_KEY=|Bearer [A-Za-z0-9]|ghp_|sk-|spotify_refresh|refresh_token|device_token" . || true)"
@@ -108,6 +83,53 @@ jobs:
               exit 1
             fi
           fi
+      - name: Validate D1 migrations
+        if: matrix.suite == 'worker'
+        run: npx wrangler d1 migrations apply djconnect_api --local
+      - name: Test
+        if: matrix.suite == 'worker'
+        run: npm test -- --run
+      - name: Generate post-merge coverage evidence
+        if: matrix.suite == 'worker' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        run: |
+          npm run test:coverage
+          printf '%s\n' "$GITHUB_SHA" > coverage-main-sha.txt
+      - name: Upload post-merge coverage evidence
+        if: matrix.suite == 'worker' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: api-cobertura-coverage
+          path: |
+            coverage/cobertura-coverage.xml
+            coverage-main-sha.txt
+          if-no-files-found: error
+      - name: Local E2E contract smoke
+        if: matrix.suite == 'worker'
+        run: npm run test:e2e
+      - name: Postman contract smoke test
+        if: matrix.suite == 'worker'
+        run: npm run postman:test
+      - name: Compiled rendezvous product and private RPC boundaries
+        if: matrix.suite == 'product'
+        run: npm run test:rendezvous-product
+      - name: Internal rendezvous product composition
+        if: matrix.suite == 'composition'
+        run: npm run test:rendezvous-composition
+
+  validate:
+    name: Validate
+    if: always()
+    needs: [software-assurance-governance, checks]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every independent validation lane
+        env:
+          CHECKS_RESULT: ${{ needs.checks.result }}
+          GOVERNANCE_RESULT: ${{ needs.software-assurance-governance.result }}
+        run: |
+          test "$CHECKS_RESULT" = success
+          test "$GOVERNANCE_RESULT" = success
 
   cleanup-workflow-runs:
     name: Cleanup old workflow runs
