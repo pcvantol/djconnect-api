@@ -49,6 +49,7 @@ class PreparationTests(unittest.TestCase):
                 self.rejects(self.plan)
             # Install only fixed, verified delta inputs; no fetching PR objects.
             additions = (*v.DELTA_SOURCES, *v.DELTA_ADDITIONS, *v.REFERENCE_DELTA, v.DELTA_PATH,
+                         v.WORKFLOW_DELTA_SOURCE, v.WORKFLOW_DELTA_PATH,
                          *(record[0] for record in v.DELTA_PROOFS))
             for path in additions:
                 raw = (canonical / path).read_bytes()
@@ -83,6 +84,38 @@ class PreparationTests(unittest.TestCase):
         with patch.object(v, 'pinned_working_proof', side_effect=lambda name, pin:
                           changed if name == path else original(name, pin)):
             self.rejects(self.plan)
+
+    def test_qualification_workflow_delta_cannot_expand_or_forge_history(self):
+        original = v.pinned_working_proof(v.WORKFLOW_DELTA_PATH, v.WORKFLOW_DELTA_SHA256)
+        for mutation in ('extra-source', 'wrong-original', 'no-change', 'wrong-new', 'wrong-scope', 'empty'):
+            changed = copy.deepcopy(original)
+            item = changed['changes'][v.WORKFLOW_DELTA_SOURCE]
+            if mutation == 'extra-source':
+                changed['changes']['src/index.ts'] = dict(item)
+            elif mutation == 'wrong-original':
+                item['before'] = 'f' * 64
+            elif mutation == 'no-change':
+                item['after'] = item['before']
+            elif mutation == 'wrong-new':
+                item['after'] = 'f' * 64
+            elif mutation == 'wrong-scope':
+                changed['scope'] = 'ACTIVATION'
+            else:
+                changed['changes'] = {}
+            with self.subTest(mutation=mutation):
+                self.rejects_changed_proof(v.WORKFLOW_DELTA_PATH, changed)
+
+    def test_qualification_workflow_metadata_is_not_an_activation_or_runtime_override(self):
+        sources, refs = v.baseline()
+        historical = v.decode((v.ROOT / v.DELTA_PROOFS[1][0]).read_bytes())['source_hashes']
+        changed = {name for name, pin in historical.items()
+                   if not name.startswith('node_modules/') and sources[name] != pin}
+        self.assertEqual(changed, {v.WORKFLOW_DELTA_SOURCE})
+        self.assertEqual(refs[v.WORKFLOW_DELTA_PATH], v.WORKFLOW_DELTA_SHA256)
+        result = v.validate(self.plan)
+        self.assertEqual(set(result['qualification_workflow_delta']), {v.WORKFLOW_DELTA_SOURCE})
+        self.assertEqual(result['open_gate_count'], 22)
+        self.assertFalse(result['activation_allowed'])
 
     def test_delta_missing_extra_noop_and_foreign_source_rejected(self):
         for mutation in ('missing', 'extra', 'noop', 'before', 'after', 'map',

@@ -77,7 +77,8 @@
     "docs/rendezvous/compatible-runtime-shared-observations-v4.json": "5bee972aa2bc3a02fe44b8f92543a90d7f1d42791e4aed59490fc7ac855153e0",
     "docs/rendezvous/compatible-runtime-module-observations-v4.json": "5389556e1ee2ee1e1f1d90af1ac17f3346157121f21df4e031ed23011c9f69b6",
     "docs/rendezvous/closed-enrollment-service-source-delta-v2.json": "8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5",
-    "docs/rendezvous/closed-enrollment-service-product-observations-v2.json": "82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15"
+    "docs/rendezvous/closed-enrollment-service-product-observations-v2.json": "82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15",
+    "docs/rendezvous/qualification-workflow-delta-v1.json": "5af37a24c9dfe7ead48425ce3597f0d9eb6288c20bc8ca5e415b5f977a96d3f1"
   },
   "schema_version": 1,
   "secret_names": [
@@ -164,7 +165,7 @@
     "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
     "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
     "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
-    ".github/workflows/ci-cd.yml": "546ad4495db1fbf8f83489c16cf7e32919525c3fa4e58e69e4e62b61ce5ab82b",
+    ".github/workflows/ci-cd.yml": "b9ad8dee552c9c91189fa816cbb5f922068c6d5af72b5f311c73a8172bf9f2de",
     "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
     "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
     "qualification/rendezvous/root-integration.check.mjs": "b30be29743d836a3a4d0d3c006369c5ca9c1b2c5d3a25be05ef221c1727d193e",
@@ -211,7 +212,9 @@
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
     "delta_sha256": "8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5",
     "effective_source_map_sha256": "e2d0a139879729c728ab89f85534987bbc28f95e47de9c05389f801a8028e239",
-    "kind": "BASELINE_PLUS_PINNED_DELTA"
+    "kind": "BASELINE_PLUS_PINNED_DELTA",
+    "qualification_workflow_delta_sha256": "5af37a24c9dfe7ead48425ce3597f0d9eb6288c20bc8ca5e415b5f977a96d3f1",
+    "qualified_source_map_sha256": "d75bef5d8a7ddcff4723639817f6f0e2c85967d528e9be3c2bbb0dc4fe1f5109"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

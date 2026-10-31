@@ -24,15 +24,22 @@ export async function checkSourcePins(pins,base){
 export async function sourceSnapshot(){
  const status=gitRead(['status','--porcelain','--untracked-files=normal']);need(status.status===0&&status.stdout==='');
  const checked=spawnSync('python3',['scripts/validate_rendezvous_deployment_plan.py'],{cwd:repo,encoding:'utf8',timeout:30000});
- need(checked.status===0&&JSON.parse(checked.stdout).activation_allowed===false);
+ need(checked.status===0);const preparation=JSON.parse(checked.stdout);need(preparation.activation_allowed===false);
  const plan=JSON.parse(await readFile(join(repo,'docs/rendezvous/deployment-preparation-v1.json')));
  const rootPath='docs/rendezvous/closed-enrollment-service-product-observations-v2.json';
  const rootRaw=await readFile(join(repo,rootPath));
  need(plan.reference_hashes[rootPath]===sha(rootRaw));
  const root=JSON.parse(rootRaw);
  // The current immutable proof may add installed bytes, never replace source pins.
- for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/'))need(plan.source_hashes[name]===pin);
- const pins={...plan.source_hashes,...plan.reference_hashes,...root.source_hashes};
+ // The offline validator accepts only the hash-pinned qualification-workflow
+ // delta. Historical runtime/installed proofs remain byte-bound and unchanged.
+ const delta=preparation.qualification_workflow_delta;
+ need(delta&&Object.keys(delta).join(',')==='.github/workflows/ci-cd.yml');
+ for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
+  if(Object.hasOwn(delta,name))need(delta[name].before===pin&&delta[name].after===plan.source_hashes[name]);
+  else need(plan.source_hashes[name]===pin);
+ }
+ const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
  const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===50);
  await checkSourcePins(pins,repo);
  for(const p of toolFiles)pins[p]=sha(await readFile(join(repo,p)));
