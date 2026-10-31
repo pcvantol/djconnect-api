@@ -107,7 +107,9 @@ class PreparationTests(unittest.TestCase):
 
     def test_qualification_workflow_metadata_is_not_an_activation_or_runtime_override(self):
         sources, refs = v.baseline()
-        historical = v.decode((v.ROOT / v.DELTA_PROOFS[1][0]).read_bytes())['source_hashes']
+        maps = [v.decode((v.ROOT / name).read_bytes())[field]
+                for name, _pin, field, _count, _scope in v.DELTA_PROOFS]
+        historical = v.merge_sources(maps[0], maps[2], maps[1], with_closed_issuer=True)
         changed = {name for name, pin in historical.items()
                    if not name.startswith('node_modules/') and sources[name] != pin}
         self.assertEqual(changed, {v.WORKFLOW_DELTA_SOURCE})
