@@ -1,0 +1,88 @@
+import type {NativeProofKind} from './server-wire';
+import {canonical} from '../../src/surface-push/wire';
+import {need,integer} from '../host-app-wake/wire';
+import {decodeOperatorAuthorization,decodeNativeOriginal,decodeNativeChallenge,type OperatorAuthorizationData,type NativeOriginalData,type NativeChallengeData} from './wire';
+export interface AuthorizationRow {authorization_id:string;operation_id:string;request_hash:string;core_install_token_record_id:string;ha_install_id:string;authorization_json:string;issued_at:number;expires_at:number;outcome:'authorized'|'expired'|'withdrawn';accepted_at:number;original_request_expires_at:number}
+export interface IssuerRow {authorization_id:string;core_purpose_id:string;issuer_operation_id:string;claim_id:string;request_hash:string;original_json:string;private_purpose_id:string;issued_at:number;expires_at:number;accepted_at:number;original_request_expires_at:number;outcome:'reserved'|'issued'|'expired'|'unknown'|'withdrawn'}
+export interface NativeJobRow {challenge_id:string;authorization_id:string;core_purpose_id:string;operation_id:string;generation:string;revision:number;request_hash:string;original_json:string;challenge_json:string;proof_kind:NativeProofKind;verification_claim:string|null;captured_at:number;expires_at:number;outcome:'reserved'|'verified'|'rejected'|'expired'|'unknown'|'withdrawn'}
+const LIVE=`SELECT 1 FROM host_wake_operator_authorizations a JOIN install_tokens i ON i.id=a.core_install_token_record_id AND i.ha_install_id=a.ha_install_id WHERE a.authorization_id=? AND a.outcome='authorized' AND a.issued_at<=? AND a.expires_at>? AND i.disabled=0`;
+/** Actual D1 once-history. No status read returns a credential or issues a grant.
+ * SQL checks actual local install-token state, not remote Core RAM state. */
+export class ReceivingStore {
+ constructor(readonly db:D1Database,readonly capacity:number){integer(capacity,1,10000);}
+ async authorization(id:string){return this.db.prepare('SELECT * FROM host_wake_operator_authorizations WHERE authorization_id=?').bind(id).first<AuthorizationRow>();}
+ async issuer(id:string,corePurpose:string){return this.db.prepare('SELECT * FROM host_wake_issuer_once WHERE authorization_id=? AND core_purpose_id=?').bind(id,corePurpose).first<IssuerRow>();}
+ async nativeJob(challenge:string){return this.db.prepare('SELECT * FROM host_wake_native_jobs WHERE challenge_id=?').bind(challenge).first<NativeJobRow>();}
+ /** Call only AFTER authenticating the actual selected custodian HMAC. The
+  * original captured deadline remains in the row even after late auth. */
+ async authorize(value:OperatorAuthorizationData,requestHash:string,captured:number,at:number){
+  const v=decodeOperatorAuthorization(value);integer(captured);integer(at,captured);integer(captured+30000);
+  // No unrelated token/HA pair can receive a grant, even under concurrency.
+  await this.db.prepare(`INSERT OR IGNORE INTO host_wake_operator_authorizations
+   (authorization_id,operation_id,request_hash,core_install_token_record_id,ha_install_id,authorization_json,issued_at,expires_at,outcome,accepted_at,original_request_expires_at)
+   SELECT ?,?,?,?,?,?,?,?,CASE WHEN ?>=? OR ?>=? THEN 'expired' ELSE 'authorized' END,?,?
+   WHERE EXISTS(SELECT 1 FROM install_tokens WHERE id=? AND ha_install_id=? AND disabled=0)
+   AND (SELECT COUNT(*) FROM host_wake_operator_authorizations)<?`)
+   .bind(v.authorization_id,v.operation_id,requestHash,v.core_install_token_record_id,v.ha_install_id,canonical(v),v.original_authorization_issued_at_ms,v.original_authorization_expires_at_ms,at,captured+30000,at,v.original_authorization_expires_at_ms,captured,captured+30000,v.core_install_token_record_id,v.ha_install_id,this.capacity).run();
+  const row=await this.authorization(v.authorization_id);need(row&&row.request_hash===requestHash&&row.operation_id===v.operation_id,'host_wake_authorization_consumed_or_capacity',409);return row;
+ }
+ /** Preallocated terminal update; works at full capacity without encryption,
+  * provider credentials or an additional operation/budget allocation. */
+ async withdrawAuthorization(id:string){
+  await this.db.batch([
+   this.db.prepare("UPDATE host_wake_operator_authorizations SET outcome='withdrawn' WHERE authorization_id=?").bind(id),
+   this.db.prepare("UPDATE host_wake_issuer_once SET outcome='withdrawn' WHERE authorization_id=?").bind(id),
+   this.db.prepare("UPDATE host_wake_native_jobs SET outcome='withdrawn' WHERE authorization_id=?").bind(id),
+   this.db.prepare(`UPDATE host_app_wake_purposes SET withdrawn=1,ciphertext=NULL,nonce=NULL WHERE purpose_id IN (SELECT private_purpose_id FROM host_wake_issuer_once WHERE authorization_id=?)`).bind(id)
+  ]);
+ }
+ async isLive(id:string,principal:string,at:number){integer(at);return !!await this.db.prepare(LIVE+' AND i.id=?').bind(id,at,at,principal).first();}
+ /** The original semantic purpose identity, not a transport operation UUID,
+  * is the primary once-key. A new HTTP retry cannot replace its deadline. */
+ async reserveIssuer(id:string,principal:string,operation:string,requestHash:string,original:NativeOriginalData,privatePurpose:string,claim:string,captured:number,at:number){
+  const v=decodeNativeOriginal(original);integer(captured);integer(at,captured);const auth=await this.authorization(id);need(auth,'host_wake_authorization_missing',403);const a=decodeOperatorAuthorization(JSON.parse(auth.authorization_json));
+  for(const k of ['owner_binding','device_binding','source_binding','paired_subject_binding_sha256','selected_ha_origin_sha256','identity_policy_sha256','deployment_policy_sha256','platform','apns_environment'] as const)need(v[k]===a[k],'host_wake_authorization_scope',403);
+  need(canonical(v.target)===canonical(a.target),'host_wake_authorization_scope',403);
+  need(v.original_wake_issued_at_ms>=a.original_authorization_issued_at_ms&&v.original_wake_expires_at_ms<=a.original_authorization_expires_at_ms&&v.original_wake_expires_at_ms-v.original_wake_issued_at_ms<=a.max_original_purpose_ms,'host_wake_authorization_window',403);
+  // Bind to exactly the selected existing record; rotation has no inferred lineage.
+  need(principal===a.core_install_token_record_id,'host_wake_principal',403);
+  await this.db.prepare(`INSERT OR IGNORE INTO host_wake_issuer_once
+   (authorization_id,core_purpose_id,issuer_operation_id,claim_id,request_hash,original_json,private_purpose_id,issued_at,expires_at,accepted_at,original_request_expires_at,outcome)
+   SELECT ?,?,?,?,?,?,?,?,?,?,?,CASE WHEN ?>=? OR ?>=? THEN 'expired' ELSE 'reserved' END
+   WHERE EXISTS(${LIVE} AND i.id=?) AND (SELECT COUNT(*) FROM host_wake_issuer_once)<?`)
+   .bind(id,v.core_purpose_id,operation,claim,requestHash,canonical(v),privatePurpose,v.original_wake_issued_at_ms,v.original_wake_expires_at_ms,captured,captured+30000,at,captured+30000,at,v.original_wake_expires_at_ms,id,at,at,principal,this.capacity).run();
+  const row=await this.issuer(id,v.core_purpose_id);need(row&&row.request_hash===requestHash&&row.issuer_operation_id===operation,'host_wake_issuer_consumed_or_capacity',409);return row;
+ }
+ /** Caller receives an existing challenge, never a new nonce on duplicate,
+  * lost-reply, UNKNOWN, rejected or expired semantic register attempts. */
+ async reserveNativeJob(id:string,principal:string,original:NativeOriginalData,challenge:NativeChallengeData,requestHash:string,expectedKind:NativeProofKind,at:number){
+  const v=decodeNativeOriginal(original),c=decodeNativeChallenge(challenge,v);integer(at,c.captured_at_ms);need(expectedKind==='app_attest_attestation'||expectedKind==='app_attest_assertion');
+  await this.db.prepare(`INSERT OR IGNORE INTO host_wake_native_jobs
+   (challenge_id,authorization_id,core_purpose_id,operation_id,generation,revision,request_hash,original_json,challenge_json,proof_kind,captured_at,expires_at,outcome)
+   SELECT ?,?,?,?,?,?,?,?,?,?,?,?,CASE WHEN ?>=? THEN 'expired' ELSE 'reserved' END
+   WHERE EXISTS(${LIVE} AND i.id=?)
+   AND EXISTS(SELECT 1 FROM host_wake_issuer_once WHERE authorization_id=? AND core_purpose_id=? AND outcome='issued' AND original_json=? AND expires_at>?)
+   AND (SELECT COUNT(*) FROM host_wake_native_jobs WHERE authorization_id=? AND core_purpose_id=?)<
+    (SELECT json_extract(authorization_json,'$.max_operations') FROM host_wake_operator_authorizations WHERE authorization_id=?)`)
+   .bind(c.challenge_id,id,v.core_purpose_id,v.operation_id,v.generation,v.revision,requestHash,canonical(v),canonical(c),expectedKind,c.captured_at_ms,c.expires_at_ms,at,c.expires_at_ms,id,at,at,principal,id,v.core_purpose_id,canonical(v),at,id,v.core_purpose_id,id).run();
+  const row=await this.nativeJob(c.challenge_id);need(row&&row.authorization_id===id&&row.core_purpose_id===v.core_purpose_id&&row.request_hash===requestHash&&row.proof_kind===expectedKind,'host_wake_native_job_consumed_or_capacity',409);return row;
+ }
+ /** Durable once marker BEFORE native crypto awaits. UNKNOWN is deliberately
+  * retained after crash/lost reply; only the selected real verifier may later
+  * atomically publish a valid proof/counter receipt. This store has no positive
+  * enrollment/verification writer or generic boolean proof-admission method. */
+ async claimNativeProof(id:string,principal:string,challenge:string,kind:NativeProofKind,claim:string,at:number):Promise<boolean>{
+  integer(at);const r=await this.db.prepare(`UPDATE host_wake_native_jobs SET outcome='unknown',verification_claim=?
+   WHERE challenge_id=? AND authorization_id=? AND proof_kind=? AND outcome='reserved' AND captured_at<=? AND expires_at>?
+   AND EXISTS(${LIVE} AND i.id=?)
+   AND EXISTS(SELECT 1 FROM host_wake_issuer_once s WHERE s.authorization_id=host_wake_native_jobs.authorization_id AND s.core_purpose_id=host_wake_native_jobs.core_purpose_id AND s.outcome='issued' AND s.expires_at>?)`)
+   .bind(claim,challenge,id,kind,at,at,id,at,at,principal,at).run();return r.meta.changes===1;
+ }
+ /** Reserve-to-issued is performed only once. Persisted UNKNOWN/expiry cannot
+  * be promoted by retry. No recovery of Source181's one-time credential. */
+ async finishIssuer(id:string,purpose:string,outcome:'issued'|'unknown'|'expired',at:number){
+  integer(at);await this.db.prepare(`UPDATE host_wake_issuer_once SET outcome=CASE WHEN original_request_expires_at<=? OR expires_at<=? THEN 'expired' ELSE ? END
+   WHERE authorization_id=? AND core_purpose_id=? AND outcome='reserved'
+   AND EXISTS(${LIVE})`).bind(at,at,outcome,id,purpose,id,at,at).run();
+ }
+}
