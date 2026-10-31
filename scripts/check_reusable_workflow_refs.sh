@@ -3,6 +3,18 @@ set -euo pipefail
 
 # A GitHub commit can still resolve through the API after it leaves main, while
 # Actions can reject reusable workflows pinned to that orphaned history.
+# Capture discovery in the parent shell. Process-substitution failures do not
+# propagate through set -e and must not silently skip every verification.
+# git is already required by Actions checkout; ripgrep is not a runner contract.
+if ! workflow_refs="$(git grep --no-index -h -o -E 'pcvantol/djconnect/\.github/workflows/[^ @]+@[0-9a-f]{40}' -- .github/workflows | sort -u)"; then
+  echo "Cannot enumerate pinned canonical reusable workflows" >&2
+  exit 1
+fi
+if [[ -z "${workflow_refs}" ]]; then
+  echo "No pinned canonical reusable workflows found" >&2
+  exit 1
+fi
+
 while IFS= read -r workflow_ref; do
   workflow_path="${workflow_ref#pcvantol/djconnect/}"
   workflow_path="${workflow_path%@*}"
@@ -14,4 +26,4 @@ while IFS= read -r workflow_ref; do
   fi
   gh api "repos/pcvantol/djconnect/contents/${workflow_path}?ref=${commit_sha}" --jq .path >/dev/null
   echo "Verified ${workflow_ref}"
-done < <(rg --no-filename -o 'pcvantol/djconnect/\.github/workflows/[^ @]+@[0-9a-f]{40}' .github/workflows | sort -u)
+done <<< "${workflow_refs}"
