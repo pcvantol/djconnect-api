@@ -1,0 +1,26 @@
+{
+  "classification": "SOURCE_QUALIFICATION_ONLY_NO_LIVE_FACTORY",
+  "base": "2d8637e634f5b2db84151e66027204db885d4369",
+  "reviewed_Cloudflare_preparation_sha256": "e5cd381a2723ec428c30cf00df998359fc8beee09d25b430c754b6ec0011308b",
+  "independent_Root_preparation_review_sha256": "a21454c8431e2972804ea511326a4c9bab3320e27fcb046d551994562c9f766e",
+  "inputs_sha256": {
+    "coordinator/cloudflare/Dockerfile": "3647f76d2a3b52259e7b630262befb8946dd0d882d82b7a729dc9c72dca58471",
+    "coordinator/cloudflare/README.md": "0d63286b64bb3d6e5a202cbe26610f724589aeb24ae6fef1c9b6bbd9ed417838",
+    "coordinator/cloudflare/build-source.mjs": "6d8c65af30bdf32b3c92e272753b66a57a3a6fd88eecd78f774f2f6038f9c958",
+    "coordinator/cloudflare/container-entry.ts": "b4e8175e2df586aac1e9ff165404fda3401f7c280312453ed0c2354c6adb2ae7",
+    "coordinator/cloudflare/executor.ts": "46d003a6bb752620b44897edcd62bf8cb86a3c4c872f56b14fd379132d65dd4b",
+    "coordinator/cloudflare/inputs.json": "fa97a37789bbcbce25ba46f653c960c634cb5ab40358ca019574a762689e4dc3",
+    "coordinator/cloudflare/model.ts": "11acfdfc0b498e843583424a7caa8634eb7947018e7d78837215e644b0142ab6",
+    "coordinator/cloudflare/outbound.ts": "dfd5a98da26d5c1a428afa43f96ae63a03ec2b2ff3b54deb065d8aa9efd8733a",
+    "coordinator/cloudflare/qualification/bridge-worker.ts": "dbf97985978e7a1a97469cafb1cbe33dd2c8cdfb936bc1cf2d244910e32201ba",
+    "coordinator/cloudflare/qualification/node-loopback.mjs": "faa3ad4d10b2ab3f4244f5f4bf295a38d8d2adf667da6cb558cfab5ef9f81707",
+    "coordinator/cloudflare/qualification/state.check.ts": "a6704281b88f905cee615ac7cee4dc677263fc10bbf60d289f970f6dc6fa2254",
+    "coordinator/cloudflare/qualification/tsconfig.json": "b965eac3f62f191625e54245773ae34842cdced00c0c76d0a9ff73a6380f354f",
+    "coordinator/cloudflare/qualification/vitest.config.mts": "ea197fb1c93e9e8fdc71a80d551b46ae6efdd41a7ebd0f6f634efb4bd987bf25",
+    "coordinator/cloudflare/qualification/worker.ts": "19c5e2af124978f59ea90fd2d6690ef1cfad24b2659b6db9e6a7fabc9d011675",
+    "coordinator/cloudflare/qualification/wrangler.jsonc": "60113b134da117d03309fac4159bc174f21abb6efe8844d3dc2a836b6047e58c",
+    "coordinator/cloudflare/rpc.ts": "f35a4f139cdbe9703eed90ce340d8d9f2542d10819e161616bc6edb9d0504d11",
+    "coordinator/cloudflare/state.ts": "461b1e45f2251c56865804eda44ebc0697ac3a888525c7e97e0a64ab5f9a7052",
+    ".github/workflows/cloudflare-coordinator-source.yml": "a53e0e5cac01e489ded6d9c59a2333528d75f4245144c3a3d8a8080f8729f6c5"
+  }
+}
