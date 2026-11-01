@@ -24,15 +24,45 @@ export async function checkSourcePins(pins,base){
 export async function sourceSnapshot(){
  const status=gitRead(['status','--porcelain','--untracked-files=normal']);need(status.status===0&&status.stdout==='');
  const checked=spawnSync('python3',['scripts/validate_rendezvous_deployment_plan.py'],{cwd:repo,encoding:'utf8',timeout:30000});
- need(checked.status===0&&JSON.parse(checked.stdout).activation_allowed===false);
+ need(checked.status===0);const preparation=JSON.parse(checked.stdout);need(preparation.activation_allowed===false);
  const plan=JSON.parse(await readFile(join(repo,'docs/rendezvous/deployment-preparation-v1.json')));
  const rootPath='docs/rendezvous/closed-enrollment-service-product-observations-v2.json';
  const rootRaw=await readFile(join(repo,rootPath));
  need(plan.reference_hashes[rootPath]===sha(rootRaw));
  const root=JSON.parse(rootRaw);
- // The current immutable proof may add installed bytes, never replace source pins.
- for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/'))need(plan.source_hashes[name]===pin);
- const pins={...plan.source_hashes,...plan.reference_hashes,...root.source_hashes};
+ // Retain both historical proofs and exact separately validated deltas.
+ // No current checkout/JSON may replace an original proof or authorize native.
+ const delta=preparation.qualification_workflow_delta;
+ need(delta&&Object.keys(delta).join(',')==='.github/workflows/ci-cd.yml');
+ const closedPath='docs/rendezvous/host-wake-closed-root-source-delta-v1.json';
+ const closedRaw=await readFile(join(repo,closedPath)),provenance=preparation.source_provenance;
+ need(plan.reference_hashes[closedPath]===sha(closedRaw)&&sha(closedRaw)===provenance.closed_receiving_root_delta_sha256);
+ const closed=JSON.parse(closedRaw);
+ need(closed.scope==='EXACT_CLOSED_RECEIVING_ROOT_SOURCE_DELTA_NOT_ACTIVATION'&&closed.public_activation_allowed===false);
+ need(closed.baseline_source_map_sha256===provenance.qualified_source_map_sha256&&closed.effective_source_map_sha256===provenance.closed_receiving_root_source_map_sha256);
+ const retentionPath='docs/rendezvous/active-ci-retention-source-delta-v1.json',retentionRaw=await readFile(join(repo,retentionPath));
+ need(plan.reference_hashes[retentionPath]===sha(retentionRaw)&&sha(retentionRaw)===provenance.active_ci_retention_delta_sha256);
+ const retention=JSON.parse(retentionRaw);
+ need(retention.scope==='EXACT_ACTIVE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'&&retention.public_activation_allowed===false);
+ need(retention.baseline_source_map_sha256===closed.effective_source_map_sha256&&retention.effective_source_map_sha256===provenance.active_ci_retention_source_map_sha256);
+ const categoryPath='docs/rendezvous/native-first-category-source-delta-v1.json',categoryRaw=await readFile(join(repo,categoryPath));
+ need(plan.reference_hashes[categoryPath]===sha(categoryRaw)&&sha(categoryRaw)===provenance.native_first_category_delta_sha256);
+ const category=JSON.parse(categoryRaw);need(category.scope==='EXACT_PRIVATE_FIRST_CATEGORY_SOURCE_NOT_ACTIVATION'&&category.public_activation_allowed===false);
+ need(category.baseline_source_map_sha256===retention.effective_source_map_sha256&&category.effective_source_map_sha256===provenance.native_first_category_source_map_sha256);
+ const mountPath='docs/rendezvous/private-receiving-mount-source-delta-v1.json',mountRaw=await readFile(join(repo,mountPath));
+ need(plan.reference_hashes[mountPath]===sha(mountRaw)&&sha(mountRaw)===provenance.private_receiving_mount_delta_sha256);
+ const mount=JSON.parse(mountRaw);need(mount.scope==='EXACT_PRIVATE_RECEIVING_MOUNT_NOT_EFFECT_AUTHORIZATION'&&mount.private_http_mount_selected===true&&mount.production_effect_authorized===false);
+ need(mount.baseline_source_map_sha256===category.effective_source_map_sha256&&mount.effective_source_map_sha256===provenance.private_receiving_mount_source_map_sha256);
+ for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
+  let expected=pin;
+  if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
+  if(Object.hasOwn(closed.changes,name)){need(closed.changes[name].before===expected);expected=closed.changes[name].after;}
+  if(Object.hasOwn(retention.changes,name)){need(retention.changes[name].before===expected);expected=retention.changes[name].after;}
+  if(Object.hasOwn(category.changes,name)){need(category.changes[name].before===expected);expected=category.changes[name].after;}
+  if(Object.hasOwn(mount.changes,name)){need(mount.changes[name].before===expected);expected=mount.changes[name].after;}
+  need(plan.source_hashes[name]===expected);
+ }
+ const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
  const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===50);
  await checkSourcePins(pins,repo);
  for(const p of toolFiles)pins[p]=sha(await readFile(join(repo,p)));

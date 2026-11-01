@@ -1,0 +1,23 @@
+{
+  "classification": "RICH_DELIVERY_EXPLICIT_PORT_ADAPTER_NOT_PRODUCTION_COMPOSITION",
+  "base": "e2ad9be00253e2ae4b23c3b42e3f6f3c31a57024",
+  "rich_contract_sha256": "2a4a4a4f49e0f6d5a1015169ff63b27091f80d6d857423940a0381d955bbb499",
+  "esbuild_version": "0.28.1",
+  "inputs_sha256": {
+    ".github/workflows/rich-delivery-adapter.yml": "45ec1cff1acf38282db3dec483fda262fffc02bd2d52ad7bcc193c88b39f9a74",
+    "coordinator/rich-delivery/README.md": "41fb9c3d8e7b7f01d3b6fa79b514673f93e00cf104520fb754d39a29c08c18ff",
+    "coordinator/rich-delivery/adapter.ts": "5330d1527ba717bbccf098bbcde4ae809f6f3554a748538b28742a6944801573",
+    "coordinator/rich-delivery/build-source.mjs": "6795bcefcf1a40a69aa75b5bc577e0152cfede237af0ea7e910d59a1367241fb",
+    "coordinator/rich-delivery/qualification/check-package.mjs": "06a50d4d696c79c3faf277b37193c5f7fe34d824b0140badf5c7d9f649c47fba",
+    "coordinator/rich-delivery/qualification/delivery.check.ts": "68800c8ff62054afb381c1eaab01deca8e53b4efc0403820dbf998fc0d18dd92",
+    "coordinator/rich-delivery/qualification/tsconfig.json": "e4dd5f91b5b9f288d99a658a53930567aff8789c343e37d38139209554b1d513",
+    "coordinator/rich-delivery/qualification/vitest.config.mts": "161c9b77854aa2acccc4a20c03b287cc738c2b45724992169e26dd5924c523a1",
+    "coordinator/rich-delivery/qualification/worker.ts": "d11984203d2423eebe79639c323bc35ea2505326549e609a771625fc42d827ce",
+    "coordinator/rich-delivery/qualification/wrangler.jsonc": "892eddafc89f22aa93ea884a3916c354ff4e954a5b60b7c66a6980f4d5d6f706",
+    "coordinator/rich-session/profile-data.ts": "d5c6c4755bff698e25aa5a58af5d1c19592d20815792b162f3a499678c985d96",
+    "coordinator/rich-session/qualification/apple-fixtures/attributes_original_uuid.json": "f3a40f9865cc311e0dbb7009c8d460b68192e6e7e85e1ad8f402db10b065b132",
+    "coordinator/rich-session/qualification/apple-fixtures/state_rich_both.json": "ca6a3ce305d5777226108dd5cf469ecedf9d116afcb4348b01725f6c0e110974",
+    "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+    "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a"
+  }
+}

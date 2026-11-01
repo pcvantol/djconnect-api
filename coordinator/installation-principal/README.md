@@ -8,9 +8,15 @@ This implementation requires its own whole-source/exact review and delivery.
 It is developed from reviewed parent PR168 candidate
 `b6e5360f05ffff3107c7c5f4256f9e1898ee329d`, normally merged with its own human
 approval as protected main `bd746b0602926720a57b518907b60c66289fcc14`.
-Those parent commits have identical trees. This child is restacked onto that
-protected main; the separate parent Final and this source's own exact review,
-CI, merge decision and original delivery remain distinct gates.
+Those original parent commits have identical trees. Initial candidate
+`854d98e59f45cd945f9e67367b2900c51bd565d3` was restacked onto that protected main.
+The current integration base is qualified Final189 main
+`75763b9bf5e8f76d94f2dec189f1baf54a4cc8c8`. Only this README, source-manifest
+metadata and its exact input pin for the current workflow-reference guard
+change; the twelve other source files and three-input bundled library graph
+are unchanged. Historical parent and source proofs keep their original scope.
+This source still requires a fresh exact review, current CI and protected
+delivery followed by its own original main qualification and separate Final.
 
 `decodeRecord(text, recordType)` accepts exactly eleven closed record families
 and a separate closed operation-status envelope with six outcome variants.

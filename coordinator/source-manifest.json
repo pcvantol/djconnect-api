@@ -9,7 +9,7 @@
   "Core_contract_state": "Content-pinned source candidate, not claimed merged or installed",
   "global_invariant_source": "Reviewed D1 once/CAS/global-counter recipe, reused semantics and new provider-specific tests, no D1 execution/authority substitution",
   "inputs_sha256": {
-    ".github/workflows/push-coordinator-source.yml": "97adb949c8aaf82e43d77da284e0158d6570e0fb8020520387a9cda6ab9f3f33",
+    ".github/workflows/push-coordinator-source.yml": "d1fb031429a38a574385ef0c5e7205b2b7958382180fb2743763e311dee9bf6e",
     "coordinator/README.md": "bf9613ca966abb2e64921fdb746e1c9677534568444ead6165809a97414556cf",
     "coordinator/pyproject.toml": "81552278748e5fc7163259e8262e8169292c69e41154531fee47fbd1d112233a",
     "coordinator/qualification/canonical-vectors.mjs": "59024ffa8db2177bb7b79dbc10f1b804b6c4b951a258b246714d9161ed878764",

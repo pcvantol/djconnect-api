@@ -123,11 +123,26 @@ export default {async fetch(request,env,ctx){
 	const options=name=>({name,compatibilityDate:'2026-06-20',compatibilityFlags:['nodejs_compat'],modulesRoot:output,
 		outboundService:()=>{egress++;return new Response(null,{status:503});},
 		modules:[{type:'ESModule',path:join(output,'driver.mjs'),contents:driver},{type:'ESModule',path:join(output,'bundle.mjs'),contents:bundle}],
-		bindings:name==='configured'?configured:{},
+		bindings:name==='private-auth'?{...configured,DJCONNECT_RELAY_SECRET:'SYNTHETIC_PRODUCT_AUTH_DENIAL_NOT_REAL'}:name==='configured'?configured:{},
+		d1Databases:name==='private-auth'?{DB:'local-private-auth-denial-only'}:{},
 		durableObjects:Object.fromEntries(Object.entries(inputs.local_test_bindings).map(([name,className])=>[name,{className,useSQLite:true}])),
 	});
-	runtime=new Miniflare(convertV4MiniflareOptions({workers:[options('missing'),options('configured')],durableObjectsPersist:false,unsafeInspectDurableObjects:true,log:new Log(LogLevel.NONE)}));
+	runtime=new Miniflare(convertV4MiniflareOptions({workers:[options('missing'),options('configured'),options('private-auth')],durableObjectsPersist:false,d1Persist:false,unsafeInspectDurableObjects:true,log:new Log(LogLevel.NONE)}));
 	const missing=await runtime.getWorker('missing'),good=await runtime.getWorker('configured');
+	let receivingConfigurationChecks=0;
+	for(const candidate of [missing,good])for(const suffix of ['', '/issuer/issue','/issuer/status','/issuer/withdraw','/native/challenge','/native/complete','/native/status','/authorization/resolve','/operator/authorize','/operator/withdraw','/operator/native-policy','/operator/native-policy/withdraw','/register','/wake','/status','/revoke'])for(const method of ['GET','POST']){
+		const response=await candidate.fetch('https://local.test/v1/push/host-app-wake'+suffix,{method});
+		assert.equal(response.status,503);assert.equal((await response.json()).error,'host_wake_receiving_unavailable');receivingConfigurationChecks++;
+	}
+	assert.equal(receivingConfigurationChecks,64);assert.equal(egress,0);
+	const privateWorker=await runtime.getWorker('private-auth');let receivingAuthChecks=0;
+	for(const suffix of ['', '/issuer/issue','/issuer/status','/issuer/withdraw','/native/challenge','/native/complete','/native/status','/authorization/resolve','/operator/authorize','/operator/withdraw','/operator/native-policy','/operator/native-policy/withdraw','/register','/wake','/status','/revoke'])for(const method of ['GET','POST']){
+		const response=await privateWorker.fetch('https://local.test/v1/push/host-app-wake'+suffix,{method,headers:{'content-type':'application/json'}});
+		const expected=method==='GET'||suffix===''?404:suffix.startsWith('/operator/')||suffix==='/authorization/resolve'?401:400;
+		assert.equal(response.status,expected);assert.equal((await response.json()).success,false);receivingAuthChecks++;
+	}
+	assert.equal(receivingAuthChecks,32);assert.equal(egress,0);
+
 	assert.equal((await good.fetch('https://local.test/__private_product_test/egress-guard')).status,503);
 	assert.equal(egress,1);egress=0;
 	let checks=0,forbiddenCalls=0;
@@ -190,7 +205,7 @@ export default {async fetch(request,env,ctx){
 	const keyCall=await rpc(good,'ADMISSION_STATE','admitKeyCall');assert.deepEqual(keyCall.value,{ok:true});checks++;
 	assert.equal(egress,0);checks++;
 	await runtime.dispose();runtime=undefined;
-	const report={schema_version:1,scope:'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY',result:'PASS',checks,forbidden_rpc_calls_rejected:forbiddenCalls,source_hashes:sources,
+	const report={schema_version:1,scope:'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY',result:'PASS',checks,unconfigured_receiving_prefix_checks:receivingConfigurationChecks,private_receiving_auth_denial_checks:receivingAuthChecks,forbidden_rpc_calls_rejected:forbiddenCalls,source_hashes:sources,
 		toolchain:{node:process.version,wrangler:(await load('node_modules/wrangler/package.json')).version,miniflare:wranglerRequire('miniflare/package.json').version},
 		bundle_sha256:sha(bundle),bundle_bytes:Buffer.byteLength(bundle),virtual_platform_inputs:virtualInputs,exports:entry[1].exports,rpc_allowlists:manifest.methods,
 		default_no_config:'FAIL_CLOSED',configured_malformed_default_genuine_enrollment:'REJECTED_ORIGINAL_CHALLENGE_PRESERVED',configured_unknown_key_management_proof:'REJECTED',unauthorized_key_rows:0,outbound_calls:egress,

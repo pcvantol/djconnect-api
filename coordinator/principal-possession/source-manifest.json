@@ -24,7 +24,7 @@
     "coordinator/worker-do/model.ts": "32721b4275b62ee75600a2c50537cbc2214bd9cba8369ed10acebc4669b2f094",
     "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
-    "scripts/check_reusable_workflow_refs.sh": "c81261d27ba9c2dcfbee8a4e3671b20fe476cd01b8ec17c162019ff7b153e046",
+    "scripts/check_reusable_workflow_refs.sh": "dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5",
     "coordinator/principal-possession/qualification/check-package.mjs": "130e16afb0ec969157e10b08718eda67720524bd665762bce2ce11e08fcc045f"
   }
 }

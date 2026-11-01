@@ -1,0 +1,18 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import assert from 'node:assert/strict';
+const dir=resolve(process.argv[2]),sha=x=>createHash('sha256').update(x).digest('hex');
+const proof=JSON.parse(await readFile(join(dir,'source-package.json')));
+assert.equal(sha(await readFile(join(dir,'host-app-wake.mjs'))),proof.module_sha256);
+assert.equal(sha(await readFile(join(dir,'schema.sql'))),proof.schema_sha256);
+assert.equal(sha(await readFile(join(dir,'LICENSE'))),proof.license_sha256);
+const {createHostAppWakeService,decode,VERSION,ROLE,BODY}=await import(pathToFileURL(join(dir,'host-app-wake.mjs')).href);
+assert.throws(()=>createHostAppWakeService({}));
+const request={version:VERSION,purpose_id:'synthetic-purpose',operation_id:'synthetic-operation',generation:'original-generation',revision:1,event:'direct_rich_refresh'};
+assert.deepEqual(decode('wake',request),request);
+for(const key of ['payload','artwork_url','read_credential','aps','topic'])assert.throws(()=>decode('wake',{...request,[key]:'forbidden'}));
+assert.equal(ROLE,'host_app_wake');assert.equal(BODY,'{"aps":{"content-available":1}}');
+const result={actual_packaged_ESM:true,module_sha256:proof.module_sha256,schema_sha256:proof.schema_sha256,strict_wake_input:true,no_default_ports:true,no_default_original_authority:true,content_free_body:true,actual_D1_or_APNs_in_this_package_check:false,actual_APNs_or_key_effect:false,production_admission:false};
+await writeFile(join(dir,'package-check.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

@@ -1,0 +1,369 @@
+{
+  "classification": "SYNTHETIC_PROTOCOL_SHAPES_ONLY; POSITIVE_NATIVE_REPLIES_ARE_MODELED_DATA_NOT_OBSERVED_APPLE_PROOF_OR_ADMISSION",
+  "original": {
+    "version": "djc-host-app-wake-native/1",
+    "core_purpose_id": "fixture-original-display",
+    "operation_id": "11111111-1111-4111-8111-111111111111",
+    "generation": "fixture-original-generation",
+    "revision": 1,
+    "token_role": "host_app_wake",
+    "target": {
+      "host_bundle_id": "example.fixture.host",
+      "installation_id": "fixture-native-install"
+    },
+    "platform": "ipados",
+    "apns_environment": "sandbox",
+    "native_key_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+    "native_token_sha256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+    "original_wake_issued_at_ms": 1800000000000,
+    "original_wake_expires_at_ms": 1800003600000,
+    "original_display_expires_at_ms": 1800007200000,
+    "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+    "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+    "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+    "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+  },
+  "retained_proof_kind": "app_attest_attestation",
+  "policy_request": {
+    "version": "djc-host-app-wake-receiving/1",
+    "method": "POST",
+    "route": "/v1/push/host-app-wake/operator/native-policy",
+    "action": "native_policy",
+    "operation_id": "fixture-first-policy-operation",
+    "authorization_id": "fixture-authorization",
+    "native_key_ref": "fixture-private-custodian-reference",
+    "native_key_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+    "profile": "host_wake_apple_properties_attestation_v2",
+    "app_identifier": "ABCDEFGHIJ.example.fixture.host",
+    "apns_team_id": "ABCDEFGHIJ",
+    "app_attest_environment": "development",
+    "bundle_version": "1.0",
+    "launch_validation_category_b64": "AwAAAA==",
+    "signed_host_artifact_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "signed_environment_receipt_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "scope": {
+      "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+      "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+      "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+      "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "target": {
+        "host_bundle_id": "example.fixture.host",
+        "installation_id": "fixture-native-install"
+      },
+      "platform": "ipados",
+      "apns_environment": "sandbox"
+    },
+    "original_policy_issued_at_ms": 1800000000000,
+    "original_policy_expires_at_ms": 1800007200000
+  },
+  "resolve": {
+    "classification": "SYNTHETIC_DATA_ONLY_NO_OPERATOR_ROLE_KEY_OR_DEVICE_AUTHORITY",
+    "request": {
+      "version": "djc-host-app-wake-receiving/1",
+      "scope": {
+        "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+        "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+        "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+        "target": {
+          "host_bundle_id": "example.fixture.host",
+          "installation_id": "fixture-native-install"
+        },
+        "platform": "ipados",
+        "apns_environment": "sandbox",
+        "native_key_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
+      }
+    },
+    "path": "/v1/push/host-app-wake/authorization/resolve",
+    "request_sha256": "097575c37f917f7d3377a092e667fdd93bae7c56f76696bff5db254a7ddef71d",
+    "scope_sha256": "cc95976c1fe8011962e671f6878bdcfa0292dc458ae07d940c4fb5986fd6f6dd",
+    "reply": {
+      "version": "djc-host-app-wake-receiving/1",
+      "resolution": "existing",
+      "authorization_id": "fixture-existing-operator-role",
+      "request_sha256": "097575c37f917f7d3377a092e667fdd93bae7c56f76696bff5db254a7ddef71d",
+      "scope_sha256": "cc95976c1fe8011962e671f6878bdcfa0292dc458ae07d940c4fb5986fd6f6dd",
+      "original_authorization_issued_at_ms": 1800000000000,
+      "original_authorization_expires_at_ms": 1800007200000,
+      "max_original_purpose_ms": 3600000,
+      "max_operations": 16,
+      "max_reserved_sends": 8,
+      "native_proof_kind": "app_attest_attestation",
+      "registration_mode": "single_original_no_rotation",
+      "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  },
+  "cases": [
+    {
+      "route": "issuer/issue",
+      "request": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "original": {
+          "version": "djc-host-app-wake-native/1",
+          "core_purpose_id": "fixture-original-display",
+          "operation_id": "11111111-1111-4111-8111-111111111111",
+          "generation": "fixture-original-generation",
+          "revision": 1,
+          "token_role": "host_app_wake",
+          "target": {
+            "host_bundle_id": "example.fixture.host",
+            "installation_id": "fixture-native-install"
+          },
+          "platform": "ipados",
+          "apns_environment": "sandbox",
+          "native_key_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+          "native_token_sha256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+          "original_wake_issued_at_ms": 1800000000000,
+          "original_wake_expires_at_ms": 1800003600000,
+          "original_display_expires_at_ms": 1800007200000,
+          "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+          "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+          "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+          "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+          "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+          "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+        }
+      },
+      "request_sha256": "02b6d9434be6de15dd94cd3eba89b9031955e0e19c7d910358a53c5287b689a0",
+      "reply": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "request_sha256": "02b6d9434be6de15dd94cd3eba89b9031955e0e19c7d910358a53c5287b689a0",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "state": "issued",
+        "original_wake_issued_at_ms": 1800000000000,
+        "original_wake_expires_at_ms": 1800003600000,
+        "original_display_expires_at_ms": 1800007200000,
+        "purpose_id": "fixture-private-API-purpose",
+        "credential_state": "available",
+        "credential": "djchw_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "expires_at_ms": 1800003600000,
+        "native_proof_kind": "app_attest_attestation",
+        "registration_mode": "single_original_no_rotation",
+        "original": {
+          "version": "djc-host-app-wake-native/1",
+          "core_purpose_id": "fixture-original-display",
+          "operation_id": "11111111-1111-4111-8111-111111111111",
+          "generation": "fixture-original-generation",
+          "revision": 1,
+          "token_role": "host_app_wake",
+          "target": {
+            "host_bundle_id": "example.fixture.host",
+            "installation_id": "fixture-native-install"
+          },
+          "platform": "ipados",
+          "apns_environment": "sandbox",
+          "native_key_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+          "native_token_sha256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+          "original_wake_issued_at_ms": 1800000000000,
+          "original_wake_expires_at_ms": 1800003600000,
+          "original_display_expires_at_ms": 1800007200000,
+          "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+          "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+          "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+          "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+          "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+          "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+        }
+      }
+    },
+    {
+      "route": "issuer/status",
+      "request": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display"
+      },
+      "request_sha256": "c268101d7f1d9cb5aa0ddd00592b313c28794ad4214d51a284d6d9e94c8eb34e",
+      "reply": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "request_sha256": "c268101d7f1d9cb5aa0ddd00592b313c28794ad4214d51a284d6d9e94c8eb34e",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "state": "issued",
+        "original_wake_issued_at_ms": 1800000000000,
+        "original_wake_expires_at_ms": 1800003600000,
+        "original_display_expires_at_ms": 1800007200000,
+        "purpose_id": "fixture-private-API-purpose",
+        "credential_state": "unavailable"
+      }
+    },
+    {
+      "route": "issuer/withdraw",
+      "request": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display"
+      },
+      "request_sha256": "c85a79b63980b2f4d59f02b6c03fa1f32426479c9072c50a1fd74a52d9c54fa5",
+      "reply": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "request_sha256": "c85a79b63980b2f4d59f02b6c03fa1f32426479c9072c50a1fd74a52d9c54fa5",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "state": "withdrawn",
+        "original_wake_issued_at_ms": 1800000000000,
+        "original_wake_expires_at_ms": 1800003600000,
+        "original_display_expires_at_ms": 1800007200000
+      }
+    },
+    {
+      "route": "native/challenge",
+      "request": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "challenge_id": "22222222-2222-4222-8222-222222222222"
+      },
+      "request_sha256": "0a20ff26b225cf3852843767fc5315e94ed41688ad50cf98b0b9f52caecbe617",
+      "reply": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "request_sha256": "0a20ff26b225cf3852843767fc5315e94ed41688ad50cf98b0b9f52caecbe617",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "state": "pending",
+        "original_wake_issued_at_ms": 1800000000000,
+        "original_wake_expires_at_ms": 1800003600000,
+        "original_display_expires_at_ms": 1800007200000,
+        "native_proof_kind": "app_attest_attestation",
+        "original": {
+          "version": "djc-host-app-wake-native/1",
+          "core_purpose_id": "fixture-original-display",
+          "operation_id": "11111111-1111-4111-8111-111111111111",
+          "generation": "fixture-original-generation",
+          "revision": 1,
+          "token_role": "host_app_wake",
+          "target": {
+            "host_bundle_id": "example.fixture.host",
+            "installation_id": "fixture-native-install"
+          },
+          "platform": "ipados",
+          "apns_environment": "sandbox",
+          "native_key_id_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+          "native_token_sha256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+          "original_wake_issued_at_ms": 1800000000000,
+          "original_wake_expires_at_ms": 1800003600000,
+          "original_display_expires_at_ms": 1800007200000,
+          "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+          "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+          "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+          "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+          "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+          "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+        },
+        "challenge": {
+          "challenge_id": "22222222-2222-4222-8222-222222222222",
+          "nonce_b64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          "captured_at_ms": 1800000000000,
+          "expires_at_ms": 1800000030000
+        },
+        "canonical_transcript_utf8": "{\"challenge\":{\"captured_at_ms\":1800000000000,\"challenge_id\":\"22222222-2222-4222-8222-222222222222\",\"expires_at_ms\":1800000030000,\"nonce_b64url\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},\"original\":{\"apns_environment\":\"sandbox\",\"core_purpose_id\":\"fixture-original-display\",\"deployment_policy_sha256\":\"7777777777777777777777777777777777777777777777777777777777777777\",\"device_binding\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"generation\":\"fixture-original-generation\",\"identity_policy_sha256\":\"6666666666666666666666666666666666666666666666666666666666666666\",\"native_key_id_b64\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"native_token_sha256\":\"630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd\",\"operation_id\":\"11111111-1111-4111-8111-111111111111\",\"original_display_expires_at_ms\":1800007200000,\"original_wake_expires_at_ms\":1800003600000,\"original_wake_issued_at_ms\":1800000000000,\"owner_binding\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"paired_subject_binding_sha256\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"platform\":\"ipados\",\"revision\":1,\"selected_ha_origin_sha256\":\"5555555555555555555555555555555555555555555555555555555555555555\",\"source_binding\":\"4444444444444444444444444444444444444444444444444444444444444444\",\"target\":{\"host_bundle_id\":\"example.fixture.host\",\"installation_id\":\"fixture-native-install\"},\"token_role\":\"host_app_wake\",\"version\":\"djc-host-app-wake-native/1\"}}",
+        "client_data_sha256": "c0ad2efea348cbe2c0e88be04148ccd0d9d5ed459b15a62dba2c74ec59ed12f3"
+      }
+    },
+    {
+      "route": "native/complete",
+      "request": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "challenge_id": "22222222-2222-4222-8222-222222222222",
+        "native_proof": {
+          "kind": "app_attest_attestation",
+          "bytes_b64": "TU9ERUxFRCBEQVRBIE9OTFk7IE5PVCBBUFBMRSBQUk9PRg=="
+        }
+      },
+      "request_sha256": "31f96a4c5e6ad28a25b21d629e74ff472c55017f637caa8beb14c582303796c2",
+      "reply": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "request_sha256": "31f96a4c5e6ad28a25b21d629e74ff472c55017f637caa8beb14c582303796c2",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "state": "native_verified",
+        "original_wake_issued_at_ms": 1800000000000,
+        "original_wake_expires_at_ms": 1800003600000,
+        "original_display_expires_at_ms": 1800007200000,
+        "challenge_id": "22222222-2222-4222-8222-222222222222",
+        "native_proof_kind": "app_attest_attestation",
+        "original_sha256": "2c3f46723000dfff1cb5a06bdad0d9dc1fd84578ddf704a2aca53557c7ec3738",
+        "native_verified_at_ms": 1800000001000
+      }
+    },
+    {
+      "route": "native/status",
+      "request": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "challenge_id": "22222222-2222-4222-8222-222222222222"
+      },
+      "request_sha256": "55f8f8bc35ebc2308c4926efc35590a6236b98917f0baa35d9f51b66cdeaf430",
+      "reply": {
+        "version": "djc-host-app-wake-receiving/1",
+        "authorization_id": "fixture-authorization",
+        "issuer_operation_id": "fixture-issuer-operation",
+        "core_purpose_id": "fixture-original-display",
+        "request_sha256": "55f8f8bc35ebc2308c4926efc35590a6236b98917f0baa35d9f51b66cdeaf430",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "state": "native_verified",
+        "original_wake_issued_at_ms": 1800000000000,
+        "original_wake_expires_at_ms": 1800003600000,
+        "original_display_expires_at_ms": 1800007200000,
+        "challenge_id": "22222222-2222-4222-8222-222222222222",
+        "native_proof_kind": "app_attest_attestation",
+        "original_sha256": "2c3f46723000dfff1cb5a06bdad0d9dc1fd84578ddf704a2aca53557c7ec3738",
+        "native_verified_at_ms": 1800000001000
+      }
+    }
+  ],
+  "invalid_proof_runtime_expectation": {
+    "status": 403,
+    "body": {
+      "version": "djc-host-app-wake-receiving/1",
+      "success": false,
+      "error": "host_wake_native_proof_rejected"
+    }
+  },
+  "immutable_boundaries": {
+    "key_reference": "native_key_ref PRIVATE API custodian row; native_key_id_b64 actual public SDK32-byte identifier only",
+    "first_key_attempt": "exactly one API-private first job per pending policy/SDK key; no new UUID/parent after UNKNOWN",
+    "issuer_kind": "selected from actual state and persisted at original issuer reservation; never flip a prepared child kind after another child enrolls",
+    "transcript": "unchanged R31 public fields and actual LF; no private IDs",
+    "clock_and_effects": "NO genuine signed host, SDK key, native clock, device, provider or production qualification supplied"
+  }
+}
