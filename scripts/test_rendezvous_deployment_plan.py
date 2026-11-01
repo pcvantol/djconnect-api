@@ -52,7 +52,8 @@ class PreparationTests(unittest.TestCase):
                          v.WORKFLOW_DELTA_SOURCE, v.WORKFLOW_DELTA_PATH,
                          *(record[0] for record in v.DELTA_PROOFS),
                          *v.CLOSED_RECEIVING_MAP_CHANGES, v.CLOSED_RECEIVING_DELTA_PATH,
-                         v.CLOSED_RECEIVING_PRODUCT_PATH)
+                         v.CLOSED_RECEIVING_PRODUCT_PATH, *v.RETENTION_SOURCES,
+                         v.RETENTION_DELTA_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
@@ -106,6 +107,26 @@ class PreparationTests(unittest.TestCase):
                 changed['changes'] = {}
             with self.subTest(mutation=mutation):
                 self.rejects_changed_proof(v.WORKFLOW_DELTA_PATH, changed)
+
+    def test_retention_delta_cannot_authorize_activation(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        value['public_activation_allowed'] = True
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
+
+    def test_retention_delta_cannot_replace_a_historical_source(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        value['changes']['.github/workflows/ci-cd.yml']['before'] = 'f' * 64
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
+
+    def test_retention_delta_is_exact_not_an_extra_source_allowlist(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        value['changes']['src/index.ts'] = {'before': 'a' * 64, 'after': 'b' * 64}
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
+
+    def test_retention_delta_cannot_omit_its_cleanup_implementation(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        del value['changes']['scripts/cleanup_workflow_runs.py']
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
 
     def test_qualification_workflow_metadata_is_not_an_activation_or_runtime_override(self):
         sources, refs = v.baseline_before_receiving_root()
@@ -204,7 +225,8 @@ class PreparationTests(unittest.TestCase):
                     changed['changes'][name]['grant'] = True
                 self.rejects_changed_proof(v.DELTA_PATH, changed)
         self.assertEqual(len(v.baseline_before_receiving_root()[0]), 119)
-        self.assertEqual(len(self.plan['source_hashes']), 142)
+        self.assertEqual(len(v.baseline_before_ci_retention()[0]), 142)
+        self.assertEqual(len(self.plan['source_hashes']), 144)
         for name in v.DELTA_SOURCES:
             changed = copy.deepcopy(delta)
             changed['changes'][name]['before'] = None

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_ACTIVE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME",
+  "base_source": "b28a32e8fe80d612009c35a82961dba9c993e986",
+  "baseline_source_map_sha256": "5ca0758d825063e9dafcb519eef238d707d52d52fbc35d270d37af38c5c146fd",
+  "effective_source_map_sha256": "cef45d9af9b6637b950205d2b779833cfb721de3bb8c6452d0acc2e11f869383",
+  "changes": {
+    ".github/workflows/ci-cd.yml": {
+      "before": "b9ad8dee552c9c91189fa816cbb5f922068c6d5af72b5f311c73a8172bf9f2de",
+      "after": "640157550ca89f26ea85f6e0b5a749048cbbf017f33f54061d078bec84ac625c"
+    },
+    "scripts/cleanup_workflow_runs.py": {
+      "before": null,
+      "after": "8b70c428ea0faac65c0e073a20925c8ebc69f360107785c6a0e5c6bc3032b20f"
+    },
+    "scripts/test_cleanup_workflow_runs.py": {
+      "before": null,
+      "after": "1534693fa4a80c8a008b9a7923a56a031a8a3966da521a3396c33b4ac3bab626"
+    }
+  },
+  "public_activation_allowed": false
+}
