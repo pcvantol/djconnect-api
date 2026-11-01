@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only the separately pinned five-file category layer may supersede
         # these historical bytes. validate() checks EVERY effective input.
-        if name not in CATEGORY_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -373,7 +373,7 @@ SOURCE_PROVENANCE.update(native_first_category_delta_sha256=CATEGORY_DELTA_SHA25
                          native_first_category_source_map_sha256=CATEGORY_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_private_mount():
     sources, refs = baseline_before_native_category()
     delta = pinned_working_proof(CATEGORY_DELTA_PATH, CATEGORY_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
@@ -394,6 +394,37 @@ def baseline():
             == CATEGORY_SOURCE_MAP_SHA256)
     refs = dict(refs)
     refs[CATEGORY_DELTA_PATH] = CATEGORY_DELTA_SHA256
+    return effective, refs
+
+
+MOUNT_DELTA_PATH = 'docs/rendezvous/private-receiving-mount-source-delta-v1.json'
+MOUNT_DELTA_SHA256 = '8d4c6f7343c37bea54ac53709dd49d1c01e28a2d2ebe19a0102448cc7fccc960'
+MOUNT_SOURCE_MAP_SHA256 = 'b734d7cdb32ef1785d40f3be6c2b6779b5203adf909c8fb4de48c78e12ac7b43'
+MOUNT_SOURCES = frozenset(('coordinator/host-app-wake-receiving/operator-auth.ts', 'coordinator/host-app-wake-receiving/service.ts', 'scripts/qualify_rendezvous_product_build.mjs', 'src/host-wake-receiving/dispatch.ts'))
+SOURCE_PROVENANCE.update(private_receiving_mount_delta_sha256=MOUNT_DELTA_SHA256,
+                         private_receiving_mount_source_map_sha256=MOUNT_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_private_mount()
+    delta = pinned_working_proof(MOUNT_DELTA_PATH, MOUNT_DELTA_SHA256)
+    require(set(delta) == {'schema_version','scope','base_source','baseline_source_map_sha256',
+            'effective_source_map_sha256','changes','private_http_mount_selected','production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PRIVATE_RECEIVING_MOUNT_NOT_EFFECT_AUTHORIZATION'
+            and delta['base_source'] == '067a214b8f59524481ec1309d07cfa8270abb20f'
+            and delta['private_http_mount_selected'] is True and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == MOUNT_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before','after'} and change['before'] == sources[name]
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective) == MOUNT_SOURCE_MAP_SHA256)
+    refs = dict(refs)
+    refs[MOUNT_DELTA_PATH] = MOUNT_DELTA_SHA256
     return effective, refs
 
 

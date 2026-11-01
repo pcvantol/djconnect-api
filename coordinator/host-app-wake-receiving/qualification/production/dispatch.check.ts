@@ -1,5 +1,5 @@
 import {env} from 'cloudflare:test';
-import {describe,it,expect,beforeAll,beforeEach} from 'vitest';
+import {describe,it,expect,beforeAll,beforeEach,vi} from 'vitest';
 import type {AppEnv} from '../../../../src/types';
 import worker from '../../../../src/index';
 import {dispatchPrivateReceivingRequest,receiveOriginalPrivateRequest} from '../../../../src/host-wake-receiving/dispatch';
@@ -12,14 +12,21 @@ import sourceSchema from '../../../host-app-wake/schema.sql?raw';
 import schema from '../../schema.sql?raw';
 import installSchema from '../../../../migrations/0002_install_tokens.sql?raw';
 const paths=['','/issuer/issue','/issuer/status','/issuer/withdraw','/native/challenge','/native/complete','/native/status','/authorization/resolve','/operator/authorize','/operator/withdraw','/operator/native-policy','/operator/native-policy/withdraw','/register','/wake','/status','/revoke'];
-describe('actual production caller: fixed closed prefix and original pre-await anchor; no native admission',()=>{
+describe('actual private production caller: authentication and original pre-await anchor; no native admission',()=>{
  beforeAll(async()=>{for(const text of [installSchema,sourceSchema,schema])for(const sql of text.replace(/--[^\n]*/g,'').split(';').filter(v=>v.trim()))await env.DB.prepare(sql).run();});
  beforeEach(async()=>{for(const t of ['host_wake_native_verifications','host_wake_native_enrollments','host_wake_native_pending_policies','host_wake_child_withdrawals','host_wake_receiving_intents','host_wake_native_jobs','host_wake_issuer_once','host_wake_operator_authorizations','host_app_wake_operations','host_app_wake_purposes','install_tokens'])await env.DB.prepare('DELETE FROM '+t).run();});
- it.each(paths)('actual Worker keeps %s closed before environment/credentials/body/clock',async path=>{
-  let touched=0;const config=new Proxy({},{get(){touched++;throw Error('no env read');}}),clock=()=>{touched++;throw Error('no clock read');},transport:typeof fetch=async()=>{touched++;throw Error('no provider');};
-  const request=new Request('https://local.test/v1/push/host-app-wake'+path,{method:'POST',body:'{}'});Object.defineProperty(request,'text',{value(){touched++;throw Error('no body read');}});
-  expect((await dispatchPrivateReceivingRequest(request,config,clock,transport))!.status).toBe(503);expect((await worker.fetch(request as Parameters<typeof worker.fetch>[0],config as Parameters<typeof worker.fetch>[1],{} as ExecutionContext)).status).toBe(503);expect(touched).toBe(0);
+ it.each(paths)('actual Worker denies unauthenticated %s without reading body or calling provider',async path=>{
+  let bodyReads=0,provider=0;const config={...env,DJCONNECT_RELAY_SECRET:'SYNTHETIC_MOUNT_TEST_NOT_A_REAL_SECRET'} as AppEnv;
+  const make=()=>{const request=new Request('https://local.test/v1/push/host-app-wake'+path,{method:'POST',headers:{'content-type':'application/json'},body:'{}'});Object.defineProperty(request,'body',{get(){bodyReads++;throw Error('unauthenticated body must not be read');}});return request;};
+  const expected=path===''?404:path.startsWith('/operator/')||path==='/authorization/resolve'?401:400;
+  const transport:typeof fetch=async()=>{provider++;throw Error('NO PROVIDER');};
+  const spy=vi.spyOn(globalThis,'fetch').mockImplementation(transport);try{
+   expect((await dispatchPrivateReceivingRequest(make(),config,Date.now,transport))!.status).toBe(expected);
+   expect((await worker.fetch(make() as Parameters<typeof worker.fetch>[0],config as Parameters<typeof worker.fetch>[1],{} as ExecutionContext)).status).toBe(expected);
+   expect(bodyReads).toBe(0);expect(provider).toBe(0);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_operator_authorizations').first('n')).toBe(0);
+  }finally{spy.mockRestore();}
  });
+ it('fails closed if the original platform clock throws before any environment access',async()=>{let touched=0;const config=new Proxy({},{get(){touched++;throw Error('NO ENV');}});const r=await dispatchPrivateReceivingRequest(new Request('https://local.test/v1/push/host-app-wake/native/status'),config,()=>{throw Error('CLOCK');},fetch);expect(r!.status).toBe(503);expect(touched).toBe(0);});
  it.each(['/v1/push/host-app-wake-other','/v1/push/surface','/v1/rendezvous','/health'])('does not intercept another namespace %s',path=>{expect(dispatchPrivateReceivingRequest(new Request('https://local.test'+path),{},()=>{throw Error('no clock');},fetch)).toBeUndefined();});
  it.each([NaN,-1,1.5,Number.MAX_SAFE_INTEGER+1])('rejects invalid original UTC DATA %s without creating authority',async capturedAt=>{const r=await receiveOriginalPrivateRequest(new Request('https://local.test'+OPERATOR_AUTHORIZE,{method:'POST',body:'{}'}),env as AppEnv,{capturedAt,observeUTC:Date.now,fetcher:fetch,capacity:1});expect(r.status).toBe(503);});
  async function operatorRequest(){
@@ -30,6 +37,11 @@ describe('actual production caller: fixed closed prefix and original pre-await a
   return{at,config:{...env,DJCONNECT_RELAY_SECRET:secret} as AppEnv,request:()=>new Request('https://local.test'+OPERATOR_AUTHORIZE,{method:'POST',headers:{'content-type':'application/json','x-djconnect-timestamp':timestamp,'x-djconnect-signature':[...sig].map(b=>b.toString(16).padStart(2,'0')).join('')},body:raw})};
  }
  it('control: an unanchored receive-time clock can create a new callback window after the original expired',async()=>{const x=await operatorRequest(),svc=createReceivingService({env:x.config,now:()=>x.at+30001,fetcher:fetch,capacity:16});try{expect((await svc.handle(x.request())).status).toBe(200);expect((await new ReceivingStore(env.DB,16).authorization('composition-authorization'))?.outcome).toBe('authorized');}finally{svc.close();}});
+ it('actual shipping root reaches the existing HMAC operator gate with original capture before awaits',async()=>{const x=await operatorRequest();const r=await worker.fetch(x.request() as Parameters<typeof worker.fetch>[0],x.config as Parameters<typeof worker.fetch>[1],{} as ExecutionContext);expect(r.status).toBe(200);expect((await new ReceivingStore(env.DB,16).authorization('composition-authorization'))?.outcome).toBe('authorized');});
+ it.each(['origin','cookie','bearer'] as const)('actual shipping HMAC-only operator rejects %s before body or authority write',async bad=>{
+  const x=await operatorRequest(),r=x.request();if(bad==='origin')r.headers.set('origin','https://example.invalid');if(bad==='cookie')r.headers.set('cookie','synthetic=only');if(bad==='bearer')r.headers.set('authorization','Bearer '+x.config.DJCONNECT_RELAY_SECRET);let bodies=0;Object.defineProperty(r,'body',{get(){bodies++;throw Error('NO BODY');}});
+  const response=await worker.fetch(r as Parameters<typeof worker.fetch>[0],x.config as Parameters<typeof worker.fetch>[1],{} as ExecutionContext);expect(response.status).toBe(bad==='bearer'?401:503);expect(bodies).toBe(0);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_operator_authorizations').first('n')).toBe(0);
+ });
  it('same actual HMAC and D1: original caller capture expires before await can create a new authorization',async()=>{const x=await operatorRequest();let bodyReads=0;const request=x.request();Object.defineProperty(request,'body',{get(){bodyReads++;throw Error('body must not be read after original expiry');}});const r=await receiveOriginalPrivateRequest(request,x.config,{capturedAt:x.at,observeUTC:()=>x.at+30001,fetcher:async()=>{throw Error('NO PROVIDER');},capacity:16});expect(r.status).toBe(409);expect(bodyReads).toBe(0);expect(await new ReceivingStore(env.DB,16).authorization('composition-authorization')).toBeNull();});
  it('retains the actual operator gate when the original callback is still within its window',async()=>{const x=await operatorRequest();const r=await receiveOriginalPrivateRequest(x.request(),x.config,{capturedAt:x.at,observeUTC:()=>Math.max(x.at,Date.now()),fetcher:async()=>{throw Error('NO PROVIDER');},capacity:16});expect(r.status).toBe(200);expect((await new ReceivingStore(env.DB,16).authorization('composition-authorization'))?.outcome).toBe('authorized');});
  it('detects a real later UTC regression even with an older retained capture',()=>{const at=Date.now(),observations=[at+100,at+50];expect(()=>new RequestWindow(()=>observations.shift()!,new AbortController().signal,at)).toThrow('host_wake_clock_regressed');});

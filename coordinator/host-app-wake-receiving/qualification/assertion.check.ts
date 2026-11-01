@@ -264,7 +264,7 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
  it('retains the original ten-second body budget before operator authentication or grant allocation',async()=>{
   let time=Date.now();const config={...env,DJCONNECT_RELAY_SECRET:'synthetic-unused-operator-key'} as AppEnv,svc=createReceivingService({env:config,capacity:16,now:()=>time,fetcher:fetch});
   let controller:ReadableStreamDefaultController<Uint8Array>;const stream=new ReadableStream<Uint8Array>({start(value){controller=value;}});
-  try{const pending=svc.handle(new Request('https://local.test'+OPERATOR_AUTHORIZE,{method:'POST',headers:{'content-type':'application/json'},body:stream}));await Promise.resolve();time+=10001;controller!.enqueue(new TextEncoder().encode('{}'));controller!.close();const result=await pending;expect(result.status).toBe(409);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_operator_authorizations').first('n')).toBe(1);}
+  try{const pending=svc.handle(new Request('https://local.test'+OPERATOR_AUTHORIZE,{method:'POST',headers:{'content-type':'application/json','x-djconnect-timestamp':String(Math.floor(time/1000)),'x-djconnect-signature':'0'.repeat(64)},body:stream}));await Promise.resolve();time+=10001;controller!.enqueue(new TextEncoder().encode('{}'));controller!.close();const result=await pending;expect(result.status).toBe(409);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_operator_authorizations').first('n')).toBe(1);}
   finally{svc.close();}
  });
 
