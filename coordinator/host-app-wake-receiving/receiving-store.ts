@@ -88,7 +88,10 @@ export class ReceivingStore {
  /** The original semantic purpose identity, not a transport operation UUID,
   * is the primary once-key. A new HTTP retry cannot replace its deadline. */
  async reserveIssuer(id:string,principal:string,operation:string,requestHash:string,original:NativeOriginalData,privatePurpose:string,claim:string,captured:number,at:number,expectedKind:NativeProofKind){
-  need(expectedKind==='app_attest_attestation'||expectedKind==='app_attest_assertion');const v=decodeNativeOriginal(original);integer(captured);integer(at,captured);const auth=await this.authorization(id);need(auth,'host_wake_authorization_missing',403);const a=decodeOperatorAuthorization(JSON.parse(auth.authorization_json));
+  need(expectedKind==='app_attest_attestation'||expectedKind==='app_attest_assertion');const v=decodeNativeOriginal(original);integer(captured);integer(at,captured);
+  // The original API observation is the ceiling. A later callback cannot
+  // legalize future issuance or renew the retained Core tuple/deadlines.
+  need(v.original_wake_issued_at_ms<=captured,'host_wake_original_scope',403);const auth=await this.authorization(id);need(auth,'host_wake_authorization_missing',403);const a=decodeOperatorAuthorization(JSON.parse(auth.authorization_json));
   for(const k of ['owner_binding','device_binding','source_binding','paired_subject_binding_sha256','selected_ha_origin_sha256','identity_policy_sha256','deployment_policy_sha256','platform','apns_environment'] as const)need(v[k]===a[k],'host_wake_authorization_scope',403);
   need(canonical(v.target)===canonical(a.target),'host_wake_authorization_scope',403);
   need(v.original_wake_issued_at_ms>=a.original_authorization_issued_at_ms&&v.original_wake_expires_at_ms<=a.original_authorization_expires_at_ms&&v.original_wake_expires_at_ms-v.original_wake_issued_at_ms<=a.max_original_purpose_ms,'host_wake_authorization_window',403);

@@ -117,7 +117,7 @@
     "node_modules/@noble/hashes/sha2.js": "471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b",
     "node_modules/pkijs/build/index.js": "81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685",
     "coordinator/host-app-wake-receiving/native-policy.ts": "777ff00385ffb90d8dd351657d1aad1b53aaf90b576e7efd0db26657719207cd",
-    "coordinator/host-app-wake-receiving/receiving-store.ts": "7d62aa3df7c461de6b932338e5cbab82cb349974fb39efaa023592a984976ce9",
+    "coordinator/host-app-wake-receiving/receiving-store.ts": "088bf1e4df57bcaaddf38617f154f686c354700993922554216fc5f93e7270e3",
     "coordinator/host-app-wake-receiving/native-policy-store.ts": "14cd32feb9de4b85211ad72eb5e51bf5173a2c3e71806d06ac0518f846e38517",
     "coordinator/host-app-wake-receiving/server-wire.ts": "b7670ff7b8ec0666369bdb5844858e1d7509e86077952d72289092c107dda665",
     "coordinator/host-app-wake-receiving/native-assertion.ts": "899fd463e5e3f7b601385fe2b2d38b74c3ad32aad74dc386c55cd121c7e96851",
@@ -151,8 +151,8 @@
     "wrangler": "4.151.3",
     "miniflare": "5.20261019.1-beta"
   },
-  "bundle_sha256": "b185b47c07e76152e2121acf350c03b85548374ec5eaa0900e36f30b10dabae0",
-  "bundle_bytes": 1465584,
+  "bundle_sha256": "91a0e81c1e42ae35150edbd58c26d2e55317956132b7e1b5a34ea5f7a9106f20",
+  "bundle_bytes": 1465671,
   "virtual_platform_inputs": {
     "node-built-in-modules:stream": {
       "bytes": 61,
