@@ -144,6 +144,7 @@ jobs:
     permissions:
       actions: write
       contents: read
+      pull-requests: read
 
     steps:
       - name: Checkout exact cleanup source

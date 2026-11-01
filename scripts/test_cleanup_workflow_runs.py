@@ -129,6 +129,48 @@ class RetentionTests(unittest.TestCase):
                 self.invoke(api)
                 self.assertNotIn(102, api.deleted)
 
+    def test_cleanup_from_old_main_preserves_current_main_premerge_evidence(self):
+        class NewMainProvider(Provider):
+            def get(self, endpoint, paginated=False):
+                if endpoint == ROOT + '/git/ref/heads/main':
+                    self.calls.append(endpoint)
+                    return {'object': {'sha': '9' * 40}}
+                if endpoint == ROOT + '/commits/' + '9' * 40 + '/pulls?per_page=100':
+                    self.calls.append(endpoint)
+                    return [[{'merged_at': '2026-11-01T09:30:00Z', 'base': {'ref': 'main'},
+                              'merge_commit_sha': '9' * 40, 'head': {'sha': OLD}}]]
+                return super().get(endpoint, paginated)
+        api = NewMainProvider()
+        self.invoke(api)
+        self.assertNotIn(105, api.deleted)
+        self.assertNotIn(203, api.deleted)
+        self.assertTrue(any('/commits/' + '9' * 40 + '/pulls?' in path for path in api.calls))
+
+    def test_current_main_source_relation_lookup_failure_stops_before_delete(self):
+        class UnavailableMainProvider(Provider):
+            def get(self, endpoint, paginated=False):
+                if endpoint == ROOT + '/git/ref/heads/main':
+                    self.calls.append(endpoint)
+                    return {'object': {'sha': '9' * 40}}
+                if endpoint == ROOT + '/commits/' + '9' * 40 + '/pulls?per_page=100':
+                    raise retention.SafetyStop('current_main_relation_unavailable')
+                return super().get(endpoint, paginated)
+        api = UnavailableMainProvider()
+        with self.assertRaisesRegex(retention.SafetyStop, 'current_main_relation_unavailable'):
+            self.invoke(api)
+        self.assertEqual(api.deleted, [])
+
+    def test_missing_current_main_origin_is_not_empty_protection(self):
+        class MissingOriginProvider(Provider):
+            def get(self, endpoint, paginated=False):
+                if endpoint == ROOT + '/commits/' + ORIGINAL + '/pulls?per_page=100':
+                    return [[]]
+                return super().get(endpoint, paginated)
+        api = MissingOriginProvider()
+        with self.assertRaisesRegex(retention.SafetyStop, 'current_main_origin_unknown'):
+            self.invoke(api)
+        self.assertEqual(api.deleted, [])
+
     def test_unknown_fresh_status_stops_the_invocation(self):
         api = Provider()
         api.actual_status[102] = 'future_unknown_status'

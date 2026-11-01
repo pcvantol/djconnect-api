@@ -329,8 +329,8 @@ def baseline_before_ci_retention():
 
 
 RETENTION_DELTA_PATH = 'docs/rendezvous/active-ci-retention-source-delta-v1.json'
-RETENTION_DELTA_SHA256 = '73e23b4aecdfdb851707a118471df4c1beac2c89d41bd955a57e5a5e156759ac'
-RETENTION_SOURCE_MAP_SHA256 = 'cef45d9af9b6637b950205d2b779833cfb721de3bb8c6452d0acc2e11f869383'
+RETENTION_DELTA_SHA256 = 'a474ec1ca6579b0892348be55c06ab0122105615d379f7727357b4a401ce56db'
+RETENTION_SOURCE_MAP_SHA256 = '7afaaefbee37a68f003badc1a2426fd9e02fe90ff3fe4a7e4ddff2198e035bfa'
 RETENTION_SOURCES = frozenset(('.github/workflows/ci-cd.yml', 'scripts/cleanup_workflow_runs.py', 'scripts/test_cleanup_workflow_runs.py'))
 SOURCE_PROVENANCE.update(active_ci_retention_delta_sha256=RETENTION_DELTA_SHA256,
                          active_ci_retention_source_map_sha256=RETENTION_SOURCE_MAP_SHA256)

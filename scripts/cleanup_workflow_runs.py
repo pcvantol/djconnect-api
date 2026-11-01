@@ -59,17 +59,23 @@ class GitHub:
         require(result.returncode == 0, 'delete_failed')
 
 
-def protected_heads(api, repository, original):
+def protected_heads(api, repository, original, expected_main=None):
     root = 'repos/' + repository
     main = source_sha(api.get(root + '/git/ref/heads/main')['object']['sha'])
+    require(expected_main is None or main == expected_main, 'main_changed_stop_cleanup')
     protected = {original, main}
     for pr in page_items(api.get(root + '/pulls?state=open&per_page=100', True)):
         protected.add(source_sha(pr['head']['sha']))
     # Preserve the specific pre-merge evidence relationship as well.
-    for pr in page_items(api.get(root + '/commits/' + original + '/pulls?per_page=100', True)):
-        if (pr.get('merged_at') and pr['base']['ref'] == 'main'
-                and pr.get('merge_commit_sha') == original):
-            protected.add(source_sha(pr['head']['sha']))
+    for revision in dict.fromkeys((original, main)):
+        related = set()
+        for pr in page_items(api.get(root + '/commits/' + revision + '/pulls?per_page=100', True)):
+            if (pr.get('merged_at') and pr['base']['ref'] == 'main'
+                    and pr.get('merge_commit_sha') == revision):
+                related.add(source_sha(pr['head']['sha']))
+        if revision == main:
+            require(bool(related), 'current_main_origin_unknown_stop_cleanup')
+        protected.update(related)
     return main, protected
 
 
@@ -112,7 +118,7 @@ def cleanup(api, repository, original, current_run, keep=2, execute=False, maxim
               'original_sha': original, 'main_sha': initial_main, 'execute': execute,
               'planned': [], 'deleted': [], 'skipped': []}
     for indexed in candidates[:maximum]:
-        main, fresh_protected = protected_heads(api, repository, original)
+        main, fresh_protected = protected_heads(api, repository, original, initial_main)
         require(main == initial_main, 'main_changed_stop_cleanup')
         actual = api.get(root + '/actions/runs/' + str(indexed['id']))
         validate_run(actual)
