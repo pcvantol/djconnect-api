@@ -324,8 +324,41 @@ def baseline_before_receiving_root():
     return qualification_workflow_delta(effective, references)
 
 
-def baseline():
+def baseline_before_ci_retention():
     return closed_receiving_root_delta(*baseline_before_receiving_root())
+
+
+RETENTION_DELTA_PATH = 'docs/rendezvous/active-ci-retention-source-delta-v1.json'
+RETENTION_DELTA_SHA256 = 'a474ec1ca6579b0892348be55c06ab0122105615d379f7727357b4a401ce56db'
+RETENTION_SOURCE_MAP_SHA256 = '7afaaefbee37a68f003badc1a2426fd9e02fe90ff3fe4a7e4ddff2198e035bfa'
+RETENTION_SOURCES = frozenset(('.github/workflows/ci-cd.yml', 'scripts/cleanup_workflow_runs.py', 'scripts/test_cleanup_workflow_runs.py'))
+SOURCE_PROVENANCE.update(active_ci_retention_delta_sha256=RETENTION_DELTA_SHA256,
+                         active_ci_retention_source_map_sha256=RETENTION_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_ci_retention()
+    delta = pinned_working_proof(RETENTION_DELTA_PATH, RETENTION_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_ACTIVE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'
+            and delta['base_source'] == 'b28a32e8fe80d612009c35a82961dba9c993e986'
+            and delta['public_activation_allowed'] is False)
+    require(delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == RETENTION_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources.get(name)
+                and change['before'] != change['after'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == RETENTION_SOURCE_MAP_SHA256)
+    references = dict(refs)
+    references[RETENTION_DELTA_PATH] = RETENTION_DELTA_SHA256
+    return effective, references
 
 
 def validate(plan):

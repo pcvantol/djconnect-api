@@ -40,10 +40,16 @@ export async function sourceSnapshot(){
  const closed=JSON.parse(closedRaw);
  need(closed.scope==='EXACT_CLOSED_RECEIVING_ROOT_SOURCE_DELTA_NOT_ACTIVATION'&&closed.public_activation_allowed===false);
  need(closed.baseline_source_map_sha256===provenance.qualified_source_map_sha256&&closed.effective_source_map_sha256===provenance.closed_receiving_root_source_map_sha256);
+ const retentionPath='docs/rendezvous/active-ci-retention-source-delta-v1.json',retentionRaw=await readFile(join(repo,retentionPath));
+ need(plan.reference_hashes[retentionPath]===sha(retentionRaw)&&sha(retentionRaw)===provenance.active_ci_retention_delta_sha256);
+ const retention=JSON.parse(retentionRaw);
+ need(retention.scope==='EXACT_ACTIVE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'&&retention.public_activation_allowed===false);
+ need(retention.baseline_source_map_sha256===closed.effective_source_map_sha256&&retention.effective_source_map_sha256===provenance.active_ci_retention_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
   if(Object.hasOwn(closed.changes,name)){need(closed.changes[name].before===expected);expected=closed.changes[name].after;}
+  if(Object.hasOwn(retention.changes,name)){need(retention.changes[name].before===expected);expected=retention.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
