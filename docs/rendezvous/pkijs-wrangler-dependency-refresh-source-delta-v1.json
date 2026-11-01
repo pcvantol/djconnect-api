@@ -3,7 +3,7 @@
   "scope": "EXACT_PKIJS_WRANGLER_DEPENDENCY_REFRESH_NOT_ACTIVATION",
   "base_source": "f156c3049a6320bc16d084b4b17b526090ccb7a7",
   "baseline_source_map_sha256": "b734d7cdb32ef1785d40f3be6c2b6779b5203adf909c8fb4de48c78e12ac7b43",
-  "effective_source_map_sha256": "9a0d367b13cad867a1eb4e0bc47e3eaca13bbfa5391cb09c94abd457eb86f784",
+  "effective_source_map_sha256": "272aeb7fb48586102d9e5dc6bab70724857539a022e7b2446c4e24ac9e40c1db",
   "source_changes": {
     "package-lock.json": {
       "before": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
@@ -24,6 +24,10 @@
     "qualification/rendezvous/run_shared_key_workerd.mjs": {
       "before": "2eba698776c44bc3fdd4e90252d0ae182b180d6d2889b8d39621fa1588879109",
       "after": "91514965bb1207e273891488423d256ac29cb6a510887d78667c0bebcc996f37"
+    },
+    "qualification/rendezvous/run_challenge_budget_workerd.mjs": {
+      "before": "05d62078b1e4e0855a75e66411e1b06494aac2ef644800c1cc092e4b2bf464d6",
+      "after": "7f92e95b3d090d8900e67704ef300065648c7671cb298ee389a33ae834cb2e88"
     }
   },
   "source_additions": {
@@ -41,7 +45,12 @@
   },
   "reference_additions": {
     "coordinator/host-app-wake-receiving/runtime/source-inputs.json": "d8b3977cff475348de7485b0e710f21b45b328bf80150befc956f8de4ec49288",
-    "coordinator/installation-principal/source-manifest.json": "7b45cfc676341688962496ac28b6bf6b764fdd0d78adaf25a6c37df3c561714d"
+    "coordinator/installation-principal/source-manifest.json": "7b45cfc676341688962496ac28b6bf6b764fdd0d78adaf25a6c37df3c561714d",
+    "coordinator/host-app-wake/source-manifest.json": "6638cd1ddb9a0d73b77bf6d52a31a8392273110050ea27e9940879b26d940d99",
+    "coordinator/principal-possession/source-manifest.json": "bb69d593cb396a5200ed6f5abb65fd8f8b56912422a221df5e54608d2ec9eb03",
+    "coordinator/rich-delivery/source-manifest.json": "ddeeae017d9090138451602dd88d0060373d8f99d175f9a3e728118674196810",
+    "coordinator/rich-session/source-manifest.json": "bff9290856f767fe1143f7816f113f07d85da128a64076e60a198171a02e1170",
+    "coordinator/worker-do/source-manifest.json": "a239704b579ce1318e88437271995c9b1d0cb2813ed11fb75321cd6a6460e075"
   },
   "installed_changes": {
     "node_modules/pkijs/build/index.js": {

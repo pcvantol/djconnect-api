@@ -113,7 +113,7 @@ class PreparationTests(unittest.TestCase):
 
     def test_dependency_refresh_is_closed_and_retains_installed_history(self):
         proof = v.pinned_working_proof(v.DEPENDENCY_DELTA_PATH, v.DEPENDENCY_DELTA_SHA256)
-        self.assertEqual(len(proof['source_changes']), 5)
+        self.assertEqual(len(proof['source_changes']), 6)
         self.assertEqual(len(proof['source_additions']), 1)
         self.assertEqual(len(proof['installed_changes']), 1)
         self.assertFalse(proof['public_activation_allowed'])

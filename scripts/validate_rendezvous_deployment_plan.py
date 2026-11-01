@@ -430,12 +430,12 @@ def baseline_before_dependency_refresh():
 
 
 DEPENDENCY_DELTA_PATH = 'docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json'
-DEPENDENCY_DELTA_SHA256 = '1290f3d1ba1a9cc612d9952b51ecd4ffd6c52a4d8a8cbf1d697507340a4460c3'
-DEPENDENCY_SOURCE_MAP_SHA256 = '9a0d367b13cad867a1eb4e0bc47e3eaca13bbfa5391cb09c94abd457eb86f784'
-DEPENDENCY_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs'))
+DEPENDENCY_DELTA_SHA256 = 'd72223211a34f4556515499ffa4ea6e77ba931cba5b6febf9121d3748f6aeca2'
+DEPENDENCY_SOURCE_MAP_SHA256 = '272aeb7fb48586102d9e5dc6bab70724857539a022e7b2446c4e24ac9e40c1db'
+DEPENDENCY_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/run_challenge_budget_workerd.mjs', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs'))
 DEPENDENCY_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json',))
 DEPENDENCY_REFERENCE_CHANGES = frozenset(('THIRD_PARTY_NOTICES.md', 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md'))
-DEPENDENCY_REFERENCE_ADDITIONS = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/installation-principal/source-manifest.json'))
+DEPENDENCY_REFERENCE_ADDITIONS = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json'))
 DEPENDENCY_INSTALLED_CHANGE = {'node_modules/pkijs/build/index.js': {'before': '81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685', 'after': 'fcd402426e202ea647e51e0a1150cee1e66e41e1e18c2e7ef8cea013c92488c4'}}
 SOURCE_PROVENANCE.update(dependency_refresh_delta_sha256=DEPENDENCY_DELTA_SHA256,
                          dependency_refresh_source_map_sha256=DEPENDENCY_SOURCE_MAP_SHA256)
