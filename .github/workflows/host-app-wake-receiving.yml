@@ -31,6 +31,10 @@ jobs:
             config: vitest.config.mts
           - suite: isolated-vendor-model
             config: enrollment-store.config.mts
+          - suite: packaged
+            config: vitest.packaged.config.mts
+          - suite: production-caller
+            config: production/vitest.config.mts
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
@@ -45,8 +49,22 @@ jobs:
       - name: Strict types for both qualification suites
         if: matrix.suite == 'ordinary'
         run: node_modules/.bin/tsc --noEmit --project coordinator/host-app-wake-receiving/qualification/tsconfig.json
+      - name: Build and verify the portable closed receiving package
+        if: matrix.suite == 'packaged'
+        env:
+          PACKAGE_OUTPUT: ${{ runner.temp }}/host-wake-receiving-package
+        run: |
+          set -euo pipefail
+          node coordinator/host-app-wake-receiving/runtime/build-package.mjs "$PACKAGE_OUTPUT" > "${{ runner.temp }}/receiving-build-result.json"
+          proof="$(jq -r '.proof_sha256' "${{ runner.temp }}/receiving-build-result.json")"
+          [[ "$proof" =~ ^[a-f0-9]{64}$ ]]
+          printf 'DJC_HOST_WAKE_PACKAGE_PROOF=%s\n' "$proof" >> "$GITHUB_ENV"
+          printf '%s\n' "$proof" > "${{ runner.temp }}/receiving-package-proof.sha256"
+          node coordinator/host-app-wake-receiving/runtime/check-negative.mjs "$PACKAGE_OUTPUT/package" "$proof" "${{ runner.temp }}/receiving-package-negative.json"
+          node coordinator/host-app-wake-receiving/runtime/check-integrity.mjs "$PACKAGE_OUTPUT/package" "$proof" "${{ runner.temp }}/receiving-package-corruption-controls" > "${{ runner.temp }}/receiving-package-integrity.json"
       - name: Actual local workerd and SQLite; modeled vendor suite is not Apple trust
         env:
+          DJC_HOST_WAKE_PACKAGE: ${{ runner.temp }}/host-wake-receiving-package/package
           TMPDIR: ${{ runner.temp }}
           WRANGLER_LOG_PATH: ${{ runner.temp }}/host-wake-receiving-${{ matrix.suite }}.log
         run: node_modules/.bin/vitest run --config coordinator/host-app-wake-receiving/qualification/${{ matrix.config }} --reporter=json --outputFile="${{ runner.temp }}/host-wake-receiving-${{ matrix.suite }}.json"
@@ -57,4 +75,8 @@ jobs:
           name: host-app-wake-receiving-${{ matrix.suite }}
           path: |
             ${{ runner.temp }}/host-wake-receiving-${{ matrix.suite }}.json
+            ${{ runner.temp }}/host-wake-receiving-package/package
+            ${{ runner.temp }}/receiving-package-proof.sha256
+            ${{ runner.temp }}/receiving-package-negative.json
+            ${{ runner.temp }}/receiving-package-integrity.json
           if-no-files-found: error

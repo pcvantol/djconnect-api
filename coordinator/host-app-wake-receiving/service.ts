@@ -1,4 +1,4 @@
-/** SOURCE ONLY private receiving composition. Not imported by public root.
+/** Private receiving composition. The production root imports a source-closed prefix.
  * Explicit pending-policy first attestation and saved-key assertions; genuine
  * native acceptance and public/production composition remain separate. */
 import type {AppEnv} from '../../src/types';
@@ -22,17 +22,18 @@ import {resolveAuthorization,RESOLVE_PATH} from './authorization-resolve';
 import {requireReceivingGuards} from './guard-schema';
 import {receiveTarget} from './target-transport';
 import {SERVER_PREFIX} from './server-wire';
-export interface ReceivingOptions {env:AppEnv;now:()=>number;fetcher:typeof fetch;capacity:number}
+export interface ReceivingOptions {env:AppEnv;now:()=>number;fetcher:typeof fetch;capacity:number;originalRequestCapture?:Readonly<{request:Request;capturedAt:number}>}
 const headers={'content-type':'application/json; charset=utf-8','cache-control':'no-store','referrer-policy':'no-referrer','x-content-type-options':'nosniff'};
 const json=(v:unknown)=>new Response(JSON.stringify(v),{headers});
 /** No default clock, fake verifier, public key callback, implicit auth supplier,
  * retrying transport, deployment policy, native enrollment or provider is added. */
 export function createReceivingService(options:ReceivingOptions){
  const {env,now,fetcher,capacity}=options;need(env?.DB&&typeof now==='function'&&typeof fetcher==='function','host_wake_receiving_unavailable',503);integer(capacity,1,4096);
- const db=env.DB,store=new ReceivingStore(db,capacity);let closed=false,highWater=0;
+ const capture=options.originalRequestCapture,originalAt=capture?.capturedAt,originalRequest=capture?.request;need(capture===undefined||(originalRequest instanceof Request&&Number.isSafeInteger(originalAt)&&originalAt!>=0),'host_wake_receiving_unavailable',503);
+ const db=env.DB,store=new ReceivingStore(db,capacity);let closed=false,highWater=0,captureUsed=false;
  const fields=['DB','DJCONNECT_RELAY_SECRET','APNS_TEAM_ID','APNS_KEY_ID','APNS_PRIVATE_KEY','APNS_TOPIC_IOS','APNS_ENVIRONMENT','APNS_TOKEN_ENCRYPTION_KEY'] as const;
  const config=Object.fromEntries(fields.map(k=>[k,env[k]]));
- const clock=()=>{try{need(!closed&&options.env===env&&options.now===now&&options.fetcher===fetcher&&options.capacity===capacity&&fields.every(k=>env[k]===config[k]),'host_wake_receiving_unavailable',503);const at=now();integer(at);need(at>=highWater,'host_wake_receiving_unavailable',503);highWater=at;return at;}catch(error){closed=true;throw error;}};
+ const clock=()=>{try{need(!closed&&options.env===env&&options.now===now&&options.fetcher===fetcher&&options.capacity===capacity&&options.originalRequestCapture===capture&&(capture===undefined||(capture.request===originalRequest&&capture.capturedAt===originalAt))&&fields.every(k=>env[k]===config[k]),'host_wake_receiving_unavailable',503);const at=now();integer(at);need(at>=highWater,'host_wake_receiving_unavailable',503);highWater=at;return at;}catch(error){closed=true;throw error;}};
  async function issuerFor(i:PrivateIntake):Promise<IssuerRow>{
   const s=await i.window.run(()=>store.issuer(i.input.authorization_id,i.input.core_purpose_id));need(s,'host_wake_history_unknown',404);need(s.issuer_operation_id===i.input.issuer_operation_id,'host_wake_header_body_scope',403);return s;
  }
@@ -46,7 +47,7 @@ export function createReceivingService(options:ReceivingOptions){
  async function privateRoute(request:Request):Promise<Response>{
   let intake:PrivateIntake|undefined,backend:Awaited<ReturnType<typeof bindSource181>>|undefined,s:IssuerRow|undefined,ownIssuerClaim:string|undefined,proofClaim:string|undefined,job:NativeJobRow|undefined;
   try{
-   intake=await receivePrivate(request,env,clock,capacity);const i=intake,w=i.window,input=i.input;
+   intake=await receivePrivate(request,env,clock,capacity,originalAt);const i=intake,w=i.window,input=i.input;
    const hash=i.intent?.request_hash??await w.run(()=>sha256Hex(canonical(['DJC-HOST-WAKE-API-REQUEST-V1','POST',SERVER_PREFIX+i.route,input])));need(hash);
    if(i.route==='issuer/withdraw'){
     // Negative authority depends on the actual selected principal/role, never
@@ -102,7 +103,7 @@ export function createReceivingService(options:ReceivingOptions){
   }finally{backend?.close();intake?.close();}
  }
  async function operator(request:Request,kind:'authorize'|'withdraw'|'native_policy'|'native_policy_withdraw'){
-  const w=new RequestWindow(clock,request.signal);try{
+  const w=new RequestWindow(clock,request.signal,originalAt);try{
    const u=new URL(request.url);need(request.method==='POST'&&u.protocol==='https:'&&!request.url.includes('?')&&!request.url.includes('#'),'host_wake_operator_route',404);
    const {raw}=await readBoundedPrivateBody(request,w);const body=await w.run(()=>authenticateOperator(new Request(request.url,{method:request.method,headers:request.headers,body:raw,signal:w.signal}),env,kind));w.check();
    if(body.action==='native_policy'){const hash=await w.run(()=>sha256Hex(canonical(body))),row=await w.run(()=>authorizeNativePolicy(db,body,hash,w.capturedAt,w.check(),capacity));w.check();return json({version:RECEIVING_VERSION,native_key_ref:row.native_key_ref,outcome:row.outcome});}
@@ -112,10 +113,11 @@ export function createReceivingService(options:ReceivingOptions){
   }finally{w.close();}
  }
  return Object.freeze({close(){closed=true;},async handle(request:Request):Promise<Response>{try{
+  if(capture){need(!captureUsed&&request===originalRequest,'host_wake_receiving_unavailable',503);captureUsed=true;}
   clock();const path=new URL(request.url).pathname;
-  if(path===RESOLVE_PATH)return json(await resolveAuthorization(request,env,clock));
+  if(path===RESOLVE_PATH)return json(await resolveAuthorization(request,env,clock,originalAt));
   if(path===OPERATOR_AUTHORIZE||path===OPERATOR_WITHDRAW||path===OPERATOR_NATIVE_POLICY||path===OPERATOR_NATIVE_WITHDRAW)return await operator(request,path===OPERATOR_AUTHORIZE?'authorize':path===OPERATOR_WITHDRAW?'withdraw':path===OPERATOR_NATIVE_POLICY?'native_policy':'native_policy_withdraw');
-  if(['register','wake','status','revoke'].some(kind=>path===SERVER_PREFIX+kind))return await receiveTarget(request,env,clock,fetcher,capacity);
+  if(['register','wake','status','revoke'].some(kind=>path===SERVER_PREFIX+kind))return await receiveTarget(request,env,clock,fetcher,capacity,originalAt);
   return await privateRoute(request);
  }catch(error){return error instanceof WakeError||error instanceof HttpError?privateError(error.code,error.status):privateError('host_wake_receiving_unavailable',503);}}});
 }

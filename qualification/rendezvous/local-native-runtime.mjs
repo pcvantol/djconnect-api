@@ -30,14 +30,21 @@ export async function sourceSnapshot(){
  const rootRaw=await readFile(join(repo,rootPath));
  need(plan.reference_hashes[rootPath]===sha(rootRaw));
  const root=JSON.parse(rootRaw);
- // The current immutable proof may add installed bytes, never replace source pins.
- // The offline validator accepts only the hash-pinned qualification-workflow
- // delta. Historical runtime/installed proofs remain byte-bound and unchanged.
+ // Retain both historical proofs and exact separately validated deltas.
+ // No current checkout/JSON may replace an original proof or authorize native.
  const delta=preparation.qualification_workflow_delta;
  need(delta&&Object.keys(delta).join(',')==='.github/workflows/ci-cd.yml');
+ const closedPath='docs/rendezvous/host-wake-closed-root-source-delta-v1.json';
+ const closedRaw=await readFile(join(repo,closedPath)),provenance=preparation.source_provenance;
+ need(plan.reference_hashes[closedPath]===sha(closedRaw)&&sha(closedRaw)===provenance.closed_receiving_root_delta_sha256);
+ const closed=JSON.parse(closedRaw);
+ need(closed.scope==='EXACT_CLOSED_RECEIVING_ROOT_SOURCE_DELTA_NOT_ACTIVATION'&&closed.public_activation_allowed===false);
+ need(closed.baseline_source_map_sha256===provenance.qualified_source_map_sha256&&closed.effective_source_map_sha256===provenance.closed_receiving_root_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
-  if(Object.hasOwn(delta,name))need(delta[name].before===pin&&delta[name].after===plan.source_hashes[name]);
-  else need(plan.source_hashes[name]===pin);
+  let expected=pin;
+  if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
+  if(Object.hasOwn(closed.changes,name)){need(closed.changes[name].before===expected);expected=closed.changes[name].after;}
+  need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
  const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===50);

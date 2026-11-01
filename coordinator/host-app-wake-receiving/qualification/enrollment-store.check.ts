@@ -54,6 +54,9 @@ describe('MODELED Apple evidence ONLY: actual D1 first-enrollment transaction/on
    expect((await svc.handle(complete())).status).toBe(409);expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_native_enrollments').first('n')).toBe(1);
   }finally{svc.close();}
  });
+ it('MODEL ONLY: persists the SHA256 of original receipt bytes, never the implicit comma-separated text coercion',async()=>{
+  const svc=await staged();try{expect((await svc.handle(complete())).status).toBe(200);const digest=await env.DB.prepare('SELECT enrollment_receipt_sha256 FROM host_wake_native_enrollments').first('enrollment_receipt_sha256');expect(digest).toBe('301b365c3f441cd5d4bd7fa674c1ae0d7ee8b28cb2c922f3ee41ee2785fa78fe');expect(digest).not.toBe('42d0b6ae39531967ca667dd62a1ca5433b5c23c165119b2b675ba1484bbbaeda');}finally{svc.close();}
+ });
  it('MODEL ONLY: allows actual Source181 token registration to consume the one initial attestation receipt exactly once',async()=>{
   const svc=await staged();try{expect((await svc.handle(complete())).status).toBe(200);const row=(await store.issuer('native-authorization',o.core_purpose_id))!;
    const cap=issuedCap; // Actual one-time capability retained from issue, never recovered or rebound.

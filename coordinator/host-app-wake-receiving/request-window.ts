@@ -4,10 +4,10 @@ import {integer,need,WakeError} from '../host-app-wake/wire';
 export class RequestWindow {
  readonly capturedAt:number;readonly expiresAt:number;readonly signal:AbortSignal;
  private last:number;private readonly lifetime=new AbortController();private readonly timer:ReturnType<typeof setTimeout>;
- constructor(private readonly now:()=>number,signal:AbortSignal){
+ constructor(private readonly now:()=>number,signal:AbortSignal,originalCapture?:number){
   need(typeof now==='function'&&signal instanceof AbortSignal,'host_wake_clock_required',503);
-  const at=now();integer(at);integer(at+30000);this.capturedAt=at;this.last=at;this.expiresAt=at+30000;
-  this.timer=setTimeout(()=>this.lifetime.abort(),30000);this.signal=AbortSignal.any([signal,this.lifetime.signal]);
+  const observed=now();integer(observed);const at=originalCapture??observed;integer(at);integer(at+30000);need(observed>=at,'host_wake_clock_regressed',503);this.capturedAt=at;this.last=observed;this.expiresAt=at+30000;
+  this.timer=setTimeout(()=>this.lifetime.abort(),Math.max(1,this.expiresAt-observed));this.signal=AbortSignal.any([signal,this.lifetime.signal]);
   try{this.check();}catch(e){this.close();throw e;}
  }
  check():number{
