@@ -45,11 +45,16 @@ export async function sourceSnapshot(){
  const retention=JSON.parse(retentionRaw);
  need(retention.scope==='EXACT_ACTIVE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'&&retention.public_activation_allowed===false);
  need(retention.baseline_source_map_sha256===closed.effective_source_map_sha256&&retention.effective_source_map_sha256===provenance.active_ci_retention_source_map_sha256);
+ const categoryPath='docs/rendezvous/native-first-category-source-delta-v1.json',categoryRaw=await readFile(join(repo,categoryPath));
+ need(plan.reference_hashes[categoryPath]===sha(categoryRaw)&&sha(categoryRaw)===provenance.native_first_category_delta_sha256);
+ const category=JSON.parse(categoryRaw);need(category.scope==='EXACT_PRIVATE_FIRST_CATEGORY_SOURCE_NOT_ACTIVATION'&&category.public_activation_allowed===false);
+ need(category.baseline_source_map_sha256===retention.effective_source_map_sha256&&category.effective_source_map_sha256===provenance.native_first_category_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
   if(Object.hasOwn(closed.changes,name)){need(closed.changes[name].before===expected);expected=closed.changes[name].after;}
   if(Object.hasOwn(retention.changes,name)){need(retention.changes[name].before===expected);expected=retention.changes[name].after;}
+  if(Object.hasOwn(category.changes,name)){need(category.changes[name].before===expected);expected=category.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

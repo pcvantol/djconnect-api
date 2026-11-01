@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:djconnect:host-wake-private-native-policy:2",
+  "$id": "urn:djconnect:host-wake-private-native-policy:3",
   "description": "Structural DATA only. Actual existing custodian HMAC over timestamp plus exact body, signed method/path/action/version and original request window are mandatory. Runtime additionally compares appIdentifier/team/target, active operator/native scope and original expiry bounds. No key or policy is created by parsing this schema. Fields are explicit; no QA application/build/environment or actual signed-artifact fact is supplied.",
   "oneOf": [
     {
@@ -23,183 +23,372 @@
           "const": "request"
         },
         "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "version",
-            "method",
-            "route",
-            "action",
-            "operation_id",
-            "authorization_id",
-            "native_key_ref",
-            "native_key_id_b64",
-            "profile",
-            "app_identifier",
-            "apns_team_id",
-            "app_attest_environment",
-            "bundle_version",
-            "launch_validation_category_b64",
-            "signed_host_artifact_sha256",
-            "signed_environment_receipt_sha256",
-            "scope",
-            "original_policy_issued_at_ms",
-            "original_policy_expires_at_ms"
-          ],
-          "properties": {
-            "version": {
-              "const": "djc-host-app-wake-receiving/1"
-            },
-            "method": {
-              "const": "POST"
-            },
-            "route": {
-              "const": "/v1/push/host-app-wake/operator/native-policy"
-            },
-            "action": {
-              "const": "native_policy"
-            },
-            "operation_id": {
-              "type": "string",
-              "pattern": "^[A-Za-z0-9_-]{1,128}$"
-            },
-            "authorization_id": {
-              "type": "string",
-              "pattern": "^[A-Za-z0-9_-]{1,128}$"
-            },
-            "native_key_ref": {
-              "type": "string",
-              "pattern": "^[A-Za-z0-9_-]{1,128}$"
-            },
-            "native_key_id_b64": {
-              "type": "string",
-              "pattern": "^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$"
-            },
-            "profile": {
-              "const": "host_wake_apple_properties_attestation_v2"
-            },
-            "app_identifier": {
-              "type": "string",
-              "pattern": "^[A-Z0-9]{10}\\.[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
-            },
-            "apns_team_id": {
-              "type": "string",
-              "pattern": "^[A-Z0-9]{10}$"
-            },
-            "app_attest_environment": {
-              "enum": [
-                "development",
-                "production"
-              ]
-            },
-            "bundle_version": {
-              "type": "string",
-              "pattern": "^[0-9]{1,20}(?:\\.[0-9]{1,20}){0,2}$"
-            },
-            "launch_validation_category_b64": {
-              "enum": [
-                "AgAAAA==",
-                "AwAAAA==",
-                "BAAAAA==",
-                "BQAAAA=="
-              ]
-            },
-            "signed_host_artifact_sha256": {
-              "type": "string",
-              "pattern": "^[a-f0-9]{64}$"
-            },
-            "signed_environment_receipt_sha256": {
-              "type": "string",
-              "pattern": "^[a-f0-9]{64}$"
-            },
-            "scope": {
+          "oneOf": [
+            {
               "type": "object",
               "additionalProperties": false,
               "required": [
-                "paired_subject_binding_sha256",
-                "owner_binding",
-                "device_binding",
-                "source_binding",
-                "selected_ha_origin_sha256",
-                "identity_policy_sha256",
-                "deployment_policy_sha256",
-                "target",
-                "platform",
-                "apns_environment"
+                "version",
+                "method",
+                "route",
+                "action",
+                "operation_id",
+                "authorization_id",
+                "native_key_ref",
+                "native_key_id_b64",
+                "profile",
+                "app_identifier",
+                "apns_team_id",
+                "app_attest_environment",
+                "bundle_version",
+                "launch_validation_category_b64",
+                "signed_host_artifact_sha256",
+                "signed_environment_receipt_sha256",
+                "scope",
+                "original_policy_issued_at_ms",
+                "original_policy_expires_at_ms"
               ],
               "properties": {
-                "paired_subject_binding_sha256": {
+                "version": {
+                  "const": "djc-host-app-wake-receiving/1"
+                },
+                "method": {
+                  "const": "POST"
+                },
+                "route": {
+                  "const": "/v1/push/host-app-wake/operator/native-policy"
+                },
+                "action": {
+                  "const": "native_policy"
+                },
+                "operation_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                },
+                "authorization_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                },
+                "native_key_ref": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                },
+                "native_key_id_b64": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$"
+                },
+                "profile": {
+                  "const": "host_wake_apple_properties_attestation_v2"
+                },
+                "app_identifier": {
+                  "type": "string",
+                  "pattern": "^[A-Z0-9]{10}\\.[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
+                },
+                "apns_team_id": {
+                  "type": "string",
+                  "pattern": "^[A-Z0-9]{10}$"
+                },
+                "app_attest_environment": {
+                  "enum": [
+                    "development",
+                    "production"
+                  ]
+                },
+                "bundle_version": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,20}(?:\\.[0-9]{1,20}){0,2}$"
+                },
+                "launch_validation_category_b64": {
+                  "enum": [
+                    "AgAAAA==",
+                    "AwAAAA==",
+                    "BAAAAA==",
+                    "BQAAAA=="
+                  ]
+                },
+                "signed_host_artifact_sha256": {
                   "type": "string",
                   "pattern": "^[a-f0-9]{64}$"
                 },
-                "owner_binding": {
+                "signed_environment_receipt_sha256": {
                   "type": "string",
                   "pattern": "^[a-f0-9]{64}$"
                 },
-                "device_binding": {
-                  "type": "string",
-                  "pattern": "^[a-f0-9]{64}$"
-                },
-                "source_binding": {
-                  "type": "string",
-                  "pattern": "^[a-f0-9]{64}$"
-                },
-                "selected_ha_origin_sha256": {
-                  "type": "string",
-                  "pattern": "^[a-f0-9]{64}$"
-                },
-                "identity_policy_sha256": {
-                  "type": "string",
-                  "pattern": "^[a-f0-9]{64}$"
-                },
-                "deployment_policy_sha256": {
-                  "type": "string",
-                  "pattern": "^[a-f0-9]{64}$"
-                },
-                "target": {
+                "scope": {
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "host_bundle_id",
-                    "installation_id"
+                    "paired_subject_binding_sha256",
+                    "owner_binding",
+                    "device_binding",
+                    "source_binding",
+                    "selected_ha_origin_sha256",
+                    "identity_policy_sha256",
+                    "deployment_policy_sha256",
+                    "target",
+                    "platform",
+                    "apns_environment"
                   ],
                   "properties": {
-                    "host_bundle_id": {
+                    "paired_subject_binding_sha256": {
                       "type": "string",
-                      "maxLength": 200,
-                      "pattern": "^[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
+                      "pattern": "^[a-f0-9]{64}$"
                     },
-                    "installation_id": {
+                    "owner_binding": {
                       "type": "string",
-                      "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "device_binding": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "source_binding": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "selected_ha_origin_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "identity_policy_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "deployment_policy_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "target": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "host_bundle_id",
+                        "installation_id"
+                      ],
+                      "properties": {
+                        "host_bundle_id": {
+                          "type": "string",
+                          "maxLength": 200,
+                          "pattern": "^[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
+                        },
+                        "installation_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                        }
+                      }
+                    },
+                    "platform": {
+                      "enum": [
+                        "ios",
+                        "ipados"
+                      ]
+                    },
+                    "apns_environment": {
+                      "enum": [
+                        "sandbox",
+                        "production"
+                      ]
                     }
                   }
                 },
-                "platform": {
-                  "enum": [
-                    "ios",
-                    "ipados"
-                  ]
+                "original_policy_issued_at_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
                 },
-                "apns_environment": {
-                  "enum": [
-                    "sandbox",
-                    "production"
-                  ]
+                "original_policy_expires_at_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
                 }
               }
             },
-            "original_policy_issued_at_ms": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
-            },
-            "original_policy_expires_at_ms": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "version",
+                "method",
+                "route",
+                "action",
+                "operation_id",
+                "authorization_id",
+                "native_key_ref",
+                "native_key_id_b64",
+                "profile",
+                "app_identifier",
+                "apns_team_id",
+                "app_attest_environment",
+                "bundle_version",
+                "signed_host_artifact_sha256",
+                "signed_environment_receipt_sha256",
+                "scope",
+                "original_policy_issued_at_ms",
+                "original_policy_expires_at_ms",
+                "allowed_launch_validation_categories_b64"
+              ],
+              "properties": {
+                "version": {
+                  "const": "djc-host-app-wake-receiving/1"
+                },
+                "method": {
+                  "const": "POST"
+                },
+                "route": {
+                  "const": "/v1/push/host-app-wake/operator/native-policy"
+                },
+                "action": {
+                  "const": "native_policy"
+                },
+                "operation_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                },
+                "authorization_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                },
+                "native_key_ref": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                },
+                "native_key_id_b64": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$"
+                },
+                "profile": {
+                  "const": "host_wake_apple_properties_attestation_v3"
+                },
+                "app_identifier": {
+                  "type": "string",
+                  "pattern": "^[A-Z0-9]{10}\\.[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
+                },
+                "apns_team_id": {
+                  "type": "string",
+                  "pattern": "^[A-Z0-9]{10}$"
+                },
+                "app_attest_environment": {
+                  "enum": [
+                    "development",
+                    "production"
+                  ]
+                },
+                "bundle_version": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,20}(?:\\.[0-9]{1,20}){0,2}$"
+                },
+                "signed_host_artifact_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "signed_environment_receipt_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "scope": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "paired_subject_binding_sha256",
+                    "owner_binding",
+                    "device_binding",
+                    "source_binding",
+                    "selected_ha_origin_sha256",
+                    "identity_policy_sha256",
+                    "deployment_policy_sha256",
+                    "target",
+                    "platform",
+                    "apns_environment"
+                  ],
+                  "properties": {
+                    "paired_subject_binding_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "owner_binding": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "device_binding": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "source_binding": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "selected_ha_origin_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "identity_policy_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "deployment_policy_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "target": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "host_bundle_id",
+                        "installation_id"
+                      ],
+                      "properties": {
+                        "host_bundle_id": {
+                          "type": "string",
+                          "maxLength": 200,
+                          "pattern": "^[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
+                        },
+                        "installation_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                        }
+                      }
+                    },
+                    "platform": {
+                      "enum": [
+                        "ios",
+                        "ipados"
+                      ]
+                    },
+                    "apns_environment": {
+                      "enum": [
+                        "sandbox",
+                        "production"
+                      ]
+                    }
+                  }
+                },
+                "original_policy_issued_at_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "original_policy_expires_at_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "allowed_launch_validation_categories_b64": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 4,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "AgAAAA==",
+                      "AwAAAA==",
+                      "BAAAAA==",
+                      "BQAAAA=="
+                    ]
+                  }
+                }
+              }
             }
-          }
+          ]
         }
       }
     },
