@@ -53,7 +53,7 @@ class PreparationTests(unittest.TestCase):
                          *(record[0] for record in v.DELTA_PROOFS),
                          *v.CLOSED_RECEIVING_MAP_CHANGES, v.CLOSED_RECEIVING_DELTA_PATH,
                          v.CLOSED_RECEIVING_PRODUCT_PATH, *v.RETENTION_SOURCES,
-                         v.RETENTION_DELTA_PATH, *v.CATEGORY_SOURCES, v.CATEGORY_DELTA_PATH)
+                         v.RETENTION_DELTA_PATH, *v.CATEGORY_SOURCES, v.CATEGORY_DELTA_PATH, *v.MOUNT_SOURCES, v.MOUNT_DELTA_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
@@ -107,6 +107,27 @@ class PreparationTests(unittest.TestCase):
                 changed['changes'] = {}
             with self.subTest(mutation=mutation):
                 self.rejects_changed_proof(v.WORKFLOW_DELTA_PATH, changed)
+
+    def test_mount_delta_is_four_exact_paths_not_effect_authority(self):
+        proof = v.pinned_working_proof(v.MOUNT_DELTA_PATH, v.MOUNT_DELTA_SHA256)
+        self.assertEqual(len(proof['changes']), 4)
+        self.assertTrue(proof['private_http_mount_selected'])
+        self.assertFalse(proof['production_effect_authorized'])
+
+    def test_mount_delta_cannot_grant_production_effect(self):
+        proof = v.pinned_working_proof(v.MOUNT_DELTA_PATH, v.MOUNT_DELTA_SHA256)
+        proof['production_effect_authorized'] = True
+        self.rejects_changed_proof(v.MOUNT_DELTA_PATH, proof)
+
+    def test_mount_delta_cannot_add_unreviewed_source(self):
+        proof = v.pinned_working_proof(v.MOUNT_DELTA_PATH, v.MOUNT_DELTA_SHA256)
+        proof['changes']['unreviewed.ts'] = {'before': None, 'after':'f'*64}
+        self.rejects_changed_proof(v.MOUNT_DELTA_PATH, proof)
+
+    def test_mount_delta_cannot_rewrite_prior_category_map(self):
+        proof = v.pinned_working_proof(v.MOUNT_DELTA_PATH, v.MOUNT_DELTA_SHA256)
+        proof['baseline_source_map_sha256'] = 'f'*64
+        self.rejects_changed_proof(v.MOUNT_DELTA_PATH, proof)
 
     def test_category_delta_preserves_prior_ci_and_runtime_maps(self):
         self.assertEqual(len(v.baseline_before_native_category()[0]), 144)

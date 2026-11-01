@@ -17,7 +17,7 @@ import {authorizeNativePolicy,withdrawNativePolicy} from './native-policy-store'
 import {OPERATOR_NATIVE_POLICY,OPERATOR_NATIVE_WITHDRAW} from './native-policy';
 import {verifySavedAssertion,commitVerifiedAssertion} from './native-assertion';
 import {decodePrivateReply,privateBase,privateError,type PrivateState} from './server-reply';
-import {authenticateOperator} from './operator-auth';
+import {authenticateOperator,requireOperatorHeaders} from './operator-auth';
 import {resolveAuthorization,RESOLVE_PATH} from './authorization-resolve';
 import {requireReceivingGuards} from './guard-schema';
 import {receiveTarget} from './target-transport';
@@ -105,6 +105,7 @@ export function createReceivingService(options:ReceivingOptions){
  async function operator(request:Request,kind:'authorize'|'withdraw'|'native_policy'|'native_policy_withdraw'){
   const w=new RequestWindow(clock,request.signal,originalAt);try{
    const u=new URL(request.url);need(request.method==='POST'&&u.protocol==='https:'&&!request.url.includes('?')&&!request.url.includes('#'),'host_wake_operator_route',404);
+   requireOperatorHeaders(request);
    const {raw}=await readBoundedPrivateBody(request,w);const body=await w.run(()=>authenticateOperator(new Request(request.url,{method:request.method,headers:request.headers,body:raw,signal:w.signal}),env,kind));w.check();
    if(body.action==='native_policy'){const hash=await w.run(()=>sha256Hex(canonical(body))),row=await w.run(()=>authorizeNativePolicy(db,body,hash,w.capturedAt,w.check(),capacity));w.check();return json({version:RECEIVING_VERSION,native_key_ref:row.native_key_ref,outcome:row.outcome});}
    if(body.action==='native_policy_withdraw'){await w.run(()=>withdrawNativePolicy(db,body.native_key_ref,capacity));w.check();return json({version:RECEIVING_VERSION,native_key_ref:body.native_key_ref,outcome:'withdrawn'});}

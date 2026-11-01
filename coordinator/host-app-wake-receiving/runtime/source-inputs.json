@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "classification": "PINNED_PRIVATE_RECEIVING_PACKAGE_SOURCE_NOT_AUTHORITY",
-  "base_source": "41549dadff8efb2da5fa0ab23ff7abeff86e19df",
+  "base_source": "067a214b8f59524481ec1309d07cfa8270abb20f",
   "compatibility": {
     "date": "2026-08-22",
     "flags": [
@@ -209,7 +209,7 @@
     "coordinator/host-app-wake-receiving/native-policy-store.ts": "14cd32feb9de4b85211ad72eb5e51bf5173a2c3e71806d06ac0518f846e38517",
     "coordinator/host-app-wake-receiving/native-policy.ts": "634ed4334424a3ecd291b78a0df72d9d8093319d3b9c4c9e58080027ed5cc83c",
     "coordinator/host-app-wake-receiving/native-state.ts": "0402413b986acecf98d3a29cb7524cc1fde3d2426d6ebad5b64a21e819cd4f5d",
-    "coordinator/host-app-wake-receiving/operator-auth.ts": "f3e30b0462aaad45687bf1fbd2e6b28cab24ef954b3698d9bf6853922cf671de",
+    "coordinator/host-app-wake-receiving/operator-auth.ts": "34a50718a1fb1e45dbc5382b971a2fbbbdf577adb08129728f15c35b621d7c52",
     "coordinator/host-app-wake-receiving/principal.ts": "1f658b0409fde1d91642ccb00900bb7b20c1d712f437f37e225830a8a751f89e",
     "coordinator/host-app-wake-receiving/private-intake.ts": "b7e98ae0530d1387c378e8011fde289b54f3fed8ca0288598767709525724b4c",
     "coordinator/host-app-wake-receiving/qualification/package-types.d.ts": "e9a35040cbb9cb3c6f96caa7528962a89640b259bc700f049eea083fdbfcfc69",
@@ -234,7 +234,7 @@
     "coordinator/host-app-wake-receiving/schema.sql": "3c445ae6c75e95bf16ef0c153f36fa8b73e8b818dc9e3a62a7c2354878ff0b72",
     "coordinator/host-app-wake-receiving/server-reply.ts": "3d42eca8d56da4b70f9d2cf5672d5f690137b0487a4c7af393eed797ff129fbf",
     "coordinator/host-app-wake-receiving/server-wire.ts": "b7670ff7b8ec0666369bdb5844858e1d7509e86077952d72289092c107dda665",
-    "coordinator/host-app-wake-receiving/service.ts": "089bf19488ba7a79e75abc07c850e501ad055a82e014b96f4ca29ae6ce8578dc",
+    "coordinator/host-app-wake-receiving/service.ts": "704333208d0f94a1dc03230915259880f1f250356d442b15ebafa828dba98a5d",
     "coordinator/host-app-wake-receiving/source-backend.ts": "9344ca283494a672025743b7417da2354d823a5fcd2cce63b1858688e726ca67",
     "coordinator/host-app-wake-receiving/target-transport.ts": "1bfcf310aa1f59a1cbc7015e852e7f77991cc369af6c2afd0f4d27893b54a4ae",
     "coordinator/host-app-wake-receiving/wire.ts": "e7f0964436fb63622294e6b1525aa9e1d82f18bc4bada514c00b1572faf06819",
