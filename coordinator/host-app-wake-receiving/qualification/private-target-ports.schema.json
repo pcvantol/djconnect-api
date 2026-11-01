@@ -1,0 +1,2803 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:djconnect:host-wake-private-target-ports:1",
+  "description": "Structural synthetic DATA envelopes only; actual HTTP bodies/replies are unchanged Source181. Header keys in vector envelopes use canonical display casing; actual HTTP names are case insensitive. Runtime additionally joins exact operation/purpose/original/deadlines and computed correlation header; no role, original parent, native enrollment, clock or provider admission is supplied. Terminal source state precedes historical operation_state. Error examples include401/409; schema includes the full fixed status/code table extracted from server-reply.ts.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "request"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Authorization",
+            "Content-Type",
+            "X-DJConnect-Host-Wake-Authorization-ID",
+            "X-DJConnect-Host-Wake-Core-Purpose-ID",
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID",
+            "X-DJConnect-Host-Wake-Capability",
+            "X-DJConnect-Host-Wake-Operation-ID"
+          ],
+          "properties": {
+            "Authorization": {
+              "type": "string",
+              "pattern": "^Bearer djci_[A-Za-z0-9_-]{43}$"
+            },
+            "Content-Type": {
+              "const": "application/json"
+            },
+            "X-DJConnect-Host-Wake-Authorization-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Core-Purpose-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Capability": {
+              "type": "string",
+              "pattern": "^djchw_[A-Za-z0-9_-]{43}$"
+            },
+            "X-DJConnect-Host-Wake-Operation-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "generation",
+            "revision",
+            "token_role",
+            "target",
+            "apns_environment",
+            "apns_token"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "generation": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256
+            },
+            "token_role": {
+              "const": "host_app_wake"
+            },
+            "target": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "host_bundle_id",
+                "installation_id"
+              ],
+              "properties": {
+                "host_bundle_id": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "pattern": "^[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+$"
+                },
+                "installation_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                }
+              }
+            },
+            "apns_environment": {
+              "enum": [
+                "sandbox",
+                "production"
+              ]
+            },
+            "apns_token": {
+              "type": "string",
+              "pattern": "^(?:[a-f0-9]{2}){16,2048}$"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 200
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "state",
+            "generation",
+            "revision",
+            "expires_at_ms",
+            "transport_expires_at_ms",
+            "operation_state",
+            "provider_status"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "state": {
+              "enum": [
+                "withdrawn",
+                "expired",
+                "registered",
+                "unregistered"
+              ]
+            },
+            "generation": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                }
+              ]
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "expires_at_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "transport_expires_at_ms": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              ]
+            },
+            "operation_state": {
+              "enum": [
+                "unknown",
+                "registered",
+                "conflict",
+                "expired",
+                "provider_accepted",
+                "provider_rejected",
+                "not_sent"
+              ]
+            },
+            "provider_status": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 599
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 202
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "operation_state"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_state": {
+              "const": "unknown"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 400
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_invalid"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 401
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_core_auth",
+                "host_wake_operator_hmac_required",
+                "auth_required"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 403
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_principal_scope",
+                "host_wake_native_authority",
+                "host_wake_header_body_scope",
+                "host_wake_original_scope",
+                "host_wake_original_native_token",
+                "host_wake_native_proof_rejected"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 404
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_receiving_route",
+                "host_wake_operator_route",
+                "host_wake_history_unknown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 409
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
+                "host_wake_intent_consumed",
+                "host_wake_intent_capacity_or_authority",
+                "host_wake_authorization_consumed_or_capacity",
+                "host_wake_issuer_consumed_or_capacity",
+                "host_wake_issuer_consumed",
+                "host_wake_native_job_consumed_or_capacity",
+                "host_wake_native_job_consumed",
+                "host_wake_native_job_expired",
+                "host_wake_transport_expired",
+                "host_wake_body_timeout",
+                "host_wake_cancelled"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 413
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_size"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 415
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_media"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/register"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 503
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
+                "host_wake_receiving_unavailable",
+                "host_wake_authorization_unavailable",
+                "host_wake_native_enrollment_unavailable",
+                "host_wake_native_policy_unavailable",
+                "host_wake_native_attestation_unavailable",
+                "host_wake_native_deployment_mismatch"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "request"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Authorization",
+            "Content-Type",
+            "X-DJConnect-Host-Wake-Authorization-ID",
+            "X-DJConnect-Host-Wake-Core-Purpose-ID",
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID",
+            "X-DJConnect-Host-Wake-Capability",
+            "X-DJConnect-Host-Wake-Operation-ID"
+          ],
+          "properties": {
+            "Authorization": {
+              "type": "string",
+              "pattern": "^Bearer djci_[A-Za-z0-9_-]{43}$"
+            },
+            "Content-Type": {
+              "const": "application/json"
+            },
+            "X-DJConnect-Host-Wake-Authorization-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Core-Purpose-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Capability": {
+              "type": "string",
+              "pattern": "^djchw_[A-Za-z0-9_-]{43}$"
+            },
+            "X-DJConnect-Host-Wake-Operation-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "generation",
+            "revision",
+            "event"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "generation": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256
+            },
+            "event": {
+              "const": "direct_rich_refresh"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 200
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "state",
+            "generation",
+            "revision",
+            "expires_at_ms",
+            "transport_expires_at_ms",
+            "operation_state",
+            "provider_status"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "state": {
+              "enum": [
+                "withdrawn",
+                "expired",
+                "registered",
+                "unregistered"
+              ]
+            },
+            "generation": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                }
+              ]
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "expires_at_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "transport_expires_at_ms": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              ]
+            },
+            "operation_state": {
+              "enum": [
+                "unknown",
+                "registered",
+                "conflict",
+                "expired",
+                "provider_accepted",
+                "provider_rejected",
+                "not_sent"
+              ]
+            },
+            "provider_status": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 599
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 202
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "operation_state"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_state": {
+              "const": "unknown"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 400
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_invalid"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 401
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_core_auth",
+                "host_wake_operator_hmac_required",
+                "auth_required"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 403
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_principal_scope",
+                "host_wake_native_authority",
+                "host_wake_header_body_scope",
+                "host_wake_original_scope",
+                "host_wake_original_native_token",
+                "host_wake_native_proof_rejected"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 404
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_receiving_route",
+                "host_wake_operator_route",
+                "host_wake_history_unknown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 409
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
+                "host_wake_intent_consumed",
+                "host_wake_intent_capacity_or_authority",
+                "host_wake_authorization_consumed_or_capacity",
+                "host_wake_issuer_consumed_or_capacity",
+                "host_wake_issuer_consumed",
+                "host_wake_native_job_consumed_or_capacity",
+                "host_wake_native_job_consumed",
+                "host_wake_native_job_expired",
+                "host_wake_transport_expired",
+                "host_wake_body_timeout",
+                "host_wake_cancelled"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 413
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_size"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 415
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_media"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/wake"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 503
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
+                "host_wake_receiving_unavailable",
+                "host_wake_authorization_unavailable",
+                "host_wake_native_enrollment_unavailable",
+                "host_wake_native_policy_unavailable",
+                "host_wake_native_attestation_unavailable",
+                "host_wake_native_deployment_mismatch"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "request"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Authorization",
+            "Content-Type",
+            "X-DJConnect-Host-Wake-Authorization-ID",
+            "X-DJConnect-Host-Wake-Core-Purpose-ID",
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID",
+            "X-DJConnect-Host-Wake-Capability"
+          ],
+          "properties": {
+            "Authorization": {
+              "type": "string",
+              "pattern": "^Bearer djci_[A-Za-z0-9_-]{43}$"
+            },
+            "Content-Type": {
+              "const": "application/json"
+            },
+            "X-DJConnect-Host-Wake-Authorization-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Core-Purpose-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Capability": {
+              "type": "string",
+              "pattern": "^djchw_[A-Za-z0-9_-]{43}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 200
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "state",
+            "generation",
+            "revision",
+            "expires_at_ms",
+            "transport_expires_at_ms",
+            "operation_state",
+            "provider_status"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "state": {
+              "enum": [
+                "withdrawn",
+                "expired",
+                "registered",
+                "unregistered"
+              ]
+            },
+            "generation": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                }
+              ]
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "expires_at_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "transport_expires_at_ms": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              ]
+            },
+            "operation_state": {
+              "enum": [
+                "unknown",
+                "registered",
+                "conflict",
+                "expired",
+                "provider_accepted",
+                "provider_rejected",
+                "not_sent"
+              ]
+            },
+            "provider_status": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 599
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 202
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "operation_state"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_state": {
+              "const": "unknown"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 400
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_invalid"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 401
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_core_auth",
+                "host_wake_operator_hmac_required",
+                "auth_required"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 403
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_principal_scope",
+                "host_wake_native_authority",
+                "host_wake_header_body_scope",
+                "host_wake_original_scope",
+                "host_wake_original_native_token",
+                "host_wake_native_proof_rejected"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 404
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_receiving_route",
+                "host_wake_operator_route",
+                "host_wake_history_unknown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 409
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
+                "host_wake_intent_consumed",
+                "host_wake_intent_capacity_or_authority",
+                "host_wake_authorization_consumed_or_capacity",
+                "host_wake_issuer_consumed_or_capacity",
+                "host_wake_issuer_consumed",
+                "host_wake_native_job_consumed_or_capacity",
+                "host_wake_native_job_consumed",
+                "host_wake_native_job_expired",
+                "host_wake_transport_expired",
+                "host_wake_body_timeout",
+                "host_wake_cancelled"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 413
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_size"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 415
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_media"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/status"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 503
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
+                "host_wake_receiving_unavailable",
+                "host_wake_authorization_unavailable",
+                "host_wake_native_enrollment_unavailable",
+                "host_wake_native_policy_unavailable",
+                "host_wake_native_attestation_unavailable",
+                "host_wake_native_deployment_mismatch"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "request"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Authorization",
+            "Content-Type",
+            "X-DJConnect-Host-Wake-Authorization-ID",
+            "X-DJConnect-Host-Wake-Core-Purpose-ID",
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID",
+            "X-DJConnect-Host-Wake-Capability"
+          ],
+          "properties": {
+            "Authorization": {
+              "type": "string",
+              "pattern": "^Bearer djci_[A-Za-z0-9_-]{43}$"
+            },
+            "Content-Type": {
+              "const": "application/json"
+            },
+            "X-DJConnect-Host-Wake-Authorization-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Core-Purpose-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Issuer-Operation-ID": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "X-DJConnect-Host-Wake-Capability": {
+              "type": "string",
+              "pattern": "^djchw_[A-Za-z0-9_-]{43}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 200
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "state",
+            "generation",
+            "revision",
+            "expires_at_ms",
+            "transport_expires_at_ms",
+            "operation_state",
+            "provider_status"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "state": {
+              "enum": [
+                "withdrawn",
+                "expired",
+                "registered",
+                "unregistered"
+              ]
+            },
+            "generation": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$"
+                }
+              ]
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 256
+            },
+            "expires_at_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "transport_expires_at_ms": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              ]
+            },
+            "operation_state": {
+              "enum": [
+                "unknown",
+                "registered",
+                "conflict",
+                "expired",
+                "provider_accepted",
+                "provider_rejected",
+                "not_sent"
+              ]
+            },
+            "provider_status": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 599
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "headers",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "reply"
+        },
+        "status": {
+          "const": 202
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "X-DJConnect-Host-Wake-Request-SHA256"
+          ],
+          "properties": {
+            "X-DJConnect-Host-Wake-Request-SHA256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "purpose_id",
+            "operation_id",
+            "operation_state"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake/1"
+            },
+            "purpose_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            },
+            "operation_state": {
+              "const": "unknown"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 400
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_invalid"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 401
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_core_auth",
+                "host_wake_operator_hmac_required",
+                "auth_required"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 403
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_principal_scope",
+                "host_wake_native_authority",
+                "host_wake_header_body_scope",
+                "host_wake_original_scope",
+                "host_wake_original_native_token",
+                "host_wake_native_proof_rejected"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 404
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_receiving_route",
+                "host_wake_operator_route",
+                "host_wake_history_unknown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 409
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_policy_consumed_or_capacity",
+                "host_wake_intent_consumed",
+                "host_wake_intent_capacity_or_authority",
+                "host_wake_authorization_consumed_or_capacity",
+                "host_wake_issuer_consumed_or_capacity",
+                "host_wake_issuer_consumed",
+                "host_wake_native_job_consumed_or_capacity",
+                "host_wake_native_job_consumed",
+                "host_wake_native_job_expired",
+                "host_wake_transport_expired",
+                "host_wake_body_timeout",
+                "host_wake_cancelled"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 413
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_size"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 415
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_media"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "direction",
+        "status",
+        "body"
+      ],
+      "properties": {
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/push/host-app-wake/revoke"
+        },
+        "direction": {
+          "const": "error"
+        },
+        "status": {
+          "const": 503
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "version": {
+              "const": "djc-host-app-wake-receiving/1"
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "enum": [
+                "host_wake_native_status_unavailable",
+                "host_wake_native_receipt_unavailable",
+                "host_wake_receiving_unavailable",
+                "host_wake_authorization_unavailable",
+                "host_wake_native_enrollment_unavailable",
+                "host_wake_native_policy_unavailable",
+                "host_wake_native_attestation_unavailable",
+                "host_wake_native_deployment_mismatch"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

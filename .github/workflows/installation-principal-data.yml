@@ -1,0 +1,54 @@
+name: Installation principal closed DATA
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  software-assurance-governance:
+    name: Software Assurance governance
+    permissions:
+      contents: read
+    uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875
+    with:
+      execution_profile: balanced
+      owner: pcvantol/djconnect-api
+  installation-codec-data:
+    name: Actual workerd installation codec DATA only
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - name: Verify reusable workflow pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check_reusable_workflow_refs.sh
+      - run: npm ci
+      - name: Strict DATA source and test types
+        run: node_modules/.bin/tsc -p coordinator/installation-principal/qualification/tsconfig.json --noEmit
+      - name: Actual local workerd public software conformance
+        env:
+          TMPDIR: ${{ runner.temp }}
+          WRANGLER_LOG_PATH: ${{ runner.temp }}/principal-installation-codec-data.log
+        run: node_modules/.bin/vitest run --config coordinator/installation-principal/qualification/vitest.config.mts --reporter=json --outputFile="${{ runner.temp }}/installation-codec-tests.json"
+      - name: Package locked standalone DATA library
+        run: node coordinator/installation-principal/build-source.mjs "${{ runner.temp }}/installation-codec-package"
+      - name: Verify actual packaged DATA module
+        run: node coordinator/installation-principal/qualification/check-package.mjs "${{ runner.temp }}/installation-codec-package"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: installation-principal-data-conformance
+          path: |
+            ${{ runner.temp }}/installation-codec-tests.json
+            ${{ runner.temp }}/installation-codec-package
+          if-no-files-found: error

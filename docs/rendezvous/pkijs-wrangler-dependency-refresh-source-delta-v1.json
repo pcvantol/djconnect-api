@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_PKIJS_WRANGLER_DEPENDENCY_REFRESH_NOT_ACTIVATION",
+  "base_source": "f156c3049a6320bc16d084b4b17b526090ccb7a7",
+  "baseline_source_map_sha256": "b734d7cdb32ef1785d40f3be6c2b6779b5203adf909c8fb4de48c78e12ac7b43",
+  "effective_source_map_sha256": "fddced4e256bf1300a53d201f3be7f4db34adff45fc8313f2fe1e9e9637bef86",
+  "source_changes": {
+    "package-lock.json": {
+      "before": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "after": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72"
+    },
+    "package.json": {
+      "before": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "after": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca"
+    },
+    "rendezvous-build-inputs.json": {
+      "before": "af49737535f5e1720d86c4187c3b68743566b2c170040744b9efd7cd618f07ad",
+      "after": "c7171c36dc32809f3da00aaad53f251c8db5e00325d3ac4f9f0a661d29eb5c9e"
+    },
+    "scripts/qualify_rendezvous_product_build.mjs": {
+      "before": "c4ea3a8f970c5ef44912d046c75a7f2f671f7c1373030096592d4e83c282d170",
+      "after": "7935beb7a67f5b0d6ade26edc5c82c10e4359cc5140160487918952ebd6f0a42"
+    }
+  },
+  "source_additions": {
+    "qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json": "1270c280cca0adadde67da371afeba936d404552a51f7c8929daa34126bf57b3"
+  },
+  "reference_changes": {
+    "THIRD_PARTY_NOTICES.md": {
+      "before": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+      "after": "432e039c4f87dcb2d934adf01a66340a0070ed2b3172484d24d2d99a1b7a8b32"
+    },
+    "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": {
+      "before": "c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e",
+      "after": "68abd3e55b36afe8654a2e1a73b4d99631d66c0969d41dec87cba45cbcc117bb"
+    }
+  },
+  "reference_additions": {
+    "coordinator/host-app-wake-receiving/runtime/source-inputs.json": "d8b3977cff475348de7485b0e710f21b45b328bf80150befc956f8de4ec49288",
+    "coordinator/installation-principal/source-manifest.json": "7b45cfc676341688962496ac28b6bf6b764fdd0d78adaf25a6c37df3c561714d"
+  },
+  "installed_changes": {
+    "node_modules/pkijs/build/index.js": {
+      "before": "81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685",
+      "after": "fcd402426e202ea647e51e0a1150cee1e66e41e1e18c2e7ef8cea013c92488c4"
+    }
+  },
+  "public_activation_allowed": false,
+  "production_effect_authorized": false
+}

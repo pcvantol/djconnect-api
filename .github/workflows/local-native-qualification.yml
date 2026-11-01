@@ -7,7 +7,13 @@ on:
 permissions:
   contents: read
 jobs:
-  host-and-private-worker:
+  native-checks:
+    name: Native (${{ matrix.suite }})
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        suite: [default-genuine, receiver-policy, qa-profile, fixed40381, source-history]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -20,27 +26,40 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Offline preparation and squash-safe source history
+        if: matrix.suite == 'source-history'
         run: python3 -m unittest scripts/test_rendezvous_deployment_plan.py
       - name: Private files and actual default-genuine workerd negatives
+        if: matrix.suite == 'default-genuine'
         run: node --test qualification/rendezvous/local-native.check.mjs
       - name: Fixed private40381 source/profile/software-policy and actual genuine negatives
+        if: matrix.suite == 'fixed40381'
         run: node --test qualification/rendezvous/private-profile-40381.check.mjs
       - name: Fixed root sourceguard derivation refuses drift
+        if: matrix.suite == 'source-history'
         run: node --test qualification/rendezvous/root-integration-derivation.check.mjs
-      - name: Immutable public receiver to actual local API interoperability
+      - name: Immutable public receiver and isolated policy dependencies
+        if: matrix.suite == 'receiver-policy' || matrix.suite == 'qa-profile'
         run: |
           DJC_INTEROP_INPUTS="$(mktemp -d)"
           chmod 700 "$DJC_INTEROP_INPUTS"
           node qualification/rendezvous/prepare-receiver-interop.mjs "$DJC_INTEROP_INPUTS"
           npm ci --prefix "$DJC_INTEROP_INPUTS" --ignore-scripts --no-audit --no-fund
-          node qualification/rendezvous/run-receiver-interop.mjs "$DJC_INTEROP_INPUTS"
+          echo "DJC_INTEROP_INPUTS=$DJC_INTEROP_INPUTS" >> "$GITHUB_ENV"
           DJC_POLICY_DEPS="$(mktemp -d)"
           DJC_POLICY_OUTPUT="$RUNNER_TEMP/enrollment-policy-qualification"
           chmod 700 "$DJC_POLICY_DEPS"
           printf '{"private":true}\n' > "$DJC_POLICY_DEPS/package.json"
           ln -s "$GITHUB_WORKSPACE/node_modules" "$DJC_POLICY_DEPS/node_modules"
+          echo "DJC_POLICY_DEPS=$DJC_POLICY_DEPS" >> "$GITHUB_ENV"
+          echo "DJC_POLICY_OUTPUT=$DJC_POLICY_OUTPUT" >> "$GITHUB_ENV"
+      - name: Immutable public receiver to actual local API interoperability
+        if: matrix.suite == 'receiver-policy'
+        run: |
+          node qualification/rendezvous/run-receiver-interop.mjs "$DJC_INTEROP_INPUTS"
           node qualification/rendezvous/run_challenge_budget_workerd.mjs "$DJC_POLICY_DEPS" "$DJC_POLICY_OUTPUT" "$DJC_INTEROP_INPUTS/node_modules/jose"
-          node scripts/qualify_rendezvous_qa_profile.mjs "$DJC_POLICY_DEPS" "${DJC_POLICY_OUTPUT}-qa-profile" "$DJC_INTEROP_INPUTS/node_modules/jose"
+      - name: Fixed QA profile against its own runtime and state
+        if: matrix.suite == 'qa-profile'
+        run: node scripts/qualify_rendezvous_qa_profile.mjs "$DJC_POLICY_DEPS" "${DJC_POLICY_OUTPUT}-qa-profile" "$DJC_INTEROP_INPUTS/node_modules/jose"
       - name: Report allowlisted QA failure coordinates
         if: failure()
         run: |
@@ -118,6 +137,16 @@ jobs:
           report_failure(base, base, 'original_shared')
           report_failure(pathlib.Path(str(base) + '-qa-profile'), pathlib.Path(str(base) + '-qa-profile') / 'workerd', 'qa_derived')
           PY
+  host-and-private-worker:
+    if: always()
+    needs: native-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every isolated native qualification lane
+        env:
+          NATIVE_RESULT: ${{ needs.native-checks.result }}
+        run: test "$NATIVE_RESULT" = success
   actual-browser-worker:
     runs-on: ubuntu-latest
     timeout-minutes: 10

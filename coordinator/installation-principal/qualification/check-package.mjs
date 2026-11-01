@@ -1,0 +1,22 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import assert from 'node:assert/strict';
+const dir=resolve(process.argv[2]),hash=b=>createHash('sha256').update(b).digest('hex');
+const proof=JSON.parse(await readFile(join(dir,'source-package.json'),'utf8'));
+for(const [n,k]of [['codec-data.mjs','module_sha256'],['design-r2.json','design_sha256'],['schema-data.json','schema_sha256'],['expired-synthetic-records.json','public_fixture_sha256']])assert.equal(hash(await readFile(join(dir,n))),proof[k]);
+const lib=await import(pathToFileURL(join(dir,'codec-data.mjs')).href);
+assert.deepEqual(Object.keys(lib).sort(),['InstallationDataError','checkBootstrapChain','checkCommittedWithdrawalData','checkDevicePairData','checkOriginalWithdrawal','checkPrincipalData','checkRetirementData','decodeRecord','decodeTranscript']);
+const f=JSON.parse(await readFile(join(dir,'expired-synthetic-records.json'),'utf8')),r=f.records;
+for(const [k,v]of Object.entries(r)){const out=await lib.decodeRecord(v.canonical,k);assert.equal(out.digest,v.digest);assert(Object.isFrozen(out)&&Object.isFrozen(out.values));assert.equal(out.classification,'INSTALLATION_PRINCIPAL_DATA_ONLY');}
+for(const v of f.statuses)assert.equal((await lib.decodeRecord(v.canonical,'operation_status')).digest,v.digest);
+const b={generation:r.custody_generation_preparation.canonical,receipt:r.custody_public_receipt.canonical,subject:r.installation_principal_subject.canonical,context:r.bootstrap_admission_context.canonical,proof:r.bootstrap_proof_preparation.canonical,original_expected_transcript:f.R1.canonical};
+const i={...b,intent:r.original_admission_intent.canonical,withdrawal:r.original_operation_withdrawal_preparation.canonical},p={...b,principal:r.installation_principal_record.canonical};
+await lib.checkBootstrapChain(b);await lib.checkOriginalWithdrawal(i);await lib.checkRetirementData({...i,tombstone:r.original_admission_retirement_tombstone.canonical});await lib.checkPrincipalData(p);await lib.checkDevicePairData({...p,pair_join:r.device_pair_join.canonical});await lib.checkCommittedWithdrawalData({...p,withdrawal:r.withdrawal_preparation.canonical});
+const t=await lib.decodeTranscript(f.R1.canonical);assert.equal(t.body_sha256,f.R1.body_sha256);assert.equal(t.signing_input_sha256,f.R1.signing_input_sha256);
+assert(!Object.hasOwn((await lib.checkOriginalWithdrawal(i)).withdrawal.values,'principal_record_sha256'));
+await assert.rejects(lib.checkBootstrapChain({...b,original_expected_transcript:b.original_expected_transcript+'\n'}),lib.InstallationDataError);
+await assert.rejects(lib.decodeRecord(r.original_operation_withdrawal_preparation.canonical,'withdrawal_preparation'),lib.InstallationDataError);
+const observed={classification:'ACTUAL_PACKAGED_CLOSED_CODEC_HOST_CHECK_NOT_ADMISSION',node:process.version,module_sha256:proof.module_sha256,records:11,status_variants:6,primitive_chain_checks:6,exports_closed_DATA_only:true,R1_bytes_hashes_equal:true,frozen_owned_outputs:true,pending_withdrawal_needs_no_future_result:true,original_mismatch_and_crossfamily_rejected:true,registry_ledger_runtime:false,keys_signing_provision_deploy_native:false};
+await writeFile(join(dir,'package-check.json'),JSON.stringify(observed,null,2)+'\n');console.log(JSON.stringify(observed));

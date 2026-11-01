@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "scope": "SEPARATE_DOCUMENTARY_FINALIZATION_OF_SOURCE177_NOT_OWN_FINAL_QUALIFICATION",
+  "source_PR": 177,
+  "source_candidate": "5aaf886747675bb3b0f3739656e3846dd835831a",
+  "source_main": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+  "source_tree": "5552dc7bb3535a21f5b5b1708aa057fec3299cfb",
+  "source_parent": "cf99363e3a6f32a69d3d5fd49d7c8328ae3c5bfc",
+  "source_review_sha256": "fe3f65f990fb0f819a9168844231cfa06fb8d5583fa6bc29e448050e9fabe406",
+  "independent_original_source_closure_sha256": "769e8eceffdb667af842b0d03ae840e6cd1822fd6783640d9f717f8216e94f91",
+  "source_original_join_packet_sha256": "9c23cbe499e441523441808b1bfe806536ee365126b54b921cc70cf966f6e3be",
+  "source_file_count": 7,
+  "all_other_tracked_entries_unchanged": 646,
+  "implementation": {
+    "Validate": {
+      "lanes": [
+        "static",
+        "worker",
+        "product",
+        "composition"
+      ],
+      "max_parallel": 4,
+      "canonical_pin_preflight": true,
+      "stable_aggregate": "Validate",
+      "require_all_lanes_and_governance": true
+    },
+    "native": {
+      "lanes": [
+        "default-genuine",
+        "receiver-policy",
+        "qa-profile",
+        "fixed40381",
+        "source-history"
+      ],
+      "max_parallel": 3,
+      "stable_aggregate": "host-and-private-worker",
+      "existing_browser_job_unchanged": true
+    },
+    "failure_policy": "Fail-fast disabled. Stable aggregates reject failed, cancelled or skipped prerequisite groups.",
+    "workflow_provenance": "Exactly one fixed ci-cd.yml before/after transition plus descriptor and complete qualified map digests; historical baseline/shared/module/root and installed proofs retained.",
+    "preserved_order": [
+      "Stateful cases within one runtime and existing fileParallelism:false",
+      "Worker migration/test/coverage/E2E/Postman sequence",
+      "Package construction/readback dependencies",
+      "Provider, deploy, provisioning and post-Validate release gates"
+    ],
+    "all_API_workflows_inspected": 24
+  },
+  "local_preparation_tests": {
+    "head": "5aaf886747675bb3b0f3739656e3846dd835831a",
+    "passed": 45,
+    "failed": 0,
+    "separate_process_max": 3,
+    "actual_peak_overlap": 3,
+    "wall_seconds": 55.178221708,
+    "sum_case_seconds": 119.38175996,
+    "controlled_serial_benchmark": false
+  },
+  "independent_shell_gate_controls": {
+    "cases": 30,
+    "result": "PASS"
+  },
+  "preliminary_failures_retained": [
+    "Schedule-only bd099ac failed original workflow source pins; no qualification claimed.",
+    "30fea passed four native suites but failed one new test using root-only history; 5aaf compares the complete original shared/module/root map, preserving the one-change assertion."
+  ],
+  "source_PR_CI": {
+    "applicable_workflows": 17,
+    "all": "SUCCESS",
+    "Validate": 41191324595,
+    "native": 41191324134,
+    "TrustedDelivery": 41191324545,
+    "exact_OwnerAuthorization": 41191431254
+  },
+  "observed_PR_timing": {
+    "native_run": 41191324134,
+    "seconds": 171,
+    "parent_main_native_run": 41189944522,
+    "parent_seconds": 339,
+    "limit": "Different hosted executions and test-count context; observed comparison only, not a controlled benchmark or guaranteed speedup."
+  },
+  "own_source_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 41192100880,
+      "event": "workflow_run",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Post-Merge Release Evidence",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41192100558,
+      "event": "workflow_run",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "API release artifact",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912113,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "AI-development projection",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912371,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Surface enrollment source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912349,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Native proof DATA journal source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912426,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Push coordinator source qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912279,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Reusable workflow guard regression",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912071,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Fixed rendezvous QA build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912403,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Principal possession crypto DATA",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912321,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Rich Session raw DATA profile",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912116,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "TDE observe",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912578,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Worker DO registry source conformance",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912629,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Rich delivery adapter",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912405,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Native proof transcript source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912451,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "CodeQL",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912090,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Local native experiment qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41191912329,
+      "event": "push",
+      "headSha": "f9c56cdd5864c656639aaf1c4d0310eacf953234",
+      "name": "Validate",
+      "status": "completed"
+    }
+  ],
+  "actual_source_main_lane_overlap": {
+    "native": {
+      "lanes": 5,
+      "all_success": true,
+      "actual_peak_overlap": 3
+    },
+    "Validate": {
+      "lanes": 4,
+      "all_success": true,
+      "actual_peak_overlap": 4
+    }
+  },
+  "own_source_guard": {
+    "run": 41191912279,
+    "artifact": 13039595438,
+    "passed": 10,
+    "failed": 0
+  },
+  "own_source_possession": {
+    "run": 41191912403,
+    "artifact": 13038898766,
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0,
+    "module_sha256": "226cb5de3f1f84d8b21a4b898326e7261a4580d8e14ade8931c96e024fb9def5",
+    "unchanged": true
+  },
+  "own_source_coverage": {
+    "run": 41191912329,
+    "artifact": 13039480932,
+    "zip_sha256": "427d52092cc7b2ca4b93dab42d3473401d36316ea911af18f5f8e5e4f926ffb4",
+    "exact_main_marker": true
+  },
+  "own_source_formal": {
+    "run": 41192100880,
+    "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "findings": [],
+    "canonical_digest": "df49b2be5c7364c074f64963d7e0e1f3e1c49ffb967d86acf4d12f03579e3bc5"
+  },
+  "own_source_durable": {
+    "asset": 695046036,
+    "provider_sha256": "ab1fb6e4394e468625c0f6619a551eac165a3cbb3f24709eb73b34e20e2deac0",
+    "canonical_integrity_verified": true,
+    "all12_checks": "PASS",
+    "canonical_policy": "733ecc2836d40611b2b7472308a7175a6130c91a"
+  },
+  "own_source_release": {
+    "run": 41192100558,
+    "artifact": 13039870106,
+    "TAR_sha256": "89fc7dabaac99d4249590e60e589d654e50e0f30714bc3c58a1ec808cd15e1c0",
+    "Worker_sha256": "cf303c5dd765f5f1621bf0af7dd21735dbd7049ea34483e638875c032bd3fc58",
+    "Worker_bytes": 1291540,
+    "parent_comparison": "Owner verified exactly one embedded release SHA differs; all eighteen other regular TAR members equal.",
+    "independent_parent_binary_comparison": "Not repeated by Core; independent exact tree/runtime/dependency source comparison was performed."
+  },
+  "limits": {
+    "deployed": false,
+    "activated": false,
+    "operational_gates_open": 22,
+    "runtime_dependency_changes": false,
+    "key_provider_native_or_installed_acceptance": false,
+    "Source176_or_held169_174_175_requalified": false,
+    "separate_Final_own_CI_main_original_qualification": "REQUIRED_AFTER_THIS_DOCUMENTARY_CANDIDATE"
+  }
+}
