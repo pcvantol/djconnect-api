@@ -430,9 +430,9 @@ def baseline_before_dependency_refresh():
 
 
 DEPENDENCY_DELTA_PATH = 'docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json'
-DEPENDENCY_DELTA_SHA256 = 'c2a687c31869aaae9c73ee9595f20a03dc000bf78dc59c8ccb4129553dfbbcaa'
-DEPENDENCY_SOURCE_MAP_SHA256 = 'fddced4e256bf1300a53d201f3be7f4db34adff45fc8313f2fe1e9e9637bef86'
-DEPENDENCY_SOURCES = frozenset(('package-lock.json', 'package.json', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs'))
+DEPENDENCY_DELTA_SHA256 = '1290f3d1ba1a9cc612d9952b51ecd4ffd6c52a4d8a8cbf1d697507340a4460c3'
+DEPENDENCY_SOURCE_MAP_SHA256 = '9a0d367b13cad867a1eb4e0bc47e3eaca13bbfa5391cb09c94abd457eb86f784'
+DEPENDENCY_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs'))
 DEPENDENCY_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json',))
 DEPENDENCY_REFERENCE_CHANGES = frozenset(('THIRD_PARTY_NOTICES.md', 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md'))
 DEPENDENCY_REFERENCE_ADDITIONS = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/installation-principal/source-manifest.json'))

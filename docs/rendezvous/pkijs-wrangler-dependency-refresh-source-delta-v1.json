@@ -3,7 +3,7 @@
   "scope": "EXACT_PKIJS_WRANGLER_DEPENDENCY_REFRESH_NOT_ACTIVATION",
   "base_source": "f156c3049a6320bc16d084b4b17b526090ccb7a7",
   "baseline_source_map_sha256": "b734d7cdb32ef1785d40f3be6c2b6779b5203adf909c8fb4de48c78e12ac7b43",
-  "effective_source_map_sha256": "fddced4e256bf1300a53d201f3be7f4db34adff45fc8313f2fe1e9e9637bef86",
+  "effective_source_map_sha256": "9a0d367b13cad867a1eb4e0bc47e3eaca13bbfa5391cb09c94abd457eb86f784",
   "source_changes": {
     "package-lock.json": {
       "before": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
@@ -20,6 +20,10 @@
     "scripts/qualify_rendezvous_product_build.mjs": {
       "before": "c4ea3a8f970c5ef44912d046c75a7f2f671f7c1373030096592d4e83c282d170",
       "after": "7935beb7a67f5b0d6ade26edc5c82c10e4359cc5140160487918952ebd6f0a42"
+    },
+    "qualification/rendezvous/run_shared_key_workerd.mjs": {
+      "before": "2eba698776c44bc3fdd4e90252d0ae182b180d6d2889b8d39621fa1588879109",
+      "after": "91514965bb1207e273891488423d256ac29cb6a510887d78667c0bebcc996f37"
     }
   },
   "source_additions": {
