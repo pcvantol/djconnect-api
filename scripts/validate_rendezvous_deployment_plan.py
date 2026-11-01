@@ -252,7 +252,11 @@ def closed_receiving_root_delta(sources, references):
         # original build maps; it never needs or treats an installation as authority.
         if name.startswith('node_modules/'):
             continue
-        require(digest(safe_path(name).read_bytes()) == expected and effective.get(name) == expected)
+        require(effective.get(name) == expected)
+        # Only the separately pinned five-file category layer may supersede
+        # these historical bytes. validate() checks EVERY effective input.
+        if name not in CATEGORY_SOURCES:
+            require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
     return effective, refs
@@ -336,7 +340,7 @@ SOURCE_PROVENANCE.update(active_ci_retention_delta_sha256=RETENTION_DELTA_SHA256
                          active_ci_retention_source_map_sha256=RETENTION_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_native_category():
     sources, refs = baseline_before_ci_retention()
     delta = pinned_working_proof(RETENTION_DELTA_PATH, RETENTION_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source',
@@ -359,6 +363,38 @@ def baseline():
     references = dict(refs)
     references[RETENTION_DELTA_PATH] = RETENTION_DELTA_SHA256
     return effective, references
+
+
+CATEGORY_DELTA_PATH = 'docs/rendezvous/native-first-category-source-delta-v1.json'
+CATEGORY_DELTA_SHA256 = '6c0a6e47f00057881fd4ecdab64c626c91a583617fe5ae6376c62cafbf06960e'
+CATEGORY_SOURCE_MAP_SHA256 = '04dfade9e9e2573c27b1640f14a309a1f9f6feee0ea69d97f5b95c27713b6096'
+CATEGORY_SOURCES = frozenset(('coordinator/host-app-wake-receiving/guard-schema.ts', 'coordinator/host-app-wake-receiving/native-apple-evidence.mjs', 'coordinator/host-app-wake-receiving/native-attestation.ts', 'coordinator/host-app-wake-receiving/native-policy.ts', 'coordinator/host-app-wake-receiving/native-state.ts'))
+SOURCE_PROVENANCE.update(native_first_category_delta_sha256=CATEGORY_DELTA_SHA256,
+                         native_first_category_source_map_sha256=CATEGORY_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_native_category()
+    delta = pinned_working_proof(CATEGORY_DELTA_PATH, CATEGORY_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PRIVATE_FIRST_CATEGORY_SOURCE_NOT_ACTIVATION'
+            and delta['base_source'] == '41549dadff8efb2da5fa0ab23ff7abeff86e19df'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == CATEGORY_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == CATEGORY_SOURCE_MAP_SHA256)
+    refs = dict(refs)
+    refs[CATEGORY_DELTA_PATH] = CATEGORY_DELTA_SHA256
+    return effective, refs
 
 
 def validate(plan):

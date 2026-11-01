@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "classification": "PINNED_PRIVATE_RECEIVING_PACKAGE_SOURCE_NOT_AUTHORITY",
-  "base_source": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+  "base_source": "41549dadff8efb2da5fa0ab23ff7abeff86e19df",
   "compatibility": {
     "date": "2026-08-22",
     "flags": [
@@ -197,24 +197,24 @@
     "coordinator/host-app-wake-receiving/authorization-resolve.ts": "f4ad510f625fb557c700a475157f0530796dfb84fa2d3179b68a06c52426a744",
     "coordinator/host-app-wake-receiving/dispatch-guard.sql": "1a4f6f95ddfddd0fcfabb2c420839ed59edef481fc511f08a027cf300f79f599",
     "coordinator/host-app-wake-receiving/eligibility-view.sql": "3d2eec6548b9c9821c9653718072a81d6c571e80273e13667d8447be0d5ee9b1",
-    "coordinator/host-app-wake-receiving/guard-schema.ts": "de6f0e42e9a8b412f0b68659f85cafde47f77b0f899883a9d23b14b12b14e1d0",
+    "coordinator/host-app-wake-receiving/guard-schema.ts": "a8abd4250a43b64f0b94567d7ee2e39224de22222ccc24f2067d16ba9d3ce2de",
     "coordinator/host-app-wake-receiving/issuer-guard.sql": "8f17457bf6f237ecf35dac2432b4551d47bfae8c0d11f68d1e90b9c1e24044de",
-    "coordinator/host-app-wake-receiving/native-apple-evidence.d.mts": "65dd21c6cd33ed5489217c9aac287d2edf2c61426a16f2314fe6342176c709ee",
-    "coordinator/host-app-wake-receiving/native-apple-evidence.mjs": "31c9b7667a0b84db1f04604e1b8e8c254faad97ddceddae21444689cce28cee3",
+    "coordinator/host-app-wake-receiving/native-apple-evidence.d.mts": "7d60bc44cf54d739c5b9085768e1e87386c48d1b29c75d42517dd5ccf76291a5",
+    "coordinator/host-app-wake-receiving/native-apple-evidence.mjs": "3c2f7a7e322e524b986d71e0f6c71bb55b86dc6ecf4970ae3dca51f7e1a88434",
     "coordinator/host-app-wake-receiving/native-assertion.ts": "899fd463e5e3f7b601385fe2b2d38b74c3ad32aad74dc386c55cd121c7e96851",
-    "coordinator/host-app-wake-receiving/native-attestation.ts": "f5b41c667f158983ee4b9fda9b1b13c7f67272fad47c358b8bff5d3c55b08f5a",
+    "coordinator/host-app-wake-receiving/native-attestation.ts": "971209abbcdceb029b9e07d5fb936ec3c5d59b229c8bb42ebff3a91dd20e60a3",
     "coordinator/host-app-wake-receiving/native-first-job-guard.sql": "cb5462532981462511bd35f9536be583376a31c5f048659480c1e4b885a3114a",
     "coordinator/host-app-wake-receiving/native-first-proof-guard.sql": "bc8b44d715b56b6eafc17824b1af4a6fa5df5b178b648a683b121e0c3b691014",
-    "coordinator/host-app-wake-receiving/native-key-insert-guard.sql": "cfce586f9b8fca0e9b59eea981559fbc0cb44dfeb2d75bffc7f35310630676ba",
+    "coordinator/host-app-wake-receiving/native-key-insert-guard.sql": "0573721a7eae7e7e20fead22d96761c5f701ba2fd1b423259d08817c8193b0a1",
     "coordinator/host-app-wake-receiving/native-policy-store.ts": "14cd32feb9de4b85211ad72eb5e51bf5173a2c3e71806d06ac0518f846e38517",
-    "coordinator/host-app-wake-receiving/native-policy.ts": "777ff00385ffb90d8dd351657d1aad1b53aaf90b576e7efd0db26657719207cd",
-    "coordinator/host-app-wake-receiving/native-state.ts": "f58b3188a3adb853cccd4dd03c5bbc75f4dd265a55148adcdd6cc78b515ce6bd",
+    "coordinator/host-app-wake-receiving/native-policy.ts": "634ed4334424a3ecd291b78a0df72d9d8093319d3b9c4c9e58080027ed5cc83c",
+    "coordinator/host-app-wake-receiving/native-state.ts": "0402413b986acecf98d3a29cb7524cc1fde3d2426d6ebad5b64a21e819cd4f5d",
     "coordinator/host-app-wake-receiving/operator-auth.ts": "f3e30b0462aaad45687bf1fbd2e6b28cab24ef954b3698d9bf6853922cf671de",
     "coordinator/host-app-wake-receiving/principal.ts": "1f658b0409fde1d91642ccb00900bb7b20c1d712f437f37e225830a8a751f89e",
     "coordinator/host-app-wake-receiving/private-intake.ts": "b7e98ae0530d1387c378e8011fde289b54f3fed8ca0288598767709525724b4c",
     "coordinator/host-app-wake-receiving/qualification/package-types.d.ts": "e9a35040cbb9cb3c6f96caa7528962a89640b259bc700f049eea083fdbfcfc69",
     "coordinator/host-app-wake-receiving/qualification/packaged-entry.check.ts": "48c7e10d8564583019b810ab839907ddc6a51097f9041b4697bb2d7df707a577",
-    "coordinator/host-app-wake-receiving/qualification/private-native-policy.schema.json": "df7c288627ad1c8b9ec4e9020c643611a44205e07f5b7229229b7de354c11106",
+    "coordinator/host-app-wake-receiving/qualification/private-native-policy.schema.json": "43d1e2d0aa32c6f2c8c2c88b7f47a6c717e7eead5120007e1dd82118945c334c",
     "coordinator/host-app-wake-receiving/qualification/private-receiving-ports.schema.json": "cd03bea7ed5e7b64c327182905eb5549e1d5484bb719826a9bf463643c9a202e",
     "coordinator/host-app-wake-receiving/qualification/private-target-ports.schema.json": "850d3ba5928187283df820dcc8109883227803b337f499cc802d3329f3c88dd8",
     "coordinator/host-app-wake-receiving/qualification/vitest.config.mts": "398386a066ef6bfbedf86073253cb1e2e1b3bf3ae8078ea169eb8b62f50e8d8d",
@@ -347,7 +347,7 @@
     },
     "host_wake_native_key_insert_guard": {
       "file": "schema/native-key-insert-guard.sql",
-      "sha256": "9d0a5699681c2f57df554156d98fe63f63bbd9236246a9aa5b778c5f2f459261"
+      "sha256": "00481d53cc5b12c83858d1cf039069cb93f2d91b2dee4dc27efdc14b4feaa8ca"
     },
     "host_wake_receiving_dispatch_guard": {
       "file": "schema/dispatch-guard.sql",

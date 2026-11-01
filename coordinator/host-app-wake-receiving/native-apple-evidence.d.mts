@@ -7,7 +7,8 @@ export interface NativeAppleEvidencePolicy {
  readonly app_identifier:string;
  readonly app_attest_environment:string;
  readonly bundle_version:string;
- readonly launch_validation_category_b64:string;
+ readonly launch_validation_category_b64?:string;
+ readonly allowed_launch_validation_categories_b64?:readonly string[];
 }
 export interface NativeAppleEvidenceWindow {
  readonly signal:AbortSignal;
@@ -16,6 +17,7 @@ export interface NativeAppleEvidenceWindow {
 }
 export interface NativeAppleEvidence {
  readonly scope:'APPLE_ATTESTATION_AND_RECEIPT_CRYPTO_STATUS_ONLY_NO_ENROLLMENT';
+ readonly launch_validation_category_b64:string;
  readonly public_key_spki_b64:string;
  readonly receipt:Uint8Array;
  readonly receiptCreated:number;
