@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only the separately pinned five-file category layer may supersede
         # these historical bytes. validate() checks EVERY effective input.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -405,7 +405,7 @@ SOURCE_PROVENANCE.update(private_receiving_mount_delta_sha256=MOUNT_DELTA_SHA256
                          private_receiving_mount_source_map_sha256=MOUNT_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_dependency_refresh():
     sources, refs = baseline_before_private_mount()
     delta = pinned_working_proof(MOUNT_DELTA_PATH, MOUNT_DELTA_SHA256)
     require(set(delta) == {'schema_version','scope','base_source','baseline_source_map_sha256',
@@ -425,6 +425,66 @@ def baseline():
     require(delta['effective_source_map_sha256'] == source_map_digest(effective) == MOUNT_SOURCE_MAP_SHA256)
     refs = dict(refs)
     refs[MOUNT_DELTA_PATH] = MOUNT_DELTA_SHA256
+    return effective, refs
+
+
+
+DEPENDENCY_DELTA_PATH = 'docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json'
+DEPENDENCY_DELTA_SHA256 = 'd72223211a34f4556515499ffa4ea6e77ba931cba5b6febf9121d3748f6aeca2'
+DEPENDENCY_SOURCE_MAP_SHA256 = '272aeb7fb48586102d9e5dc6bab70724857539a022e7b2446c4e24ac9e40c1db'
+DEPENDENCY_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/run_challenge_budget_workerd.mjs', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs'))
+DEPENDENCY_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json',))
+DEPENDENCY_REFERENCE_CHANGES = frozenset(('THIRD_PARTY_NOTICES.md', 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md'))
+DEPENDENCY_REFERENCE_ADDITIONS = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json'))
+DEPENDENCY_INSTALLED_CHANGE = {'node_modules/pkijs/build/index.js': {'before': '81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685', 'after': 'fcd402426e202ea647e51e0a1150cee1e66e41e1e18c2e7ef8cea013c92488c4'}}
+SOURCE_PROVENANCE.update(dependency_refresh_delta_sha256=DEPENDENCY_DELTA_SHA256,
+                         dependency_refresh_source_map_sha256=DEPENDENCY_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_dependency_refresh()
+    delta = pinned_working_proof(DEPENDENCY_DELTA_PATH, DEPENDENCY_DELTA_SHA256)
+    require(set(delta) == {'schema_version','scope','base_source','baseline_source_map_sha256',
+            'effective_source_map_sha256','source_changes','source_additions','reference_changes',
+            'reference_additions','installed_changes','public_activation_allowed','production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PKIJS_WRANGLER_DEPENDENCY_REFRESH_NOT_ACTIVATION'
+            and delta['base_source'] == 'f156c3049a6320bc16d084b4b17b526090ccb7a7'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['source_changes']) == DEPENDENCY_SOURCES
+            and set(delta['source_additions']) == DEPENDENCY_ADDITIONS
+            and set(delta['reference_changes']) == DEPENDENCY_REFERENCE_CHANGES
+            and set(delta['reference_additions']) == DEPENDENCY_REFERENCE_ADDITIONS
+            and delta['installed_changes'] == DEPENDENCY_INSTALLED_CHANGE)
+    valid_hash = lambda h: isinstance(h, str) and len(h) == 64 and all(c in '0123456789abcdef' for c in h)
+    effective, refs = dict(sources), dict(refs)
+    for name, change in delta['source_changes'].items():
+        require(set(change) == {'before','after'} and change['before'] == sources[name]
+                and change['after'] != change['before'] and valid_hash(change['after']))
+        effective[name] = change['after']
+    for name, pin in delta['source_additions'].items():
+        require(name not in effective and valid_hash(pin))
+        effective[name] = pin
+    require(source_map_digest(effective) == delta['effective_source_map_sha256'] == DEPENDENCY_SOURCE_MAP_SHA256)
+    for name, change in delta['reference_changes'].items():
+        require(set(change) == {'before','after'} and change['before'] == refs[name]
+                and change['after'] != change['before'] and valid_hash(change['after']))
+        refs[name] = change['after']
+    for name, pin in delta['reference_additions'].items():
+        require(name not in refs and valid_hash(pin))
+        refs[name] = pin
+    previous = pinned_working_proof(CLOSED_RECEIVING_PRODUCT_PATH, CLOSED_RECEIVING_PRODUCT_SHA256)
+    installed = {k: h for k, h in previous['source_hashes'].items() if k.startswith('node_modules/')}
+    for name, change in DEPENDENCY_INSTALLED_CHANGE.items():
+        require(installed[name] == change['before'] and valid_hash(change['after']))
+        installed[name] = change['after']
+    provenance = pinned_working_proof('qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json', effective['qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json'])
+    require(provenance['installed_inputs_sha256'] == installed and len(installed) == 50
+            and provenance['installed_changes'] == DEPENDENCY_INSTALLED_CHANGE
+            and provenance['unchanged_installed_inputs'] == 49
+            and provenance['real_native_or_production_effect'] is False)
+    refs[DEPENDENCY_DELTA_PATH] = DEPENDENCY_DELTA_SHA256
     return effective, refs
 
 

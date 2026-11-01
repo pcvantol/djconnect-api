@@ -48,15 +48,18 @@ async function main(){
 	const pkg=await load('package.json'),lock=await load('package-lock.json');
 	assert.deepEqual(pkg.dependencies,inputs.dependencies);
 	for(const [name,version] of Object.entries(inputs.dependencies))assert.equal(lock.packages['node_modules/'+name].version,version);
-	for(const file of ['compatible-runtime-dependency-provenance-v3.json']){
+	for(const file of ['compatible-runtime-dependency-provenance-v4.json']){
 		const provenance=await load('qualification/rendezvous/'+file);
+		assert.equal(sha(await readFile(join(repo,'package-lock.json'))),provenance.dependency_lock_sha256);
+		assert.equal(Object.keys(provenance.installed_inputs_sha256).length,50);
+		for(const [name,pin] of Object.entries(provenance.installed_inputs_sha256))assert.equal(sha(await readFile(join(repo,name))),pin);
 		for(const p of provenance.packages){
 			assert.equal(lock.packages[p.path]?.version,p.version);
 			assert.equal(lock.packages[p.path]?.integrity,p.integrity);
 		}
 	}
 	const sources={};
-	for(const file of ['src/index.ts','src/rendezvous/perimeter.ts','src/rendezvous/coordinators.ts','src/rendezvous/trust.ts','package.json','package-lock.json','wrangler.jsonc','tsconfig.json','vitest.config.mts','rendezvous-build-inputs.json','scripts/qualify_rendezvous_product_build.mjs','qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json'])sources[file]=sha(await readFile(join(repo,file)));
+	for(const file of ['src/index.ts','src/rendezvous/perimeter.ts','src/rendezvous/coordinators.ts','src/rendezvous/trust.ts','package.json','package-lock.json','wrangler.jsonc','tsconfig.json','vitest.config.mts','rendezvous-build-inputs.json','scripts/qualify_rendezvous_product_build.mjs','qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json','qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json'])sources[file]=sha(await readFile(join(repo,file)));
 	phase='actual-product-dry-run';
 	const built=spawnSync(process.execPath,[join(repo,'node_modules/wrangler/bin/wrangler.js'),'deploy','--dry-run','--outdir',output,'--metafile',join(output,'metafile.json')],{cwd:repo,encoding:'utf8'});
 	await writeFile(join(output,'private-build.log'),built.stdout+built.stderr,{mode:0o600});
@@ -127,7 +130,7 @@ export default {async fetch(request,env,ctx){
 		d1Databases:name==='private-auth'?{DB:'local-private-auth-denial-only'}:{},
 		durableObjects:Object.fromEntries(Object.entries(inputs.local_test_bindings).map(([name,className])=>[name,{className,useSQLite:true}])),
 	});
-	runtime=new Miniflare(convertV4MiniflareOptions({workers:[options('missing'),options('configured'),options('private-auth')],durableObjectsPersist:false,d1Persist:false,unsafeInspectDurableObjects:true,log:new Log(LogLevel.NONE)}));
+	runtime=new Miniflare({...convertV4MiniflareOptions({workers:[options('missing'),options('configured'),options('private-auth')],durableObjectsPersist:false,d1Persist:false,unsafeInspectDurableObjects:true,log:new Log(LogLevel.NONE)}),enableDevRegistry:false});
 	const missing=await runtime.getWorker('missing'),good=await runtime.getWorker('configured');
 	let receivingConfigurationChecks=0;
 	for(const candidate of [missing,good])for(const suffix of ['', '/issuer/issue','/issuer/status','/issuer/withdraw','/native/challenge','/native/complete','/native/status','/authorization/resolve','/operator/authorize','/operator/withdraw','/operator/native-policy','/operator/native-policy/withdraw','/register','/wake','/status','/revoke'])for(const method of ['GET','POST']){

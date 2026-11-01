@@ -53,7 +53,10 @@ class PreparationTests(unittest.TestCase):
                          *(record[0] for record in v.DELTA_PROOFS),
                          *v.CLOSED_RECEIVING_MAP_CHANGES, v.CLOSED_RECEIVING_DELTA_PATH,
                          v.CLOSED_RECEIVING_PRODUCT_PATH, *v.RETENTION_SOURCES,
-                         v.RETENTION_DELTA_PATH, *v.CATEGORY_SOURCES, v.CATEGORY_DELTA_PATH, *v.MOUNT_SOURCES, v.MOUNT_DELTA_PATH)
+                         v.RETENTION_DELTA_PATH, *v.CATEGORY_SOURCES, v.CATEGORY_DELTA_PATH, *v.MOUNT_SOURCES, v.MOUNT_DELTA_PATH,
+                         *v.DEPENDENCY_SOURCES, *v.DEPENDENCY_ADDITIONS,
+                         *v.DEPENDENCY_REFERENCE_CHANGES, *v.DEPENDENCY_REFERENCE_ADDITIONS,
+                         v.DEPENDENCY_DELTA_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
@@ -107,6 +110,39 @@ class PreparationTests(unittest.TestCase):
                 changed['changes'] = {}
             with self.subTest(mutation=mutation):
                 self.rejects_changed_proof(v.WORKFLOW_DELTA_PATH, changed)
+
+    def test_dependency_refresh_is_closed_and_retains_installed_history(self):
+        proof = v.pinned_working_proof(v.DEPENDENCY_DELTA_PATH, v.DEPENDENCY_DELTA_SHA256)
+        self.assertEqual(len(proof['source_changes']), 6)
+        self.assertEqual(len(proof['source_additions']), 1)
+        self.assertEqual(len(proof['installed_changes']), 1)
+        self.assertFalse(proof['public_activation_allowed'])
+        self.assertFalse(proof['production_effect_authorized'])
+        self.assertEqual(len(v.baseline_before_dependency_refresh()[0]), 144)
+        self.assertEqual(len(v.baseline()[0]), 145)
+
+    def test_dependency_refresh_rejects_scope_history_and_source_forgery(self):
+        original = v.pinned_working_proof(v.DEPENDENCY_DELTA_PATH, v.DEPENDENCY_DELTA_SHA256)
+        for mutation in ('base', 'baseline', 'effective', 'extra-source', 'before', 'after',
+                         'installed-extra', 'installed-before', 'installed-after',
+                         'reference-extra', 'reference-before', 'addition-extra',
+                         'activation', 'effect', 'scope'):
+            proof = copy.deepcopy(original)
+            if mutation == 'base': proof['base_source'] = 'f' * 40
+            elif mutation == 'baseline': proof['baseline_source_map_sha256'] = 'f' * 64
+            elif mutation == 'effective': proof['effective_source_map_sha256'] = 'f' * 64
+            elif mutation == 'extra-source': proof['source_changes']['src/index.ts'] = {'before': 'a'*64, 'after': 'b'*64}
+            elif mutation in ('before', 'after'): proof['source_changes']['package-lock.json'][mutation] = 'f' * 64
+            elif mutation == 'installed-extra': proof['installed_changes']['node_modules/asn1js/build/index.js'] = {'before': 'a'*64, 'after': 'b'*64}
+            elif mutation.startswith('installed-'): proof['installed_changes']['node_modules/pkijs/build/index.js'][mutation.split('-')[1]] = 'f' * 64
+            elif mutation == 'reference-extra': proof['reference_changes']['API_CONTRACT.md'] = {'before': 'a'*64, 'after': 'b'*64}
+            elif mutation == 'reference-before': proof['reference_changes']['THIRD_PARTY_NOTICES.md']['before'] = 'f' * 64
+            elif mutation == 'addition-extra': proof['reference_additions']['unreviewed.json'] = 'f' * 64
+            elif mutation == 'activation': proof['public_activation_allowed'] = True
+            elif mutation == 'effect': proof['production_effect_authorized'] = True
+            else: proof['scope'] = 'ACTIVATION'
+            with self.subTest(mutation=mutation):
+                self.rejects_changed_proof(v.DEPENDENCY_DELTA_PATH, proof)
 
     def test_mount_delta_is_four_exact_paths_not_effect_authority(self):
         proof = v.pinned_working_proof(v.MOUNT_DELTA_PATH, v.MOUNT_DELTA_SHA256)
@@ -268,7 +304,8 @@ class PreparationTests(unittest.TestCase):
                 self.rejects_changed_proof(v.DELTA_PATH, changed)
         self.assertEqual(len(v.baseline_before_receiving_root()[0]), 119)
         self.assertEqual(len(v.baseline_before_ci_retention()[0]), 142)
-        self.assertEqual(len(self.plan['source_hashes']), 144)
+        self.assertEqual(len(v.baseline_before_dependency_refresh()[0]), 144)
+        self.assertEqual(len(self.plan['source_hashes']), 145)
         for name in v.DELTA_SOURCES:
             changed = copy.deepcopy(delta)
             changed['changes'][name]['before'] = None

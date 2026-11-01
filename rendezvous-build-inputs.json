@@ -10,7 +10,7 @@
   "dependencies": {
     "cbor": "10.0.12",
     "asn1js": "4.0.0",
-    "pkijs": "4.0.0"
+    "pkijs": "4.0.1"
   },
   "root_exports": [
     "AllocationBudget",

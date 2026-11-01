@@ -54,7 +54,7 @@
     "coordinator/rich-session/qualification/vitest.config.mts": "4f43bcab8272f20b48cf518d8cbca709bb76f0262422656e0b1f4fd929983d5a",
     "coordinator/rich-session/qualification/worker.ts": "927409c6726c9462921b4e4b9e0abda01dc472a4f6094fc29dedfc3bd249c4fa",
     "coordinator/rich-session/qualification/wrangler.jsonc": "3cf49517fd574002f1b88f73ba40d9dabe444e1a2a86a1665a9610be00edcbd5",
-    "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+    "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "worker-configuration.d.ts": "2ec5f6aebdf8f39db18c9f05fa40223a739372802e7b76f1885541146919e13d"
   }

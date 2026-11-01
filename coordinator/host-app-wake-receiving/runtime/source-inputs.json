@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "classification": "PINNED_PRIVATE_RECEIVING_PACKAGE_SOURCE_NOT_AUTHORITY",
-  "base_source": "067a214b8f59524481ec1309d07cfa8270abb20f",
+  "base_source": "f156c3049a6320bc16d084b4b17b526090ccb7a7",
   "compatibility": {
     "date": "2026-08-22",
     "flags": [
@@ -129,8 +129,8 @@
       "integrity": "sha512-l2NNj07e9afPnhAhvgVrCD/oy2Ai1yfLpuo3EpiO1jFTsB4sFz6oIfAfSZyQzVpkZQ9xS8ZS5g1jCBgq4Hwo0g=="
     },
     "pkijs": {
-      "version": "4.0.0",
-      "integrity": "sha512-2cRrl7hofMVkgP8uB4V/1v5ofFatz9CC3kId41pWVxJVpoh9LfCiU8z+aTegfC3O9qstY6p+aSzHi3age8DlNw=="
+      "version": "4.0.1",
+      "integrity": "sha512-hs6jHBg+Y9ZZ9r5w2CHnKXkGPOr3qWfkLfnZGlbNkP2hceGZ6EgjnTS7tqwbugHXx5mCqoSf4TUH2nu1diirnA=="
     }
   },
   "selected_production_functions": {
@@ -193,7 +193,7 @@
   "inputs_sha256": {
     ".github/workflows/host-app-wake-receiving.yml": "1e7f5b26f3000ab378430619e89db3fb653a402da09c0252c846658c0cac8b2b",
     "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
-    "THIRD_PARTY_NOTICES.md": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+    "THIRD_PARTY_NOTICES.md": "432e039c4f87dcb2d934adf01a66340a0070ed2b3172484d24d2d99a1b7a8b32",
     "coordinator/host-app-wake-receiving/authorization-resolve.ts": "f4ad510f625fb557c700a475157f0530796dfb84fa2d3179b68a06c52426a744",
     "coordinator/host-app-wake-receiving/dispatch-guard.sql": "1a4f6f95ddfddd0fcfabb2c420839ed59edef481fc511f08a027cf300f79f599",
     "coordinator/host-app-wake-receiving/eligibility-view.sql": "3d2eec6548b9c9821c9653718072a81d6c571e80273e13667d8447be0d5ee9b1",
@@ -307,12 +307,12 @@
     "node_modules/nofilter/lib/index.js": "b87629040413cb877c60278a7de6a2ec45abfc4ab3120f012b5dc6d5148242db",
     "node_modules/nofilter/package.json": "1370c2fbfa4f4cbbced7f01b49bfa6487484887868d62158f8b190353d1dba7c",
     "node_modules/pkijs/LICENSE": "d27a2aa238102924ea75da808f79253484347d824b9b7b077837e4232f9493f5",
-    "node_modules/pkijs/build/index.js": "81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685",
-    "node_modules/pkijs/package.json": "1d2e706ef68c1d2e5a36cf49513ab433151849fce7ef7884cf1a648531e1700b",
-    "node_modules/wrangler/package.json": "6fb2634a7130ce179f8f6462067c7821191588a296e8e798d6f2ff52add60228",
-    "node_modules/wrangler/wrangler-dist/cli.js": "85a0fd68160392c7b9233a2a3406a94d61ab2a84d6dc192ebcb758774a76ee61",
-    "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
-    "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+    "node_modules/pkijs/build/index.js": "fcd402426e202ea647e51e0a1150cee1e66e41e1e18c2e7ef8cea013c92488c4",
+    "node_modules/pkijs/package.json": "62b8ec09e9423d2a3d82b8e9fcadfd0fd1688bb4e391f9b004d27a18451477b5",
+    "node_modules/wrangler/package.json": "91a57982d1e7a1871036d0194e65f69f2373022fc5fb39cd1f3e106202b345a5",
+    "node_modules/wrangler/wrangler-dist/cli.js": "8dab269b2b490df04d1aeac0858a8d56af494b4144bcb4b66171b41d114cf88b",
+    "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
+    "package.json": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
     "qualification/rendezvous/receipt-status-candidate.mjs": "7f2b1aa7d4307e36a8edddea7d89a1ada327ead8c9350e82866c6eee9449d434",
     "src/auth.ts": "3ea011df8bdc5bad6796047b15566b459a5cc4f7fc3effda6eb2f2deab22dbd0",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",

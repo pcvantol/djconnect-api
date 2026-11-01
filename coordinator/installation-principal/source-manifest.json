@@ -24,8 +24,8 @@
     "coordinator/worker-do/qualification/wrangler.jsonc": "136fd9b2cdac6e5fafcff91109844d49adacd1ece79db6f857c758d51ee577a6",
     "coordinator/worker-do/registry.ts": "de457d315db7746be016a202c35a5eb3e4de4064d7a37d688dd68c29968a187b",
     "coordinator/worker-do/worker.ts": "8a007aca2501c7a9f685a10b59db2117d4fa8563a484729bc6703aa261d6a4ca",
-    "package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
-    "package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+    "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
+    "package.json": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
     "scripts/check_reusable_workflow_refs.sh": "dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
     "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8",
@@ -36,5 +36,6 @@
   "parent_source_PR": 168,
   "protected_parent_main": "bd746b0602926720a57b518907b60c66289fcc14",
   "integration_base_main": "75763b9bf5e8f76d94f2dec189f1baf54a4cc8c8",
-  "original_reviewed_candidate": "854d98e59f45cd945f9e67367b2900c51bd565d3"
+  "original_reviewed_candidate": "854d98e59f45cd945f9e67367b2900c51bd565d3",
+  "dependency_refresh_base_main": "f156c3049a6320bc16d084b4b17b526090ccb7a7"
 }

@@ -53,6 +53,10 @@ export async function sourceSnapshot(){
  need(plan.reference_hashes[mountPath]===sha(mountRaw)&&sha(mountRaw)===provenance.private_receiving_mount_delta_sha256);
  const mount=JSON.parse(mountRaw);need(mount.scope==='EXACT_PRIVATE_RECEIVING_MOUNT_NOT_EFFECT_AUTHORIZATION'&&mount.private_http_mount_selected===true&&mount.production_effect_authorized===false);
  need(mount.baseline_source_map_sha256===category.effective_source_map_sha256&&mount.effective_source_map_sha256===provenance.private_receiving_mount_source_map_sha256);
+ const dependencyPath='docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json',dependencyRaw=await readFile(join(repo,dependencyPath));
+ need(plan.reference_hashes[dependencyPath]===sha(dependencyRaw)&&sha(dependencyRaw)===provenance.dependency_refresh_delta_sha256);
+ const dependency=JSON.parse(dependencyRaw);need(dependency.scope==='EXACT_PKIJS_WRANGLER_DEPENDENCY_REFRESH_NOT_ACTIVATION'&&dependency.public_activation_allowed===false&&dependency.production_effect_authorized===false);
+ need(dependency.baseline_source_map_sha256===mount.effective_source_map_sha256&&dependency.effective_source_map_sha256===provenance.dependency_refresh_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -60,10 +64,12 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(retention.changes,name)){need(retention.changes[name].before===expected);expected=retention.changes[name].after;}
   if(Object.hasOwn(category.changes,name)){need(category.changes[name].before===expected);expected=category.changes[name].after;}
   if(Object.hasOwn(mount.changes,name)){need(mount.changes[name].before===expected);expected=mount.changes[name].after;}
+  if(Object.hasOwn(dependency.source_changes,name)){need(dependency.source_changes[name].before===expected);expected=dependency.source_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
  const installed=Object.keys(root.source_hashes).filter(p=>p.startsWith('node_modules/'));need(installed.length===50);
+ for(const [name,change] of Object.entries(dependency.installed_changes)){need(name==='node_modules/pkijs/build/index.js'&&pins[name]===change.before);pins[name]=change.after;}
  await checkSourcePins(pins,repo);
  for(const p of toolFiles)pins[p]=sha(await readFile(join(repo,p)));
  const head=gitRead(['rev-parse','HEAD']);need(head.status===0&&/^[0-9a-f]{40}\n$/.test(head.stdout));
@@ -118,9 +124,9 @@ export default {async fetch(request,env){
   const bindings={LOCAL_BRIDGE:bridge,RENDEZVOUS_EDGE_POLICY:'djc-direct-edge-identity/1-candidate',RENDEZVOUS_IP_HASH_KEY:randomBytes(32).toString('base64'),RECEIPT_ACTIVE_KEY:randomBytes(32).toString('base64'),COMPOSED_POLICY_ENABLED:'djc-http-composition-qualification/1',REQUEST_POLICY_ENABLED:'djc-request-admission-qualification/2',ALLOCATION_POLICY_ENABLED:'djc-allocation-qualification/1',INDEX_POLICY_ENABLED:'djc-index-qualification/1',ASSERTION_POLICY_ENABLED:'ios-dev-qualification/1',ASSERTION_POLICY_EXPIRES_AT:String(until),ENROLLMENT_POLICY_REVISION:stage?'private-40381-registration-recover/1':'local-native-file-experiment/1'};
   const egress={allowed:0,denied:0};
   const outbound=async request=>{egress[allowedStatusRequest(request)?'allowed':'denied']++;return statusOnlyOutbound(request);};
-  runtime=new Miniflare(convertV4MiniflareOptions({host:'127.0.0.1',inspectorHost:'127.0.0.1',durableObjectsPersist:false,unsafeInspectDurableObjects:true,log:new Log(LogLevel.NONE),workers:[{name:'local-native',compatibilityDate:'2026-06-20',compatibilityFlags:['nodejs_compat'],modulesRoot:join(scratch,'build'),modules:[{type:'ESModule',path:join(scratch,'build/driver.mjs'),contents:bundle}],bindings,durableObjects:Object.fromEntries(Object.entries(inputs.local_test_bindings).map(([k,className])=>[k,{className,useSQLite:true}])),outboundService:outbound},
+  runtime=new Miniflare({...convertV4MiniflareOptions({host:'127.0.0.1',inspectorHost:'127.0.0.1',durableObjectsPersist:false,unsafeInspectDurableObjects:true,log:new Log(LogLevel.NONE),workers:[{name:'local-native',compatibilityDate:'2026-06-20',compatibilityFlags:['nodejs_compat'],modulesRoot:join(scratch,'build'),modules:[{type:'ESModule',path:join(scratch,'build/driver.mjs'),contents:bundle}],bindings,durableObjects:Object.fromEntries(Object.entries(inputs.local_test_bindings).map(([k,className])=>[k,{className,useSQLite:true}])),outboundService:outbound},
    // Separate QA-only positive interception control; no DOs, secrets or arbitrary URL.
-   {name:'guard-control',modulesRoot:scratch,modules:[{type:'ESModule',path:join(scratch,'guard.mjs'),contents:"export default {fetch(){return fetch('https://egress-denied.example.invalid/qualification');}}"}],outboundService:outbound}]}));
+   {name:'guard-control',modulesRoot:scratch,modules:[{type:'ESModule',path:join(scratch,'guard.mjs'),contents:"export default {fetch(){return fetch('https://egress-denied.example.invalid/qualification');}}"}],outboundService:outbound}]}),enableDevRegistry:false});
   const url=await runtime.ready;need(url.hostname==='127.0.0.1');
   let inspectorDisabled=false;try{await runtime.getInspectorURL();}catch{inspectorDisabled=true;}need(inspectorDisabled);
   const control=await runtime.getWorker('guard-control');need((await control.fetch('https://local.invalid/')).status===503&&egress.denied===1&&egress.allowed===0);
