@@ -283,9 +283,9 @@
   "operational_gates": {
     "all22": "OPEN",
     "activation": false,
-    "receiving_prefix": "SOURCE_CLOSED_503"
+    "receiving_prefix": "SOURCE_SELECTED_AUTH_GATED_NOT_DEPLOYED"
   },
-  "readiness": "DRAFT_AWAITING_AUTHORIZED_SOURCE187_ORIGINALS_REVIEW_THEN_EXACT_TWO_DOCUMENT_REVIEW",
+  "readiness": "SOURCE185_186_187_188_ORIGINALS_QUALIFIED_EXACT_TWO_DOC_REVIEW_AND_OWN_FINAL_DELIVERY_PENDING",
   "source187": {
     "candidate": "358826285b52c8fb13034baed8fcf335c68751c6",
     "main": "067a214b8f59524481ec1309d07cfa8270abb20f",
