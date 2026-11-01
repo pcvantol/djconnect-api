@@ -22,5 +22,13 @@ BEGIN
   AND NEW.platform=json_extract(p.policy_json,'$.scope.platform') AND NEW.environment=json_extract(p.policy_json,'$.scope.apns_environment')
   AND NEW.identity_policy_sha256=json_extract(p.policy_json,'$.scope.identity_policy_sha256') AND NEW.deployment_policy_sha256=json_extract(p.policy_json,'$.scope.deployment_policy_sha256')
   AND NEW.signed_environment_receipt_sha256=json_extract(p.policy_json,'$.signed_environment_receipt_sha256')
+  AND json_extract(NEW.assertion_policy_json,'$.profile')='host_wake_apple_assertion_properties_v2'
+  AND json_extract(NEW.assertion_policy_json,'$.app_identifier')=json_extract(p.policy_json,'$.app_identifier')
+  AND json_extract(NEW.assertion_policy_json,'$.bundle_version')=json_extract(p.policy_json,'$.bundle_version')
+  AND ((json_extract(p.policy_json,'$.profile')='host_wake_apple_properties_attestation_v2'
+    AND json_extract(NEW.assertion_policy_json,'$.launch_validation_category_b64')=json_extract(p.policy_json,'$.launch_validation_category_b64'))
+   OR (json_extract(p.policy_json,'$.profile')='host_wake_apple_properties_attestation_v3'
+    AND EXISTS(SELECT 1 FROM json_each(p.policy_json,'$.allowed_launch_validation_categories_b64') c
+     WHERE c.value=json_extract(NEW.assertion_policy_json,'$.launch_validation_category_b64'))))
  );
 END;

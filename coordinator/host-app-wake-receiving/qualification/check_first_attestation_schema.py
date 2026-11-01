@@ -22,6 +22,11 @@ cases.append((policy_schema, {'method': 'POST', 'path': p['route'], 'direction':
 withdraw_path = p['route'] + '/withdraw'
 cases.append((policy_schema, {'method': 'POST', 'path': withdraw_path, 'direction': 'request', 'body': {'version': p['version'], 'method': 'POST', 'route': withdraw_path, 'action': 'native_policy_withdraw', 'operation_id': 'fixture-policy-withdrawal', 'native_key_ref': p['native_key_ref']}}))
 cases.append((policy_schema, {'method': 'POST', 'path': withdraw_path, 'direction': 'reply', 'body': {'version': p['version'], 'native_key_ref': p['native_key_ref'], 'outcome': 'withdrawn'}}))
+for allowed in [['AgAAAA=='], ['AgAAAA==','AwAAAA=='], ['AgAAAA==','AwAAAA==','BAAAAA==','BQAAAA==']]:
+    first=copy.deepcopy(p)
+    del first['launch_validation_category_b64']
+    first.update(profile='host_wake_apple_properties_attestation_v3',allowed_launch_validation_categories_b64=allowed)
+    cases.append((policy_schema, {'method':'POST','path':p['route'],'direction':'request','body':first}))
 passed = negatives = 0
 for schema, value in cases:
     validator = Draft202012Validator(schema)

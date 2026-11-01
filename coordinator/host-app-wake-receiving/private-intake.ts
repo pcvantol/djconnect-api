@@ -40,8 +40,8 @@ export interface PrivateIntake {route:ServerRoute;input:Readonly<ServerInput>;pr
 /** The owner must finish the returned intent exactly once and close its window.
  * Missing/invalid identity never reserves an intent. Every mutation after intake
  * must recheck the original window and its own atomic SQL eligibility. */
-export async function receivePrivate(request:Request,env:AppEnv,now:()=>number,capacity:number):Promise<PrivateIntake>{
- const db=env.DB,store=new ReceivingStore(db,capacity),window=new RequestWindow(now,request.signal);let intent:IntentRow|null=null;
+export async function receivePrivate(request:Request,env:AppEnv,now:()=>number,capacity:number,originalCapture?:number):Promise<PrivateIntake>{
+ const db=env.DB,store=new ReceivingStore(db,capacity),window=new RequestWindow(now,request.signal,originalCapture);let intent:IntentRow|null=null;
  try{
   const route=serverRoute(request),scope=privateScopeHeaders(request),principal=await authenticateCore(request,db,window);
   const auth=await window.run(()=>store.authorization(scope.authorization_id));need(auth&&auth.core_install_token_record_id===principal.id&&auth.ha_install_id===principal.ha_install_id,'host_wake_principal_scope',403);

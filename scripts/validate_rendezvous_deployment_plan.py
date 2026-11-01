@@ -31,7 +31,7 @@ DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/r
 DELTA_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json', 'src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/enrollment-wire.ts', 'src/surface-push/enrollment.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
 REFERENCE_DELTA = {'THIRD_PARTY_NOTICES.md': {'before': '6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e', 'after': '9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f'}, 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md': {'before': 'd01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442', 'after': 'c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e'}}
 INSTALLED_DEPENDENCY_DELTA = {'node_modules/@noble/hashes/_md.js': {'before': None, 'after': '60cf3010fda89e3e4d3f0e7ff1ce249e9c467f34b4fd41b6fd6101d9f69be763'}, 'node_modules/@noble/hashes/_u64.js': {'before': None, 'after': 'b09da8c07fe8187c07649494cdb7cd0bcf13df90b506a9473d19e4d5f8c2e102'}, 'node_modules/@noble/hashes/esm/_md.js': {'before': 'cefb1557e7715cb2117c83f82ef3e3175c7e0391c80bd5795b2d4effc45fc582', 'after': None}, 'node_modules/@noble/hashes/esm/_u64.js': {'before': 'e48c0cfc10810439a4807b46db136ce603a3fa09b62584f513ef2f3ca496af54', 'after': None}, 'node_modules/@noble/hashes/esm/crypto.js': {'before': '9211d026c5d21e60e0126dd6f01150d87da5ba7261b8f468215c1264372ff5a5', 'after': None}, 'node_modules/@noble/hashes/esm/legacy.js': {'before': '4906186a82438392443e3ac2a59d0acbbec2bee2595d048c8d8c0dd6584d4bdb', 'after': None}, 'node_modules/@noble/hashes/esm/sha1.js': {'before': 'cd708647a4aad36d820253fc75e3a821efe842652b2c9134903c5aec33a2926a', 'after': None}, 'node_modules/@noble/hashes/esm/sha2.js': {'before': 'e729088b82e5450bff54c3a0013582aa42e1fe8f58dd31f5967f6ebe34c52299', 'after': None}, 'node_modules/@noble/hashes/esm/utils.js': {'before': '4cf4c1e05affedcb4fd584a43d76ae1a3711e34a36e2251b90c27e33ecc74fad', 'after': None}, 'node_modules/@noble/hashes/legacy.js': {'before': None, 'after': '690553a41af2fdd1e32ff6b534ba8508e95f1861c09c2d62fe762b6b501e09be'}, 'node_modules/@noble/hashes/sha2.js': {'before': None, 'after': '471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b'}, 'node_modules/@noble/hashes/utils.js': {'before': None, 'after': '037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c'}, 'node_modules/@peculiar/utils/build/_virtual/_rolldown/runtime.js': {'before': None, 'after': '1b10431e13b4eb349c329aba7d2beb6e6c224de569eac52966731c8239a941c9'}, 'node_modules/@peculiar/utils/build/bytes.js': {'before': None, 'after': '3257233f9027e4bd4db558cbe9dd29a1bece8395f5c699eabf04169e38b02779'}, 'node_modules/@peculiar/utils/build/bytes/buffer-source.js': {'before': None, 'after': 'd3a77cab2b8426ce297e8429b9d2ba03dbdbe97865b8173c51da0c92226b0f49'}, 'node_modules/@peculiar/utils/build/bytes/concat.js': {'before': None, 'after': '0d7017fef27635bed4dfed715736209bdf8e6959953549be15fc79cb103f8ea9'}, 'node_modules/@peculiar/utils/build/bytes/equal.js': {'before': None, 'after': '535bd6636af131a226dc59dd3642c4edb787611b71d78b94693b16523c5bd950'}, 'node_modules/@peculiar/utils/build/bytes/sequence.js': {'before': None, 'after': '771d13453aa579693ff8f1538ee754a8a21921bd910fe97bb571bddea572a4e1'}, 'node_modules/@peculiar/utils/build/converters/convert.js': {'before': None, 'after': '86c63126f664051c739c52945ce076a4aeb1171da95ddf78dba7d95886b80a8c'}, 'node_modules/@peculiar/utils/build/converters/defaults.js': {'before': None, 'after': '1781d65e5ebe30b2340b023bbcfff40fb9cee2e70918ce7e7f0c84999bd2fd7e'}, 'node_modules/@peculiar/utils/build/converters/registry.js': {'before': None, 'after': '162d1ba3bdbc3d014a9c48bd8c5aa325f5eb8a958104c7fe03d7ea8ef1319b40'}, 'node_modules/@peculiar/utils/build/encoding/base64.js': {'before': None, 'after': '98b0130b60565fcadfed4aa50b8854de6eafe9c224dbd2c5c994c673a50066c4'}, 'node_modules/@peculiar/utils/build/encoding/base64url.js': {'before': None, 'after': 'a2131390bb30cce0d6ab42ff32e056f7d665552449cb1829787a3001fae9add1'}, 'node_modules/@peculiar/utils/build/encoding/binary.js': {'before': None, 'after': '92727e40c10bb92f0bcf9b8841590ef11df1764b3027be3041e44f04edf56794'}, 'node_modules/@peculiar/utils/build/encoding/hex.js': {'before': None, 'after': 'a7066c019c44348f1d1fa6bb1972bf368a304af41b04e2dff3e4805a5cef81e0'}, 'node_modules/@peculiar/utils/build/encoding/utf16.js': {'before': None, 'after': '20ce0b98604a618599e5831158f94a032f94aa0a50c0e280dea776656a7f166c'}, 'node_modules/@peculiar/utils/build/encoding/utf8.js': {'before': None, 'after': 'd0e538af363ad2c92b6578f62902d6a374e94b34c7e90a9f5261743642c7c8a5'}, 'node_modules/@peculiar/utils/build/index.js': {'before': None, 'after': '249fb0a4cf5b6dd1cbc12f2c109d9ad5afa55fc34f6696db8a971b09efc6ad36'}, 'node_modules/@peculiar/utils/build/integer/int.js': {'before': None, 'after': '0b2523f5a56762ebc749a77ecd9f8ad1914d1240300efffd7ac87926b27c31b5'}, 'node_modules/@peculiar/utils/build/integer/uint.js': {'before': None, 'after': '53609f035e2e0513d1321147b5dbb8cf8ce483cd0fa3023e61a70dd1e0f85bab'}, 'node_modules/@peculiar/utils/build/legacy/buffer-source-converter.js': {'before': None, 'after': '61261697f592eefdda6393751447b22db37708d8cef7b42ecb79e69c366c2a67'}, 'node_modules/@peculiar/utils/build/legacy/convert.js': {'before': None, 'after': 'd604e5ffd876889bb177cf9ec2ebef468bc165ac7ffe28d2ab87736cc4263a6f'}, 'node_modules/@peculiar/utils/build/legacy/functions.js': {'before': None, 'after': 'be5e4255b7b45de3415b35f136656f3e44a413577740622a90ecea8b32e02b5f'}, 'node_modules/@peculiar/utils/build/pem/pem.js': {'before': None, 'after': '4204fe9f301df4cb96ed08ededb41934ec33e784d3aab1a31af3b9867184520b'}, 'node_modules/asn1js/build/index.es.js': {'before': 'ee1dbac2b2f8bc0edd15f56932d847f5a8565b20d0b2b22d6c978360279899e4', 'after': None}, 'node_modules/asn1js/build/index.js': {'before': None, 'after': '4a3cfe45a598edb62cbfcf89426f6a2556dd505bf3838935c106829fbfe32024'}, 'node_modules/bytestreamjs/build/bit.js': {'before': None, 'after': 'a3b2c1f5f923a1ed39b55745a4e501b2b6092b081c380acc73a542456e6687f9'}, 'node_modules/bytestreamjs/build/bit_stream.js': {'before': None, 'after': '220bc62673ddcbd43073d2f1f056c3da3ed6a4f44dc183af569b2e7a876ecca4'}, 'node_modules/bytestreamjs/build/byte_stream.js': {'before': None, 'after': '1dec0f7089d75334e9b58ae9b4690879dd88043cd3f377e9af4b20f9f0ff1b39'}, 'node_modules/bytestreamjs/build/helpers.js': {'before': None, 'after': '0e8003c7739767109d5a4931dde4c3aedec18100b5a3e3bc327d560cb6ef606c'}, 'node_modules/bytestreamjs/build/index.js': {'before': None, 'after': '4794bc465f13842696ec8c1ad027de9c198ad55c3c482059fe1694204833ebc2'}, 'node_modules/bytestreamjs/build/mjs/bit.js': {'before': '948aa3449ba484a4b33b8d251714a655ec67544e991902cd1773cab0c8cc1bfe', 'after': None}, 'node_modules/bytestreamjs/build/mjs/bit_stream.js': {'before': '109291e1cfc9e95db75748154cffd39163145d66fd85a6240d28eb5d8335c2f8', 'after': None}, 'node_modules/bytestreamjs/build/mjs/byte_stream.js': {'before': 'd265091e6b5209c1839b2c3f4d91df681a37bb1d3e3834891619d422277b634c', 'after': None}, 'node_modules/bytestreamjs/build/mjs/helpers.js': {'before': '9fe919254ac3db6db045e008cce021c5223146d8d9fbb2b3c5aa45a9ec1b2abf', 'after': None}, 'node_modules/bytestreamjs/build/mjs/index.js': {'before': '3139b1bdc36c99c155d14ff24e46ae5f3ecf78900f56de49bd466da2ed022de1', 'after': None}, 'node_modules/bytestreamjs/build/mjs/seq_bit_stream.js': {'before': '01b075ad7bc1c49fa2854cbe3c82407c29f12d01a926e0e77c68fe266159e5f8', 'after': None}, 'node_modules/bytestreamjs/build/mjs/seq_stream.js': {'before': 'bfa20e5092a8b5387091c9b00133a0fcaedf8bff090840cbb3872045346c1dc4', 'after': None}, 'node_modules/bytestreamjs/build/seq_bit_stream.js': {'before': None, 'after': '656eb46b51688d11ca3eb6b673e5d9f7c837727378676447da564b9a9416518e'}, 'node_modules/bytestreamjs/build/seq_stream.js': {'before': None, 'after': '6d5446062668db78d3ca06dbf75f5a76544347a93781af69c458f6448b17a6b4'}, 'node_modules/pkijs/build/index.es.js': {'before': '5f5c08540929f01ee75373b9f317753aeb6a7239241658473bb37826e2f85a50', 'after': None}, 'node_modules/pkijs/build/index.js': {'before': None, 'after': '81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685'}, 'node_modules/pvtsutils/build/index.js': {'before': '8cf4300225298c7811fd72840f84ebd12dda5359f29fffdba09cb67a63a5943f', 'after': None}, 'node_modules/pvutils/build/utils.es.js': {'before': 'e1a942c322462a4a2b1a2311b2b40bd9ab1779273d98fca085e074532f96db98', 'after': None}}
-SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': '8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5', 'effective_source_map_sha256': 'e2d0a139879729c728ab89f85534987bbc28f95e47de9c05389f801a8028e239', 'kind': 'BASELINE_PLUS_PINNED_DELTA'}
+SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': '8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5', 'effective_source_map_sha256': 'e2d0a139879729c728ab89f85534987bbc28f95e47de9c05389f801a8028e239', 'kind': 'BASELINE_PLUS_PINNED_DELTA', 'closed_receiving_root_delta_sha256': 'c1aacd517175cd5a4a6ea976029af294b6fbc73fbe6013098d3c272aebb12628', 'closed_receiving_root_product_sha256': '1ae2f21996bf74c606ddfb80072dbe8f1c7bc87aa0f703821c35189e87ebff0a', 'closed_receiving_root_source_map_sha256': '5ca0758d825063e9dafcb519eef238d707d52d52fbc35d270d37af38c5c146fd', 'qualification_workflow_delta_sha256': '5af37a24c9dfe7ead48425ce3597f0d9eb6288c20bc8ca5e415b5f977a96d3f1', 'qualified_source_map_sha256': 'd75bef5d8a7ddcff4723639817f6f0e2c85967d528e9be3c2bbb0dc4fe1f5109'}
 
 WORKFLOW_DELTA_PATH = 'docs/rendezvous/qualification-workflow-delta-v1.json'
 WORKFLOW_DELTA_SHA256 = '5af37a24c9dfe7ead48425ce3597f0d9eb6288c20bc8ca5e415b5f977a96d3f1'
@@ -210,7 +210,59 @@ def qualification_workflow_delta(sources, references):
     return effective, refs
 
 
-def baseline():
+CLOSED_RECEIVING_DELTA_PATH = 'docs/rendezvous/host-wake-closed-root-source-delta-v1.json'
+CLOSED_RECEIVING_DELTA_SHA256 = 'c1aacd517175cd5a4a6ea976029af294b6fbc73fbe6013098d3c272aebb12628'
+CLOSED_RECEIVING_PRODUCT_PATH = 'docs/rendezvous/host-wake-closed-root-product-observations-v1.json'
+CLOSED_RECEIVING_PRODUCT_SHA256 = '1ae2f21996bf74c606ddfb80072dbe8f1c7bc87aa0f703821c35189e87ebff0a'
+CLOSED_RECEIVING_MAP_CHANGES = frozenset(('coordinator/host-app-wake-receiving/authorization-resolve.ts', 'coordinator/host-app-wake-receiving/guard-schema.ts', 'coordinator/host-app-wake-receiving/native-apple-evidence.mjs', 'coordinator/host-app-wake-receiving/native-assertion.ts', 'coordinator/host-app-wake-receiving/native-attestation.ts', 'coordinator/host-app-wake-receiving/native-policy-store.ts', 'coordinator/host-app-wake-receiving/native-policy.ts', 'coordinator/host-app-wake-receiving/native-state.ts', 'coordinator/host-app-wake-receiving/operator-auth.ts', 'coordinator/host-app-wake-receiving/principal.ts', 'coordinator/host-app-wake-receiving/private-intake.ts', 'coordinator/host-app-wake-receiving/receiving-store.ts', 'coordinator/host-app-wake-receiving/request-window.ts', 'coordinator/host-app-wake-receiving/server-reply.ts', 'coordinator/host-app-wake-receiving/server-wire.ts', 'coordinator/host-app-wake-receiving/service.ts', 'coordinator/host-app-wake-receiving/source-backend.ts', 'coordinator/host-app-wake-receiving/target-transport.ts', 'coordinator/host-app-wake-receiving/wire.ts', 'coordinator/host-app-wake/service.ts', 'coordinator/host-app-wake/store.ts', 'coordinator/host-app-wake/wire.ts', 'scripts/qualify_rendezvous_product_build.mjs', 'src/host-wake-receiving/dispatch.ts', 'src/index.ts'))
+
+
+def closed_receiving_root_delta(sources, references):
+    # Preserve every historical source/proof. Only this new exact additive
+    # closed-root import closure may differ; it is no activation approval.
+    delta = pinned_working_proof(CLOSED_RECEIVING_DELTA_PATH, CLOSED_RECEIVING_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'protected_source_parent', 'baseline_source_map_sha256', 'effective_source_map_sha256', 'changes', 'product_proof', 'map_additions_are_newly_compiled_inputs_not_claimed_git_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1 and delta['scope'] == 'EXACT_CLOSED_RECEIVING_ROOT_SOURCE_DELTA_NOT_ACTIVATION')
+    require(delta['public_activation_allowed'] is False and delta['map_additions_are_newly_compiled_inputs_not_claimed_git_additions'] is True)
+    require(delta['protected_source_parent'] == '2f56dbf6d58f882c2dd586dadb87734e044e95f3')
+    require(delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    require(set(delta['changes']) == CLOSED_RECEIVING_MAP_CHANGES)
+    effective, refs = dict(sources), dict(references)
+    for name, change in delta['changes'].items():
+        safe_path(name)
+        require(set(change) == {'before', 'after'} and change['before'] == sources.get(name)
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == SOURCE_PROVENANCE['closed_receiving_root_source_map_sha256'])
+    product = pinned_working_proof(CLOSED_RECEIVING_PRODUCT_PATH, CLOSED_RECEIVING_PRODUCT_SHA256)
+    require(product['scope'] == 'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY' and product['result'] == 'PASS'
+            and product['checks'] == 128 and product['closed_receiving_prefix_checks'] == 64
+            and product['outbound_calls'] == 0 and product['native_positive_accepted'] is False
+            and product['service_activated'] is False and product['cloudflare_mutations'] is False)
+    require(delta['product_proof'] == {'path': CLOSED_RECEIVING_PRODUCT_PATH,
+        'sha256': CLOSED_RECEIVING_PRODUCT_SHA256, 'legacy_checks': 128,
+        'closed_receiving_prefix_checks': 64, 'installed_dependency_inputs_unchanged': 50})
+    old_product = pinned_working_proof(DELTA_PROOFS[1][0], DELTA_PROOFS[1][1])
+    installed = lambda p: {k: v for k, v in p['source_hashes'].items() if k.startswith('node_modules/')}
+    require(installed(product) == installed(old_product) and len(installed(product)) == 50)
+    for name, expected in product['source_hashes'].items():
+        # Offline preparation validates installed bytes through both immutable
+        # original build maps; it never needs or treats an installation as authority.
+        if name.startswith('node_modules/'):
+            continue
+        require(effective.get(name) == expected)
+        # Only the separately pinned five-file category layer may supersede
+        # these historical bytes. validate() checks EVERY effective input.
+        if name not in CATEGORY_SOURCES:
+            require(digest(safe_path(name).read_bytes()) == expected)
+    refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
+    refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
+    return effective, refs
+
+
+def baseline_before_receiving_root():
     # Original protected history remains authoritative, even after squash deletes PR refs.
     original, references = immutable_baseline()
     delta = pinned_working_proof(DELTA_PATH, DELTA_SHA256)
@@ -274,6 +326,75 @@ def baseline():
         references[name] = change['after']
     references[DELTA_PATH] = DELTA_SHA256
     return qualification_workflow_delta(effective, references)
+
+
+def baseline_before_ci_retention():
+    return closed_receiving_root_delta(*baseline_before_receiving_root())
+
+
+RETENTION_DELTA_PATH = 'docs/rendezvous/active-ci-retention-source-delta-v1.json'
+RETENTION_DELTA_SHA256 = 'a474ec1ca6579b0892348be55c06ab0122105615d379f7727357b4a401ce56db'
+RETENTION_SOURCE_MAP_SHA256 = '7afaaefbee37a68f003badc1a2426fd9e02fe90ff3fe4a7e4ddff2198e035bfa'
+RETENTION_SOURCES = frozenset(('.github/workflows/ci-cd.yml', 'scripts/cleanup_workflow_runs.py', 'scripts/test_cleanup_workflow_runs.py'))
+SOURCE_PROVENANCE.update(active_ci_retention_delta_sha256=RETENTION_DELTA_SHA256,
+                         active_ci_retention_source_map_sha256=RETENTION_SOURCE_MAP_SHA256)
+
+
+def baseline_before_native_category():
+    sources, refs = baseline_before_ci_retention()
+    delta = pinned_working_proof(RETENTION_DELTA_PATH, RETENTION_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_ACTIVE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'
+            and delta['base_source'] == 'b28a32e8fe80d612009c35a82961dba9c993e986'
+            and delta['public_activation_allowed'] is False)
+    require(delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == RETENTION_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources.get(name)
+                and change['before'] != change['after'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == RETENTION_SOURCE_MAP_SHA256)
+    references = dict(refs)
+    references[RETENTION_DELTA_PATH] = RETENTION_DELTA_SHA256
+    return effective, references
+
+
+CATEGORY_DELTA_PATH = 'docs/rendezvous/native-first-category-source-delta-v1.json'
+CATEGORY_DELTA_SHA256 = '6c0a6e47f00057881fd4ecdab64c626c91a583617fe5ae6376c62cafbf06960e'
+CATEGORY_SOURCE_MAP_SHA256 = '04dfade9e9e2573c27b1640f14a309a1f9f6feee0ea69d97f5b95c27713b6096'
+CATEGORY_SOURCES = frozenset(('coordinator/host-app-wake-receiving/guard-schema.ts', 'coordinator/host-app-wake-receiving/native-apple-evidence.mjs', 'coordinator/host-app-wake-receiving/native-attestation.ts', 'coordinator/host-app-wake-receiving/native-policy.ts', 'coordinator/host-app-wake-receiving/native-state.ts'))
+SOURCE_PROVENANCE.update(native_first_category_delta_sha256=CATEGORY_DELTA_SHA256,
+                         native_first_category_source_map_sha256=CATEGORY_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_native_category()
+    delta = pinned_working_proof(CATEGORY_DELTA_PATH, CATEGORY_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PRIVATE_FIRST_CATEGORY_SOURCE_NOT_ACTIVATION'
+            and delta['base_source'] == '41549dadff8efb2da5fa0ab23ff7abeff86e19df'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == CATEGORY_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == CATEGORY_SOURCE_MAP_SHA256)
+    refs = dict(refs)
+    refs[CATEGORY_DELTA_PATH] = CATEGORY_DELTA_SHA256
+    return effective, refs
 
 
 def validate(plan):

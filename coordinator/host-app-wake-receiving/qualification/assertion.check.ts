@@ -37,8 +37,8 @@ async function job(original=o,id=vectors.challenge.challenge_id,nonce='A'.repeat
  await store.reserveNativeJob('authorization','record',original,c,'c'.repeat(64),'app_attest_assertion',Date.now());
  expect(await store.claimNativeProof('authorization','record',id,'app_attest_assertion',privateClaim,Date.now())).toBe(true);return c;
 }
-async function assertion(original=o,challenge=vectors.challenge,counter=1){
- const props=cbor.encode(new Map<string,unknown>([['apple_bundle_version_01','12345'],['apple_validation_category_01',Buffer.from([3,0,0,0])]]));
+async function assertion(original=o,challenge=vectors.challenge,counter=1,category=3){
+ const props=cbor.encode(new Map<string,unknown>([['apple_bundle_version_01','12345'],['apple_validation_category_01',Buffer.from([category,0,0,0])]]));
  const auth=new Uint8Array(37+props.length);auth.set(await hash(new TextEncoder().encode(app)));auth[32]=0xc0;new DataView(auth.buffer).setUint32(33,counter,false);auth.set(props,37);
  const data=nativeSigningData(original,challenge).client_data;const nonce=await hash(combine(auth,await hash(data)));
  const raw=new Uint8Array(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},pair.privateKey,nonce));const der=new Uint8Array(pki.createCMSECDSASignature(raw.buffer));
@@ -63,12 +63,17 @@ describe('actual saved-key assertion crypto + atomic D1 counter receipt, SYNTHET
   // old unbound/QA rows cannot become native authority through API composition.
   const nativePolicy=decodeNativePolicy({version:RECEIVING_VERSION,method:'POST',route:OPERATOR_NATIVE_POLICY,action:'native_policy',operation_id:'synthetic-prior-policy',authorization_id:'authorization',native_key_ref:'native-record',native_key_id_b64:o.native_key_id_b64,profile:'host_wake_apple_properties_attestation_v2',app_identifier:app,apns_team_id:'ABCDEFGHIJ',app_attest_environment:'development',bundle_version:'12345',launch_validation_category_b64:btoa(String.fromCharCode(3,0,0,0)),signed_host_artifact_sha256:'9'.repeat(64),signed_environment_receipt_sha256:'f'.repeat(64),scope,original_policy_issued_at_ms:at,original_policy_expires_at_ms:at+7200000});
   await env.DB.prepare(`INSERT INTO host_wake_native_pending_policies(native_key_ref,native_key_id_b64,authorization_id,operation_id,request_hash,policy_json,issued_at,expires_at,outcome,original_request_expires_at) VALUES(?,?,?,?,?,?,?,?,'enrolled',?)`).bind('native-record',o.native_key_id_b64,'authorization',nativePolicy.operation_id,'9'.repeat(64),canonical(nativePolicy),at,at+7200000,at+30000).run();
-  await env.DB.prepare('UPDATE host_wake_native_enrollments SET native_policy_json=?,assertion_policy_json=?').bind(canonical(nativePolicy),assertionPolicyForNative(nativePolicy)).run();
+  await env.DB.prepare('UPDATE host_wake_native_enrollments SET native_policy_json=?,assertion_policy_json=?').bind(canonical(nativePolicy),assertionPolicyForNative(nativePolicy,btoa(String.fromCharCode(3,0,0,0)))).run();
   c=await job();
  });
  async function verified(w:RequestWindow){return verifySavedAssertion(env.DB,'authorization','record',c.challenge_id,claim,await assertion(o,c),w);}
  it('verifies actual ECDSA bytes then commits one atomic actual counter/proof receipt with no caller key/boolean',async()=>{
   const w=clock();try{const result=await verified(w);expect(result).not.toBeNull();expect(await commitVerifiedAssertion(result!,w)).toBe(true);expect(await env.DB.prepare('SELECT counter FROM host_wake_native_enrollments').first('counter')).toBe(1);expect((await store.nativeJob(c.challenge_id))?.outcome).toBe('verified');expect(await env.DB.prepare('SELECT COUNT(*) n FROM host_wake_native_verifications').first('n')).toBe(1);}finally{w.close();}
+ });
+ it.each([2,3])('SYNTHETIC prior v3 enrollment with signed category3: real assertion category %s stays exact, not initial-set widened',async category=>{
+  const row=await env.DB.prepare('SELECT native_policy_json FROM host_wake_native_enrollments').first<{native_policy_json:string}>();const policy=JSON.parse(row!.native_policy_json);delete policy.launch_validation_category_b64;policy.profile='host_wake_apple_properties_attestation_v3';policy.allowed_launch_validation_categories_b64=[2,3].map(n=>btoa(String.fromCharCode(n,0,0,0)));
+  const encoded=canonical(decodeNativePolicy(policy));await env.DB.prepare('UPDATE host_wake_native_pending_policies SET policy_json=?').bind(encoded).run();await env.DB.prepare('UPDATE host_wake_native_enrollments SET native_policy_json=?').bind(encoded).run();
+  const w=clock();try{const result=await verifySavedAssertion(env.DB,'authorization','record',c.challenge_id,claim,await assertion(o,c,1,category),w);if(category===2){expect(result).toBeNull();expect(await env.DB.prepare('SELECT counter FROM host_wake_native_enrollments').first('counter')).toBe(0);}else{expect(result).not.toBeNull();expect(await commitVerifiedAssertion(result!,w)).toBe(true);}}finally{w.close();}
  });
  it('cannot manufacture a branded crypto receipt from JSON or replay an actual one',async()=>{
   const w=clock();try{await expect(commitVerifiedAssertion({kind:'host_wake_assertion_crypto_only'},w)).rejects.toThrow('host_wake_native_crypto_receipt_required');const result=await verified(w);expect(await commitVerifiedAssertion(result!,w)).toBe(true);await expect(commitVerifiedAssertion(result!,w)).rejects.toThrow('host_wake_native_crypto_receipt_required');}finally{w.close();}

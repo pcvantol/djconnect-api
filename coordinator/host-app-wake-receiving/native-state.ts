@@ -5,7 +5,7 @@ import {need} from '../host-app-wake/wire';
 import {canonical} from '../../src/surface-push/wire';
 import {decodeSavedAssertionPolicy} from './native-assertion';
 import {currentNativePolicy} from './native-policy-store';
-import {strictNativeBase64,type NativePolicy} from './native-policy';
+import {requireNativeCategory,strictNativeBase64,type NativePolicy} from './native-policy';
 import {RequestWindow} from './request-window';
 import type {OperatorAuthorizationData,NativeOriginalData} from './wire';
 export interface NativeEnrollment {native_key_ref:string;native_key_id_b64:string;public_key_spki_b64:string;assertion_policy_json:string|null;native_policy_json:string|null;enrollment_job_id:string|null;enrollment_claim:string|null;host_bundle:string;install_id:string;platform:string;environment:string;identity_policy_sha256:string;deployment_policy_sha256:string;enrollment_receipt_sha256:string;signed_environment_receipt_sha256:string;issued_at:number;expires_at:number;counter:number;disabled:number}
@@ -21,6 +21,7 @@ export async function loadNativeState(db:D1Database,auth:Readonly<OperatorAuthor
   need(assertion.profile==='host_wake_apple_assertion_properties_v2'&&n.native_policy_json!==null,'host_wake_native_policy_unavailable',503);
   {
    const saved=await currentNativePolicy(db,auth.authorization_id,auth.native_key_ref,window,original);policy=saved.policy;
+   need(assertion.app_identifier===policy.app_identifier&&assertion.bundle_version===policy.bundle_version,'host_wake_native_authority',403);requireNativeCategory(policy,assertion.launch_validation_category_b64!);
    need(saved.row.outcome==='enrolled'&&n.native_policy_json===saved.row.policy_json&&policy.native_key_id_b64===keyId&&policy.signed_environment_receipt_sha256===n.signed_environment_receipt_sha256,'host_wake_native_authority',403);
   }
   const raw=Uint8Array.from(atob(n.public_key_spki_b64),c=>c.charCodeAt(0)),key=await window.run(()=>crypto.subtle.importKey('spki',raw,{name:'ECDSA',namedCurve:'P-256'},true,['verify']));

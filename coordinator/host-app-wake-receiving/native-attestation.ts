@@ -2,7 +2,6 @@
  * SOURCE ONLY: no SDK call, public route, caller CA, fake verdict port or default
  * app/build/environment. Initial production/native acceptance remains separate. */
 import type {AppEnv} from '../../src/types';
-import {sha256Hex} from '../../src/crypto';
 import {seal} from '../../src/surface-push/crypto';
 import {canonical} from '../../src/surface-push/wire';
 import {integer,need} from '../host-app-wake/wire';
@@ -10,11 +9,11 @@ import {decodeNativeOriginal,decodeNativeChallenge,nativeSigningData,RECEIVING_V
 import {proof,type NativeProofData} from './server-wire';
 import {ReceivingStore,type NativeJobRow} from './receiving-store';
 import {currentNativePolicy,type NativePolicyRow} from './native-policy-store';
-import {assertionPolicyForNative,type NativePolicy} from './native-policy';
+import {assertionPolicyForNative,requireNativeCategory,type NativePolicy} from './native-policy';
 import {verifyAppleAttestationEvidence,NativeReceiptStatusUnavailable} from './native-apple-evidence.mjs';
 import {RequestWindow} from './request-window';
 export interface VerifiedAttestation {readonly kind:'host_wake_first_attestation_crypto_only'}
-interface Material {db:D1Database;job:NativeJobRow;principal:string;claim:string;policy:Readonly<NativePolicy>;policyRow:NativePolicyRow;authorizationJSON:string;spki:string;receiptHash:string;receiptCreated:number;expires:number;statusChecked:number;statusExpires:number;ciphertext:string;nonce:string;capacity:number}
+interface Material {db:D1Database;job:NativeJobRow;principal:string;claim:string;policy:Readonly<NativePolicy>;policyRow:NativePolicyRow;authorizationJSON:string;observedCategory:string;spki:string;receiptHash:string;receiptCreated:number;expires:number;statusChecked:number;statusExpires:number;ciphertext:string;nonce:string;capacity:number}
 const verified=new WeakMap<VerifiedAttestation,Material>();
 export async function verifySavedAttestation(db:D1Database,env:AppEnv,authorization:string,principal:string,challenge:string,claim:string,value:NativeProofData,window:RequestWindow,fetcher:typeof fetch,capacity:number):Promise<VerifiedAttestation|null>{
  const input=proof(value);need(input.kind==='app_attest_attestation'&&env.DB===db,'host_wake_native_authority',403);integer(capacity,1,4096);
@@ -33,22 +32,23 @@ export async function verifySavedAttestation(db:D1Database,env:AppEnv,authorizat
  try{evidence=await verifyAppleAttestationEvidence(Uint8Array.from(atob(input.bytes_b64),v=>v.charCodeAt(0)),nativeSigningData(o,c).client_data,o.native_key_id_b64,p,actualWindow,fetcher);}
  catch(error){if(error instanceof NativeReceiptStatusUnavailable)need(false,'host_wake_native_status_unavailable',503);throw error;}
  if(!evidence)return null;actualWindow.check();
+ const observedCategory=requireNativeCategory(p,evidence.launch_validation_category_b64);
  need(evidence.scope==='APPLE_ATTESTATION_AND_RECEIPT_CRYPTO_STATUS_ONLY_NO_ENROLLMENT'&&evidence.receipt instanceof Uint8Array&&evidence.receipt.length>0&&evidence.receipt.length<=16384&&typeof evidence.public_key_spki_b64==='string','host_wake_native_receipt_unavailable',503);
  const spkiBytes=Uint8Array.from(atob(evidence.public_key_spki_b64),c=>c.charCodeAt(0));need(spkiBytes.length>0&&spkiBytes.length<=2048&&btoa(String.fromCharCode(...spkiBytes))===evidence.public_key_spki_b64,'host_wake_native_receipt_unavailable',503);
  const imported=await actualWindow.run(()=>crypto.subtle.importKey('spki',spkiBytes,{name:'ECDSA',namedCurve:'P-256'},true,['verify'])),point=await actualWindow.run(()=>crypto.subtle.exportKey('raw',imported));need(point instanceof ArrayBuffer,'host_wake_native_receipt_unavailable',503);
  const returnedId=new Uint8Array(await actualWindow.run(()=>crypto.subtle.digest('SHA-256',point)));need(btoa(String.fromCharCode(...returnedId))===p.native_key_id_b64,'host_wake_native_receipt_unavailable',503);
  const at=actualWindow.check();need(evidence.receiptCreated<=at&&at-evidence.receiptCreated<=300000&&evidence.statusCheckedAt<=at&&evidence.statusExpiresAt>at,'host_wake_native_status_unavailable',503);
- const receiptHash=await actualWindow.run(()=>sha256Hex(evidence.receipt)),expires=Math.min(saved.row.expires_at,evidence.expires,evidence.statusExpiresAt);need(expires>actualWindow.check(),'host_wake_native_job_expired',409);
+ const receiptHash=await actualWindow.run(async()=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',Uint8Array.from(evidence.receipt))),v=>v.toString(16).padStart(2,'0')).join('')),expires=Math.min(saved.row.expires_at,evidence.expires,evidence.statusExpiresAt);need(expires>actualWindow.check(),'host_wake_native_job_expired',409);
  const aad=canonical([RECEIVING_VERSION,'native-attestation-receipt',p.native_key_ref,p.native_key_id_b64,saved.row.request_hash,saved.row.issued_at,saved.row.expires_at]);
  const sealed=await actualWindow.run(()=>seal(btoa(String.fromCharCode(...evidence.receipt)),env.APNS_TOKEN_ENCRYPTION_KEY,aad));actualWindow.check();
- const result=Object.freeze({kind:'host_wake_first_attestation_crypto_only' as const});verified.set(result,{db,job,principal,claim,policy:p,policyRow:saved.row,authorizationJSON:auth.authorization_json,spki:evidence.public_key_spki_b64,receiptHash,receiptCreated:evidence.receiptCreated,expires,statusChecked:evidence.statusCheckedAt,statusExpires:evidence.statusExpiresAt,ciphertext:sealed.ciphertext,nonce:sealed.nonce,capacity});return result;
+ const result=Object.freeze({kind:'host_wake_first_attestation_crypto_only' as const});verified.set(result,{db,job,principal,claim,policy:p,policyRow:saved.row,authorizationJSON:auth.authorization_json,observedCategory,spki:evidence.public_key_spki_b64,receiptHash,receiptCreated:evidence.receiptCreated,expires,statusChecked:evidence.statusCheckedAt,statusExpires:evidence.statusExpiresAt,ciphertext:sealed.ciphertext,nonce:sealed.nonce,capacity});return result;
  }finally{clearTimeout(nativeTimer);nativeLifetime.abort();}
 }
 /** Only a real verifier-created opaque receipt can install a key. No caller
  * verdict, CA, clock boolean, JSON receipt or old QA approval is accepted. */
 export async function commitVerifiedAttestation(result:VerifiedAttestation,window:RequestWindow):Promise<boolean>{
  const material=verified.get(result);need(material,'host_wake_native_crypto_receipt_required',403);verified.delete(result);window.check();
- const {db,job,principal,claim,policy:p,policyRow:r,authorizationJSON,spki,receiptHash,receiptCreated,expires,statusChecked,statusExpires,ciphertext,nonce,capacity}=material,commit=crypto.randomUUID(),now="CAST(unixepoch('subsec')*1000 AS INTEGER)";
+ const {db,job,principal,claim,policy:p,policyRow:r,authorizationJSON,observedCategory,spki,receiptHash,receiptCreated,expires,statusChecked,statusExpires,ciphertext,nonce,capacity}=material,commit=crypto.randomUUID(),now="CAST(unixepoch('subsec')*1000 AS INTEGER)";
  // The insert guards abort this whole D1 transaction if the native nonce or
  // local ownership or signed common-status freshness crosses its boundary
  // between the conditional statements. The key lifetime is clipped to that
@@ -69,7 +69,7 @@ export async function commitVerifiedAttestation(result:VerifiedAttestation,windo
   db.prepare(`INSERT INTO host_wake_native_enrollments
    (native_key_ref,native_key_id_b64,public_key_spki_b64,assertion_policy_json,native_policy_json,enrollment_job_id,enrollment_claim,receipt_ciphertext,receipt_nonce,receipt_created_at,common_status_checked_at,common_status_expires_at,host_bundle,install_id,platform,environment,identity_policy_sha256,deployment_policy_sha256,enrollment_receipt_sha256,signed_environment_receipt_sha256,issued_at,expires_at,counter,counter_claim,disabled)
    SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,${now},?,0,?,0 FROM host_wake_native_pending_policies p WHERE p.native_key_ref=? AND p.outcome='enrolled' AND p.enrollment_claim=?`)
-   .bind(p.native_key_ref,p.native_key_id_b64,spki,assertionPolicyForNative(p),r.policy_json,job.private_job_id,commit,ciphertext,nonce,receiptCreated,statusChecked,statusExpires,p.scope.target.host_bundle_id,p.scope.target.installation_id,p.scope.platform,p.scope.apns_environment,p.scope.identity_policy_sha256,p.scope.deployment_policy_sha256,receiptHash,p.signed_environment_receipt_sha256,expires,commit,p.native_key_ref,commit),
+   .bind(p.native_key_ref,p.native_key_id_b64,spki,assertionPolicyForNative(p,observedCategory),r.policy_json,job.private_job_id,commit,ciphertext,nonce,receiptCreated,statusChecked,statusExpires,p.scope.target.host_bundle_id,p.scope.target.installation_id,p.scope.platform,p.scope.apns_environment,p.scope.identity_policy_sha256,p.scope.deployment_policy_sha256,receiptHash,p.signed_environment_receipt_sha256,expires,commit,p.native_key_ref,commit),
   db.prepare(`INSERT INTO host_wake_native_verifications(challenge_id,private_job_id,native_key_ref,verified_counter,verified_at,commit_claim,original_json)
    SELECT ?,?,?,0,${now},?,? FROM host_wake_native_enrollments n WHERE n.native_key_ref=? AND n.enrollment_claim=? AND n.enrollment_job_id=?`)
    .bind(job.challenge_id,job.private_job_id,p.native_key_ref,commit,job.original_json,p.native_key_ref,commit,job.private_job_id),

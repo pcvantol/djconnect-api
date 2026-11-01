@@ -50,7 +50,10 @@ class PreparationTests(unittest.TestCase):
             # Install only fixed, verified delta inputs; no fetching PR objects.
             additions = (*v.DELTA_SOURCES, *v.DELTA_ADDITIONS, *v.REFERENCE_DELTA, v.DELTA_PATH,
                          v.WORKFLOW_DELTA_SOURCE, v.WORKFLOW_DELTA_PATH,
-                         *(record[0] for record in v.DELTA_PROOFS))
+                         *(record[0] for record in v.DELTA_PROOFS),
+                         *v.CLOSED_RECEIVING_MAP_CHANGES, v.CLOSED_RECEIVING_DELTA_PATH,
+                         v.CLOSED_RECEIVING_PRODUCT_PATH, *v.RETENTION_SOURCES,
+                         v.RETENTION_DELTA_PATH, *v.CATEGORY_SOURCES, v.CATEGORY_DELTA_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
@@ -105,8 +108,49 @@ class PreparationTests(unittest.TestCase):
             with self.subTest(mutation=mutation):
                 self.rejects_changed_proof(v.WORKFLOW_DELTA_PATH, changed)
 
+    def test_category_delta_preserves_prior_ci_and_runtime_maps(self):
+        self.assertEqual(len(v.baseline_before_native_category()[0]), 144)
+        proof = v.pinned_working_proof(v.CATEGORY_DELTA_PATH, v.CATEGORY_DELTA_SHA256)
+        self.assertEqual(len(proof['changes']), 5)
+        self.assertFalse(proof['public_activation_allowed'])
+
+    def test_category_delta_cannot_authorize_activation(self):
+        proof = v.pinned_working_proof(v.CATEGORY_DELTA_PATH, v.CATEGORY_DELTA_SHA256)
+        proof['public_activation_allowed'] = True
+        self.rejects_changed_proof(v.CATEGORY_DELTA_PATH, proof)
+
+    def test_category_delta_cannot_rewrite_the_prior_source(self):
+        proof = v.pinned_working_proof(v.CATEGORY_DELTA_PATH, v.CATEGORY_DELTA_SHA256)
+        proof['baseline_source_map_sha256'] = 'f' * 64
+        self.rejects_changed_proof(v.CATEGORY_DELTA_PATH, proof)
+
+    def test_category_delta_cannot_add_unlisted_runtime(self):
+        proof = v.pinned_working_proof(v.CATEGORY_DELTA_PATH, v.CATEGORY_DELTA_SHA256)
+        proof['changes']['unreviewed.ts'] = {'before': None, 'after': 'f' * 64}
+        self.rejects_changed_proof(v.CATEGORY_DELTA_PATH, proof)
+
+    def test_retention_delta_cannot_authorize_activation(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        value['public_activation_allowed'] = True
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
+
+    def test_retention_delta_cannot_replace_a_historical_source(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        value['changes']['.github/workflows/ci-cd.yml']['before'] = 'f' * 64
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
+
+    def test_retention_delta_is_exact_not_an_extra_source_allowlist(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        value['changes']['src/index.ts'] = {'before': 'a' * 64, 'after': 'b' * 64}
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
+
+    def test_retention_delta_cannot_omit_its_cleanup_implementation(self):
+        value = v.pinned_working_proof(v.RETENTION_DELTA_PATH, v.RETENTION_DELTA_SHA256)
+        del value['changes']['scripts/cleanup_workflow_runs.py']
+        self.rejects_changed_proof(v.RETENTION_DELTA_PATH, value)
+
     def test_qualification_workflow_metadata_is_not_an_activation_or_runtime_override(self):
-        sources, refs = v.baseline()
+        sources, refs = v.baseline_before_receiving_root()
         maps = [v.decode((v.ROOT / name).read_bytes())[field]
                 for name, _pin, field, _count, _scope in v.DELTA_PROOFS]
         historical = v.merge_sources(maps[0], maps[2], maps[1], with_closed_issuer=True)
@@ -149,7 +193,9 @@ class PreparationTests(unittest.TestCase):
 
     def test_each_new_proof_and_delta_raw_hash_is_mandatory(self):
         original = Path.read_bytes
-        for name in (v.DELTA_PATH, *(record[0] for record in v.DELTA_PROOFS)):
+        for name in (v.DELTA_PATH, *(record[0] for record in v.DELTA_PROOFS),
+                         *v.CLOSED_RECEIVING_MAP_CHANGES, v.CLOSED_RECEIVING_DELTA_PATH,
+                         v.CLOSED_RECEIVING_PRODUCT_PATH):
             with self.subTest(name=name):
                 def changed(path):
                     return b'{}' if path == v.ROOT / name else original(path)
@@ -199,7 +245,9 @@ class PreparationTests(unittest.TestCase):
                 else:
                     changed['changes'][name]['grant'] = True
                 self.rejects_changed_proof(v.DELTA_PATH, changed)
-        self.assertEqual(len(self.plan['source_hashes']), 119)
+        self.assertEqual(len(v.baseline_before_receiving_root()[0]), 119)
+        self.assertEqual(len(v.baseline_before_ci_retention()[0]), 142)
+        self.assertEqual(len(self.plan['source_hashes']), 144)
         for name in v.DELTA_SOURCES:
             changed = copy.deepcopy(delta)
             changed['changes'][name]['before'] = None
@@ -426,6 +474,35 @@ class PreparationTests(unittest.TestCase):
                 changed['THIRD_PARTY_NOTICES.md']['before'] = 'f' * 64
             with patch.object(v, 'REFERENCE_DELTA', changed):
                 self.rejects(self.plan)
+
+    def test_prior_qualified_plan_does_not_cover_the_new_root(self):
+        previous = copy.deepcopy(self.plan)
+        previous['source_hashes'], previous['reference_hashes'] = v.baseline_before_receiving_root()
+        for key in list(previous['source_provenance']):
+            if key.startswith('closed_receiving_root_'):
+                del previous['source_provenance'][key]
+        self.rejects(previous)
+
+    def test_closed_root_proof_cannot_grant_activation(self):
+        proof = v.pinned_working_proof(v.CLOSED_RECEIVING_DELTA_PATH, v.CLOSED_RECEIVING_DELTA_SHA256)
+        proof['public_activation_allowed'] = True
+        self.rejects_changed_proof(v.CLOSED_RECEIVING_DELTA_PATH, proof)
+
+    def test_closed_root_delta_cannot_expand_the_source_map(self):
+        proof = v.pinned_working_proof(v.CLOSED_RECEIVING_DELTA_PATH, v.CLOSED_RECEIVING_DELTA_SHA256)
+        proof['changes']['src/unreviewed.ts'] = {'before': None, 'after': 'f' * 64}
+        self.rejects_changed_proof(v.CLOSED_RECEIVING_DELTA_PATH, proof)
+
+    def test_closed_root_requires_all_observed_public_denials(self):
+        proof = v.pinned_working_proof(v.CLOSED_RECEIVING_PRODUCT_PATH, v.CLOSED_RECEIVING_PRODUCT_SHA256)
+        proof['closed_receiving_prefix_checks'] = 63
+        self.rejects_changed_proof(v.CLOSED_RECEIVING_PRODUCT_PATH, proof)
+
+    def test_closed_root_cannot_change_an_installed_dependency(self):
+        proof = v.pinned_working_proof(v.CLOSED_RECEIVING_PRODUCT_PATH, v.CLOSED_RECEIVING_PRODUCT_SHA256)
+        name = next(k for k in proof['source_hashes'] if k.startswith('node_modules/'))
+        proof['source_hashes'][name] = 'f' * 64
+        self.rejects_changed_proof(v.CLOSED_RECEIVING_PRODUCT_PATH, proof)
 
 
 if __name__ == '__main__':
