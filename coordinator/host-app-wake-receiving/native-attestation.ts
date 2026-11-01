@@ -2,7 +2,6 @@
  * SOURCE ONLY: no SDK call, public route, caller CA, fake verdict port or default
  * app/build/environment. Initial production/native acceptance remains separate. */
 import type {AppEnv} from '../../src/types';
-import {sha256Hex} from '../../src/crypto';
 import {seal} from '../../src/surface-push/crypto';
 import {canonical} from '../../src/surface-push/wire';
 import {integer,need} from '../host-app-wake/wire';
@@ -38,7 +37,7 @@ export async function verifySavedAttestation(db:D1Database,env:AppEnv,authorizat
  const imported=await actualWindow.run(()=>crypto.subtle.importKey('spki',spkiBytes,{name:'ECDSA',namedCurve:'P-256'},true,['verify'])),point=await actualWindow.run(()=>crypto.subtle.exportKey('raw',imported));need(point instanceof ArrayBuffer,'host_wake_native_receipt_unavailable',503);
  const returnedId=new Uint8Array(await actualWindow.run(()=>crypto.subtle.digest('SHA-256',point)));need(btoa(String.fromCharCode(...returnedId))===p.native_key_id_b64,'host_wake_native_receipt_unavailable',503);
  const at=actualWindow.check();need(evidence.receiptCreated<=at&&at-evidence.receiptCreated<=300000&&evidence.statusCheckedAt<=at&&evidence.statusExpiresAt>at,'host_wake_native_status_unavailable',503);
- const receiptHash=await actualWindow.run(()=>sha256Hex(evidence.receipt)),expires=Math.min(saved.row.expires_at,evidence.expires,evidence.statusExpiresAt);need(expires>actualWindow.check(),'host_wake_native_job_expired',409);
+ const receiptHash=await actualWindow.run(async()=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',Uint8Array.from(evidence.receipt))),v=>v.toString(16).padStart(2,'0')).join('')),expires=Math.min(saved.row.expires_at,evidence.expires,evidence.statusExpiresAt);need(expires>actualWindow.check(),'host_wake_native_job_expired',409);
  const aad=canonical([RECEIVING_VERSION,'native-attestation-receipt',p.native_key_ref,p.native_key_id_b64,saved.row.request_hash,saved.row.issued_at,saved.row.expires_at]);
  const sealed=await actualWindow.run(()=>seal(btoa(String.fromCharCode(...evidence.receipt)),env.APNS_TOKEN_ENCRYPTION_KEY,aad));actualWindow.check();
  const result=Object.freeze({kind:'host_wake_first_attestation_crypto_only' as const});verified.set(result,{db,job,principal,claim,policy:p,policyRow:saved.row,authorizationJSON:auth.authorization_json,spki:evidence.public_key_spki_b64,receiptHash,receiptCreated:evidence.receiptCreated,expires,statusChecked:evidence.statusCheckedAt,statusExpires:evidence.statusExpiresAt,ciphertext:sealed.ciphertext,nonce:sealed.nonce,capacity});return result;

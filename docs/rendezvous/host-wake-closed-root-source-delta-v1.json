@@ -3,7 +3,7 @@
   "scope": "EXACT_CLOSED_RECEIVING_ROOT_SOURCE_DELTA_NOT_ACTIVATION",
   "protected_source_parent": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
   "baseline_source_map_sha256": "d75bef5d8a7ddcff4723639817f6f0e2c85967d528e9be3c2bbb0dc4fe1f5109",
-  "effective_source_map_sha256": "a63615c62ab663f3adf828c747e9741704acba740e2f856320460e5a8af4ca2c",
+  "effective_source_map_sha256": "70bcdc910d5ca67741ba55e9aa5524c345b4698ae73e01688bc7879a7dfe5920",
   "changes": {
     "coordinator/host-app-wake-receiving/authorization-resolve.ts": {
       "before": null,
@@ -23,7 +23,7 @@
     },
     "coordinator/host-app-wake-receiving/native-attestation.ts": {
       "before": null,
-      "after": "f85fbb3b935bc62b67db6c585fdc7ab6bf3fea9a7ac92913b3d2590e19095029"
+      "after": "f5b41c667f158983ee4b9fda9b1b13c7f67272fad47c358b8bff5d3c55b08f5a"
     },
     "coordinator/host-app-wake-receiving/native-policy-store.ts": {
       "before": null,
@@ -108,7 +108,7 @@
   },
   "product_proof": {
     "path": "docs/rendezvous/host-wake-closed-root-product-observations-v1.json",
-    "sha256": "5a903e01259c10e489df64ca5b8ab5085271c65bec9d52a2c39be7027d7d4318",
+    "sha256": "766e54219bdf7dbdaec97bd599eaf43990e1e34f19ed7e05bea77461dd954acc",
     "legacy_checks": 128,
     "closed_receiving_prefix_checks": 64,
     "installed_dependency_inputs_unchanged": 50

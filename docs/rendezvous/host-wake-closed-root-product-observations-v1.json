@@ -130,7 +130,7 @@
     "coordinator/host-app-wake-receiving/source-backend.ts": "9344ca283494a672025743b7417da2354d823a5fcd2cce63b1858688e726ca67",
     "qualification/rendezvous/receipt-status-candidate.mjs": "7f2b1aa7d4307e36a8edddea7d89a1ada327ead8c9350e82866c6eee9449d434",
     "coordinator/host-app-wake-receiving/native-apple-evidence.mjs": "31c9b7667a0b84db1f04604e1b8e8c254faad97ddceddae21444689cce28cee3",
-    "coordinator/host-app-wake-receiving/native-attestation.ts": "f85fbb3b935bc62b67db6c585fdc7ab6bf3fea9a7ac92913b3d2590e19095029",
+    "coordinator/host-app-wake-receiving/native-attestation.ts": "f5b41c667f158983ee4b9fda9b1b13c7f67272fad47c358b8bff5d3c55b08f5a",
     "coordinator/host-app-wake-receiving/server-reply.ts": "3d42eca8d56da4b70f9d2cf5672d5f690137b0487a4c7af393eed797ff129fbf",
     "coordinator/host-app-wake-receiving/operator-auth.ts": "f3e30b0462aaad45687bf1fbd2e6b28cab24ef954b3698d9bf6853922cf671de",
     "coordinator/host-app-wake-receiving/authorization-resolve.ts": "f4ad510f625fb557c700a475157f0530796dfb84fa2d3179b68a06c52426a744",
@@ -151,8 +151,8 @@
     "wrangler": "4.151.3",
     "miniflare": "5.20261019.1-beta"
   },
-  "bundle_sha256": "dade8e60146c02791e7f76bb8aeacdf0aeae0dc863d6be3bafc9b2476299b4dc",
-  "bundle_bytes": 1465456,
+  "bundle_sha256": "b185b47c07e76152e2121acf350c03b85548374ec5eaa0900e36f30b10dabae0",
+  "bundle_bytes": 1465584,
   "virtual_platform_inputs": {
     "node-built-in-modules:stream": {
       "bytes": 61,
