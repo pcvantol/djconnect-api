@@ -19,8 +19,8 @@ export function decodeResolve(value:unknown):Readonly<{version:typeof RECEIVING_
  return Object.freeze({version:RECEIVING_VERSION,scope:Object.freeze({...s,target:Object.freeze({...s.target})})}) as unknown as Readonly<{version:typeof RECEIVING_VERSION;scope:Readonly<RoleScope>}>;
 }
 export interface ResolvedAuthorization {version:typeof RECEIVING_VERSION;resolution:'existing';authorization_id:string;request_sha256:string;scope_sha256:string;original_authorization_issued_at_ms:number;original_authorization_expires_at_ms:number;max_original_purpose_ms:number;max_operations:number;max_reserved_sends:number;native_proof_kind:'app_attest_assertion'|'app_attest_attestation';registration_mode:'single_original_no_rotation';selected_ha_origin_sha256:string;identity_policy_sha256:string;deployment_policy_sha256:string}
-export async function resolveAuthorization(request:Request,env:AppEnv,now:()=>number):Promise<Readonly<ResolvedAuthorization>>{
- const db=env.DB,window=new RequestWindow(now,request.signal);
+export async function resolveAuthorization(request:Request,env:AppEnv,now:()=>number,originalCapture?:number):Promise<Readonly<ResolvedAuthorization>>{
+ const db=env.DB,window=new RequestWindow(now,request.signal,originalCapture);
  try{
   const u=new URL(request.url);need(request.method==='POST'&&u.protocol==='https:'&&u.pathname===RESOLVE_PATH&&!request.url.includes('?')&&!request.url.includes('#'),'host_wake_receiving_route',404);
   for(const h of ['origin','cookie','x-djconnect-device-id','x-djconnect-client-type'])need(!request.headers.has(h),'host_wake_server_transport',403);

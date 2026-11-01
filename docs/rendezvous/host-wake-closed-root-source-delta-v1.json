@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_CLOSED_RECEIVING_ROOT_SOURCE_DELTA_NOT_ACTIVATION",
+  "protected_source_parent": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+  "baseline_source_map_sha256": "d75bef5d8a7ddcff4723639817f6f0e2c85967d528e9be3c2bbb0dc4fe1f5109",
+  "effective_source_map_sha256": "a63615c62ab663f3adf828c747e9741704acba740e2f856320460e5a8af4ca2c",
+  "changes": {
+    "coordinator/host-app-wake-receiving/authorization-resolve.ts": {
+      "before": null,
+      "after": "f4ad510f625fb557c700a475157f0530796dfb84fa2d3179b68a06c52426a744"
+    },
+    "coordinator/host-app-wake-receiving/guard-schema.ts": {
+      "before": null,
+      "after": "de6f0e42e9a8b412f0b68659f85cafde47f77b0f899883a9d23b14b12b14e1d0"
+    },
+    "coordinator/host-app-wake-receiving/native-apple-evidence.mjs": {
+      "before": null,
+      "after": "31c9b7667a0b84db1f04604e1b8e8c254faad97ddceddae21444689cce28cee3"
+    },
+    "coordinator/host-app-wake-receiving/native-assertion.ts": {
+      "before": null,
+      "after": "899fd463e5e3f7b601385fe2b2d38b74c3ad32aad74dc386c55cd121c7e96851"
+    },
+    "coordinator/host-app-wake-receiving/native-attestation.ts": {
+      "before": null,
+      "after": "f85fbb3b935bc62b67db6c585fdc7ab6bf3fea9a7ac92913b3d2590e19095029"
+    },
+    "coordinator/host-app-wake-receiving/native-policy-store.ts": {
+      "before": null,
+      "after": "14cd32feb9de4b85211ad72eb5e51bf5173a2c3e71806d06ac0518f846e38517"
+    },
+    "coordinator/host-app-wake-receiving/native-policy.ts": {
+      "before": null,
+      "after": "777ff00385ffb90d8dd351657d1aad1b53aaf90b576e7efd0db26657719207cd"
+    },
+    "coordinator/host-app-wake-receiving/native-state.ts": {
+      "before": null,
+      "after": "f58b3188a3adb853cccd4dd03c5bbc75f4dd265a55148adcdd6cc78b515ce6bd"
+    },
+    "coordinator/host-app-wake-receiving/operator-auth.ts": {
+      "before": null,
+      "after": "f3e30b0462aaad45687bf1fbd2e6b28cab24ef954b3698d9bf6853922cf671de"
+    },
+    "coordinator/host-app-wake-receiving/principal.ts": {
+      "before": null,
+      "after": "1f658b0409fde1d91642ccb00900bb7b20c1d712f437f37e225830a8a751f89e"
+    },
+    "coordinator/host-app-wake-receiving/private-intake.ts": {
+      "before": null,
+      "after": "b7e98ae0530d1387c378e8011fde289b54f3fed8ca0288598767709525724b4c"
+    },
+    "coordinator/host-app-wake-receiving/receiving-store.ts": {
+      "before": null,
+      "after": "7d62aa3df7c461de6b932338e5cbab82cb349974fb39efaa023592a984976ce9"
+    },
+    "coordinator/host-app-wake-receiving/request-window.ts": {
+      "before": null,
+      "after": "4952d616cb629ed7ba6214c519c3fe51ba4eb53ed776426986e5c2d987d814b6"
+    },
+    "coordinator/host-app-wake-receiving/server-reply.ts": {
+      "before": null,
+      "after": "3d42eca8d56da4b70f9d2cf5672d5f690137b0487a4c7af393eed797ff129fbf"
+    },
+    "coordinator/host-app-wake-receiving/server-wire.ts": {
+      "before": null,
+      "after": "b7670ff7b8ec0666369bdb5844858e1d7509e86077952d72289092c107dda665"
+    },
+    "coordinator/host-app-wake-receiving/service.ts": {
+      "before": null,
+      "after": "089bf19488ba7a79e75abc07c850e501ad055a82e014b96f4ca29ae6ce8578dc"
+    },
+    "coordinator/host-app-wake-receiving/source-backend.ts": {
+      "before": null,
+      "after": "9344ca283494a672025743b7417da2354d823a5fcd2cce63b1858688e726ca67"
+    },
+    "coordinator/host-app-wake-receiving/target-transport.ts": {
+      "before": null,
+      "after": "1bfcf310aa1f59a1cbc7015e852e7f77991cc369af6c2afd0f4d27893b54a4ae"
+    },
+    "coordinator/host-app-wake-receiving/wire.ts": {
+      "before": null,
+      "after": "e7f0964436fb63622294e6b1525aa9e1d82f18bc4bada514c00b1572faf06819"
+    },
+    "coordinator/host-app-wake/service.ts": {
+      "before": null,
+      "after": "d5fc50e6f2ba4450fad35c2057de174a5441cb1c989b8a82a5d926f0c8f44ad0"
+    },
+    "coordinator/host-app-wake/store.ts": {
+      "before": null,
+      "after": "7c2ba2750216da5bb9f4c67f3925e036b4a953a6941a8e361ce17ee4c949e969"
+    },
+    "coordinator/host-app-wake/wire.ts": {
+      "before": null,
+      "after": "4c1da6b524c312d36f5df226e59385eb0b4a041412dd14dc55b4b3f9b0747aae"
+    },
+    "scripts/qualify_rendezvous_product_build.mjs": {
+      "before": "b862f1ecd959b439af936c6d514fb5d9bca6d52fdcd0621770f896d0f8e1234b",
+      "after": "fad69790ef5f3bea6047cc944412e16437f84ab85eeacbe7c8284c099d86968c"
+    },
+    "src/host-wake-receiving/dispatch.ts": {
+      "before": null,
+      "after": "4ff554a563516752a07bf0c1b01d97e3c182f7df5527929d5ca566e281d26bbf"
+    },
+    "src/index.ts": {
+      "before": "172fffb5e9d015f7ad17af205fef82bf0cb247bb35e685b8b57b7ba93f055f94",
+      "after": "82d971c8ad989cbe00a8406673c99838d72eb9de9451d6ce39dc40e3f1df41c2"
+    }
+  },
+  "product_proof": {
+    "path": "docs/rendezvous/host-wake-closed-root-product-observations-v1.json",
+    "sha256": "5a903e01259c10e489df64ca5b8ab5085271c65bec9d52a2c39be7027d7d4318",
+    "legacy_checks": 128,
+    "closed_receiving_prefix_checks": 64,
+    "installed_dependency_inputs_unchanged": 50
+  },
+  "map_additions_are_newly_compiled_inputs_not_claimed_git_additions": true,
+  "public_activation_allowed": false
+}

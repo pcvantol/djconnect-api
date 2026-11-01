@@ -45,8 +45,8 @@ export function decodeTargetReply(value:unknown,input:Input,original:Readonly<Na
 function receipt(r:Row,op:Operation|null,operation:string,at:number){
  return {version:VERSION,purpose_id:r.purpose_id,operation_id:operation,state:r.withdrawn?'withdrawn':at>=r.expires_at?'expired':r.ciphertext?'registered':'unregistered',generation:r.generation,revision:r.revision,expires_at_ms:r.expires_at,transport_expires_at_ms:op?.kind==='wake'?op.expires_at:null,operation_state:op?.outcome==='dispatch_started'||op?.outcome==='reserved'?'unknown':op?.outcome??'unknown',provider_status:op?.provider_status??null};
 }
-export async function receiveTarget(request:Request,env:AppEnv,now:()=>number,fetcher:typeof fetch,capacity:number):Promise<Response>{
- const window=new RequestWindow(now,request.signal),db=env.DB,store=new ReceivingStore(db,capacity),source=new WakeStore(db);let intent:IntentRow|undefined,backend:Awaited<ReturnType<typeof bindSource181>>|undefined;
+export async function receiveTarget(request:Request,env:AppEnv,now:()=>number,fetcher:typeof fetch,capacity:number,originalCapture?:number):Promise<Response>{
+ const window=new RequestWindow(now,request.signal,originalCapture),db=env.DB,store=new ReceivingStore(db,capacity),source=new WakeStore(db);let intent:IntentRow|undefined,backend:Awaited<ReturnType<typeof bindSource181>>|undefined;
  try{
   const kind=targetKind(request),scope=privateScopeHeaders(request),cap=request.headers.get(TARGET_CAPABILITY_HEADER);need(cap&&/^djchw_[A-Za-z0-9_-]{43}$/.test(cap),'host_wake_core_auth',401);
   const positive=kind==='register'||kind==='wake';let operation:string|undefined;
