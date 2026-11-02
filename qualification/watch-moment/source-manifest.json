@@ -17,7 +17,7 @@
     "src/watch-moment/wire.ts"
   ],
   "inputs_sha256": {
-    "docs/push/WATCH_MOMENT_ALERT_TRANSPORT_V1.md": "c2816ed4d3b5dac7596f45bf92384211b2b200cc4f9a0977bb912804a695ee54",
+    "docs/push/WATCH_MOMENT_ALERT_TRANSPORT_V1.md": "70d7b3e5ee9adc41bb46da8b8ab279c6035544a9de5260392724cb8c628427ac",
     "docs/push/watch-moment-alert-proposal-v1.json": "236f9a840015463e8d2f6962c7f759bb6bc24999c373ec697a076b9632da982c",
     "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
     "package.json": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
@@ -35,10 +35,10 @@
     "src/watch-moment/payload.ts": "1f86511528493ccd9f1472f0192ea6e89d2e139641e9235bb1a3f3978e4dafd8",
     "src/watch-moment/relay.ts": "cd1054fe745ca749baaa3f1f7bd7324a8e4a92d03f90f94d920cc8fba88c8bad",
     "src/watch-moment/schema.sql": "5085069dd97cf0eefc53a8c84272ffb3e089fd88be1b59093c804ff8eb389431",
-    "src/watch-moment/service.ts": "d1c22df527d001294f8543d80ac1fbed498882e0023161b764deb31eb6754be4",
+    "src/watch-moment/service.ts": "409c2c3a0a04de09fc3675e6192063751cd24a5809e17ee0463a9ba8d136d34d",
     "src/watch-moment/store.ts": "09239829c8f8b91afd5af80edb0e1a13ed3b26351dac7a5de3368ae146979c0e",
     "src/watch-moment/wire.ts": "c9dab8c50327668214fb5ecb8c69095970bfda3c7e6209fb85660dc60f8dc5fb",
-    "test/watch-moment.spec.ts": "48c825d63bb45a2847a51ad9c371cc8113b8db29df50b4033b7b0185eb46c251",
+    "test/watch-moment.spec.ts": "1d03a898f9c019c606670022da57ae8b40f84b74a67891a0ed8ddf9012854311",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "worker-configuration.d.ts": "388f08efd99c9c53e71edfa5b78d7b5c225802d1c415661dc79f060b823ca266",
     ".github/workflows/watch-moment-alert-source.yml": "304e1144828089e32e89995e84d12977dcda57dc64c6dcbfc79d1b019bc94536"

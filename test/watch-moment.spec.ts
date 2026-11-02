@@ -202,6 +202,15 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 		await service.dispatch(e, signal()); expect((await service.cancel(e, signal()))?.state).toBe("cancelled");
 		now += 5000; expect((await service.dispatch(e, signal())).state).toBe("cancelled"); expect(sender).toHaveBeenCalledOnce();
 	});
+	it("retains original withdrawal authority after registry ownership changes, without an active credential", async () => {
+		const base = setup({ send: async () => ({ status: 503 }) }), e = publish();
+		await base.service.dispatch(e, signal());
+		const original = await base.ports.admit(e, "cancel", signal());
+		await env.DB.prepare("UPDATE registrations SET ha_user_hash=?,disabled=1 WHERE id=?").bind("f".repeat(64), registration.id).run();
+		const { service, send } = setup({ admit: async () => ({ ...original, registration: undefined }) });
+		expect((await service.cancel(e, signal()))?.state).toBe("cancelled"); expect(send).not.toHaveBeenCalled();
+		await expect(service.dispatch(e, signal())).rejects.toThrow("moment_recipient");
+	});
 	it("reserves bounded capacity for cancellation, retaining earlier outcomes", async () => {
 		const { service, send } = setup({ limits: { capacity: 3, installationCapacity: 3, recipientBurst: 10 } });
 		await service.dispatch(publish({ event_id: "event-1" }), signal()); await service.dispatch(publish({ event_id: "event-2" }), signal());

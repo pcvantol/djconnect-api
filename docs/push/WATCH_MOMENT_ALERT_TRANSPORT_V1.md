@@ -28,6 +28,11 @@ and trustworthy original clock. Cancellation requires its distinct original
 withdrawal authority, including after opt-out. Structural validation is not that
 authority. No caller-provided boolean can replace it.
 
+An original withdrawal checks the original publication/registration bindings
+against its once record. It does not require a currently active registration,
+encrypted token or current-owner credential. Its server-supplied authority must
+remain specific to that original withdrawal; no send authority is inferred.
+
 The exact registered Watch app, owner, installation, device, environment and
 encrypted token binding must match an actual row in the existing API database.
 The send marker atomically checks that registration, and the provider handoff

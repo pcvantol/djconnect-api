@@ -12,7 +12,8 @@ export interface Admission {
 	registration_binding: string;
 	eligible_since_ms: number;
 	expires_at_ms: number;
-	registration: Registration;
+	/** Required for send; original withdrawal needs no active native credential. */
+	registration?: Registration;
 }
 type Action = "send" | "cancel";
 export interface MomentPorts {
@@ -59,22 +60,25 @@ export function createMomentTransport(ports: MomentPorts) {
 		need(!signal.aborted && !closed, "moment_cancelled", 409);
 		const admissionSignal = AbortSignal.any([signal, AbortSignal.timeout(5000)]);
 		const raw = await boundedWork(ports.admit(event, action, admissionSignal), admissionSignal);
-		need(raw && raw.registration, "moment_authority", 403);
-		const admission = Object.freeze({ ...raw, registration: Object.freeze({ ...raw.registration }) });
+		need(raw, "moment_authority", 403);
+		const admission = Object.freeze({ ...raw, registration: raw.registration ? Object.freeze({ ...raw.registration }) : undefined });
 		const r = admission.registration;
 		need(admission.event_hash === requestHash && hex(admission.recipient_binding) && hex(admission.registration_binding), "moment_authority", 403);
 		need(Number.isSafeInteger(admission.eligible_since_ms) && admission.eligible_since_ms > 0
 			&& Number.isSafeInteger(admission.expires_at_ms), "moment_authority", 403);
-		need(r.client_type === "watchos" && r.ha_install_id === event.ha_install_id && r.ha_user_hash === event.ha_user_hash
-			&& r.device_id === event.device_id && r.topic === "dev.djconnect.ios.watch"
-			&& r.app_bundle_id === r.topic && ["sandbox", "production"].includes(r.apns_environment)
-			&& hex(r.apns_token_hash)
-			&& typeof r.apns_token_ciphertext === "string" && r.apns_token_ciphertext.length > 0
-			&& typeof r.apns_token_nonce === "string" && r.apns_token_nonce.length > 0, "moment_recipient", 403);
-		let categories: unknown; try { categories = JSON.parse(r.categories_json); } catch { /* deny below */ }
-		if (action === "send") need(r.disabled === 0 && r.invalid === 0 && Array.isArray(categories) && categories.includes(CATEGORY), "moment_opt_out", 403);
-		// No notification backlog after opting in, reconnecting or changing owner/pairing.
-		if (action === "send") need(event.created_at_ms >= admission.eligible_since_ms, "moment_historical", 409);
+		if (action === "send") {
+			need(r, "moment_recipient", 403);
+			need(r.client_type === "watchos" && r.ha_install_id === event.ha_install_id && r.ha_user_hash === event.ha_user_hash
+				&& r.device_id === event.device_id && r.topic === "dev.djconnect.ios.watch"
+				&& r.app_bundle_id === r.topic && ["sandbox", "production"].includes(r.apns_environment)
+				&& hex(r.apns_token_hash)
+				&& typeof r.apns_token_ciphertext === "string" && r.apns_token_ciphertext.length > 0
+				&& typeof r.apns_token_nonce === "string" && r.apns_token_nonce.length > 0, "moment_recipient", 403);
+			let categories: unknown; try { categories = JSON.parse(r.categories_json); } catch { /* deny below */ }
+			need(r.disabled === 0 && r.invalid === 0 && Array.isArray(categories) && categories.includes(CATEGORY), "moment_opt_out", 403);
+			// No notification backlog after opting in, reconnecting or changing owner/pairing.
+			need(event.created_at_ms >= admission.eligible_since_ms, "moment_historical", 409);
+		}
 		let previous = 0;
 		const guard = (expiry?: number) => {
 			const at = ports.now();
@@ -87,7 +91,8 @@ export function createMomentTransport(ports: MomentPorts) {
 			if (expiry !== undefined) need(at < Math.min(expiry, admission.expires_at_ms), "moment_expired", 409);
 			return at;
 		};
-		guard(); need(await store.current(r, action === "send", true), "moment_registration_changed", 403); guard();
+		guard();
+		if (action === "send") { need(r); need(await store.current(r, true, true), "moment_registration_changed", 403); guard(); }
 		const scope = await sha256Hex(event.ha_install_id); guard();
 		const recipient = await sha256Hex(canonical([event.ha_install_id, event.ha_user_hash, event.device_id])); guard();
 		// Registration incarnation deliberately is NOT part of the operation key:
@@ -129,6 +134,7 @@ export function createMomentTransport(ports: MomentPorts) {
 		},
 		async dispatch(value: unknown, signal: AbortSignal): Promise<MomentReceipt> {
 			const p = await prepare(value, "send", signal);
+			const registration = p.admission.registration; need(registration, "moment_recipient", 403);
 			let row = (await store.get(p.key)) ?? await store.publication(p.publicationKey); p.guard();
 			const lease = crypto.randomUUID();
 			if (!row) {
@@ -155,13 +161,13 @@ export function createMomentTransport(ports: MomentPorts) {
 				p.guard(selected.expires_at_ms);
 				const notification = await buildMomentNotification(p.event, p.admission.recipient_binding, selected.expires_at_ms); p.guard(selected.expires_at_ms);
 				need(new TextEncoder().encode(JSON.stringify(notification.payload)).length <= 2048);
-				if (!(await store.mark(selected, p.guard(selected.expires_at_ms), p.admission.registration))) return { ...receipt(p.event, selected), state: "unknown" };
+				if (!(await store.mark(selected, p.guard(selected.expires_at_ms), registration))) return { ...receipt(p.event, selected), state: "unknown" };
 				p.guard(selected.expires_at_ms);
 				const providerSignal = AbortSignal.any([signal, AbortSignal.timeout(Math.max(1, Math.min(10_000, selected.expires_at_ms - p.guard(selected.expires_at_ms))))]);
-				const result = await boundedWork(ports.send(p.admission.registration, notification.payload, {
+				const result = await boundedWork(ports.send(registration, notification.payload, {
 					headers: notification.headers, expiresAt: selected.expires_at_ms, signal: providerSignal,
 					async beforeFetch() {
-						need(await store.current(p.admission.registration, true), "moment_registration_changed", 403); p.guard(selected.expires_at_ms);
+						need(await store.current(registration, true), "moment_registration_changed", 403); p.guard(selected.expires_at_ms);
 						const active = await store.get(p.key); const at = p.guard(selected.expires_at_ms);
 						need(!providerSignal.aborted, "moment_cancelled", 409);
 						need(active?.state === "dispatching" && active.lease_id === selected.lease_id, "moment_conflict", 409);
@@ -178,7 +184,7 @@ export function createMomentTransport(ports: MomentPorts) {
 				else if (retry && selected.attempts < 3 && at + delay < Math.min(selected.expires_at_ms, p.admission.expires_at_ms)) state = "retryable";
 				await store.finish(selected, state, result.status || null, at + delay);
 				if (result.status === 410 || result.reason === "BadDeviceToken" || result.reason === "Unregistered") {
-					p.guard(); const r = p.admission.registration;
+					p.guard(); const r = registration;
 					await ports.db.prepare(`UPDATE registrations SET disabled=1,invalid=1,last_error_code='InvalidWatchToken'
 					 WHERE id=? AND apns_token_hash=? AND ha_install_id=? AND ha_user_hash=? AND device_id=? AND topic=? AND apns_environment=?`)
 						.bind(r.id, r.apns_token_hash, r.ha_install_id, r.ha_user_hash, r.device_id, r.topic, r.apns_environment).run();
