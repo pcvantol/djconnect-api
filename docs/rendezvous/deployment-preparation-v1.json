@@ -64,7 +64,7 @@
   },
   "public_entrypoint": null,
   "reference_hashes": {
-    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+    "wrangler.jsonc": "5c0a0a382d9144271b754397baf3e0def47dcc83acb3a610dc4abbc28ff3b54f",
     ".github/workflows/deploy-api-worker.yml": "8fbfb0ec6d0291af560f353baa9e982c6059c87d948f1e5225201113ae1745db",
     ".github/workflows/api-release-artifact.yml": "b9e52f0c3ca882485fa6fc2c405ff11149d00736118a2a1126d9fb2448830955",
     "docs/rendezvous/implementation-contract-release-v1.json": "189e71aca07ac49cc6f7db225d3acb10a3a9fc357be02a9eaacb8f30a798c596",
@@ -85,13 +85,14 @@
     "docs/rendezvous/native-first-category-source-delta-v1.json": "6c0a6e47f00057881fd4ecdab64c626c91a583617fe5ae6376c62cafbf06960e",
     "docs/rendezvous/private-receiving-mount-source-delta-v1.json": "8d4c6f7343c37bea54ac53709dd49d1c01e28a2d2ebe19a0102448cc7fccc960",
     "coordinator/host-app-wake-receiving/runtime/source-inputs.json": "d8b3977cff475348de7485b0e710f21b45b328bf80150befc956f8de4ec49288",
-    "coordinator/installation-principal/source-manifest.json": "7b45cfc676341688962496ac28b6bf6b764fdd0d78adaf25a6c37df3c561714d",
-    "coordinator/host-app-wake/source-manifest.json": "6638cd1ddb9a0d73b77bf6d52a31a8392273110050ea27e9940879b26d940d99",
-    "coordinator/principal-possession/source-manifest.json": "bb69d593cb396a5200ed6f5abb65fd8f8b56912422a221df5e54608d2ec9eb03",
+    "coordinator/installation-principal/source-manifest.json": "e97590d4ac0461e44fcac1d2c77f7b15587cabb68c90aa23cb33f859bae3b13b",
+    "coordinator/host-app-wake/source-manifest.json": "77a58eef8c8c5148aec6dd9eceffc3c0cf319a4075a2a12f02e416feb7f5d077",
+    "coordinator/principal-possession/source-manifest.json": "123179b51c2fabc0315748b9e94eed47c7f9cb8caad238c8e14769178e80bc82",
     "coordinator/rich-delivery/source-manifest.json": "ddeeae017d9090138451602dd88d0060373d8f99d175f9a3e728118674196810",
-    "coordinator/rich-session/source-manifest.json": "bff9290856f767fe1143f7816f113f07d85da128a64076e60a198171a02e1170",
+    "coordinator/rich-session/source-manifest.json": "2d7ffc98d9698de698077869008c4df07e895ec6235dd8b95474d89d94e79e9a",
     "coordinator/worker-do/source-manifest.json": "a239704b579ce1318e88437271995c9b1d0cb2813ed11fb75321cd6a6460e075",
-    "docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json": "d72223211a34f4556515499ffa4ea6e77ba931cba5b6febf9121d3748f6aeca2"
+    "docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json": "d72223211a34f4556515499ffa4ea6e77ba931cba5b6febf9121d3748f6aeca2",
+    "docs/rendezvous/watch-topic-source-delta-v1.json": "ea503efa3a57c86df670cfe2ab4ca5d02cee1d44e9ffef1446f06b6f177a85af"
   },
   "schema_version": 1,
   "secret_names": [
@@ -174,8 +175,8 @@
     "src/index.ts": "82d971c8ad989cbe00a8406673c99838d72eb9de9451d6ce39dc40e3f1df41c2",
     "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
-    "rendezvous-build-inputs.json": "c7171c36dc32809f3da00aaad53f251c8db5e00325d3ac4f9f0a661d29eb5c9e",
-    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+    "rendezvous-build-inputs.json": "79ef2e847c72d96114355c3b9468a4e7434836401c5f6621d41f1c5ac51521cd",
+    "wrangler.jsonc": "5c0a0a382d9144271b754397baf3e0def47dcc83acb3a610dc4abbc28ff3b54f",
     "package.json": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
     "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
     ".github/workflows/ci-cd.yml": "2cc317e25d159fccf2593143dc8ca6b4bae62f128bdf05bf8db56b74da2c81d2",
@@ -264,7 +265,9 @@
     "private_receiving_mount_delta_sha256": "8d4c6f7343c37bea54ac53709dd49d1c01e28a2d2ebe19a0102448cc7fccc960",
     "private_receiving_mount_source_map_sha256": "b734d7cdb32ef1785d40f3be6c2b6779b5203adf909c8fb4de48c78e12ac7b43",
     "dependency_refresh_delta_sha256": "d72223211a34f4556515499ffa4ea6e77ba931cba5b6febf9121d3748f6aeca2",
-    "dependency_refresh_source_map_sha256": "272aeb7fb48586102d9e5dc6bab70724857539a022e7b2446c4e24ac9e40c1db"
+    "dependency_refresh_source_map_sha256": "272aeb7fb48586102d9e5dc6bab70724857539a022e7b2446c4e24ac9e40c1db",
+    "watch_topic_delta_sha256": "ea503efa3a57c86df670cfe2ab4ca5d02cee1d44e9ffef1446f06b6f177a85af",
+    "watch_topic_source_map_sha256": "e2d62207b25cb2435be51dfcbe5a4ef8a7254b8e4e920b6451ae944b060fec85"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

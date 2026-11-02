@@ -111,6 +111,36 @@ class PreparationTests(unittest.TestCase):
             with self.subTest(mutation=mutation):
                 self.rejects_changed_proof(v.WORKFLOW_DELTA_PATH, changed)
 
+    def test_watch_topic_delta_preserves_history_and_closed_activation(self):
+        before, _ = v.baseline_before_watch_topic()
+        after, _ = v.baseline()
+        self.assertEqual(len(before), len(after))
+        self.assertEqual({k for k in before if before[k] != after[k]}, {'wrangler.jsonc', 'rendezvous-build-inputs.json'})
+        proof = v.pinned_working_proof(v.WATCH_DELTA_PATH, v.WATCH_DELTA_SHA256)
+        self.assertFalse(proof['public_activation_allowed'])
+        self.assertFalse(proof['production_effect_authorized'])
+        self.assertEqual(proof['reference_changes']['wrangler.jsonc'], proof['source_changes']['wrangler.jsonc'])
+
+    def test_watch_topic_delta_rejects_forgery_and_scope_expansion(self):
+        original = v.pinned_working_proof(v.WATCH_DELTA_PATH, v.WATCH_DELTA_SHA256)
+        for mutation in ('scope', 'base_source', 'baseline_source_map_sha256',
+                         'effective_source_map_sha256', 'public_activation_allowed',
+                         'production_effect_authorized', 'extra-source', 'extra-reference',
+                         'missing-source', 'before', 'after', 'reference-before', 'reference-after'):
+            proof = copy.deepcopy(original)
+            if mutation in ('public_activation_allowed', 'production_effect_authorized'):
+                proof[mutation] = True
+            elif mutation == 'scope': proof['scope'] = 'ACTIVATION'
+            elif mutation == 'base_source': proof['base_source'] = 'f' * 40
+            elif mutation.endswith('source_map_sha256'): proof[mutation] = 'f' * 64
+            elif mutation == 'extra-source': proof['source_changes']['src/index.ts'] = {'before': 'a'*64, 'after': 'b'*64}
+            elif mutation == 'extra-reference': proof['reference_changes']['unreviewed.json'] = {'before': 'a'*64, 'after': 'b'*64}
+            elif mutation == 'missing-source': proof['source_changes'] = {}
+            elif mutation in ('before', 'after'): proof['source_changes']['wrangler.jsonc'][mutation] = 'f'*64
+            else: proof['reference_changes']['wrangler.jsonc'][mutation.split('-')[1]] = 'f'*64
+            with self.subTest(mutation=mutation):
+                self.rejects_changed_proof(v.WATCH_DELTA_PATH, proof)
+
     def test_dependency_refresh_is_closed_and_retains_installed_history(self):
         proof = v.pinned_working_proof(v.DEPENDENCY_DELTA_PATH, v.DEPENDENCY_DELTA_SHA256)
         self.assertEqual(len(proof['source_changes']), 6)

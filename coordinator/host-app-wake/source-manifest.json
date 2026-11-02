@@ -24,6 +24,6 @@
     "src/surface-push/crypto.ts": "1b2d5a85c8c8e568668c0239f7b9ab6d59d60ecc6079662a2a82d06bbac5546d",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
-    "worker-configuration.d.ts": "2ec5f6aebdf8f39db18c9f05fa40223a739372802e7b76f1885541146919e13d"
+    "worker-configuration.d.ts": "388f08efd99c9c53e71edfa5b78d7b5c225802d1c415661dc79f060b823ca266"
   }
 }

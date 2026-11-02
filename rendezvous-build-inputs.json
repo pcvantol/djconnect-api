@@ -60,7 +60,7 @@
   },
   "public_activation_allowed": false,
   "base_main_sha": "aab76f7efc3e56faed186369ff7419bea2c96aa2",
-  "base_wrangle_config_sha256": "9e9e83c881d7675329b033000a9f1c08cd59f3a911ea8a7005401a9ab3c5ef18",
+  "base_wrangle_config_sha256": "bea2cd528f2c8331355d1a8077976f4ff6a13bd0be9b21f72ad080d47f96d342",
   "local_test_bindings": {
     "REQUEST_ADMISSION": "RequestAdmission",
     "ADMISSION_STATE": "AllocationBudget",

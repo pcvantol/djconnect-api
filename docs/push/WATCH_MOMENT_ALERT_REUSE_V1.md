@@ -37,6 +37,14 @@ Environment declarations were regenerated with Wrangler's `--include-runtime=fal
 the existing runtime declarations remain unchanged. No toolchain update is part
 of this correction.
 
+The affected standalone source manifests are rebound to the regenerated
+environment declarations. A separately pinned Watch-topic delta extends the
+existing deployment-preparation source chain for the changed configuration and
+manifest references. Historical observations remain intact; source count,
+installed dependency pins, public activation denial and all 22 open operational
+gates are preserved. Negative preparation tests reject additional paths,
+forged prior hashes or an activation grant in this delta.
+
 Topic is persisted in each registration. Changing configuration does not repair
 previous registration rows: an affected device must complete its ordinary
 authenticated registration refresh after deployment. No database rewrite or
