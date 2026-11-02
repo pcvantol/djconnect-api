@@ -55,7 +55,7 @@
   },
   "limits": [
     "Required independent management/operator/install/custody/clock/restore/withdrawal authority is not implemented by this source.",
-    "Production Worker returns503 and production factory throws; no real namespace, numeric limits, management service or live registration selected.",
+    "Closed registry Worker target returns503 and production factory throws; no real namespace, numeric limits, management service or live registration selected.",
     "Synthetic test authority and public possession proof do not establish installation or operator admission.",
     "The historical47stateful design declarations are not claimed executed by these49focused tests.",
     "No genuine process eviction/restore/power-loss/device/native/provider acceptance follows.",
