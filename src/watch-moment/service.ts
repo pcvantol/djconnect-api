@@ -99,7 +99,8 @@ export function createMomentTransport(ports: MomentPorts) {
 		// re-pair/token churn may never turn an old event into a new send attempt.
 		const key = await sha256Hex(canonical([event.ha_install_id, event.ha_user_hash, event.device_id, event.session_id, event.moment_id])); guard();
 		const publicationKey = await sha256Hex(canonical([event.ha_install_id, event.ha_user_hash, event.device_id, event.event_id])); guard();
-		return { event, admission, requestHash, scope, recipient, key, publicationKey, guard };
+		const admissionBinding = await sha256Hex(canonical([admission.recipient_binding, admission.registration_binding])); guard();
+		return { event, admission, requestHash, scope, recipient, key, publicationKey, admissionBinding, guard };
 	}
 	function receipt(event: MomentEvent, row: Operation): MomentReceipt {
 		return { event_id: event.event_id, state: row.state === "reserved" || row.state === "dispatching" ? "unknown" : row.state,
@@ -111,25 +112,25 @@ export function createMomentTransport(ports: MomentPorts) {
 		async status(value: unknown, signal: AbortSignal): Promise<MomentReceipt | null> {
 			const p = await prepare(value, "send", signal), row = (await store.get(p.key)) ?? await store.publication(p.publicationKey); p.guard();
 			if (!row) return null;
-			need(row.request_hash === p.requestHash && row.registration_hash === p.admission.registration_binding, "moment_conflict", 409);
+			need(row.request_hash === p.requestHash && row.registration_hash === p.admissionBinding, "moment_conflict", 409);
 			return receipt(p.event, row);
 		},
 		async cancel(value: unknown, signal: AbortSignal): Promise<MomentReceipt | null> {
 			const p = await prepare(value, "cancel", signal); p.guard();
 			const existing = (await store.get(p.key)) ?? await store.publication(p.publicationKey); p.guard();
-			if (existing) need(existing.request_hash === p.requestHash && existing.registration_hash === p.admission.registration_binding, "moment_conflict", 409);
+			if (existing) need(existing.request_hash === p.requestHash && existing.registration_hash === p.admissionBinding, "moment_conflict", 409);
 			if (!existing) {
 				const row = await store.reserve({ operation_key: p.key, publication_key: p.publicationKey, scope_hash: p.scope, recipient_hash: p.recipient,
-					request_hash: p.requestHash, registration_hash: p.admission.registration_binding,
+					request_hash: p.requestHash, registration_hash: p.admissionBinding,
 					state: "cancelled", created_at_ms: p.event.created_at_ms, expires_at_ms: p.event.expires_at_ms,
 					lease_id: crypto.randomUUID(), attempts: 1, next_attempt_ms: 0, provider_status: null }, limits, true); p.guard();
 				need(row, "moment_capacity", 503);
-				need(row.request_hash === p.requestHash && row.registration_hash === p.admission.registration_binding, "moment_conflict", 409);
+				need(row.request_hash === p.requestHash && row.registration_hash === p.admissionBinding, "moment_conflict", 409);
 			}
-			await store.cancel(p.key, p.requestHash, p.admission.registration_binding); p.guard();
+			await store.cancel(p.key, p.requestHash, p.admissionBinding); p.guard();
 			const row = await store.get(p.key); p.guard();
 			if (!row) return null;
-			need(row.request_hash === p.requestHash && row.registration_hash === p.admission.registration_binding, "moment_conflict", 409);
+			need(row.request_hash === p.requestHash && row.registration_hash === p.admissionBinding, "moment_conflict", 409);
 			return receipt(p.event, row);
 		},
 		async dispatch(value: unknown, signal: AbortSignal): Promise<MomentReceipt> {
@@ -141,12 +142,12 @@ export function createMomentTransport(ports: MomentPorts) {
 				const deadline = Math.min(p.event.expires_at_ms, p.admission.expires_at_ms);
 				const at = p.guard(deadline);
 				row = await store.reserve({ operation_key: p.key, publication_key: p.publicationKey, scope_hash: p.scope, recipient_hash: p.recipient,
-					request_hash: p.requestHash, registration_hash: p.admission.registration_binding,
+					request_hash: p.requestHash, registration_hash: p.admissionBinding,
 					state: "reserved", created_at_ms: at, expires_at_ms: deadline, lease_id: lease,
 					attempts: 1, next_attempt_ms: at, provider_status: null }, limits); p.guard();
 				if (!row) return { event_id: p.event.event_id, state: "capacity", provider_status: null, expires_at_ms: deadline, retry_at_ms: null };
 			}
-			need(row.request_hash === p.requestHash && row.registration_hash === p.admission.registration_binding, "moment_conflict", 409);
+			need(row.request_hash === p.requestHash && row.registration_hash === p.admissionBinding, "moment_conflict", 409);
 			need(p.guard() >= row.created_at_ms, "moment_clock", 503);
 			if (row.state === "retryable" && row.attempts < 3) {
 				const at = p.guard();

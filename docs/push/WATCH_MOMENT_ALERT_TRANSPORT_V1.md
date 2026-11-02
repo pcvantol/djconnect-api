@@ -46,7 +46,9 @@ revocation, cancellation and local clock rollback deny new effects.
 `store.ts` uses actual SQLite conditional writes and unique original identities.
 Both original Session/Moment and publication ID are fenced per recipient. A new
 event ID, expiry, destination or registration incarnation cannot manufacture a
-retry. Only one reservation/CAS owner can send. A reconstructed service observes
+retry. The stored admission hash also retains the original recipient/Profile
+scope, even when the native registration itself remains unchanged.
+Only one reservation/CAS owner can send. A reconstructed service observes
 the same durable outcome. In-flight or uncertain outcomes never cause automatic
 resending. Known 429/5xx rejection may retry at most three total attempts, with
 the original deadline and provider backoff. A provider delay beyond that deadline

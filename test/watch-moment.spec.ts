@@ -15,7 +15,7 @@ const key = btoa("0123456789abcdef0123456789abcdef");
 const event = (overrides: Partial<MomentEvent> = {}): MomentEvent => ({ ...proposal.shared_synthetic_fixture.event,
 	version: VERSION, event_type: "dj_moment_published", ...overrides });
 let registration: Registration;
-let now: number, allowed: boolean, admittedUntil: number, eligibleSince: number, registrationBinding: string;
+let now: number, allowed: boolean, admittedUntil: number, eligibleSince: number, registrationBinding: string, recipientBinding: string;
 let publications: Map<string, string>;
 const publish = (overrides: Partial<MomentEvent> = {}) => {
 	const value = event({ ...(overrides.event_id ? { moment_id: "moment-" + overrides.event_id } : {}), ...overrides });
@@ -27,7 +27,7 @@ function setup(overrides: Partial<MomentPorts> = {}) {
 	const ports: MomentPorts = { db: env.DB, now: () => now,
 		async admit(e) {
 			if (publications.get(e.event_id) !== canonical(e)) throw Error("synthetic publication not admitted");
-			return { event_hash: await sha256Hex(canonical(e)), recipient_binding: "b".repeat(64),
+			return { event_hash: await sha256Hex(canonical(e)), recipient_binding: recipientBinding,
 				registration_binding: registrationBinding, eligible_since_ms: eligibleSince,
 				expires_at_ms: admittedUntil, registration };
 		},
@@ -46,6 +46,7 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 	beforeEach(async () => {
 		await env.DB.exec("DELETE FROM watch_moment_operations; DELETE FROM registrations");
 		now = NOW; allowed = true; eligibleSince = NOW - 1000; admittedUntil = NOW + 60_000; registrationBinding = "c".repeat(64); publications = new Map();
+		recipientBinding = "b".repeat(64);
 		const encrypted = await encryptSecret("e".repeat(64), key);
 		registration = { id: "example-registration", ha_install_id: "example-install", ha_user_hash: "a".repeat(64), device_id: "example-watch", client_type: "watchos",
 			apns_token_hash: await sha256Hex("e".repeat(64)), apns_token: null, apns_token_ciphertext: encrypted.ciphertext, apns_token_nonce: encrypted.nonce,
@@ -190,6 +191,11 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 	it("does not rebind an operation after token/registration incarnation changes", async () => {
 		const { service, send } = setup(), e = publish(); await service.dispatch(e, signal()); registrationBinding = "f".repeat(64);
 		await expect(service.dispatch(e, signal())).rejects.toThrow("moment_conflict"); expect(send).toHaveBeenCalledOnce();
+	});
+	it("does not rebind a retry to a changed recipient/Profile scope with the same native registration", async () => {
+		const sender = vi.fn(async () => ({ status: 503 })), { service } = setup({ send: sender }), e = publish();
+		await service.dispatch(e, signal()); recipientBinding = "f".repeat(64); now += 2000;
+		await expect(service.dispatch(e, signal())).rejects.toThrow("moment_conflict"); expect(sender).toHaveBeenCalledOnce();
 	});
 	it("keeps pre-arrival cancellation tombstones and supports withdrawal after opt-out", async () => {
 		const { service, send } = setup(), e = publish(); allowed = false; registration.disabled = 1; registration.categories_json = "[]";
