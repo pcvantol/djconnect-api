@@ -1,0 +1,31 @@
+{
+  "classification": "CLOSED_INSTALLATION_REGISTRY_SOURCE_ONLY",
+  "parent": "13cb4f3ef82e16e6f4998f68cd5d867fdf8fc1c5",
+  "design_sha256": "7b44758c5f7bba76dd3f61b042a776330ee25697523d3bd05248a5697f76db4b",
+  "esbuild_version": "0.28.1",
+  "wrangler_version": "4.154.0",
+  "wrangler_schema_sha256": "c860b006a33f3bfa669eb72c600daa8ca36a1b338159413df847a52d775e851c",
+  "inputs_sha256": {
+    ".github/workflows/installation-registry-transactions.yml": "ec1bd686c7b8c2787faea46db81743220e00fd102f2279bba745000a1a95c46b",
+    "coordinator/installation-principal/codec-data.ts": "e97325cd2e36a2c9c0e06fbc1f3891dd9b38542b84c5f6214cc10182c468e158",
+    "coordinator/installation-principal/design-r2.json": "7b44758c5f7bba76dd3f61b042a776330ee25697523d3bd05248a5697f76db4b",
+    "coordinator/installation-principal/qualification/expired-synthetic-records.json": "5a5eb360c21aaf8da7f7883c4bd9c1e6b05f4d9e62d149eaec25b39045470153",
+    "coordinator/installation-principal/schema-data.json": "2075aa2c7518cd7232e0e5de8b437270887ea6a0831dd8957f47ecd91ddf5258",
+    "coordinator/installation-registry/README.md": "af56ec6e33605f6250b3eb87b5429fbb658df69b11cb860edbb911d584703375",
+    "coordinator/installation-registry/build-source.mjs": "186b0c5d0be3781f9170c8cadddd68257a55fd89c20a031e4b539f1db97b95b1",
+    "coordinator/installation-registry/qualification/check-package.mjs": "70ab514ea0542c496bb4ac56d42c2c0e2469a97e2911cd2de2444b422e31babc",
+    "coordinator/installation-registry/qualification/fixtures.ts": "fa24a288d7a63bb7184fda9473fc2847e0753107b2a1b3a04e42c32934941e5f",
+    "coordinator/installation-registry/qualification/registry.check.ts": "8f53c7da322620434530cc9480a94e5f9d45a73999e1e217f629d68d6802725a",
+    "coordinator/installation-registry/qualification/tsconfig.json": "f1c305747173bfcb87d3251b6e70c4269792ae33f0079724690c4cbcb4c7a4dd",
+    "coordinator/installation-registry/qualification/vitest.config.mts": "470ee297a63e88f6c428860a3fd31e55a6853a2587f4bec10bf8f5446e81d158",
+    "coordinator/installation-registry/qualification/worker.ts": "5dadb0cbe3c54c99416fc2a00f0bd3b7906b77ba6f4f37de521a3d5c815c2360",
+    "coordinator/installation-registry/qualification/wrangler.jsonc": "22920eee4ab09cbf31cd7dc6cc234ae0112c8ee23129f4005fbf7335364b3b97",
+    "coordinator/installation-registry/registry.ts": "b72c478f6fe2edf39946c49d0a0c7409055dcd4c836745db3ee44212128c630c",
+    "coordinator/installation-registry/worker.ts": "9d793d7693bed6848ecc4d90ab3d1a9691b5431d9f22a36a2c5a91e71343fcf7",
+    "coordinator/principal-possession/possession-data.ts": "bca90cf8cafa4200fa7495b3d28fda37c10a4b94031b4c39317add9f82c9687d",
+    "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
+    "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
+    "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
+    "worker-configuration.d.ts": "2ec5f6aebdf8f39db18c9f05fa40223a739372802e7b76f1885541146919e13d"
+  }
+}
