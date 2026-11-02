@@ -18,7 +18,8 @@ const testEnv = {
 	APNS_PRIVATE_KEY: "",
 	APNS_TOPIC_IOS: "dev.djconnect.ios",
 	APNS_TOPIC_MACOS: "dev.djconnect.mac",
-	APNS_TOPIC_WATCHOS: "dev.djconnect.watch",
+	// Exercise the shipping config instead of masking a wrong Watch topic in fixtures.
+	APNS_TOPIC_WATCHOS: env.APNS_TOPIC_WATCHOS,
 	APNS_ENVIRONMENT: "sandbox",
 	APNS_TOKEN_ENCRYPTION_KEY: EXAMPLE_APNS_TOKEN_ENCRYPTION_KEY,
 	DJCONNECT_RELAY_SECRET: EXAMPLE_RELAY_SECRET,
@@ -832,6 +833,7 @@ describe("DJConnect API worker", () => {
 		await registerDevice(installAuth, {
 			device_id: "example-watchos-device",
 			client_type: "watchos",
+			app_bundle_id: "dev.djconnect.ios.watch",
 			apns_token: "example-watchos-apns-token",
 			apns_environment: "production",
 		});
@@ -853,7 +855,7 @@ describe("DJConnect API worker", () => {
 		]);
 		expect(fetchMock.mock.calls.map((call) => (call[1]?.headers as Record<string, string>)["apns-topic"])).toEqual([
 			"dev.djconnect.ios",
-			"dev.djconnect.watch",
+			"dev.djconnect.ios.watch",
 		]);
 	});
 

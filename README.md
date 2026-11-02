@@ -193,7 +193,7 @@ Non-secret APNs defaults are in `wrangler.jsonc`:
 - `APNS_KEY_ID=929NDF6UYK`
 - `APNS_TOPIC_IOS=dev.djconnect.ios`
 - `APNS_TOPIC_MACOS=dev.djconnect.mac`
-- `APNS_TOPIC_WATCHOS=dev.djconnect.watch`
+- `APNS_TOPIC_WATCHOS=dev.djconnect.ios.watch`
 - `APNS_ENVIRONMENT=sandbox`
 
 Keep `APNS_ENVIRONMENT=sandbox` for development/TestFlight sandbox testing.
