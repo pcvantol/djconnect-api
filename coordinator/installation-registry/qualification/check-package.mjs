@@ -1,0 +1,34 @@
+// Exercise the actually delivered ESM against real Node SQLite, not a copied implementation.
+import {readFile,writeFile} from 'node:fs/promises';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import {DatabaseSync} from 'node:sqlite';
+import assert from 'node:assert/strict';
+const out=process.argv[2],sha=b=>createHash('sha256').update(b).digest('hex');
+const proof=JSON.parse(await readFile(join(out,'source-package.json')));
+assert.equal(sha(await readFile(join(out,'registry.mjs'))),proof.module_sha256);
+assert.equal(sha(await readFile(join(out,'fixture.mjs'))),proof.public_fixture_module_sha256);
+const {InstallationRegistry,CLASSIFICATION}=await import(pathToFileURL(join(out,'registry.mjs')));
+const {fixture}=await import(pathToFileURL(join(out,'fixture.mjs')));
+assert.equal(CLASSIFICATION,'INSTALLATION_REGISTRY_TRANSACTION_DATA_ONLY');
+const f=await fixture(),db=new DatabaseSync(':memory:');
+const storage={sql:{exec(sql,...args){if(!args.length&&sql.includes(';')){db.exec(sql);return{toArray:()=>[]};}const result=db.prepare(sql).all(...args);return{toArray:()=>result};}},
+ transactionSync(fn){db.exec('BEGIN IMMEDIATE');try{const result=fn();db.exec('COMMIT');return result;}catch(e){db.exec('ROLLBACK');throw e;}},sync:async()=>{}};
+const registry=new InstallationRegistry(storage,{assertOriginal(){}},f.identity,f.restore),signal=new AbortController().signal;
+await registry.initialize(1,6,signal);
+assert.equal(JSON.parse(await registry.prepare(f.prepare,signal)).status.outcome.tag,'RESERVED');
+assert.equal(db.prepare('SELECT count(*) AS n FROM ir_claims').get().n,3);
+assert.equal(JSON.parse(await registry.admit(f.admit,signal)).status.outcome.tag,'COMMITTED');
+assert.equal((await registry.readPrincipal(f.prepare,signal)).classification,'INSTALLATION_PRINCIPAL_DATA_ONLY');
+await assert.rejects(registry.admit(f.admit,signal));
+assert.equal(JSON.parse(await registry.withdrawOriginal(f.withdraw,signal)).status.outcome.tag,'COMMITTED');
+assert.equal(JSON.parse(await registry.status(f.operation,f.proofHash,'registry_admission',signal)).status.outcome.tag,'RETIRED');
+await assert.rejects(registry.readPrincipal(f.prepare,signal));
+assert.equal(db.prepare('SELECT count(*) AS n FROM ir_claims').get().n,6);
+assert.equal(db.prepare('SELECT state_revision FROM ir_meta').get().state_revision,2);
+assert.equal(db.prepare('SELECT count(*) AS n FROM ir_retired').get().n,1);
+assert.equal(JSON.parse(await registry.withdrawOriginal(f.withdraw,signal)).status.outcome.tag,'COMMITTED');
+db.close();
+const result={module_sha256:proof.module_sha256,actual_packaged_module:true,real_node_sqlite:true,actual_public_verify:true,synthetic_authority:true,principal_authority:false,key_generation:false,signing_api:false,deployed:false};
+await writeFile(join(out,'package-check.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
