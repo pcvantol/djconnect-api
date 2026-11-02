@@ -34,7 +34,7 @@ export interface MomentReceipt {
 	retry_at_ms: number | null;
 }
 const hex = (v: unknown) => typeof v === "string" && /^[a-f0-9]{64}$/.test(v);
-async function boundedWork<T>(work: Promise<T>, signal: AbortSignal): Promise<T> {
+export async function boundedWork<T>(work: Promise<T>, signal: AbortSignal): Promise<T> {
 	let abort: (() => void) | undefined;
 	const cancelled = new Promise<never>((_resolve, reject) => {
 		abort = () => reject(new Error("moment_work_cancelled"));

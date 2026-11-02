@@ -5,6 +5,12 @@ The existing relay, D1 database, encrypted tokens and provider key path are reus
 No Worker endpoint imports this candidate yet; no migration, registration,
 provisioning, provider call or production activation is supplied by its tests.
 
+`http.ts` supplies bounded POST send/status/cancel handling and safe no-store
+receipts. A mandatory server verifier binds each request to its genuine actor
+and supplies fresh authority ports. It receives the original bounded body bytes
+for the actual selected signature scheme. There is no default verifier or URI;
+the root Worker does not invoke this handler.
+
 The [single proposed contract and shared fixture](watch-moment-alert-proposal-v1.json)
 are explicitly awaiting Core/Apple adoption. The fixture is expired synthetic
 test data, not a genuine publication, permission or native registration receipt.
@@ -79,7 +85,7 @@ the notification timestamp neither grants access nor changes content retention.
 Core/Apple must adopt the same pinned fixture or identify concrete corrections.
 Core must supply the actual original publication/current recipient authority;
 Apple must adopt the notification category/preference and exact cold-start-open
-decoder/detail read. Only then can API complete the thin authenticated assembly,
+decoder/detail read. Only then can API bind the genuine verifier and root assembly,
 select and migrate the existing database schema through the normal protected
 deployment procedure, and qualify a concrete test plan. No inferred permission
 tuple or fake native key is an acceptable substitute.

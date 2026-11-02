@@ -48,7 +48,7 @@ export function decodeEvent(value: unknown): Readonly<MomentEvent> {
 }
 
 /** Strict, duplicate-key rejecting, byte- and time-bounded read; no token/content fields. */
-export async function readEvent(request: Request): Promise<Readonly<MomentEvent>> {
+export async function readEnvelope(request: Request): Promise<{event: Readonly<MomentEvent>; bytes: Uint8Array}> {
 	need(request.headers.get("content-type")?.trim().toLowerCase() === "application/json", "moment_media", 415);
 	need(!request.headers.has("content-encoding"));
 	const reader = request.body?.getReader(); need(reader);
@@ -66,7 +66,9 @@ export async function readEvent(request: Request): Promise<Readonly<MomentEvent>
 		}
 		const bytes = new Uint8Array(size); let at = 0;
 		for (const chunk of chunks) { bytes.set(chunk, at); at += chunk.length; }
-		try { return decodeEvent(parseStrictJson(new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes))); }
+		try { return { event: decodeEvent(parseStrictJson(new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes))), bytes }; }
 		catch (e) { if (e instanceof MomentError) throw e; throw new MomentError("moment_json"); }
 	} finally { signal.removeEventListener("abort", abort); void reader.cancel().catch(() => {}); }
 }
+
+export async function readEvent(request: Request): Promise<Readonly<MomentEvent>> { return (await readEnvelope(request)).event; }

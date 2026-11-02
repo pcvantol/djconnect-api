@@ -7,6 +7,8 @@ import { existingRelaySender, type Sender } from "../src/watch-moment/relay";
 import { createMomentTransport, type Admission, type MomentPorts } from "../src/watch-moment/service";
 import { canonical, CATEGORY, decodeEvent, readEvent, VERSION, type MomentEvent } from "../src/watch-moment/wire";
 import type { AppEnv, Registration } from "../src/types";
+import { createMomentHttpHandler } from "../src/watch-moment/http";
+import { MomentError } from "../src/watch-moment/wire";
 import proposal from "../docs/push/watch-moment-alert-proposal-v1.json";
 
 const NOW = proposal.shared_synthetic_fixture.now_ms;
@@ -306,5 +308,32 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 	it("does not treat a rejected async final-authority guard as a valid authority", async () => {
 		const { service, send } = setup({ assertCurrent: (() => Promise.reject(new Error("synthetic rejected authority"))) as unknown as MomentPorts["assertCurrent"] });
 		await expect(service.dispatch(publish(), signal())).rejects.toThrow("moment_authority"); expect(send).not.toHaveBeenCalled();
+	});
+	it("binds HTTP authentication to original bounded bytes and returns a safe exact receipt", async () => {
+		const e = publish(), raw = JSON.stringify(e, null, 2), base = setup(); let checked = 0;
+		const handle = createMomentHttpHandler(async (req, value, action, bytes) => {
+			expect(req.headers.get("authorization")).toBe("Bearer example-core-request");
+			expect(action).toBe("send"); expect(value).toEqual(e); expect(new TextDecoder().decode(bytes)).toBe(raw); checked++; return base.ports;
+		});
+		const response = await handle(new Request("https://example.invalid/", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer example-core-request" }, body: raw }), "send");
+		expect(response.status).toBe(200); expect(checked).toBe(1); expect(response.headers.get("cache-control")).toBe("no-store");
+		expect(await response.json()).toEqual({ version: VERSION, event_id: e.event_id, state: "provider_accepted", provider_status: 200, transport_expires_at_ms: e.expires_at_ms, retry_at_ms: null });
+	});
+	it("denies an unauthenticated HTTP sender without admitting or sending anything", async () => {
+		const base = setup(), admit = vi.spyOn(base.ports, "admit");
+		const handle = createMomentHttpHandler(async () => { throw new MomentError("moment_auth_required", 401); });
+		const response = await handle(new Request("https://example.invalid/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(publish()) }), "send");
+		expect(response.status).toBe(401); expect(admit).not.toHaveBeenCalled(); expect(base.send).not.toHaveBeenCalled();
+	});
+	it("does not expose supplier errors or private data in HTTP failure receipts", async () => {
+		const handle = createMomentHttpHandler(async () => { throw Error("example-private-supplier-value"); });
+		const response = await handle(new Request("https://example.invalid/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(publish()) }), "send");
+		expect(response.status).toBe(503); expect(await response.json()).toEqual({ version: VERSION, error: "moment_unavailable" });
+	});
+	it("rejects unsupported HTTP methods and oversized frames before supplier work", async () => {
+		const auth = vi.fn(async () => setup().ports), handle = createMomentHttpHandler(auth);
+		expect((await handle(new Request("https://example.invalid/"), "send")).status).toBe(405);
+		expect((await handle(new Request("https://example.invalid/", { method: "POST", headers: { "content-type": "application/json" }, body: " ".repeat(2049) }), "send")).status).toBe(413);
+		expect(auth).not.toHaveBeenCalled();
 	});
 });

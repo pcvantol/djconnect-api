@@ -2,4 +2,5 @@
 export { createMomentTransport, type Admission, type MomentPorts, type MomentReceipt } from "./service";
 export { existingRelaySender } from "./relay";
 export { buildMomentNotification } from "./payload";
-export { VERSION, CATEGORY, decodeEvent, readEvent, canonical } from "./wire";
+export { createMomentHttpHandler, type AuthenticatedPorts } from "./http";
+export { VERSION, CATEGORY, MomentError, decodeEvent, readEvent, canonical } from "./wire";
