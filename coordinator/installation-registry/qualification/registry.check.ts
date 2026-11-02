@@ -116,9 +116,14 @@ it('successors cannot skip epochs even with an independently accepted new revisi
  expect(await rows(s,'ir_claims')).toHaveLength(6);
 });
 
-it('global nonce claims reject another otherwise valid principal without partial reservation',async()=>{
+it.each(['nonce','challenge'] as const)('global %s claims reject another otherwise valid principal without partial reservation',async namespace=>{
  const {s,f}=await setup();await prepare(s,f);
- const other=await fixture(1,{principalID:'fixture-other'}); // Same original operation/challenge/nonce, different complete signed chain.
+ const context=JSON.parse(f.chain.context);
+ const other=await fixture(2,{principalID:'fixture-other',...(namespace==='nonce'?{nonce:context.challenge_nonce_sha256}:{challengeID:context.challenge_id})});
+ expect(other.operation).not.toBe(f.operation);
+ const otherContext=JSON.parse(other.chain.context);
+ if(namespace==='nonce')expect(otherContext.challenge_id).not.toBe(context.challenge_id);
+ else expect(otherContext.challenge_nonce_sha256).not.toBe(context.challenge_nonce_sha256);
  await expect(prepare(s,other)).rejects.toThrow();
  expect(await rows(s,'ir_intents')).toHaveLength(1);
  expect(await rows(s,'ir_claims')).toHaveLength(3);

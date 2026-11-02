@@ -92,7 +92,7 @@ is not proof of real process eviction/restart, remote restoration or power-loss
 filesystem durability. The delivered ESM also runs against actual Node SQLite with
 real public WebCrypto verification; that packaging check uses synthetic authority.
 Earlier private47/48 declarative design cases are not claimed as executed by this
-new focused suite. The current focused suite has48 executed workerd cases,
+new focused suite. The current focused suite has49 executed workerd cases,
 including explicit successor epoch/revision, old-withdrawal isolation and global
 claim conflicts. The existing root API suite has40 passing cases. Dedicated
 registry and root strict types pass, as does the actual delivered ESM on Node

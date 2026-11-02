@@ -9,13 +9,13 @@ const record=(k:keyof typeof original.records)=>JSON.parse(original.records[k].c
 /** Expired synthetic DATA only. Original independent fixture is never edited.
  * Fixed PUBLIC insecure scalar/nonce=1 arithmetic, as existing source168 vectors.
  * No private CryptoKey, randomness, generateKey or sign API is used. */
-export async function fixture(id=1, state:{principalID?:string;principalEpoch?:number;revision?:number}={}){
+export async function fixture(id=1, state:{principalID?:string;principalEpoch?:number;revision?:number;challengeID?:string;nonce?:string}={}){
  const generation=original.records.custody_generation_preparation.canonical;
  const receipt=original.records.custody_public_receipt.canonical;
  const subjectValue={...record('installation_principal_subject'),principal_id:state.principalID??`fixture-principal-${id}`,principal_epoch:state.principalEpoch??1};
  const subject=canonical(subjectValue),subjectHash=(await decodeRecord(subject,'installation_principal_subject')).digest;
  const contextValue={...record('bootstrap_admission_context'),subject_sha256:subjectHash,expected_registry_revision:state.revision??0,
-  registration_operation_id:U(id*100+2),challenge_id:U(id*100+3),challenge_nonce_sha256:H(id*100+4)};
+  registration_operation_id:U(id*100+2),challenge_id:state.challengeID??U(id*100+3),challenge_nonce_sha256:state.nonce??H(id*100+4)};
  const context=canonical(contextValue),contextHash=(await decodeRecord(context,'bootstrap_admission_context')).digest;
  const bodyValue={...JSON.parse(original.R1.canonical),principal_id:subjectValue.principal_id,principal_epoch:subjectValue.principal_epoch,expected_registry_revision:contextValue.expected_registry_revision,
   registration_operation_id:contextValue.registration_operation_id,challenge_id:contextValue.challenge_id,challenge_nonce_sha256:contextValue.challenge_nonce_sha256,
