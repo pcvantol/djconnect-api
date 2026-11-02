@@ -17,8 +17,8 @@
     "src/watch-moment/wire.ts"
   ],
   "inputs_sha256": {
-    "docs/push/WATCH_MOMENT_ALERT_TRANSPORT_V1.md": "fec5bfed015218d54eaf266d19289ccf143ff7d2796763a05e3b1e57673e0506",
-    "docs/push/watch-moment-alert-proposal-v1.json": "66fd328bb5f334ac07aa1f947ffcb9f751d7c92dfb7a7bd1e47e18bca6f9b4a2",
+    "docs/push/WATCH_MOMENT_ALERT_TRANSPORT_V1.md": "c2816ed4d3b5dac7596f45bf92384211b2b200cc4f9a0977bb912804a695ee54",
+    "docs/push/watch-moment-alert-proposal-v1.json": "236f9a840015463e8d2f6962c7f759bb6bc24999c373ec697a076b9632da982c",
     "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
     "package.json": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
     "qualification/watch-moment/build-source.mjs": "aea682510b1d45bf736258775c7255e30ec6aab6db8c9d71311047d1211d4620",
@@ -32,13 +32,13 @@
     "src/types.ts": "d1200cffd65c9d026563cfa7688f7351b6d58d27ee79bb145d29d4006f2e7bd9",
     "src/validation.ts": "2fad4e70fb69b073f838b5233497efca4774f718ae930b9d29a1e270367d275b",
     "src/watch-moment/index.ts": "2692480ee124c7e2b0fd2173fd359aea145038d464f3304eef5b878bb540fe7d",
-    "src/watch-moment/payload.ts": "74e40014b68f9595dbc16b4d2f7a4ed0f62e8f75e45a5a18884ad5f22c6c57d3",
-    "src/watch-moment/relay.ts": "2192da90e1b7ab6555ce4afcce7ac7972ce0f1d9806fa81e053dff0df5c81578",
+    "src/watch-moment/payload.ts": "1f86511528493ccd9f1472f0192ea6e89d2e139641e9235bb1a3f3978e4dafd8",
+    "src/watch-moment/relay.ts": "cd1054fe745ca749baaa3f1f7bd7324a8e4a92d03f90f94d920cc8fba88c8bad",
     "src/watch-moment/schema.sql": "5085069dd97cf0eefc53a8c84272ffb3e089fd88be1b59093c804ff8eb389431",
     "src/watch-moment/service.ts": "d1c22df527d001294f8543d80ac1fbed498882e0023161b764deb31eb6754be4",
     "src/watch-moment/store.ts": "09239829c8f8b91afd5af80edb0e1a13ed3b26351dac7a5de3368ae146979c0e",
     "src/watch-moment/wire.ts": "c9dab8c50327668214fb5ecb8c69095970bfda3c7e6209fb85660dc60f8dc5fb",
-    "test/watch-moment.spec.ts": "1b3a96513d7ac4d73daef3aeef821deb5acf75e460ed0c5786b8538ef09bdd3c",
+    "test/watch-moment.spec.ts": "48c825d63bb45a2847a51ad9c371cc8113b8db29df50b4033b7b0185eb46c251",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "worker-configuration.d.ts": "388f08efd99c9c53e71edfa5b78d7b5c225802d1c415661dc79f060b823ca266",
     ".github/workflows/watch-moment-alert-source.yml": "304e1144828089e32e89995e84d12977dcda57dc64c6dcbfc79d1b019bc94536"

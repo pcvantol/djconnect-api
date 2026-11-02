@@ -55,12 +55,17 @@ Exhaustion is reported as unavailable rather than dropping original outcomes.
 Provider-invalid token updates are conditional on the exact old token/owner/
 device/topic/environment, so a late callback cannot disable a replacement.
 
-`relay.ts` wraps the existing `sendApns` implementation. It keeps provider signing
-and token decryption in that path, adds bounded cancellation/deadline handling,
-alert priority, original expiry and per-publication collapse identity, and never
-changes sandbox to production. Session grouping and retry collapse remain distinct.
+`relay.ts` wraps the existing `sendApns` implementation. It reuses provider signing
+and token decryption, checks the decrypted token against the actual registration
+hash and fixed APNs destination, then performs its final handoff check. It adds
+bounded cancellation, alert priority, original expiry and per-publication collapse
+identity. It preserves the registered environment. Session grouping and retry
+collapse remain distinct.
 Provider acceptance is recorded as `provider_accepted`, never as device delivery.
 The synthetic example-token smoke shortcut is disabled for this candidate.
+`transport_expires_at_ms` describes this send window. Apple must use Core's normal
+authorized detail read to establish whether retained content remains available;
+the notification timestamp neither grants access nor changes content retention.
 
 ## Remaining integration and acceptance
 

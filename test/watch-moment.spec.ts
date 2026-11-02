@@ -48,7 +48,7 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 		now = NOW; allowed = true; eligibleSince = NOW - 1000; admittedUntil = NOW + 60_000; registrationBinding = "c".repeat(64); publications = new Map();
 		const encrypted = await encryptSecret("e".repeat(64), key);
 		registration = { id: "example-registration", ha_install_id: "example-install", ha_user_hash: "a".repeat(64), device_id: "example-watch", client_type: "watchos",
-			apns_token_hash: "d".repeat(64), apns_token: null, apns_token_ciphertext: encrypted.ciphertext, apns_token_nonce: encrypted.nonce,
+			apns_token_hash: await sha256Hex("e".repeat(64)), apns_token: null, apns_token_ciphertext: encrypted.ciphertext, apns_token_nonce: encrypted.nonce,
 			apns_token_key_version: encrypted.keyVersion, apns_environment: "sandbox", topic: "dev.djconnect.ios.watch", app_bundle_id: "dev.djconnect.ios.watch",
 			app_version: "example", locale: "nl-NL", categories_json: JSON.stringify([CATEGORY]), disabled: 0, invalid: 0,
 			created_at: "example", updated_at: "example", last_success_at: null, last_error_code: null };
@@ -67,6 +67,7 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 		const expected = proposal.shared_synthetic_fixture.expected_notification;
 		expect(body).toMatchObject({ aps: { alert: { title: expected.title, body: expected.body } },
 			open_target: expected.open_target, session_id: expected.session_id, moment_id: expected.moment_id });
+		expect(body).toEqual(proposal.shared_synthetic_fixture.expected_apns.body);
 		for (const privateField of ["ha_install_id", "ha_user_hash", "device_id", "token", "text", "audio", "artwork", "url"]) expect(body).not.toHaveProperty(privateField);
 		expect(r).not.toHaveProperty("delivered");
 	});
@@ -248,6 +249,10 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 		const token = h.get("authorization")!.slice("bearer ".length).split(".");
 		const bytesOf = (v: string) => Uint8Array.from(atob(v.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
 		expect(await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pair.publicKey, bytesOf(token[2]!), new TextEncoder().encode(token.slice(0, 2).join(".")))).toBe(true);
+		registration.apns_token_hash = "f".repeat(64);
+		await env.DB.prepare("UPDATE registrations SET apns_token_hash=? WHERE id=?").bind(registration.apns_token_hash, registration.id).run();
+		expect((await service.dispatch(publish({ event_id: "mismatched-token" }), signal())).state).toBe("unknown");
+		expect(fetcher).toHaveBeenCalledOnce();
 	});
 	it.each(["url", "audio", "text", "token", "open_target", "external_relay"])("rejects unknown/private wire field %s", field => {
 		expect(() => decodeEvent({ ...event(), [field]: "example" })).toThrow("moment_invalid");

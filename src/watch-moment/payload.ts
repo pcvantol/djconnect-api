@@ -19,7 +19,7 @@ export async function buildMomentNotification(event: MomentEvent, recipientBindi
 		aps: { alert: { title: `DJConnect · ${title}`, body }, sound: "default", category: "DJCONNECT_MOMENT_V1", "thread-id": thread },
 		version: event.version, event_type: event.event_type, event_id: event.event_id,
 		open_target: "dj_moment", session_id: event.session_id, moment_id: event.moment_id,
-		expires_at_ms: expiresAt,
+		transport_expires_at_ms: expiresAt,
 	};
 	return { payload, headers: { "apns-collapse-id": collapse, "apns-expiration": String(Math.floor(expiresAt / 1000)), "apns-priority": "10" } };
 }

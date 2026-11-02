@@ -7,7 +7,10 @@
   "source_reuse": {
     "publication": "session_runtime.DJBroadcast.publish_moment -> dj_moment_published; duplicate Moment IDs are already refused",
     "original_clocks": "native_moment_delivery.MomentDeliveryBoundary; do not use read/reconnect time",
-    "detail_identity": ["session_id", "moment_id"],
+    "detail_identity": [
+      "session_id",
+      "moment_id"
+    ],
     "detail_endpoint": "NOT_SELECTED_OR_CLAIMED_AVAILABLE",
     "transport": "Existing API src/apns.ts; existing encrypted Watch registration; fixed topic dev.djconnect.ios.watch"
   },
@@ -53,6 +56,36 @@
       "open_target": "dj_moment",
       "session_id": "example-session",
       "moment_id": "example-moment"
+    },
+    "recipient_binding_example": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "expected_apns": {
+      "environment": "sandbox",
+      "headers": {
+        "apns-topic": "dev.djconnect.ios.watch",
+        "apns-push-type": "alert",
+        "apns-priority": "10",
+        "apns-expiration": "1700000060",
+        "apns-collapse-id": "56657ab8e604101c98ba79374d567980df26f9ac9504841ac0c16f5fc38f2383",
+        "content-type": "application/json"
+      },
+      "body": {
+        "aps": {
+          "alert": {
+            "title": "DJConnect · Nieuw DJ Moment",
+            "body": "Je DJ heeft iets nieuws voor je."
+          },
+          "sound": "default",
+          "category": "DJCONNECT_MOMENT_V1",
+          "thread-id": "5d84c564e8075d13b29719317a71b2f73df2705aa673eccea3125f9779f9936c"
+        },
+        "version": "djc-watch-moment/1",
+        "event_type": "dj_moment_published",
+        "event_id": "example-publication-1",
+        "open_target": "dj_moment",
+        "session_id": "example-session",
+        "moment_id": "example-moment",
+        "transport_expires_at_ms": 1700000060000
+      }
     }
   },
   "production_endpoint": null,

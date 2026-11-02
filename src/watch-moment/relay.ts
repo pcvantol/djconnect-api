@@ -1,4 +1,5 @@
 import { sendApns, type Fetcher } from "../apns";
+import { sha256Hex } from "../crypto";
 import type { AppEnv, Registration } from "../types";
 import { need } from "./wire";
 
@@ -15,6 +16,12 @@ export function existingRelaySender(env: AppEnv, now: () => number, fetcher: Fet
 	return async (registration, payload, context) => {
 		let retryAfterMs: number | undefined;
 		const bounded: Fetcher = async (input, init) => {
+			const url = new URL(input instanceof Request ? input.url : String(input));
+			const expected = registration.apns_environment === "sandbox" ? "https://api.sandbox.push.apple.com" : "https://api.push.apple.com";
+			need(url.origin === expected && !url.search && !url.hash && !url.username && !url.password, "moment_provider_target", 503);
+			const token = url.pathname.slice("/3/device/".length);
+			need(url.pathname.startsWith("/3/device/") && /^(?:[a-fA-F0-9]{2}){16,2048}$/.test(token), "moment_provider_target", 503);
+			need(await sha256Hex(token) === registration.apns_token_hash, "moment_token_binding", 503);
 			const admittedAt = await context.beforeFetch();
 			need(Number.isSafeInteger(admittedAt), "moment_clock", 503);
 			const remaining = context.expiresAt - admittedAt;
