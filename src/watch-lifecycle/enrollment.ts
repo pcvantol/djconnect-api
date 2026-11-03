@@ -49,7 +49,61 @@ function frame(challenge: Readonly<EnrollmentChallenge>, nonce: string): Uint8Ar
 	return bytes;
 }
 
-/** Closed qualification primitive. No authority implementation, challenge issuer or HTTP route. */
+interface EnrollmentIntent {
+	audience: string;
+	installation: string;
+	operator_binding: string;
+	restore_fence: string;
+	key_fingerprint: string;
+	expected_epoch: number;
+	expiry: number;
+}
+
+/** Creates a challenge only for an independently admitted operator decision. */
+export async function issueWatchEnrollmentChallenge(
+	db: D1Database, intent: EnrollmentIntent, publicSpki: Uint8Array,
+	assertCurrent: (intent: Readonly<EnrollmentIntent>) => void,
+) {
+	const original = Object.freeze({ ...intent });
+	const { audience, installation, operator_binding, restore_fence, key_fingerprint, expected_epoch, expiry } = original;
+	if (!/^[\x21-\x7e]{1,160}$/.test(audience) || !/^[A-Za-z0-9._~-]{1,160}$/.test(installation)
+		|| !/^[a-f0-9]{64}$/.test(operator_binding) || !/^[a-f0-9]{64}$/.test(restore_fence)
+		|| !/^[a-f0-9]{64}$/.test(key_fingerprint) || publicSpki.length !== 91
+		|| !Number.isSafeInteger(expected_epoch) || expected_epoch < 0 || expected_epoch >= Number.MAX_SAFE_INTEGER
+		|| !Number.isSafeInteger(expiry) || expiry < 1) return null;
+	const spki = new Uint8Array(publicSpki);
+	if (await hash(spki) !== key_fingerprint) return null;
+	await crypto.subtle.importKey("spki", spki, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+	const publicHex = Array.from(spki, b => b.toString(16).padStart(2, "0")).join("");
+	const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))))
+		.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+	const nonceHash = await hash(new Uint8Array(encoder.encode(nonce)));
+	const challengeId = crypto.randomUUID();
+	const epoch = expected_epoch + 1;
+	const insert = db.prepare(`INSERT INTO watch_lifecycle_enrollment(
+			challenge_id,audience,installation,operator_binding,restore_fence,nonce_hash,
+			key_fingerprint,public_spki_hex,epoch,predecessor_epoch,expires_at)
+		SELECT ?1,?2,?3,?4,?5,?6,?7,?8,?9,NULLIF(?10,0),?11
+		WHERE ?11-unixepoch() BETWEEN 1 AND 30
+			AND ((?10=0 AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_issuer WHERE installation=?3))
+				OR (?10>0 AND EXISTS (SELECT 1 FROM watch_lifecycle_issuer
+					WHERE installation=?3 AND epoch=?10 AND active=0)))
+			AND (SELECT count(*) FROM watch_lifecycle_enrollment WHERE installation=?3) < 4096
+		ON CONFLICT DO NOTHING RETURNING challenge_id`)
+		.bind(challengeId, audience, installation, operator_binding, restore_fence, nonceHash,
+			key_fingerprint, publicHex, epoch, expected_epoch, expiry);
+	const admitted: unknown = assertCurrent(original);
+	if (admitted !== undefined) {
+		void Promise.resolve(admitted).catch(() => undefined);
+		throw new TypeError("enrollment authority must be synchronous");
+	}
+	const stored = await insert.first<{ challenge_id: string }>();
+	if (!stored) return null;
+	return { challenge_id: stored.challenge_id, audience, installation, key_fingerprint,
+		scope: "watch-lifecycle" as const, expected_epoch, new_epoch: epoch, nonce, expiry };
+}
+
+/** Closed qualification primitive. The real authority and HTTP route are external prerequisites. */
 export async function redeemWatchEnrollment(
 	db: D1Database, challengeId: string, nonce: string, signature: Uint8Array, authority: EnrollmentAuthority,
 ): Promise<IssuerReceipt | null> {
@@ -63,6 +117,10 @@ export async function redeemWatchEnrollment(
 		.bind(challengeId).first<EnrollmentChallenge>();
 	if (!selected) return null;
 	const challenge = Object.freeze(selected);
+	const predecessor = challenge.predecessor_epoch ?? 0;
+	if (!Number.isSafeInteger(predecessor) || predecessor < 0 || predecessor >= Number.MAX_SAFE_INTEGER
+		|| !Number.isSafeInteger(challenge.epoch) || challenge.epoch !== predecessor + 1
+		|| !Number.isSafeInteger(challenge.expires_at)) return null;
 	const check = () => {
 		const result: unknown = assertCurrent(challenge);
 		if (result !== undefined) {

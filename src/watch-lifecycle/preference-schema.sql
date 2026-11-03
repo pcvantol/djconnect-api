@@ -93,7 +93,7 @@ CREATE TABLE watch_lifecycle_enrollment (
   challenge_id TEXT PRIMARY KEY,
   audience TEXT NOT NULL,
   installation TEXT NOT NULL,
-  operator_binding TEXT NOT NULL,
+  operator_binding TEXT NOT NULL UNIQUE,
   restore_fence TEXT NOT NULL,
   nonce_hash TEXT NOT NULL UNIQUE,
   key_fingerprint TEXT NOT NULL,
