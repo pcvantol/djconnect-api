@@ -1,7 +1,7 @@
 import { env } from "cloudflare:test";
 import { expect, it } from "vitest";
 import schema from "../src/watch-lifecycle/preference-schema.sql?raw";
-import { redeemWatchEnrollment } from "../src/watch-lifecycle/enrollment";
+import { issueWatchEnrollmentChallenge, redeemWatchEnrollment } from "../src/watch-lifecycle/enrollment";
 
 it("activates the exact approved issuer once, only after possession and current admission", async () => {
 	const db = env.DB;
@@ -12,12 +12,21 @@ it("activates the exact approved issuer once, only after possession and current 
 	const fingerprint = hex(await crypto.subtle.digest("SHA-256", spki));
 	const encode = (s: string) => new TextEncoder().encode(s);
 	const expiry = Number(await db.prepare("SELECT unixepoch()").first("unixepoch()")) + 25;
-	const nonce = "A".repeat(43);
-	const nonceHash = hex(await crypto.subtle.digest("SHA-256", encode(nonce)));
-	await db.prepare(`INSERT INTO watch_lifecycle_enrollment(
-		challenge_id,audience,installation,operator_binding,restore_fence,nonce_hash,key_fingerprint,public_spki_hex,epoch,expires_at)
-		VALUES ('c1','fixture-api','home','operator-fixture','restore-fixture',?,?,?,1,?)`)
-		.bind(nonceHash, fingerprint, hex(spki), expiry).run();
+	const intent = {
+		audience:"fixture-api", installation:"home", operator_binding:"a".repeat(64),
+		restore_fence:"b".repeat(64), key_fingerprint:fingerprint, expected_epoch:0, expiry,
+	};
+	const issue = () => issueWatchEnrollmentChallenge(db,intent,new Uint8Array(spki),() => {});
+	await expect(issueWatchEnrollmentChallenge(db,intent,new Uint8Array(spki),() => {
+		throw new Error("operator denied");
+	})).rejects.toThrow("operator denied");
+	expect(await db.prepare("SELECT count(*) AS n FROM watch_lifecycle_enrollment").first("n")).toBe(0);
+	const issued = await Promise.all([issue(),issue()]);
+	expect(issued.filter(Boolean)).toHaveLength(1);
+	const { nonce, challenge_id: challengeId } = issued.find(value => value !== null)!;
+	expect(nonce).toHaveLength(43);
+	expect(await db.prepare("SELECT nonce_hash FROM watch_lifecycle_enrollment").first("nonce_hash"))
+		.toBe(hex(await crypto.subtle.digest("SHA-256",encode(nonce))));
 
 	const pieces = ["DJC-WATCH-ENROLLMENT-V1\0"];
 	for (const field of ["fixture-api", "home", fingerprint, "watch-lifecycle", "0", "1", nonce, String(expiry)]) {
@@ -25,16 +34,16 @@ it("activates the exact approved issuer once, only after possession and current 
 	}
 	const signature = new Uint8Array(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, pair.privateKey, encode(pieces.join(""))));
 	const allow = { assertCurrent() {} };
-	expect(await redeemWatchEnrollment(db, "c1", nonce, new Uint8Array(64), allow)).toBeNull();
-	expect(await redeemWatchEnrollment(db, "c1", "B" + nonce.slice(1), signature, allow)).toBeNull();
+	expect(await redeemWatchEnrollment(db, challengeId, nonce, new Uint8Array(64), allow)).toBeNull();
+	expect(await redeemWatchEnrollment(db, challengeId, (nonce.startsWith("A") ? "B" : "A") + nonce.slice(1), signature, allow)).toBeNull();
 	let checks = 0;
-	await expect(redeemWatchEnrollment(db, "c1", nonce, signature, { assertCurrent() {
+	await expect(redeemWatchEnrollment(db, challengeId, nonce, signature, { assertCurrent() {
 		if (++checks === 2) throw new Error("authority revoked");
 	} })).rejects.toThrow("authority revoked");
 	expect(await db.prepare("SELECT count(*) AS n FROM watch_lifecycle_issuer").first("n")).toBe(0);
 	const receipts = await Promise.all([
-		redeemWatchEnrollment(db, "c1", nonce, signature, allow),
-		redeemWatchEnrollment(db, "c1", nonce, signature, allow),
+		redeemWatchEnrollment(db, challengeId, nonce, signature, allow),
+		redeemWatchEnrollment(db, challengeId, nonce, signature, allow),
 	]);
 	expect(receipts.filter(Boolean)).toEqual([{installation:"home",epoch:1,key_fingerprint:fingerprint,scope:"watch-lifecycle"}]);
 	expect(await db.prepare("SELECT consumed FROM watch_lifecycle_enrollment").first("consumed")).toBe(1);
