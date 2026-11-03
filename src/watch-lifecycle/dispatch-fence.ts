@@ -1,7 +1,7 @@
 import { MAX_TTL_MS } from "../watch-moment/wire";
 import type { LifecycleClaims } from "./proof";
 
-type Scope = Pick<LifecycleClaims, "installation" | "receiver" | "incarnation" | "epoch" | "key_fingerprint">;
+import { watchDispatchScopeBinding, type WatchDispatchScope as Scope } from "./dispatch-identity";
 
 const id = /^[A-Za-z0-9._~-]{1,160}$/;
 const digest = /^[a-f0-9]{64}$/;
@@ -24,13 +24,8 @@ export class WatchDispatchFence {
 	}
 
 	private binding(claims: Scope): string | null {
-		const { installation, receiver, incarnation, epoch, key_fingerprint } = claims;
-		if (!id.test(installation) || !id.test(receiver) || !id.test(incarnation) ||
-			!Number.isSafeInteger(epoch) || epoch < 1 || !digest.test(key_fingerprint) ||
-			installation !== this.scope.installation || receiver !== this.scope.receiver ||
-			incarnation !== this.scope.incarnation || epoch !== this.scope.epoch ||
-			key_fingerprint !== this.scope.key_fingerprint) return null;
-		return JSON.stringify([installation, receiver, incarnation, epoch, key_fingerprint]);
+		const binding = watchDispatchScopeBinding(claims);
+		return binding === watchDispatchScopeBinding(this.scope) ? binding : null;
 	}
 
 	async block(claims: LifecycleClaims, bodyHash: string): Promise<boolean> {

@@ -1,12 +1,18 @@
 import { DurableObject } from "cloudflare:workers";
 import { WatchDispatchFence } from "../../src/watch-lifecycle/dispatch-fence";
 
+import { watchDispatchActorName } from "../../src/watch-lifecycle/dispatch-identity";
+
+function fixtureScope(request: Request) {
+  return { installation: "lab", receiver: new URL(request.url).searchParams.get("installation") ?? "",
+    incarnation: "pair", epoch: 1, key_fingerprint: "a".repeat(64) };
+}
+
 export class DispatchActor extends DurableObject {
   async fetch(request: Request) {
     const url = new URL(request.url);
-    const claims = { audience: "lab", action: "retire" as const, installation: "lab",
-      receiver: url.searchParams.get("installation")!, incarnation: "pair", epoch: 1,
-      key_fingerprint: "a".repeat(64), operation: "revoke", expiry: 1 };
+    const claims = { ...fixtureScope(request), audience: "lab", action: "retire" as const,
+      operation: "revoke", expiry: 1 };
     const fence = new WatchDispatchFence(this.ctx.storage, claims);
     const hash = "b".repeat(64);
     const sql = this.ctx.storage.sql;
@@ -28,8 +34,9 @@ export class DispatchActor extends DurableObject {
   }
 }
 export default {
-  fetch(request: Request, env: { ACTOR: DurableObjectNamespace }) {
-    const installation = new URL(request.url).searchParams.get("installation")!;
-    return env.ACTOR.get(env.ACTOR.idFromName(installation)).fetch(request);
+  async fetch(request: Request, env: { ACTOR: DurableObjectNamespace }) {
+    const name = await watchDispatchActorName(fixtureScope(request));
+    if (name === null) return new Response(null, { status: 400 });
+    return env.ACTOR.get(env.ACTOR.idFromName(name)).fetch(request);
   },
 };
