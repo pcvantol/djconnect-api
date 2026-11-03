@@ -48,6 +48,11 @@ jobs:
           TMPDIR: ${{ runner.temp }}
           WRANGLER_LOG_PATH: ${{ runner.temp }}/watch-moment.log
         run: node_modules/.bin/vitest run test/watch-moment.spec.ts --reporter=json --outputFile="${{ runner.temp }}/watch-moment-tests.json"
+      - name: Watch dispatch fence and restart
+        if: matrix.layer == 'workerd'
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: bash qualification/watch-moment/check-dispatch-fence.sh | tee "${{ runner.temp }}/watch-dispatch-fence.log"
       - name: Package exact source and check emitted module with native SQLite
         if: matrix.layer == 'package'
         run: |
@@ -59,5 +64,6 @@ jobs:
           name: watch-moment-source-${{ matrix.layer }}
           path: |
             ${{ runner.temp }}/watch-moment-tests.json
+            ${{ runner.temp }}/watch-dispatch-fence.log
             ${{ runner.temp }}/watch-moment-package
           if-no-files-found: error
