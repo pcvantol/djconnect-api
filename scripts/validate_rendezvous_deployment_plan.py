@@ -253,9 +253,9 @@ def closed_receiving_root_delta(sources, references):
         if name.startswith('node_modules/'):
             continue
         require(effective.get(name) == expected)
-        # Only the separately pinned five-file category layer may supersede
-        # these historical bytes. validate() checks EVERY effective input.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES:
+        # Only exact pinned source-delta layers may supersede historical bytes.
+        # validate() checks EVERY effective input after applying those layers.
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -441,7 +441,7 @@ SOURCE_PROVENANCE.update(dependency_refresh_delta_sha256=DEPENDENCY_DELTA_SHA256
                          dependency_refresh_source_map_sha256=DEPENDENCY_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_watch_topic():
     sources, refs = baseline_before_dependency_refresh()
     delta = pinned_working_proof(DEPENDENCY_DELTA_PATH, DEPENDENCY_DELTA_SHA256)
     require(set(delta) == {'schema_version','scope','base_source','baseline_source_map_sha256',
@@ -486,6 +486,47 @@ def baseline():
             and provenance['real_native_or_production_effect'] is False)
     refs[DEPENDENCY_DELTA_PATH] = DEPENDENCY_DELTA_SHA256
     return effective, refs
+
+
+WATCH_DELTA_PATH = 'docs/rendezvous/watch-topic-source-delta-v1.json'
+WATCH_DELTA_SHA256 = 'ea503efa3a57c86df670cfe2ab4ca5d02cee1d44e9ffef1446f06b6f177a85af'
+WATCH_SOURCE_MAP_SHA256 = 'e2d62207b25cb2435be51dfcbe5a4ef8a7254b8e4e920b6451ae944b060fec85'
+WATCH_SOURCES = frozenset(('wrangler.jsonc', 'rendezvous-build-inputs.json'))
+WATCH_REFERENCES = frozenset(('wrangler.jsonc', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-session/source-manifest.json'))
+SOURCE_PROVENANCE.update(watch_topic_delta_sha256=WATCH_DELTA_SHA256,
+                         watch_topic_source_map_sha256=WATCH_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_watch_topic()
+    delta = pinned_working_proof(WATCH_DELTA_PATH, WATCH_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'source_changes', 'reference_changes', 'public_activation_allowed',
+            'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_WATCH_TOPIC_ALIGNMENT_NOT_ACTIVATION'
+            and delta['base_source'] == '7ac9ad160e1a8b0109262ea61d79c00bc94d659a'
+            and delta['public_activation_allowed'] is False
+            and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['source_changes']) == WATCH_SOURCES
+            and set(delta['reference_changes']) == WATCH_REFERENCES)
+    effective, references = dict(sources), dict(refs)
+    for changes, original, result in ((delta['source_changes'], sources, effective),
+                                      (delta['reference_changes'], refs, references)):
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'}
+                    and change['before'] == original[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            result[name] = change['after']
+    require(source_map_digest(effective) == delta['effective_source_map_sha256']
+            == WATCH_SOURCE_MAP_SHA256)
+    require(delta['reference_changes']['wrangler.jsonc'] == delta['source_changes']['wrangler.jsonc'])
+    references[WATCH_DELTA_PATH] = WATCH_DELTA_SHA256
+    return effective, references
 
 
 def validate(plan):

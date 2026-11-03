@@ -1,0 +1,27 @@
+// Actual packaged module + native SQLite; synthetic authority/provider, no egress.
+import {readFile} from 'node:fs/promises';
+import {join,isAbsolute} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import {DatabaseSync} from 'node:sqlite';
+import assert from 'node:assert/strict';
+const dir=process.argv[2];assert.ok(dir&&isAbsolute(dir));
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const proof=JSON.parse(await readFile(join(dir,'source-package.json')));
+for(const [name,key] of [['watch-moment.mjs','module_sha256'],['schema.sql','schema_sha256'],['contract-proposal.json','fixture_sha256']])assert.equal(sha(await readFile(join(dir,name))),proof[key]);
+for(const key of ['Core_authority_supplier','Apple_decoder_adopted','root_endpoint_selected','live_schema_migration','provisioned','deployed'])assert.equal(proof[key],false);
+const mod=await import(pathToFileURL(join(dir,'watch-moment.mjs')).href);
+const fixture=JSON.parse(await readFile(join(dir,'contract-proposal.json'))).shared_synthetic_fixture;
+assert.deepEqual(mod.decodeEvent(fixture.event),fixture.event);
+assert.throws(()=>mod.decodeEvent({...fixture.event,url:'https://example.invalid'}));
+const sqlite=new DatabaseSync(':memory:');sqlite.exec(await readFile(join(dir,'schema.sql'),'utf8'));
+const db={prepare(sql){const make=values=>({bind(...bound){return make(bound);},async first(){return sqlite.prepare(sql).get(...values)??null;},async run(){const out=sqlite.prepare(sql).run(...values);return {meta:{changes:Number(out.changes)}};}});return make([]);}};
+const r={id:'example-registration',ha_install_id:fixture.event.ha_install_id,ha_user_hash:fixture.event.ha_user_hash,device_id:fixture.event.device_id,client_type:'watchos',apns_token_hash:'d'.repeat(64),apns_token_ciphertext:'example-synthetic-ciphertext',apns_token_nonce:'example-synthetic-nonce',apns_environment:'sandbox',topic:'dev.djconnect.ios.watch',app_bundle_id:'dev.djconnect.ios.watch',disabled:0,invalid:0,categories_json:JSON.stringify([mod.CATEGORY])};
+sqlite.exec('CREATE TABLE registrations(id TEXT PRIMARY KEY,ha_install_id TEXT,ha_user_hash TEXT,device_id TEXT,client_type TEXT,apns_token_hash TEXT,apns_token_ciphertext TEXT,apns_token_nonce TEXT,apns_environment TEXT,topic TEXT,app_bundle_id TEXT,disabled INTEGER,invalid INTEGER,categories_json TEXT)');
+const columns=Object.keys(r);sqlite.prepare(`INSERT INTO registrations(${columns.join(',')}) VALUES(${columns.map(()=>'?').join(',')})`).run(...columns.map(k=>r[k]));
+let sends=0;
+const ports={db,now:()=>fixture.now_ms,limits:{capacity:16,installationCapacity:8,recipientBurst:3},async admit(event){assert.deepEqual(event,fixture.event);return {event_hash:sha(mod.canonical(event)),recipient_binding:'b'.repeat(64),registration_binding:'c'.repeat(64),eligible_since_ms:fixture.now_ms-1,expires_at_ms:fixture.event.expires_at_ms,registration:r};},assertCurrent(){},async send(registration,payload,ctx){assert.equal(registration.client_type,'watchos');await ctx.beforeFetch();assert.equal(payload.moment_id,fixture.event.moment_id);sends++;return {status:200};}};
+const transport=mod.createMomentTransport(ports),signal=new AbortController().signal;
+assert.equal((await transport.dispatch(fixture.event,signal)).state,'provider_accepted');
+assert.equal((await mod.createMomentTransport(ports).dispatch(fixture.event,signal)).state,'provider_accepted');assert.equal(sends,1);
+sqlite.close();console.log(JSON.stringify({status:'PASS_ACTUAL_PACKAGED_MODULE_SQLITE_SYNTHETIC_AUTHORITY_PROVIDER_ONLY',sends,device_delivery:false,real_provider_egress:false}));

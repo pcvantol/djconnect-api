@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_WATCH_TOPIC_ALIGNMENT_NOT_ACTIVATION",
+  "base_source": "7ac9ad160e1a8b0109262ea61d79c00bc94d659a",
+  "baseline_source_map_sha256": "272aeb7fb48586102d9e5dc6bab70724857539a022e7b2446c4e24ac9e40c1db",
+  "effective_source_map_sha256": "e2d62207b25cb2435be51dfcbe5a4ef8a7254b8e4e920b6451ae944b060fec85",
+  "source_changes": {
+    "wrangler.jsonc": {
+      "before": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+      "after": "5c0a0a382d9144271b754397baf3e0def47dcc83acb3a610dc4abbc28ff3b54f"
+    },
+    "rendezvous-build-inputs.json": {
+      "before": "c7171c36dc32809f3da00aaad53f251c8db5e00325d3ac4f9f0a661d29eb5c9e",
+      "after": "79ef2e847c72d96114355c3b9468a4e7434836401c5f6621d41f1c5ac51521cd"
+    }
+  },
+  "reference_changes": {
+    "wrangler.jsonc": {
+      "before": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+      "after": "5c0a0a382d9144271b754397baf3e0def47dcc83acb3a610dc4abbc28ff3b54f"
+    },
+    "coordinator/host-app-wake/source-manifest.json": {
+      "before": "6638cd1ddb9a0d73b77bf6d52a31a8392273110050ea27e9940879b26d940d99",
+      "after": "77a58eef8c8c5148aec6dd9eceffc3c0cf319a4075a2a12f02e416feb7f5d077"
+    },
+    "coordinator/installation-principal/source-manifest.json": {
+      "before": "7b45cfc676341688962496ac28b6bf6b764fdd0d78adaf25a6c37df3c561714d",
+      "after": "e97590d4ac0461e44fcac1d2c77f7b15587cabb68c90aa23cb33f859bae3b13b"
+    },
+    "coordinator/principal-possession/source-manifest.json": {
+      "before": "bb69d593cb396a5200ed6f5abb65fd8f8b56912422a221df5e54608d2ec9eb03",
+      "after": "123179b51c2fabc0315748b9e94eed47c7f9cb8caad238c8e14769178e80bc82"
+    },
+    "coordinator/rich-session/source-manifest.json": {
+      "before": "bff9290856f767fe1143f7816f113f07d85da128a64076e60a198171a02e1170",
+      "after": "2d7ffc98d9698de698077869008c4df07e895ec6235dd8b95474d89d94e79e9a"
+    }
+  },
+  "public_activation_allowed": false,
+  "production_effect_authorized": false
+}

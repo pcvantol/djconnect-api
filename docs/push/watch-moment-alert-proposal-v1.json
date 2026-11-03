@@ -1,0 +1,94 @@
+{
+  "contract": "djc-watch-moment/1",
+  "status": "PROPOSED_NOT_ADOPTED_BY_CORE_OR_APPLE",
+  "assignment": "DJC-WATCH-COMPANION-V2-20261102",
+  "existing_Core_source_inspected": "409828d66de8f5032ec0e123d179202ed21f99f1",
+  "existing_Apple_source_inspected": "10ea3950e01dd0e7bf7b1d4a357ef2d90d34b624",
+  "source_reuse": {
+    "publication": "session_runtime.DJBroadcast.publish_moment -> dj_moment_published; duplicate Moment IDs are already refused",
+    "original_clocks": "native_moment_delivery.MomentDeliveryBoundary; do not use read/reconnect time",
+    "detail_identity": [
+      "session_id",
+      "moment_id"
+    ],
+    "detail_endpoint": "NOT_SELECTED_OR_CLAIMED_AVAILABLE",
+    "transport": "Existing API src/apns.ts; existing encrypted Watch registration; fixed topic dev.djconnect.ios.watch"
+  },
+  "consumer_adoption_required": [
+    "Core chooses a stable original publication event_id and sends only after actual committed publication, never replay/hydration",
+    "Core identifies the actual current paired installation/user/device/Session and original notification preference; external_relay:false remains a denial",
+    "API assembly supplies a genuine current authorization/registration admission and synchronous final currentness check; no default authority implementation exists",
+    "Apple confirms actual Watch app form, entitlements/environment/token registration, dj_moments_v1 preference/category and the versioned cold-start decoder",
+    "Apple selects the exact original geauthorised Core Moment-detail read; no arbitrary URL, Session start, automatic TTS or playback action"
+  ],
+  "limits": {
+    "max_event_bytes": 2048,
+    "max_original_lifetime_ms": 300000,
+    "max_provider_attempts": 3,
+    "max_provider_wait_ms": 10000,
+    "recipient_publication_window_ms": 600000,
+    "selected_capacities": "Mandatory finite server configuration; no production selection in this proposal",
+    "history": "No automatic eviction; one reserved cancellation slot per global/installation capacity; exhaustion is a denial, never silent removal of once/unknown history"
+  },
+  "shared_synthetic_fixture": {
+    "classification": "EXPIRED_EXAMPLE_ONLY_NOT_A_CORE_OR_NATIVE_AUTHORITY_RECEIPT",
+    "now_ms": 1700000000000,
+    "event": {
+      "version": "djc-watch-moment/1",
+      "event_type": "dj_moment_published",
+      "event_id": "example-publication-1",
+      "ha_install_id": "example-install",
+      "ha_user_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "device_id": "example-watch",
+      "session_id": "example-session",
+      "moment_id": "example-moment",
+      "created_at_ms": 1700000000000,
+      "expires_at_ms": 1700000060000,
+      "locale": "nl-NL"
+    },
+    "expected_notification": {
+      "apns_push_type": "alert",
+      "apns_topic": "dev.djconnect.ios.watch",
+      "apns_environment": "sandbox",
+      "category": "DJCONNECT_MOMENT_V1",
+      "title": "DJConnect · Nieuw DJ Moment",
+      "body": "Je DJ heeft iets nieuws voor je.",
+      "open_target": "dj_moment",
+      "session_id": "example-session",
+      "moment_id": "example-moment"
+    },
+    "recipient_binding_example": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "expected_apns": {
+      "environment": "sandbox",
+      "headers": {
+        "apns-topic": "dev.djconnect.ios.watch",
+        "apns-push-type": "alert",
+        "apns-priority": "10",
+        "apns-expiration": "1700000060",
+        "apns-collapse-id": "56657ab8e604101c98ba79374d567980df26f9ac9504841ac0c16f5fc38f2383",
+        "content-type": "application/json"
+      },
+      "body": {
+        "aps": {
+          "alert": {
+            "title": "DJConnect · Nieuw DJ Moment",
+            "body": "Je DJ heeft iets nieuws voor je."
+          },
+          "sound": "default",
+          "category": "DJCONNECT_MOMENT_V1",
+          "thread-id": "5d84c564e8075d13b29719317a71b2f73df2705aa673eccea3125f9779f9936c"
+        },
+        "version": "djc-watch-moment/1",
+        "event_type": "dj_moment_published",
+        "event_id": "example-publication-1",
+        "open_target": "dj_moment",
+        "session_id": "example-session",
+        "moment_id": "example-moment",
+        "transport_expires_at_ms": 1700000060000
+      }
+    }
+  },
+  "production_endpoint": null,
+  "deployed": false,
+  "actual_Watch_registration_or_delivery": false
+}

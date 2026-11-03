@@ -18,7 +18,8 @@ const testEnv = {
 	APNS_PRIVATE_KEY: "",
 	APNS_TOPIC_IOS: "dev.djconnect.ios",
 	APNS_TOPIC_MACOS: "dev.djconnect.mac",
-	APNS_TOPIC_WATCHOS: "dev.djconnect.watch",
+	// Exercise the shipping config instead of masking a wrong Watch topic in fixtures.
+	APNS_TOPIC_WATCHOS: env.APNS_TOPIC_WATCHOS,
 	APNS_ENVIRONMENT: "sandbox",
 	APNS_TOKEN_ENCRYPTION_KEY: EXAMPLE_APNS_TOKEN_ENCRYPTION_KEY,
 	DJCONNECT_RELAY_SECRET: EXAMPLE_RELAY_SECRET,
@@ -832,6 +833,7 @@ describe("DJConnect API worker", () => {
 		await registerDevice(installAuth, {
 			device_id: "example-watchos-device",
 			client_type: "watchos",
+			app_bundle_id: "dev.djconnect.ios.watch",
 			apns_token: "example-watchos-apns-token",
 			apns_environment: "production",
 		});
@@ -853,8 +855,47 @@ describe("DJConnect API worker", () => {
 		]);
 		expect(fetchMock.mock.calls.map((call) => (call[1]?.headers as Record<string, string>)["apns-topic"])).toEqual([
 			"dev.djconnect.ios",
-			"dev.djconnect.watch",
+			"dev.djconnect.ios.watch",
 		]);
+	});
+
+	it("refreshes the persisted legacy Watch topic on authenticated re-registration", async () => {
+		const installAuth = await issueInstallAuth("example-ha-install");
+		const payload = registerPayload({
+			device_id: "example-watch-topic-upgrade",
+			client_type: "watchos",
+			app_bundle_id: "dev.djconnect.ios.watch",
+		});
+		const authHeaders = { authorization: installAuth };
+		const legacyTopic = "dev.djconnect.watch";
+		const readRows = async () => (await env.DB.prepare(
+			"SELECT id, topic FROM registrations WHERE device_id = ?",
+		).bind(payload.device_id).all<{ id: string; topic: string }>()).results;
+		const event = {
+			ha_install_id: "example-ha-install",
+			event_type: "ask_dj_response",
+			client_types: ["watchos"],
+		};
+
+		const legacy = await dispatchWithHeaders("/v1/push/register", payload, authHeaders,
+			{ ...testEnv, APNS_TOPIC_WATCHOS: legacyTopic });
+		expect(legacy.status).toBe(200);
+		const rows = await readRows();
+		expect(rows).toEqual([{ id: expect.any(String), topic: legacyTopic }]);
+
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
+			async () => new Response("{}", { status: 200 }),
+		);
+		expect((await dispatch("/v1/push/event", event, installAuth)).status).toBe(200);
+		expect(fetchMock).toHaveBeenCalledOnce();
+		expect(new Headers(fetchMock.mock.calls[0]?.[1]?.headers).get("apns-topic")).toBe(legacyTopic);
+
+		expect((await dispatch("/v1/push/register", payload, installAuth)).status).toBe(200);
+		expect(await readRows()).toEqual([{ id: rows[0]!.id, topic: "dev.djconnect.ios.watch" }]);
+		fetchMock.mockClear();
+		expect((await dispatch("/v1/push/event", event, installAuth)).status).toBe(200);
+		expect(fetchMock).toHaveBeenCalledOnce();
+		expect(new Headers(fetchMock.mock.calls[0]?.[1]?.headers).get("apns-topic")).toBe("dev.djconnect.ios.watch");
 	});
 
 	it("audits mixed APNs success and failure counts", async () => {
@@ -1123,7 +1164,7 @@ async function dispatchGet(path: string, authorization?: string): Promise<Respon
 	return response;
 }
 
-async function dispatchWithHeaders(path: string, body: unknown, headers: Record<string, string>): Promise<Response> {
+async function dispatchWithHeaders(path: string, body: unknown, headers: Record<string, string>, bindings = testEnv): Promise<Response> {
 	const serializedBody = JSON.stringify(body);
 	const request = new IncomingRequest(`https://api.djconnect.dev${path}`, {
 		method: "POST",
@@ -1134,7 +1175,7 @@ async function dispatchWithHeaders(path: string, body: unknown, headers: Record<
 		body: serializedBody,
 	});
 	const ctx = createExecutionContext();
-	const response = await worker.fetch(request, testEnv, ctx);
+	const response = await worker.fetch(request, bindings, ctx);
 	await waitOnExecutionContext(ctx);
 	return response;
 }

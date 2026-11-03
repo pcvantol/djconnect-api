@@ -1,0 +1,63 @@
+name: Watch Moment alert source
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  software-assurance-governance:
+    name: Software Assurance governance
+    permissions:
+      contents: read
+    uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875
+    with:
+      execution_profile: balanced
+      owner: pcvantol/djconnect-api
+  transport:
+    name: Watch transport (${{ matrix.layer }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        layer: [types, workerd, package]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - name: Verify reusable workflow pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check_reusable_workflow_refs.sh
+      - run: npm ci
+      - name: Strict transport and test types
+        if: matrix.layer == 'types'
+        run: node_modules/.bin/tsc --noEmit -p qualification/watch-moment/tsconfig.json
+      - name: Actual SQLite and workerd; synthetic authority and provider only
+        if: matrix.layer == 'workerd'
+        env:
+          TMPDIR: ${{ runner.temp }}
+          WRANGLER_LOG_PATH: ${{ runner.temp }}/watch-moment.log
+        run: node_modules/.bin/vitest run test/watch-moment.spec.ts --reporter=json --outputFile="${{ runner.temp }}/watch-moment-tests.json"
+      - name: Package exact source and check emitted module with native SQLite
+        if: matrix.layer == 'package'
+        run: |
+          node qualification/watch-moment/build-source.mjs "${{ runner.temp }}/watch-moment-package"
+          node qualification/watch-moment/check-package.mjs "${{ runner.temp }}/watch-moment-package"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: matrix.layer != 'types'
+        with:
+          name: watch-moment-source-${{ matrix.layer }}
+          path: |
+            ${{ runner.temp }}/watch-moment-tests.json
+            ${{ runner.temp }}/watch-moment-package
+          if-no-files-found: error
