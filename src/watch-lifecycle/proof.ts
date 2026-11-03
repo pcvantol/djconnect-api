@@ -13,6 +13,7 @@ const actionFields = {
 	"preference-write": ["expected_version", "enabled"],
 	"preference-read": [],
 	"lifecycle-status": ["target_operation", "target_body_sha256"],
+	"receiver-recover": ["predecessor", "predecessor_epoch", "recovery_grant"],
 } as const;
 
 export type LifecycleClaims = Readonly<{
@@ -20,6 +21,7 @@ export type LifecycleClaims = Readonly<{
 	epoch: number; key_fingerprint: string; expiry: number; operation: string; incarnation: string;
 	predecessor?: string; expected_version?: number; enabled?: boolean;
 	target_operation?: string; target_body_sha256?: string;
+	predecessor_epoch?: number; recovery_grant?: string;
 }>;
 
 function isCounter(value: unknown): value is number {
@@ -43,7 +45,7 @@ function decode(body: Uint8Array, expectedAudience: string, now: number): Lifecy
 		|| typeof value.key_fingerprint !== "string" || !hexDigest.test(value.key_fingerprint)) {
 		throw new TypeError("invalid lifecycle claims");
 	}
-	for (const name of ["installation", "receiver", "operation", "incarnation", ...(value.action === "replace" ? ["predecessor"] : [])]) {
+	for (const name of ["installation", "receiver", "operation", "incarnation", ...((value.action === "replace" || value.action === "receiver-recover") ? ["predecessor"] : [])]) {
 		const id = value[name];
 		if (typeof id !== "string" || !identifier.test(id)) throw new TypeError("invalid lifecycle identifier");
 	}
@@ -55,6 +57,11 @@ function decode(body: Uint8Array, expectedAudience: string, now: number): Lifecy
 		|| value.target_operation === value.operation
 		|| typeof value.target_body_sha256 !== "string" || !hexDigest.test(value.target_body_sha256)
 	)) throw new TypeError("invalid lifecycle status target");
+	if (value.action === "receiver-recover" && (
+		!isCounter(value.predecessor_epoch) || value.predecessor_epoch < 1 || value.predecessor_epoch >= value.epoch
+		|| value.predecessor === value.incarnation
+		|| typeof value.recovery_grant !== "string" || !identifier.test(value.recovery_grant)
+	)) throw new TypeError("invalid receiver recovery");
 	return Object.freeze(value) as LifecycleClaims;
 }
 
