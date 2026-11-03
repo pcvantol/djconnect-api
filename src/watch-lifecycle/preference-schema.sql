@@ -4,7 +4,8 @@ CREATE TABLE watch_lifecycle_issuer (
   epoch INTEGER NOT NULL,
   key_fingerprint TEXT NOT NULL,
   scope TEXT NOT NULL,
-  active INTEGER NOT NULL CHECK (active IN (0, 1))
+  active INTEGER NOT NULL CHECK (active IN (0, 1)),
+  public_spki_hex TEXT
 );
 CREATE TABLE watch_lifecycle_preference (
   installation TEXT NOT NULL,
@@ -86,4 +87,28 @@ BEGIN
     NEW.installation, NEW.receiver, NEW.epoch, NEW.lifecycle_operation,
     NEW.lifecycle_hash, NEW.incarnation, NEW.lifecycle_revision, NEW.retired
   );
+END;
+
+CREATE TABLE watch_lifecycle_enrollment (
+  challenge_id TEXT PRIMARY KEY,
+  audience TEXT NOT NULL,
+  installation TEXT NOT NULL,
+  operator_binding TEXT NOT NULL,
+  restore_fence TEXT NOT NULL,
+  nonce_hash TEXT NOT NULL UNIQUE,
+  key_fingerprint TEXT NOT NULL,
+  public_spki_hex TEXT NOT NULL,
+  epoch INTEGER NOT NULL,
+  predecessor_epoch INTEGER,
+  expires_at INTEGER NOT NULL,
+  consumed INTEGER NOT NULL DEFAULT 0 CHECK (consumed IN (0, 1))
+);
+CREATE TRIGGER watch_lifecycle_activate_issuer
+AFTER UPDATE OF consumed ON watch_lifecycle_enrollment
+WHEN OLD.consumed = 0 AND NEW.consumed = 1
+BEGIN
+  INSERT INTO watch_lifecycle_issuer(installation, epoch, key_fingerprint, scope, active, public_spki_hex)
+  VALUES (NEW.installation, NEW.epoch, NEW.key_fingerprint, 'watch-lifecycle', 1, NEW.public_spki_hex)
+  ON CONFLICT(installation) DO UPDATE SET epoch=excluded.epoch, key_fingerprint=excluded.key_fingerprint,
+    scope=excluded.scope, active=excluded.active, public_spki_hex=excluded.public_spki_hex;
 END;
