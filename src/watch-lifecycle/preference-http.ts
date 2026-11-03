@@ -35,6 +35,7 @@ export function createWatchPreferenceHttp(
 		if (request.method !== "POST") return new Response(null, { status: 405, headers: { ...headers, allow: "POST" } });
 		if (request.headers.get("content-type")?.trim().toLowerCase() !== "application/json"
 			|| request.headers.has("content-encoding")) return new Response(null, { status: 415, headers });
+		let writeMayHaveStarted = false;
 		try {
 			const signature = request.headers.get("djc-watch-lifecycle-signature") ?? "";
 			if (!/^[A-Za-z0-9_-]{85}[AQgw]$/.test(signature)) return unavailable();
@@ -49,14 +50,26 @@ export function createWatchPreferenceHttp(
 				.bind(claims.installation, claims.epoch, claims.key_fingerprint).first<{public_spki_hex: string | null}>();
 			if (!issuer?.public_spki_hex || !/^[a-f0-9]{182}$/.test(issuer.public_spki_hex)) return unavailable();
 			const spki = Uint8Array.from(issuer.public_spki_hex.match(/../g)!, pair => parseInt(pair, 16));
-			const receipt = await applyWatchPreference(db, body, proof, spki, audience, now, verified => {
+			const check = (verified: LifecycleClaims) => {
 				signal.throwIfAborted();
-				return assertRestoreCurrent(verified);
+				const result: unknown = assertRestoreCurrent(verified);
+				if (result !== undefined) {
+					void Promise.resolve(result).catch(() => undefined);
+					throw new TypeError("restore authority must be synchronous");
+				}
+			};
+			const receipt = await applyWatchPreference(db, body, proof, spki, audience, now, verified => {
+				check(verified);
+				writeMayHaveStarted = verified.action === "preference-write";
 			});
-			signal.throwIfAborted();
-			return receipt ? Response.json(receipt, { headers }) : unavailable();
+			if (!receipt) return unavailable();
+			check(claims);
+			return Response.json(receipt, { headers });
 		} catch {
-			return unavailable();
+			// Once submitted, a write can commit even if its acknowledgement is lost.
+			return writeMayHaveStarted
+				? Response.json({ error: "watch_preference_outcome_unknown" }, { status: 503, headers })
+				: unavailable();
 		}
 	};
 }

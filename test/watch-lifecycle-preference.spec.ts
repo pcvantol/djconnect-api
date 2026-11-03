@@ -27,8 +27,8 @@ it("stores only the current signed preference and keeps opt-out available at cap
 			b => b.toString(16).padStart(2, "0")).join("");
 		const invoke = (apply: typeof applyWatchPreference | typeof applyWatchPairing = applyWatchPreference) =>
 			apply(db, body, signature, spki, audience, now, () => {});
-		const request = () => new Request("https://fixture.invalid", {
-			method: "POST", body, headers: { "content-type": "application/json",
+		const request = (signal?: AbortSignal) => new Request("https://fixture.invalid", {
+			method: "POST", body, signal, headers: { "content-type": "application/json",
 				"djc-watch-lifecycle-signature": btoa(String.fromCharCode(...signature))
 					.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") },
 		});
@@ -54,6 +54,31 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	expect(rejected.status).toBe(403);
 	expect(await rejected.json()).toEqual({error:"watch_preference_unavailable"});
 	expect(await db.prepare("SELECT revision FROM watch_lifecycle_preference").first("revision")).toBe(0);
+	const abort = new AbortController();
+	const delayedDb = new Proxy(db, {
+		get(target, property, receiver) {
+			if (property !== "batch") return Reflect.get(target, property, receiver);
+			return async (statements: D1PreparedStatement[]) => {
+				const result = await target.batch(statements);
+				abort.abort();
+				return result;
+			};
+		},
+	});
+	const lateAbort = createWatchPreferenceHttp(delayedDb, audience, () => {});
+	const aborted = await lateAbort(optIn.request(abort.signal));
+	expect(aborted.status).toBe(503);
+	expect(await aborted.json()).toEqual({error:"watch_preference_outcome_unknown"});
+	expect(await db.prepare("SELECT revision,enabled FROM watch_lifecycle_preference").first())
+		.toEqual({revision:1,enabled:1});
+	let checks = 0;
+	const loseBeforeResponse = createWatchPreferenceHttp(db, audience, () => {
+		if (++checks === 2) throw new Error("restore authority withdrawn before reply");
+	});
+	const uncertain = await loseBeforeResponse(optIn.request());
+	expect(uncertain.status).toBe(503);
+	expect(await uncertain.json()).toEqual({error:"watch_preference_outcome_unknown"});
+	expect(await db.prepare("SELECT revision FROM watch_lifecycle_preference").first("revision")).toBe(1);
 	const http = createWatchPreferenceHttp(db, audience, () => {});
 	const response = await http(optIn.request());
 	expect(response.status).toBe(200);
