@@ -14,6 +14,7 @@ CREATE TABLE watch_lifecycle_preference (
   revision INTEGER NOT NULL DEFAULT 0,
   enabled INTEGER NOT NULL DEFAULT 0 CHECK (enabled IN (0, 1)),
   sealed INTEGER NOT NULL DEFAULT 0 CHECK (sealed IN (0, 1)),
+  retired INTEGER NOT NULL DEFAULT 0 CHECK (retired IN (0, 1)),
   operation TEXT,
   body_hash TEXT,
   PRIMARY KEY (installation, receiver)
@@ -34,4 +35,22 @@ BEGIN
   INSERT INTO watch_lifecycle_intent VALUES (
     NEW.installation, NEW.receiver, NEW.epoch, NEW.incarnation, NEW.operation, NEW.body_hash
   );
+END;
+
+CREATE TABLE watch_lifecycle_incarnation (
+  installation TEXT NOT NULL,
+  receiver TEXT NOT NULL,
+  incarnation TEXT NOT NULL,
+  PRIMARY KEY (installation, receiver, incarnation)
+);
+CREATE TRIGGER watch_lifecycle_initial_incarnation
+AFTER INSERT ON watch_lifecycle_preference
+BEGIN
+  INSERT INTO watch_lifecycle_incarnation VALUES (NEW.installation, NEW.receiver, NEW.incarnation);
+END;
+CREATE TRIGGER watch_lifecycle_replacement_incarnation
+AFTER UPDATE OF incarnation ON watch_lifecycle_preference
+WHEN NEW.incarnation != OLD.incarnation
+BEGIN
+  INSERT INTO watch_lifecycle_incarnation VALUES (NEW.installation, NEW.receiver, NEW.incarnation);
 END;
