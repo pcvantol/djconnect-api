@@ -12,7 +12,7 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	const spki = new Uint8Array(await crypto.subtle.exportKey("spki", pair.publicKey));
 	const fingerprint = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", spki)),
 		b => b.toString(16).padStart(2, "0")).join("");
-	await db.prepare("INSERT INTO watch_lifecycle_issuer VALUES ('home',1,?,'watch-lifecycle',1)").bind(fingerprint).run();
+	await db.prepare("INSERT INTO watch_lifecycle_issuer(installation,epoch,key_fingerprint,scope,active) VALUES ('home',1,?,'watch-lifecycle',1)").bind(fingerprint).run();
 	const now = Number(await db.prepare("SELECT unixepoch()").first("unixepoch()"));
 	const audience = "test-api";
 	async function signed(action: string, operation: string, extra: object = {}) {
