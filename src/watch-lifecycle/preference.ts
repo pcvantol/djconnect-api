@@ -1,4 +1,4 @@
-import { verifyLifecycleProof } from "./proof";
+import { verifyLifecycleProof, type LifecycleClaims } from "./proof";
 
 export interface PreferenceReceipt {
 	incarnation: string;
@@ -21,14 +21,22 @@ const capacity = 4096;
 
 /** Closed composition candidate. Expected SPKI must come from trusted operator enrollment. */
 export async function applyWatchPreference(
-	db: D1Database, body: Uint8Array, signature: Uint8Array, expectedSpki: Uint8Array, audience: string, now: number,
+	db: D1Database, body: Uint8Array, signature: Uint8Array, expectedSpki: Uint8Array, audience: string, now: number, assertCurrent: (claims: LifecycleClaims) => void,
 ): Promise<PreferenceReceipt | null> {
 	if (body.length > 2048) return null;
 	const original = new Uint8Array(body);
 	const claims = await verifyLifecycleProof(original, signature, expectedSpki, audience, now);
 	if (!claims) return null;
+	const check = () => {
+		const result: unknown = assertCurrent(claims);
+		if (result !== undefined) {
+			void Promise.resolve(result).catch(() => undefined);
+			throw new TypeError("preference authority must be synchronous");
+		}
+	};
 	const binding = [claims.installation, claims.receiver, claims.epoch, claims.incarnation, claims.expiry, claims.key_fingerprint];
 	if (claims.action === "preference-read") {
+		check();
 		return db.prepare(`SELECT ${receipt} FROM watch_lifecycle_preference WHERE ${current}`)
 			.bind(...binding).first<PreferenceReceipt>();
 	}
@@ -38,7 +46,7 @@ export async function applyWatchPreference(
 		byte => byte.toString(16).padStart(2, "0")).join("");
 	const parameters = [...binding, claims.expected_version, claims.operation, Number(claims.enabled), hash];
 	const available = `(SELECT count(*) FROM watch_lifecycle_intent WHERE ${intentScope}) < ?11`;
-	const [write, replay] = await db.batch<PreferenceReceipt>([
+	const statements = [
 		db.prepare(`UPDATE watch_lifecycle_preference
 			SET revision=revision+1, operation=?8, enabled=?9, body_hash=?10,
 				sealed=CASE WHEN ${available} THEN 0 ELSE 1 END
@@ -49,6 +57,8 @@ export async function applyWatchPreference(
 		db.prepare(`SELECT ${receipt} FROM watch_lifecycle_preference
 			WHERE ${current} AND revision=?7+1 AND operation=?8 AND enabled=?9 AND body_hash=?10 AND sealed=0`)
 			.bind(...parameters),
-	]);
+	];
+	check();
+	const [write, replay] = await db.batch<PreferenceReceipt>(statements);
 	return write?.results[0] ?? replay?.results[0] ?? null;
 }
