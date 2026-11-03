@@ -61,6 +61,10 @@ export async function sourceSnapshot(){
  need(plan.reference_hashes[watchPath]===sha(watchRaw)&&sha(watchRaw)===provenance.watch_topic_delta_sha256);
  const watch=JSON.parse(watchRaw);need(watch.scope==='EXACT_WATCH_TOPIC_ALIGNMENT_NOT_ACTIVATION'&&watch.public_activation_allowed===false&&watch.production_effect_authorized===false);
  need(watch.baseline_source_map_sha256===dependency.effective_source_map_sha256&&watch.effective_source_map_sha256===provenance.watch_topic_source_map_sha256);
+ const receiptPath='docs/rendezvous/watch-registration-receipt-source-delta-v1.json',receiptRaw=await readFile(join(repo,receiptPath));
+ need(plan.reference_hashes[receiptPath]===sha(receiptRaw)&&sha(receiptRaw)===provenance.watch_registration_receipt_delta_sha256);
+ const receipt=JSON.parse(receiptRaw);need(receipt.scope==='EXACT_WATCH_REGISTRATION_RECEIPT_NOT_ACTIVATION'&&receipt.public_activation_allowed===false&&receipt.production_effect_authorized===false);
+ need(receipt.baseline_source_map_sha256===watch.effective_source_map_sha256&&receipt.effective_source_map_sha256===provenance.watch_registration_receipt_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -70,6 +74,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(mount.changes,name)){need(mount.changes[name].before===expected);expected=mount.changes[name].after;}
   if(Object.hasOwn(dependency.source_changes,name)){need(dependency.source_changes[name].before===expected);expected=dependency.source_changes[name].after;}
   if(Object.hasOwn(watch.source_changes,name)){need(watch.source_changes[name].before===expected);expected=watch.source_changes[name].after;}
+  if(Object.hasOwn(receipt.source_changes,name)){need(receipt.source_changes[name].before===expected);expected=receipt.source_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
