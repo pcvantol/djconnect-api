@@ -34,7 +34,7 @@ export async function applyWatchPairing(
 		case "replace":
 			return db.prepare(`UPDATE watch_lifecycle_preference
 				SET incarnation=?4, revision=0, enabled=0, sealed=0, retired=0, operation=NULL, body_hash=NULL
-				WHERE installation=?1 AND receiver=?2 AND epoch=?3 AND incarnation=?7
+				WHERE installation=?1 AND receiver=?2 AND epoch=?3 AND incarnation=?7 AND retired=0
 					AND ${currentIssuer} AND ${unused} RETURNING ${result}`)
 				.bind(...binding, claims.predecessor).first<PairingReceipt>();
 		case "retire":

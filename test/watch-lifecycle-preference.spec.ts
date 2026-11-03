@@ -44,8 +44,16 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	const restoreOld = await signed("replace", "restore-old", { predecessor: "pair-b" });
 	expect(await restoreOld(applyWatchPairing)).toBeNull();
 	expect(await read()).toBeNull();
+	const delayedReplace = await signed("replace", "delayed-replace", { incarnation: "pair-c", predecessor: "pair-b" });
 	const retire = await signed("retire", "retire", { incarnation: "pair-b" });
 	expect(await retire(applyWatchPairing)).toMatchObject({ incarnation: "pair-b", enabled: 0, retired: 1 });
+	expect(await delayedReplace(applyWatchPairing)).toBeNull();
+	expect(await db.prepare("SELECT incarnation,retired FROM watch_lifecycle_preference").first())
+		.toEqual({ incarnation: "pair-b", retired: 1 });
+	const lateOptIn = await signed("preference-write", "late-on", {
+		incarnation: "pair-c", expected_version: 0, enabled: true,
+	});
+	expect(await lateOptIn()).toBeNull();
 	const readRetired = await signed("preference-read", "read-retired", { incarnation: "pair-b" });
 	expect(await readRetired()).toBeNull();
 	await db.prepare("UPDATE watch_lifecycle_issuer SET active=0 WHERE installation='home'").run();
