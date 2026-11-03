@@ -1,3 +1,4 @@
+import type { WatchDispatchScope } from "./dispatch-identity";
 import { applyWatchPairing } from "./pairing";
 import { verifyLifecycleProof, type LifecycleClaims } from "./proof";
 
@@ -6,7 +7,7 @@ export interface WatchRetirementPorts {
 	audience: string;
 	now(): number;
 	/** Resolve a key from trusted enrollment for the exact server-resolved scope. */
-	resolveEnrolledKey(claims: LifecycleClaims, signal: AbortSignal): Promise<Uint8Array | null>;
+	resolveEnrolledKey(claims: WatchDispatchScope, signal: AbortSignal): Promise<Uint8Array | null>;
 	/** Consult authority independent of the D1 snapshot. Unknown must deny. */
 	isRestoreCurrent(claims: LifecycleClaims, signal: AbortSignal): Promise<boolean>;
 	/** Persist an exact, idempotent fence before acknowledging. */
@@ -20,7 +21,7 @@ export type WatchRetirementOutcome = "denied" | "unknown" | "committed";
 /** Private composition. The owning Worker must supply all authority and actor ports. */
 export function createWatchRetirement(ports: WatchRetirementPorts) {
 	return async (
-		body: Uint8Array, signature: Uint8Array, candidate: LifecycleClaims, signal: AbortSignal,
+		body: Uint8Array, signature: Uint8Array, candidate: WatchDispatchScope, signal: AbortSignal,
 	): Promise<WatchRetirementOutcome> => {
 		if (body.length > 2048 || signature.length !== 64) return "denied";
 		const original = new Uint8Array(body);

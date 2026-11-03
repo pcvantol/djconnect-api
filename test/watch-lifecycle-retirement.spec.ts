@@ -1,3 +1,4 @@
+import { resolveWatchRetirementScope } from "../src/watch-lifecycle/registry-scope";
 import { env } from "cloudflare:test";
 import { expect, it } from "vitest";
 import schema from "../src/watch-lifecycle/preference-schema.sql?raw";
@@ -96,7 +97,10 @@ it("blocks dispatch before retirement and keeps it blocked on D1 failure", async
 	expect(await read()).toBe("unknown");
 	expect(blockCalls).toBe(2);
 
-	const handler = createWatchRetirementHttp(ports, async () => statusClaims);
+	expect(await resolveWatchRetirementScope(db, claims, signal)).toBeNull();
+	expect(await resolveWatchRetirementScope(db, {...statusClaims, incarnation: "other-pair"}, signal)).toBeNull();
+	expect(await resolveWatchRetirementScope(db, {...statusClaims, epoch: 2}, signal)).toBeNull();
+	const handler = createWatchRetirementHttp(ports, (lookup, signal) => resolveWatchRetirementScope(db, lookup, signal));
 	const request = (signature = status.signature) => new Request("https://fixture.invalid", {
 		method: "POST", body: new Uint8Array(status.body), headers: {
 			"content-type": "application/json",
@@ -111,5 +115,8 @@ it("blocks dispatch before retirement and keeps it blocked on D1 failure", async
 	expect(confirmed.status).toBe(200);
 	expect(await confirmed.json()).toEqual({outcome: "committed"});
 	expect(blockCalls).toBe(2);
+
+	await db.prepare("UPDATE watch_lifecycle_issuer SET active=0").run();
+	expect((await handler(request())).status).toBe(403);
 
 });

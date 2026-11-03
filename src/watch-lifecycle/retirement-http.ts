@@ -1,3 +1,4 @@
+import type { WatchDispatchScope } from "./dispatch-identity";
 import { decodeLifecycleClaims, type LifecycleClaims } from "./proof";
 import { createWatchRetirement, type WatchRetirementPorts } from "./retirement";
 import { readSignedWatchRequest } from "./signed-http";
@@ -8,7 +9,7 @@ const unavailable = () => Response.json({ error: "watch_retirement_unavailable" 
 /** Private HTTP composition. The owner must supply the authoritative registry resolver. */
 export function createWatchRetirementHttp(
 	ports: WatchRetirementPorts,
-	resolveScope: (lookup: LifecycleClaims, signal: AbortSignal) => Promise<LifecycleClaims | null>,
+	resolveScope: (lookup: LifecycleClaims, signal: AbortSignal) => Promise<WatchDispatchScope | null>,
 ) {
 	const retire = createWatchRetirement(ports);
 	return async (request: Request): Promise<Response> => {
