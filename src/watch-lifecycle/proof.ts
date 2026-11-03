@@ -33,7 +33,7 @@ async function digest(bytes: Uint8Array<ArrayBuffer>): Promise<string> {
 		byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-function decode(body: Uint8Array, expectedAudience: string, now: number): LifecycleClaims {
+export function decodeLifecycleClaims(body: Uint8Array, expectedAudience: string, now: number): LifecycleClaims {
 	if (!body.length || body.length > 2048) throw new TypeError("invalid lifecycle body");
 	const value = parseStrictJson(decoder.decode(body)) as Record<string, unknown> | null;
 	if (!value || typeof value !== "object" || Array.isArray(value) || typeof value.action !== "string"
@@ -86,7 +86,7 @@ async function frame(claims: LifecycleClaims, body: Uint8Array<ArrayBuffer>): Pr
 
 export async function frameLifecycleProof(body: Uint8Array, audience: string, now: number): Promise<Uint8Array<ArrayBuffer>> {
 	const original = new Uint8Array(body);
-	return frame(decode(original, audience, now), original);
+	return frame(decodeLifecycleClaims(original, audience, now), original);
 }
 
 /** A verified signature proves possession only. The caller owns registry and commit checks. */
@@ -97,7 +97,7 @@ export async function verifyLifecycleProof(
 	const original = new Uint8Array(body);
 	const proof = new Uint8Array(signature);
 	const spki = new Uint8Array(expectedSpki);
-	const claims = decode(original, audience, now);
+	const claims = decodeLifecycleClaims(original, audience, now);
 	if (await digest(spki) !== claims.key_fingerprint) return null;
 	const key = await crypto.subtle.importKey("spki", spki, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
 	const valid = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, key, proof, await frame(claims, original));
