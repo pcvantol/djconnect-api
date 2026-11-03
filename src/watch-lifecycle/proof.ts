@@ -12,12 +12,14 @@ const actionFields = {
 	retire: [],
 	"preference-write": ["expected_version", "enabled"],
 	"preference-read": [],
+	"lifecycle-status": ["target_operation", "target_body_sha256"],
 } as const;
 
 export type LifecycleClaims = Readonly<{
 	audience: string; action: keyof typeof actionFields; installation: string; receiver: string;
 	epoch: number; key_fingerprint: string; expiry: number; operation: string; incarnation: string;
 	predecessor?: string; expected_version?: number; enabled?: boolean;
+	target_operation?: string; target_body_sha256?: string;
 }>;
 
 function isCounter(value: unknown): value is number {
@@ -48,6 +50,11 @@ function decode(body: Uint8Array, expectedAudience: string, now: number): Lifecy
 	if (value.action === "preference-write" && (!isCounter(value.expected_version) || typeof value.enabled !== "boolean")) {
 		throw new TypeError("invalid lifecycle preference");
 	}
+	if (value.action === "lifecycle-status" && (
+		typeof value.target_operation !== "string" || !identifier.test(value.target_operation)
+		|| value.target_operation === value.operation
+		|| typeof value.target_body_sha256 !== "string" || !hexDigest.test(value.target_body_sha256)
+	)) throw new TypeError("invalid lifecycle status target");
 	return Object.freeze(value) as LifecycleClaims;
 }
 
