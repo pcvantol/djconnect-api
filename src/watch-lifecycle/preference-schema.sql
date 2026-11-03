@@ -112,3 +112,31 @@ BEGIN
   ON CONFLICT(installation) DO UPDATE SET epoch=excluded.epoch, key_fingerprint=excluded.key_fingerprint,
     scope=excluded.scope, active=excluded.active, public_spki_hex=excluded.public_spki_hex;
 END;
+
+CREATE TABLE watch_lifecycle_recovery (
+  grant_id TEXT PRIMARY KEY,
+  installation TEXT NOT NULL,
+  receiver TEXT NOT NULL,
+  predecessor_epoch INTEGER NOT NULL,
+  predecessor TEXT NOT NULL,
+  epoch INTEGER NOT NULL,
+  key_fingerprint TEXT NOT NULL,
+  incarnation TEXT NOT NULL,
+  operator_binding TEXT NOT NULL,
+  restore_fence TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  consumed INTEGER NOT NULL DEFAULT 0 CHECK (consumed IN (0, 1)),
+  operation TEXT,
+  body_hash TEXT
+);
+CREATE TRIGGER watch_lifecycle_recover_receiver
+AFTER UPDATE OF consumed ON watch_lifecycle_recovery
+WHEN OLD.consumed = 0 AND NEW.consumed = 1
+BEGIN
+  UPDATE watch_lifecycle_preference
+    SET epoch=NEW.epoch, incarnation=NEW.incarnation, revision=0, enabled=0, sealed=0, retired=0,
+        operation=NULL, body_hash=NULL, lifecycle_revision=lifecycle_revision+1,
+        lifecycle_operation=NEW.operation, lifecycle_hash=NEW.body_hash
+  WHERE installation=NEW.installation AND receiver=NEW.receiver
+    AND epoch=NEW.predecessor_epoch AND incarnation=NEW.predecessor;
+END;
