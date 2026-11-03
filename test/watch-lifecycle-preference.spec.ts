@@ -63,9 +63,15 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	const restoreOld = await signed("replace", "restore-old", { predecessor: "pair-b" });
 	expect(await restoreOld(applyWatchPairing)).toBeNull();
 	expect(await read()).toBeNull();
+	await db.prepare(`WITH RECURSIVE n(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM n WHERE x<4094)
+		INSERT INTO watch_lifecycle_incarnation SELECT 'home','watch','seed-incarnation-'||x FROM n`).run();
+	const overCapacity = await signed("replace", "over-capacity", { incarnation: "pair-d", predecessor: "pair-b" });
+	expect(await overCapacity(applyWatchPairing)).toBeNull();
 	const delayedReplace = await signed("replace", "delayed-replace", { incarnation: "pair-c", predecessor: "pair-b" });
 	const retire = await signed("retire", "retire", { incarnation: "pair-b" });
 	expect(await retire(applyWatchPairing)).toMatchObject({ incarnation: "pair-b", enabled: 0, retired: 1 });
+	expect(await db.prepare("SELECT count(*) AS n FROM watch_lifecycle_incarnation").first("n")).toBe(4096);
+	await db.prepare("DELETE FROM watch_lifecycle_incarnation WHERE incarnation LIKE 'seed-incarnation-%'").run();
 	expect(await delayedReplace(applyWatchPairing)).toBeNull();
 	expect(await db.prepare("SELECT incarnation,retired FROM watch_lifecycle_preference").first())
 		.toEqual({ incarnation: "pair-b", retired: 1 });
