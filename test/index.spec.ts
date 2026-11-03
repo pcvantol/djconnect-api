@@ -898,6 +898,26 @@ describe("DJConnect API worker", () => {
 		expect(new Headers(fetchMock.mock.calls[0]?.[1]?.headers).get("apns-topic")).toBe("dev.djconnect.ios.watch");
 	});
 
+	it("returns the persisted Watch registration ID when opting out of Moment alerts", async () => {
+		const authorization = await issueInstallAuth("example-ha-install");
+		const payload = registerPayload({
+			client_type: "watchos",
+			app_bundle_id: "dev.djconnect.ios.watch",
+			categories: ["ask_dj", "dj_moments_v1"],
+		});
+		const initial = await dispatch("/v1/push/register", payload, authorization);
+		expect(initial.status).toBe(200);
+		const receipt = await initial.json<{ id: string; apns_token_hash: string }>();
+		const rows = () => env.DB.prepare("SELECT id, categories_json FROM registrations WHERE device_id = ?")
+			.bind(payload.device_id).all<{ id: string; categories_json: string }>();
+		expect((await rows()).results).toEqual([{ id: receipt.id, categories_json: '["ask_dj","dj_moments_v1"]' }]);
+
+		const refreshed = await dispatch("/v1/push/register", { ...payload, categories: ["ask_dj"] }, authorization);
+		expect(refreshed.status).toBe(200);
+		expect((await rows()).results).toEqual([{ id: receipt.id, categories_json: '["ask_dj"]' }]);
+		expect(await refreshed.json()).toMatchObject({ id: receipt.id, apns_token_hash: receipt.apns_token_hash });
+	});
+
 	it("audits mixed APNs success and failure counts", async () => {
 		const installAuth = await issueInstallAuth("example-ha-install");
 		await registerDevice(installAuth, {

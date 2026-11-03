@@ -20,7 +20,7 @@ export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: 
 	const topic = topicForClientType(env, input.client_type);
 	const categories = JSON.stringify(input.categories ?? []);
 
-	await db.prepare(`
+	const persisted = await db.prepare(`
 		INSERT INTO registrations (
 			id, ha_install_id, ha_user_hash, device_id, client_type, apns_token_hash,
 			apns_token, apns_token_ciphertext, apns_token_nonce, apns_token_key_version,
@@ -44,6 +44,7 @@ export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: 
 			invalid = 0,
 			updated_at = datetime('now'),
 			last_error_code = NULL
+		RETURNING id
 	`).bind(
 		id,
 		input.ha_install_id,
@@ -60,9 +61,10 @@ export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: 
 		input.app_version ?? null,
 		input.locale ?? null,
 		categories,
-	).run();
+	).first<{ id: string }>();
+	if (!persisted) throw new Error("Registration write returned no row");
 
-	return { id, tokenHash };
+	return { id: persisted.id, tokenHash };
 }
 
 export async function unregister(db: D1Database, input: UnregisterRequest): Promise<number> {
