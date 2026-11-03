@@ -50,6 +50,20 @@ export class MomentStore {
 				r.apns_token_hash, r.topic, r.app_bundle_id, r.apns_environment, r.categories_json).run();
 		return (result.meta.changes ?? 0) === 1;
 	}
+	async canDispatch(row: Operation, r: Registration) {
+		const active = await this.db.prepare(`SELECT 1 FROM watch_moment_operations AS op
+		 JOIN registrations AS reg ON reg.id=?
+		 WHERE op.operation_key=? AND op.lease_id=? AND op.state='dispatching'
+		 AND op.request_hash=? AND op.registration_hash=?
+		 AND reg.ha_install_id=? AND reg.ha_user_hash=? AND reg.device_id=? AND reg.client_type='watchos'
+		 AND reg.apns_token_hash=? AND reg.topic=? AND reg.app_bundle_id=? AND reg.apns_environment=?
+		 AND reg.categories_json=? AND reg.disabled=0 AND reg.invalid=0
+		 AND reg.apns_token_ciphertext IS ? AND reg.apns_token_nonce IS ?`)
+			.bind(r.id, row.operation_key, row.lease_id, row.request_hash, row.registration_hash,
+				r.ha_install_id, r.ha_user_hash, r.device_id, r.apns_token_hash, r.topic,
+				r.app_bundle_id, r.apns_environment, r.categories_json, r.apns_token_ciphertext, r.apns_token_nonce).first();
+		return active !== null;
+	}
 	async finish(row: Operation, state: State, status: number | null, next: number) {
 		await this.db.prepare(`UPDATE watch_moment_operations SET state=?,provider_status=?,next_attempt_ms=?
 		 WHERE operation_key=? AND lease_id=? AND state IN ('reserved','dispatching')`).bind(state, status, next, row.operation_key, row.lease_id).run();

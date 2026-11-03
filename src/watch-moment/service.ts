@@ -168,10 +168,10 @@ export function createMomentTransport(ports: MomentPorts) {
 				const result = await boundedWork(ports.send(registration, notification.payload, {
 					headers: notification.headers, expiresAt: selected.expires_at_ms, signal: providerSignal,
 					async beforeFetch() {
-						need(await store.current(registration, true), "moment_registration_changed", 403); p.guard(selected.expires_at_ms);
-						const active = await store.get(p.key); const at = p.guard(selected.expires_at_ms);
+						// Check both rows in one snapshot, with no further database read before fetch.
+						need(await store.canDispatch(selected, registration), "moment_conflict", 409);
+						const at = p.guard(selected.expires_at_ms);
 						need(!providerSignal.aborted, "moment_cancelled", 409);
-						need(active?.state === "dispatching" && active.lease_id === selected.lease_id, "moment_conflict", 409);
 						return at;
 					},
 				}), providerSignal);

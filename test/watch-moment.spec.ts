@@ -158,6 +158,47 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 		} });
 		expect((await service.dispatch(publish(), signal())).state).toBe("unknown"); expect(effects).toBe(0);
 	});
+	it.each(["opt-out", "new-token"] as const)("blocks APNs when %s happens as the final operation read starts", async change => {
+		let atProviderHandoff = false;
+		let revocations = 0;
+		const fetcher = vi.fn(async () => ({ status: 200 }));
+		const db = new Proxy(env.DB, {
+			get(target, property, receiver) {
+				if (property !== "prepare") return Reflect.get(target, property, receiver);
+				return (sql: string) => {
+					const statement = target.prepare(sql);
+					if (!atProviderHandoff || !sql.includes("FROM watch_moment_operations")) return statement;
+					return {
+						bind(...values: unknown[]) {
+							const bound = statement.bind(...values);
+							return { async first() {
+								revocations++;
+								if (change === "opt-out") {
+									await target.prepare("UPDATE registrations SET categories_json='[]' WHERE id=?").bind(registration.id).run();
+								} else {
+									await target.prepare("UPDATE registrations SET apns_token_hash=? WHERE id=?").bind("f".repeat(64), registration.id).run();
+								}
+								return bound.first();
+							} };
+						},
+					};
+				};
+			},
+		});
+		const { service } = setup({ db, send: async (_r, _p, context) => {
+			atProviderHandoff = true;
+			try {
+				await context.beforeFetch();
+				return await fetcher();
+			} finally {
+				atProviderHandoff = false;
+			}
+		} });
+		const result = await service.dispatch(publish(), signal());
+		expect(revocations).toBe(1);
+		expect(fetcher).not.toHaveBeenCalled();
+		expect(result.state).toBe("unknown");
+	});
 	it("does not admit an encrypted token substituted by the authority adapter", async () => {
 		registration.apns_token_ciphertext = "example-substituted-ciphertext";
 		const { service, send } = setup(); await expect(service.dispatch(publish(), signal())).rejects.toThrow("moment_registration_changed"); expect(send).not.toHaveBeenCalled();
