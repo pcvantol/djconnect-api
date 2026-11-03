@@ -22,12 +22,26 @@ it("stores only the current signed preference and keeps opt-out available at cap
 		}));
 		const bytes = await frameLifecycleProof(body, audience, now);
 		const signature = new Uint8Array(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, pair.privateKey, bytes));
-		return (apply: typeof applyWatchPreference | typeof applyWatchPairing = applyWatchPreference) =>
+		const bodyHash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", body)),
+			b => b.toString(16).padStart(2, "0")).join("");
+		const invoke = (apply: typeof applyWatchPreference | typeof applyWatchPairing = applyWatchPreference) =>
 			apply(db, body, signature, spki, audience, now);
+		return Object.assign(invoke, { bodyHash });
 	}
 	const enroll = await signed("pair", "pair");
 	expect(await enroll(applyWatchPairing)).toMatchObject({ incarnation: "pair-a", enabled: 0, retired: 0 });
 	expect(await enroll(applyWatchPairing)).toBeNull();
+	const pairStatus = await signed("lifecycle-status", "check-pair", {
+		target_operation: "pair", target_body_sha256: enroll.bodyHash,
+	});
+	expect(await pairStatus(applyWatchPairing)).toEqual({
+		state: "committed_current", incarnation: "pair-a", revision: 1,
+		operation: "pair", body_hash: enroll.bodyHash, retired: 0,
+	});
+	const wrongDigest = await signed("lifecycle-status", "check-wrong", {
+		target_operation: "pair", target_body_sha256: "0".repeat(64),
+	});
+	expect(await wrongDigest(applyWatchPairing)).toBeNull();
 	const optIn = await signed("preference-write", "on", { expected_version: 0, enabled: true });
 	expect(await optIn()).toMatchObject({ revision: 1, operation: "on", enabled: 1 });
 	expect(await optIn()).toMatchObject({ revision: 1, operation: "on", enabled: 1 });
@@ -41,12 +55,23 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	expect(await read()).toMatchObject({ revision: 2, operation: "off", enabled: 0 });
 	const replace = await signed("replace", "replace", { incarnation: "pair-b", predecessor: "pair-a" });
 	expect(await replace(applyWatchPairing)).toMatchObject({ incarnation: "pair-b", revision: 0, enabled: 0 });
+	expect(await pairStatus(applyWatchPairing)).toEqual({ state: "superseded" });
+	const replaceStatus = await signed("lifecycle-status", "check-replace", {
+		incarnation: "pair-b", target_operation: "replace", target_body_sha256: replace.bodyHash,
+	});
+	expect(await replaceStatus(applyWatchPairing)).toMatchObject({ state: "committed_current", revision: 2 });
 	const restoreOld = await signed("replace", "restore-old", { predecessor: "pair-b" });
 	expect(await restoreOld(applyWatchPairing)).toBeNull();
 	expect(await read()).toBeNull();
+	await db.prepare(`WITH RECURSIVE n(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM n WHERE x<4094)
+		INSERT INTO watch_lifecycle_incarnation SELECT 'home','watch','seed-incarnation-'||x FROM n`).run();
+	const overCapacity = await signed("replace", "over-capacity", { incarnation: "pair-d", predecessor: "pair-b" });
+	expect(await overCapacity(applyWatchPairing)).toBeNull();
 	const delayedReplace = await signed("replace", "delayed-replace", { incarnation: "pair-c", predecessor: "pair-b" });
 	const retire = await signed("retire", "retire", { incarnation: "pair-b" });
 	expect(await retire(applyWatchPairing)).toMatchObject({ incarnation: "pair-b", enabled: 0, retired: 1 });
+	expect(await db.prepare("SELECT count(*) AS n FROM watch_lifecycle_incarnation").first("n")).toBe(4096);
+	await db.prepare("DELETE FROM watch_lifecycle_incarnation WHERE incarnation LIKE 'seed-incarnation-%'").run();
 	expect(await delayedReplace(applyWatchPairing)).toBeNull();
 	expect(await db.prepare("SELECT incarnation,retired FROM watch_lifecycle_preference").first())
 		.toEqual({ incarnation: "pair-b", retired: 1 });
@@ -54,9 +79,19 @@ it("stores only the current signed preference and keeps opt-out available at cap
 		incarnation: "pair-c", expected_version: 0, enabled: true,
 	});
 	expect(await lateOptIn()).toBeNull();
+	expect(await replaceStatus(applyWatchPairing)).toEqual({ state: "superseded" });
+	const retireStatus = await signed("lifecycle-status", "check-retire", {
+		incarnation: "pair-b", target_operation: "retire", target_body_sha256: retire.bodyHash,
+	});
+	expect(await retireStatus(applyWatchPairing)).toMatchObject({ state: "committed_current", revision: 3, retired: 1 });
+	const unknown = await signed("lifecycle-status", "check-unknown", {
+		target_operation: "never-committed", target_body_sha256: "0".repeat(64),
+	});
+	expect(await unknown(applyWatchPairing)).toEqual({ state: "unknown" });
 	const readRetired = await signed("preference-read", "read-retired", { incarnation: "pair-b" });
 	expect(await readRetired()).toBeNull();
 	await db.prepare("UPDATE watch_lifecycle_issuer SET active=0 WHERE installation='home'").run();
 	expect(await read()).toBeNull();
 	expect(await optOut()).toBeNull();
+	expect(await retireStatus(applyWatchPairing)).toBeNull();
 });
