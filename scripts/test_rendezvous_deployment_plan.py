@@ -57,7 +57,8 @@ class PreparationTests(unittest.TestCase):
                          *v.DEPENDENCY_SOURCES, *v.DEPENDENCY_ADDITIONS,
                          *v.DEPENDENCY_REFERENCE_CHANGES, *v.DEPENDENCY_REFERENCE_ADDITIONS,
                          v.DEPENDENCY_DELTA_PATH, *v.WATCH_SOURCES,
-                         *v.WATCH_REFERENCES, v.WATCH_DELTA_PATH)
+                         *v.WATCH_REFERENCES, v.WATCH_DELTA_PATH, *v.RECEIPT_SOURCES,
+                         *v.RECEIPT_REFERENCES, v.RECEIPT_DELTA_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
@@ -114,7 +115,7 @@ class PreparationTests(unittest.TestCase):
 
     def test_watch_topic_delta_preserves_history_and_closed_activation(self):
         before, _ = v.baseline_before_watch_topic()
-        after, _ = v.baseline()
+        after, _ = v.baseline_before_watch_registration_receipt()
         self.assertEqual(len(before), len(after))
         self.assertEqual({k for k in before if before[k] != after[k]}, {'wrangler.jsonc', 'rendezvous-build-inputs.json'})
         proof = v.pinned_working_proof(v.WATCH_DELTA_PATH, v.WATCH_DELTA_SHA256)

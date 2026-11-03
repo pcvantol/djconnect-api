@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -497,7 +497,7 @@ SOURCE_PROVENANCE.update(watch_topic_delta_sha256=WATCH_DELTA_SHA256,
                          watch_topic_source_map_sha256=WATCH_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_watch_registration_receipt():
     sources, refs = baseline_before_watch_topic()
     delta = pinned_working_proof(WATCH_DELTA_PATH, WATCH_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source',
@@ -527,6 +527,42 @@ def baseline():
     require(delta['reference_changes']['wrangler.jsonc'] == delta['source_changes']['wrangler.jsonc'])
     references[WATCH_DELTA_PATH] = WATCH_DELTA_SHA256
     return effective, references
+
+
+RECEIPT_DELTA_PATH = 'docs/rendezvous/watch-registration-receipt-source-delta-v1.json'
+RECEIPT_DELTA_SHA256 = '77dc038adb870e61263e2fafba22994815dc5c191fd00ae94dd8719c6b3ff13c'
+RECEIPT_SOURCE_MAP_SHA256 = 'f4e44f5a4221a0dbf4f1042fafb8c5c4ce8c927a6317da09b43e35c85010a938'
+RECEIPT_SOURCES = frozenset(('src/repositories/registrations.ts',))
+RECEIPT_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json',))
+SOURCE_PROVENANCE.update(watch_registration_receipt_delta_sha256=RECEIPT_DELTA_SHA256,
+                         watch_registration_receipt_source_map_sha256=RECEIPT_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_watch_registration_receipt()
+    delta = pinned_working_proof(RECEIPT_DELTA_PATH, RECEIPT_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'source_changes', 'reference_changes', 'public_activation_allowed',
+            'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_WATCH_REGISTRATION_RECEIPT_NOT_ACTIVATION'
+            and delta['base_source'] == '176d71afe111a70028fef0d7ed2c28f41f66aaab'
+            and delta['public_activation_allowed'] is False
+            and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['source_changes']) == RECEIPT_SOURCES
+            and set(delta['reference_changes']) == RECEIPT_REFERENCES)
+    for changes, current in ((delta['source_changes'], sources), (delta['reference_changes'], refs)):
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == current[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            current[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == RECEIPT_SOURCE_MAP_SHA256)
+    refs[RECEIPT_DELTA_PATH] = RECEIPT_DELTA_SHA256
+    return sources, refs
 
 
 def validate(plan):
