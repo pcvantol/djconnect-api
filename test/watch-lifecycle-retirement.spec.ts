@@ -2,7 +2,8 @@ import { env } from "cloudflare:test";
 import { expect, it } from "vitest";
 import schema from "../src/watch-lifecycle/preference-schema.sql?raw";
 import { applyWatchPairing } from "../src/watch-lifecycle/pairing";
-import { createWatchRetirement } from "../src/watch-lifecycle/retirement";
+import { createWatchRetirementHttp } from "../src/watch-lifecycle/retirement-http";
+import { createWatchRetirement, type WatchRetirementPorts } from "../src/watch-lifecycle/retirement";
 import { decodeLifecycleClaims } from "../src/watch-lifecycle/proof";
 import { applyWatchPreference } from "../src/watch-lifecycle/preference";
 import { frameLifecycleProof } from "../src/watch-lifecycle/proof";
@@ -46,7 +47,7 @@ it("blocks dispatch before retirement and keeps it blocked on D1 failure", async
 	let restoreCurrent = false;
 	const mutable = { ...claims, receiver: "other-watch", incarnation: "other-pair" };
 	let changeScopeDuringLookup = false;
-	const run = createWatchRetirement({
+	const ports: WatchRetirementPorts = {
 		db, audience, now: () => now,
 		async resolveEnrolledKey(scope) {
 			if (changeScopeDuringLookup) {
@@ -71,7 +72,8 @@ it("blocks dispatch before retirement and keeps it blocked on D1 failure", async
 			expect(hash).toBe(retire.bodyHash);
 			return blocked;
 		},
-	});
+	};
+	const run = createWatchRetirement(ports);
 	expect(await run(retire.body, retire.signature, claims, signal)).toBe("denied");
 	restoreCurrent = true;
 	changeScopeDuringLookup = true;
@@ -92,6 +94,22 @@ it("blocks dispatch before retirement and keeps it blocked on D1 failure", async
 	expect(await read()).toBe("committed");
 	blocked = false;
 	expect(await read()).toBe("unknown");
+	expect(blockCalls).toBe(2);
+
+	const handler = createWatchRetirementHttp(ports, async () => statusClaims);
+	const request = (signature = status.signature) => new Request("https://fixture.invalid", {
+		method: "POST", body: new Uint8Array(status.body), headers: {
+			"content-type": "application/json",
+			"djc-watch-lifecycle-signature": btoa(String.fromCharCode(...signature))
+				.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""),
+		},
+	});
+	expect((await handler(request(new Uint8Array(64)))).status).toBe(403);
+	expect((await handler(request())).status).toBe(503);
+	blocked = true;
+	const confirmed = await handler(request());
+	expect(confirmed.status).toBe(200);
+	expect(await confirmed.json()).toEqual({outcome: "committed"});
 	expect(blockCalls).toBe(2);
 
 });
