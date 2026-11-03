@@ -9,7 +9,7 @@ export interface PreferenceReceipt {
 }
 
 const current = `
-	installation=?1 AND receiver=?2 AND epoch=?3 AND incarnation=?4
+	installation=?1 AND receiver=?2 AND epoch=?3 AND incarnation=?4 AND retired=0
 	AND ?5-unixepoch() BETWEEN 1 AND 30
 	AND EXISTS (SELECT 1 FROM watch_lifecycle_issuer AS issuer
 		WHERE issuer.installation=?1 AND issuer.epoch=?3 AND issuer.key_fingerprint=?6
