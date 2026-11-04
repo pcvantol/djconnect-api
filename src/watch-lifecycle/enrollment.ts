@@ -1,4 +1,4 @@
-interface EnrollmentChallenge {
+export interface EnrollmentChallenge {
 	challenge_id: string;
 	audience: string;
 	installation: string;
@@ -15,6 +15,7 @@ interface EnrollmentChallenge {
 interface EnrollmentAuthority {
 	/** Owning composition verifies actual operator and independent restore admission. Throws on denial. */
 	assertCurrent(challenge: Readonly<EnrollmentChallenge>): void;
+	beforeCommit?(): void;
 }
 
 export interface IssuerReceipt {
@@ -49,7 +50,7 @@ function frame(challenge: Readonly<EnrollmentChallenge>, nonce: string): Uint8Ar
 	return bytes;
 }
 
-interface EnrollmentIntent {
+export interface EnrollmentIntent {
 	audience: string;
 	installation: string;
 	operator_binding: string;
@@ -109,7 +110,7 @@ export async function redeemWatchEnrollment(
 ): Promise<IssuerReceipt | null> {
 	if (!/^[A-Za-z0-9._~-]{1,160}$/.test(challengeId)
 		|| !/^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$/.test(nonce) || signature.length !== 64) return null;
-	const { assertCurrent } = authority;
+	const { assertCurrent, beforeCommit } = authority;
 	const proof = new Uint8Array(signature);
 	const selected = await db.prepare(`SELECT challenge_id,audience,installation,operator_binding,restore_fence,nonce_hash,
 		key_fingerprint,public_spki_hex,epoch,predecessor_epoch,expires_at
@@ -149,5 +150,8 @@ export async function redeemWatchEnrollment(
 			challenge.nonce_hash, challenge.key_fingerprint, challenge.public_spki_hex, challenge.epoch,
 			challenge.predecessor_epoch, challenge.expires_at, challenge.audience);
 	check();
-	return commit.first<IssuerReceipt>();
+	beforeCommit?.();
+	const receipt = await commit.first<IssuerReceipt>();
+	if (receipt) check();
+	return receipt;
 }

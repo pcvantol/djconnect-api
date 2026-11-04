@@ -56,7 +56,6 @@ export function createWatchEnrollmentRedeemHttp(
 		if (request.headers.get("content-type")?.trim().toLowerCase() !== "application/json"
 			|| request.headers.has("content-encoding")) return new Response(null, { status: 415, headers });
 		const signal = AbortSignal.any([request.signal, AbortSignal.timeout(3000)]);
-		let checks = 0;
 		let submitted = false;
 		try {
 			const { body, proof } = await readSignedWatchRequest(request, signal);
@@ -66,10 +65,9 @@ export function createWatchEnrollmentRedeemHttp(
 			const receipt = await redeemWatchEnrollment(db, value.challenge_id, value.nonce, proof, {
 				assertCurrent(challenge) {
 					signal.throwIfAborted();
-					const result = authority.assertCurrent(challenge);
-					if (result === undefined && ++checks === 2) submitted = true;
-					return result;
+					return authority.assertCurrent(challenge);
 				},
+				beforeCommit() { submitted = true; },
 			});
 			if (!receipt) return unavailable();
 			signal.throwIfAborted();
