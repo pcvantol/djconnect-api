@@ -23,9 +23,14 @@ it("blocks pending, mismatched and same-epoch rolled-back D1 observations", asyn
       .bind(state.revision,state.operation,state.body_hash,state.enabled,state.sealed).run();
   };
   expect(await rpc("dispatch",on)).toBe(false);
+  expect(await rpc("observe",prev!)).toBe("unavailable");
   expect(await rpc("init")).toBe(true);
+  expect(await rpc("observe",prev!)).toBe("confirmed");
   expect(await rpc("begin",{previous:prev,next:on})).toBe(true);
+  expect(await rpc("observe",prev!)).toBe("unavailable");
   await write(on);
+  expect(await rpc("observe",(await read())!)).toBe("pending");
+  expect(await rpc("observe",{...on,body_hash:"c".repeat(64)})).toBe("unavailable");
   expect(await rpc("dispatch",(await read())!)).toBe(false);
   expect(await rpc("confirm",{...on,body_hash:"c".repeat(64)})).toBe(false);
   expect(await rpc("dispatch",(await read())!)).toBe(false);
@@ -34,8 +39,11 @@ it("blocks pending, mismatched and same-epoch rolled-back D1 observations", asyn
   expect(await rpc("begin",{previous:on,next:off})).toBe(true);
   expect(await rpc("dispatch",(await read())!)).toBe(false);
   await write(off);
+  expect(await rpc("observe",(await read())!)).toBe("pending");
   expect(await rpc("confirm",(await read())!)).toBe(true);
+  expect(await rpc("observe",(await read())!)).toBe("confirmed");
   await write(on);
+  expect(await rpc("observe",(await read())!)).toBe("unavailable");
   expect(await rpc("dispatch",(await read())!)).toBe(false);
   expect(await rpc("init")).toBe(false);
   expect(await rpc("begin",{previous:on,next:off})).toBe(false);

@@ -69,6 +69,7 @@ export class DispatchActor extends DurableObject {
       case "/init": return Response.json(authority.initializeDisabled(scope));
       case "/begin": return Response.json(await authority.begin(scope, payload.previous, payload.next));
       case "/confirm": return Response.json(authority.confirm(scope, payload));
+      case "/observe": return Response.json(authority.classifyObservation(scope, payload));
       case "/advance": return Response.json(authority.advanceGeneration(scope, fixtureScope(scope.epoch+1)));
       default: {
         const sql = this.ctx.storage.sql;
