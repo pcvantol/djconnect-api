@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -538,7 +538,7 @@ SOURCE_PROVENANCE.update(watch_registration_receipt_delta_sha256=RECEIPT_DELTA_S
                          watch_registration_receipt_source_map_sha256=RECEIPT_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_release_retention():
     sources, refs = baseline_before_watch_registration_receipt()
     delta = pinned_working_proof(RECEIPT_DELTA_PATH, RECEIPT_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source',
@@ -562,6 +562,38 @@ def baseline():
             current[name] = change['after']
     require(source_map_digest(sources) == delta['effective_source_map_sha256'] == RECEIPT_SOURCE_MAP_SHA256)
     refs[RECEIPT_DELTA_PATH] = RECEIPT_DELTA_SHA256
+    return sources, refs
+
+
+RELEASE_RETENTION_DELTA_PATH = 'docs/rendezvous/release-ci-retention-source-delta-v1.json'
+RELEASE_RETENTION_DELTA_SHA256 = 'e57853f7ca1a0e7cab741fc6adbf2784bd86779605e9882a32098691345f2e0b'
+RELEASE_RETENTION_SOURCE_MAP_SHA256 = '95ed9d508a33a905d807bc422c525a3b8a6fc5ee3920e8e0020f174c6a23cfc5'
+RELEASE_RETENTION_SOURCES = frozenset(('.github/workflows/ci-cd.yml',))
+SOURCE_PROVENANCE.update(release_ci_retention_delta_sha256=RELEASE_RETENTION_DELTA_SHA256,
+                         release_ci_retention_source_map_sha256=RELEASE_RETENTION_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_release_retention()
+    delta = pinned_working_proof(RELEASE_RETENTION_DELTA_PATH, RELEASE_RETENTION_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_RELEASE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'
+            and delta['base_source'] == '664f68f9d7798188513c8b59aa46424a158c4630'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == RELEASE_RETENTION_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        sources[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == RELEASE_RETENTION_SOURCE_MAP_SHA256)
+    refs[RELEASE_RETENTION_DELTA_PATH] = RELEASE_RETENTION_DELTA_SHA256
     return sources, refs
 
 

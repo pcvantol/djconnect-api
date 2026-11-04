@@ -8,6 +8,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      cleanup_workflow_runs:
+        description: Delete unprotected completed workflow runs after validation.
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -138,7 +144,7 @@ jobs:
     name: Cleanup old workflow runs
     needs:
       - validate
-    if: always() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+    if: needs.validate.result == 'success' && github.event_name == 'workflow_dispatch' && inputs.cleanup_workflow_runs
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

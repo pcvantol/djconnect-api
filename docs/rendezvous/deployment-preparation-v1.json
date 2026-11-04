@@ -93,7 +93,8 @@
     "coordinator/worker-do/source-manifest.json": "a239704b579ce1318e88437271995c9b1d0cb2813ed11fb75321cd6a6460e075",
     "docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json": "d72223211a34f4556515499ffa4ea6e77ba931cba5b6febf9121d3748f6aeca2",
     "docs/rendezvous/watch-topic-source-delta-v1.json": "ea503efa3a57c86df670cfe2ab4ca5d02cee1d44e9ffef1446f06b6f177a85af",
-    "docs/rendezvous/watch-registration-receipt-source-delta-v1.json": "77dc038adb870e61263e2fafba22994815dc5c191fd00ae94dd8719c6b3ff13c"
+    "docs/rendezvous/watch-registration-receipt-source-delta-v1.json": "77dc038adb870e61263e2fafba22994815dc5c191fd00ae94dd8719c6b3ff13c",
+    "docs/rendezvous/release-ci-retention-source-delta-v1.json": "e57853f7ca1a0e7cab741fc6adbf2784bd86779605e9882a32098691345f2e0b"
   },
   "schema_version": 1,
   "secret_names": [
@@ -180,7 +181,7 @@
     "wrangler.jsonc": "5c0a0a382d9144271b754397baf3e0def47dcc83acb3a610dc4abbc28ff3b54f",
     "package.json": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
     "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
-    ".github/workflows/ci-cd.yml": "2cc317e25d159fccf2593143dc8ca6b4bae62f128bdf05bf8db56b74da2c81d2",
+    ".github/workflows/ci-cd.yml": "e1e90326dcb5d25c5f1e661d55cbd48f965700d171b0a3ad9b03fed185e2a60d",
     "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
     "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
     "qualification/rendezvous/root-integration.check.mjs": "b30be29743d836a3a4d0d3c006369c5ca9c1b2c5d3a25be05ef221c1727d193e",
@@ -270,7 +271,9 @@
     "watch_topic_delta_sha256": "ea503efa3a57c86df670cfe2ab4ca5d02cee1d44e9ffef1446f06b6f177a85af",
     "watch_topic_source_map_sha256": "e2d62207b25cb2435be51dfcbe5a4ef8a7254b8e4e920b6451ae944b060fec85",
     "watch_registration_receipt_delta_sha256": "77dc038adb870e61263e2fafba22994815dc5c191fd00ae94dd8719c6b3ff13c",
-    "watch_registration_receipt_source_map_sha256": "f4e44f5a4221a0dbf4f1042fafb8c5c4ce8c927a6317da09b43e35c85010a938"
+    "watch_registration_receipt_source_map_sha256": "f4e44f5a4221a0dbf4f1042fafb8c5c4ce8c927a6317da09b43e35c85010a938",
+    "release_ci_retention_delta_sha256": "e57853f7ca1a0e7cab741fc6adbf2784bd86779605e9882a32098691345f2e0b",
+    "release_ci_retention_source_map_sha256": "95ed9d508a33a905d807bc422c525a3b8a6fc5ee3920e8e0020f174c6a23cfc5"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
