@@ -1,3 +1,4 @@
+import haDevWorker from "../src/watch-lifecycle/ha-dev-worker";
 import { expect, it } from "vitest";
 import { createWatchAccessKeyResolver } from "../src/watch-lifecycle/access-jwks";
 import { createWatchAccessIngress } from "../src/watch-lifecycle/access-ingress";
@@ -104,4 +105,27 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	expect(interrupted.status).toBe(503);
 	expect(await interrupted.json()).toEqual({ error: "watch_preference_outcome_unknown" });
 	rpcReply.resolve(new Response(null, { status: 204 }));
+});
+
+it("keeps the dedicated HA-dev Worker closed without exact bindings and platform Access", async () => {
+	const canonical = "https://watch-ha-dev.djconnect.dev/v1/watch/preference";
+	let calls = 0;
+	const env = {
+		WATCH_ACCESS_ISSUER: "https://fixture.cloudflareaccess.com",
+		WATCH_ACCESS_AUDIENCE: "access-audience",
+		WATCH_LIFECYCLE_AUDIENCE: "lifecycle-audience",
+		WATCH_INSTALLATION: "home",
+		WATCH_ACCESS_CLIENT_ID: "machine.access",
+		WATCH_ACCESS_GENERATION: "1",
+		WATCH_ACCESS_MAX_AGE_SECONDS: "20",
+		WATCH_PRIVATE_PREFERENCE: { async preference() { calls++; return new Response(null, { status: 204 }); } },
+	};
+	const access = { access: {} } as ExecutionContext;
+	const post = (url: string) => new Request(url, { method: "POST", headers: { "content-type": "application/json" } });
+	expect((await haDevWorker.fetch(post(canonical), {}, access)).status).toBe(403);
+	expect((await haDevWorker.fetch(post(canonical), env, {} as ExecutionContext)).status).toBe(403);
+	expect((await haDevWorker.fetch(post(canonical), { ...env, WATCH_ACCESS_MAX_AGE_SECONDS: "31" }, access)).status).toBe(403);
+	expect((await haDevWorker.fetch(post(canonical + "?preview=1"), env, access)).status).toBe(403);
+	expect((await haDevWorker.fetch(post("https://preview.invalid/v1/watch/preference"), env, access)).status).toBe(403);
+	expect(calls).toBe(0);
 });
