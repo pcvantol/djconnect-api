@@ -1,0 +1,1 @@
+{"name": "watch-dispatch-do-lab", "main": "worker.ts", "compatibility_date": "2026-06-20", "durable_objects": {"bindings": [{"name": "ACTOR", "class_name": "DispatchActor"}]}, "migrations": [{"tag": "v1", "new_sqlite_classes": ["DispatchActor"]}], "d1_databases": [{"binding": "DB", "database_name": "fixture", "database_id": "00000000-0000-4000-8000-000000000001"}]}
