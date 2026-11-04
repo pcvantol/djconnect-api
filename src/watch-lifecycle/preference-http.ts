@@ -5,10 +5,23 @@ import { applyWatchPreference } from "./preference";
 const headers = { "cache-control": "no-store", "x-content-type-options": "nosniff" };
 const unavailable = () => Response.json({ error: "watch_preference_unavailable" }, { status: 403, headers });
 
-/** No route or restore authority is supplied by this qualification composition. */
+export type WatchPreferenceAdmission = Pick<LifecycleClaims,
+	"installation" | "receiver" | "incarnation" | "epoch" | "key_fingerprint"> & Readonly<{
+	action: "preference-read" | "preference-write";
+	expiresAt: number;
+}>;
+
+/** The private caller supplies admission from authenticated pairing and independent restore state. */
 export function createWatchPreferenceHttp(
 	db: D1Database, audience: string, assertRestoreCurrent: (claims: LifecycleClaims) => void,
+	admission: WatchPreferenceAdmission,
 ) {
+	const scope = Object.freeze({ ...admission });
+	const admits = (claims: LifecycleClaims) =>
+		Number.isSafeInteger(scope.expiresAt) && Math.min(scope.expiresAt, claims.expiry) > Math.floor(Date.now() / 1000)
+		&& scope.action === claims.action && scope.installation === claims.installation
+		&& scope.receiver === claims.receiver && scope.incarnation === claims.incarnation
+		&& scope.epoch === claims.epoch && scope.key_fingerprint === claims.key_fingerprint;
 	return async (request: Request): Promise<Response> => {
 		if (request.method !== "POST") return new Response(null, { status: 405, headers: { ...headers, allow: "POST" } });
 		if (request.headers.get("content-type")?.trim().toLowerCase() !== "application/json"
@@ -19,7 +32,7 @@ export function createWatchPreferenceHttp(
 			const { body, proof } = await readSignedWatchRequest(request, signal);
 			const now = Math.floor(Date.now() / 1000);
 			const claims = decodeLifecycleClaims(body, audience, now);
-			if (claims.action !== "preference-read" && claims.action !== "preference-write") return unavailable();
+			if (!admits(claims)) return unavailable();
 			const issuer = await db.prepare(`SELECT public_spki_hex FROM watch_lifecycle_issuer
 				WHERE installation=? AND epoch=? AND key_fingerprint=? AND scope='watch-lifecycle' AND active=1`)
 				.bind(claims.installation, claims.epoch, claims.key_fingerprint).first<{public_spki_hex: string | null}>();
@@ -27,6 +40,7 @@ export function createWatchPreferenceHttp(
 			const spki = Uint8Array.from(issuer.public_spki_hex.match(/../g)!, pair => parseInt(pair, 16));
 			const check = (verified: LifecycleClaims) => {
 				signal.throwIfAborted();
+				if (!admits(verified)) throw new Error("watch_preference_admission_expired");
 				const result: unknown = assertRestoreCurrent(verified);
 				if (result !== undefined) {
 					void Promise.resolve(result).catch(() => undefined);
