@@ -17,12 +17,17 @@ export class WatchEnrollmentAuthority {
 	}
 
 	async authorize(grant: Grant): Promise<boolean> {
-		if (grant.installation !== this.installation || !/^[a-f0-9]{64}$/.test(grant.operator_binding)) return false;
-		const inserted = this.storage.sql.exec(`INSERT OR IGNORE INTO watch_enrollment_authority
-			(operator_binding,binding) VALUES (?,?) RETURNING operator_binding`,
-			grant.operator_binding, binding(grant)).toArray().length === 1;
+		const inserted = this.insertGrant(grant);
 		if (inserted) await this.storage.sync();
 		return inserted;
+	}
+
+	/** Synchronous insert for the owning actor's SQLite transaction. */
+	insertGrant(grant: Grant): boolean {
+		if (grant.installation !== this.installation || !/^[a-f0-9]{64}$/.test(grant.operator_binding)) return false;
+		return this.storage.sql.exec(`INSERT OR IGNORE INTO watch_enrollment_authority
+			(operator_binding,binding) VALUES (?,?) RETURNING operator_binding`,
+			grant.operator_binding, binding(grant)).toArray().length === 1;
 	}
 
 	async revoke(operatorBinding: string): Promise<boolean> {
