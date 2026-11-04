@@ -93,13 +93,23 @@ export function createWatchAccessIngress(
 			signal.throwIfAborted();
 			// The internal recipient must independently resolve receiver and recheck the credential generation.
 			writeForwarded = operation.action === "preference-write";
-			return await binding.preference({
-				installation: policy.installation,
-				credentialId: policy.credentialId,
-				credentialGeneration: policy.credentialGeneration,
-				action: operation.action,
-				expiresAt,
-			}, body, proof);
+			const aborted = Promise.withResolvers<never>();
+			const onAbort = () => aborted.reject(signal.reason);
+			signal.addEventListener("abort", onAbort, { once: true });
+			try {
+				const response = await Promise.race([aborted.promise, binding.preference({
+					installation: policy.installation,
+					credentialId: policy.credentialId,
+					credentialGeneration: policy.credentialGeneration,
+					action: operation.action,
+					expiresAt,
+				}, body, proof)]);
+				signal.throwIfAborted();
+				if (Math.min(expiresAt, operation.expiry) <= now()) throw new Error("Watch preference admission expired");
+				return response;
+			} finally {
+				signal.removeEventListener("abort", onAbort);
+			}
 		} catch {
 			return writeForwarded ? Response.json({ error: "watch_preference_outcome_unknown" }, {
 				status: 503, headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" },

@@ -27,14 +27,16 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	};
 	const rawBody = JSON.stringify(operation, null, 1);
 	const proof = new Uint8Array(64).fill(5);
-	const request = (assertion: string, url = endpoint, body = rawBody, headers = {}) => new Request(url, {
-		method: "POST", body, headers: {
+	const request = (assertion: string, url = endpoint, body = rawBody, headers = {}, signal?: AbortSignal) => new Request(url, {
+		method: "POST", body, signal, headers: {
 			"content-type": "application/json", "cf-access-jwt-assertion": assertion,
 			"djc-watch-lifecycle-signature": base64url(proof), "cf-access-client-id": "untrusted-header", ...headers,
 		},
 	});
 	const access = { access: {} as CloudflareAccessContext };
 	let calls = 0;
+	const rpcStarted = Promise.withResolvers<void>();
+	const rpcReply = Promise.withResolvers<Response>();
 	const ingress = createWatchAccessIngress({
 		endpoint, issuer, accessAudience: "watch-access", lifecycleAudience: "watch-lifecycle",
 		installation: "home", credentialId: "machine.access", credentialGeneration: 3, maxAssertionAgeSeconds: 20,
@@ -42,6 +44,10 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	}, {
 		async preference(context, body, signature) {
 			calls++;
+			if (context.action === "preference-write") {
+				rpcStarted.resolve();
+				return rpcReply.promise;
+			}
 			expect(context).toEqual({
 				installation: "home", credentialId: "machine.access", credentialGeneration: 3,
 				action: "preference-read", expiresAt: now + 19,
@@ -67,4 +73,13 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	expect(calls).toBe(0);
 	expect((await ingress(request(valid), access)).status).toBe(204);
 	expect(calls).toBe(1);
+	const abort = new AbortController();
+	const write = JSON.stringify({ ...operation, action: "preference-write", expected_version: 0, enabled: true });
+	const pending = ingress(request(valid, endpoint, write, {}, abort.signal), access);
+	await Promise.race([rpcStarted.promise, pending.then(() => { throw new Error("write never reached binding"); })]);
+	abort.abort();
+	const interrupted = await pending;
+	expect(interrupted.status).toBe(503);
+	expect(await interrupted.json()).toEqual({ error: "watch_preference_outcome_unknown" });
+	rpcReply.resolve(new Response(null, { status: 204 }));
 });
