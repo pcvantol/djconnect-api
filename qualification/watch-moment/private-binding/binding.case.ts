@@ -89,4 +89,28 @@ it("runs signed preference ordering and expiry through a named Worker binding an
 	expect((await actor.status()).batches).toBe(3);
 	expect(await DB.prepare("SELECT revision, enabled, operation FROM watch_lifecycle_preference").first())
 		.toEqual({ revision: 1, enabled: 0, operation: "new-off" });
+
+	const secondScope = { ...scope, receiver: "second-watch", incarnation: "pair-b" };
+	const secondPair = await sign("pair", "pair-second", secondScope);
+	expect(await applyWatchPairing(DB, secondPair.body, secondPair.proof, spki, "lab", now, () => {})).not.toBeNull();
+	const secondOwner = ACTOR.getByName((await watchRestoreActorName(secondScope))!);
+	const secondAdmission = { ...fixtureAdmission, ...secondScope };
+	await actor.admit(secondAdmission);
+	await secondOwner.admit(secondAdmission);
+	await secondOwner.loseNextOwnedReply();
+	const ownedWrite = await sign("preference-write", "owned-off", {
+		...secondScope, expected_version: 0, enabled: false,
+	});
+	const invokeOwned = (signed: Awaited<ReturnType<typeof sign>>) =>
+		ROUTED.preference(context(), signed.body, signed.proof);
+	const uncertain = await invokeOwned(ownedWrite);
+	expect(uncertain.status).toBe(503);
+	expect(await uncertain.json()).toEqual({ error: "watch_preference_outcome_unknown" });
+	const secondRead = await sign("preference-read", "owned-status", secondScope);
+	expect((await ROUTED.preference({ ...context(), action: "preference-read" }, secondRead.body, secondRead.proof)).status).toBe(403);
+	const replayed = await invokeOwned(ownedWrite);
+	expect(replayed.status).toBe(200);
+	expect(await replayed.json()).toMatchObject({ revision: 1, enabled: 0, operation: "owned-off" });
+	expect((await secondOwner.status()).batches).toBe(1);
+	expect((await ROUTED.preference({ ...context(), action: "preference-read" }, secondRead.body, secondRead.proof)).status).toBe(200);
 }, 10000);

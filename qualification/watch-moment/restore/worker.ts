@@ -74,7 +74,7 @@ export class DispatchActor extends DurableObject {
       case "/begin": return Response.json(await authority.begin(scope, payload.previous, payload.next));
       case "/confirm": return Response.json(authority.confirm(scope, payload));
       case "/observe": return Response.json(authority.classifyObservation(scope, payload));
-      case "/transition": return Response.json(await runWatchRestoreTransition(authority, scope, payload.previous, payload.next, {
+      case "/transition": return Response.json(await runWatchRestoreTransition(authority, scope, payload.previous.revision, payload.next, {
         readback: () => env.DB.prepare("SELECT revision,operation,body_hash,enabled,sealed FROM transition_fixture WHERE epoch=1").first(),
         assertCurrent() {},
         async submit() {
