@@ -1,5 +1,6 @@
 import { readSignedWatchRequest } from "./signed-http";
 import { decodeLifecycleClaims, type LifecycleClaims } from "./proof";
+import type { WatchRestoreAuthority } from "./restore-authority";
 import { applyWatchPreference } from "./preference";
 
 const headers = { "cache-control": "no-store", "x-content-type-options": "nosniff" };
@@ -25,6 +26,7 @@ export function createWatchPreferenceHttp(
 	db: D1Database, audience: string, assertRestoreCurrent: (claims: LifecycleClaims) => void,
 	admission: WatchPreferenceAdmission,
 	assertMachineCurrent: (scope: WatchPreferenceAdmission) => void,
+	restore?: WatchRestoreAuthority,
 ) {
 	const scope = Object.freeze({ ...admission });
 	const withinSubmissionWindow = () =>
@@ -61,7 +63,7 @@ export function createWatchPreferenceHttp(
 			const receipt = await applyWatchPreference(db, body, proof, spki, audience, now, verified => {
 				check(verified);
 				writeMayHaveStarted = verified.action === "preference-write";
-			});
+			}, restore);
 			if (!receipt) return unavailable();
 			check(claims);
 			return Response.json(receipt, { headers });

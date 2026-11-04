@@ -6,7 +6,7 @@ interface WatchTransitionPorts {
 	/** The owning actor checks live credentials, pairing and the original deadline synchronously. */
 	assertCurrent(): void;
 	/** Submit the original revision-guarded CAS without changing its signed intent. */
-	submit(): Promise<unknown>;
+	submit(previous: WatchPreferenceState): Promise<unknown>;
 }
 
 function matches(left: WatchPreferenceState, right: WatchPreferenceState): boolean {
@@ -24,12 +24,11 @@ function assertCurrent(ports: WatchTransitionPorts): void {
 /** Stable actor only. Call with states derived from the already verified signed transition. */
 export async function runWatchRestoreTransition(
 	authority: WatchRestoreAuthority, scope: WatchDispatchScope,
-	previous: WatchPreferenceState, next: WatchPreferenceState, ports: WatchTransitionPorts,
+	expectedRevision: number, next: WatchPreferenceState, ports: WatchTransitionPorts,
 ): Promise<"confirmed" | "unavailable" | "unknown"> {
 	const binding = Object.freeze({ ...scope });
-	const before = Object.freeze({ ...previous });
 	const after = Object.freeze({ ...next });
-	if (before.sealed === 1 || after.revision !== before.revision + 1) return "unavailable";
+	if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0 || after.revision !== expectedRevision + 1) return "unavailable";
 	let reserved = false;
 	try {
 		assertCurrent(ports);
@@ -43,14 +42,14 @@ export async function runWatchRestoreTransition(
 			reserved = true;
 			return authority.confirm(binding, observed) ? "confirmed" : "unknown";
 		}
-		if (!matches(observed, before) || authority.classifyObservation(binding, observed) !== "confirmed") return "unavailable";
+		if (observed.revision !== expectedRevision || authority.classifyObservation(binding, observed) !== "confirmed") return "unavailable";
 		assertCurrent(ports);
 		// Once reservation is attempted, an error may leave durable pending state.
 		reserved = true;
-		if (!await authority.begin(binding, before, after)) return "unavailable";
+		if (!await authority.begin(binding, observed, after)) return "unavailable";
 		assertCurrent(ports);
 		if (authority.classifyObservation(binding, after) !== "pending") return "unknown";
-		await ports.submit();
+		await ports.submit(observed);
 		const committed = await ports.readback();
 		if (!committed || !matches(committed, after)) return "unknown";
 		assertCurrent(ports);

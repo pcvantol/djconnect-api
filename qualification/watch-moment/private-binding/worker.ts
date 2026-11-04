@@ -1,3 +1,5 @@
+import { createOwnedWatchPreference } from "../../../src/watch-lifecycle/owned-preference";
+import { WatchRestoreAuthority } from "../../../src/watch-lifecycle/restore-authority";
 import { DurableObject, WorkerEntrypoint } from "cloudflare:workers";
 import { createWatchPreferenceHttp, type WatchPreferenceAdmission } from "../../../src/watch-lifecycle/preference-http";
 
@@ -33,10 +35,12 @@ export class FixturePairing extends WorkerEntrypoint<LabEnv> {
 export class PreferenceActor extends DurableObject<LabEnv> {
 	private pause?: () => void;
 	private batchCount = 0;
+	private loseOwnedReply = false;
 
 	async admit(scope: Scope) {
 		this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS fixture_admission (id INTEGER PRIMARY KEY, scope TEXT)");
 		this.ctx.storage.sql.exec("INSERT INTO fixture_admission VALUES (1, ?)", JSON.stringify(scope));
+		new WatchRestoreAuthority(this.ctx.storage).initializeDisabled(scope);
 		await this.ctx.storage.sync();
 	}
 
@@ -44,6 +48,8 @@ export class PreferenceActor extends DurableObject<LabEnv> {
 		this.ctx.storage.sql.exec("DELETE FROM fixture_admission WHERE id=1");
 		await this.ctx.storage.sync();
 	}
+
+	loseNextOwnedReply() { this.loseOwnedReply = true; }
 
 	status() {
 		return { paused: this.pause !== undefined, batches: this.batchCount };
@@ -75,6 +81,19 @@ export class PreferenceActor extends DurableObject<LabEnv> {
 		const signature = btoa(String.fromCharCode(...proof)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 		const db = new Proxy(this.env.DB, {
 			get: (target, name, receiver) => {
+				if (name === "prepare" && this.loseOwnedReply) {
+					return (query: string) => {
+						const statement = target.prepare(query);
+						if (!query.startsWith("UPDATE watch_lifecycle_preference")) return statement;
+						return { bind: (...values: unknown[]) => ({ first: async () => {
+							this.loseOwnedReply = false;
+							const row = await statement.bind(...values).first();
+							this.batchCount++;
+							if (!row) throw new Error("fixture CAS did not commit");
+							throw new Error("fixture lost CAS acknowledgement");
+						} }) };
+					};
+				}
 				if (name === "prepare" && call.pauseBeforeLookup) {
 					return (query: string) => {
 						const statement = target.prepare(query);
@@ -96,12 +115,18 @@ export class PreferenceActor extends DurableObject<LabEnv> {
 				};
 			},
 		});
+		const assertCurrent = () => {
+			if (admitted() !== original) throw new Error("fixture admission withdrawn");
+		};
+		if (resolved) return createOwnedWatchPreference({
+			db, audience: "lab", actor: this.ctx, namespace: this.env.ACTOR,
+			assertPairingCurrent: assertCurrent, assertMachineCurrent: assertCurrent,
+		})(call, resolved, body, proof);
+
 		// Admission is supplied only by the test harness. Neither RPC nor D1 can install it.
 		return createWatchPreferenceHttp(db, "lab", () => {}, {
 			...scope, action: call.action, expiresAt: call.expiresAt, submitBeforeMs: call.submitBeforeMs,
-		}, () => {
-			if (admitted() !== original) throw new Error("fixture admission withdrawn");
-		})(new Request("https://fixture.invalid/internal", {
+		}, assertCurrent)(new Request("https://fixture.invalid/internal", {
 			method: "POST", body,
 			headers: { "content-type": "application/json", "djc-watch-lifecycle-signature": signature },
 		}));
