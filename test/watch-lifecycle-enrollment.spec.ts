@@ -1,3 +1,4 @@
+import { createWatchEnrollmentIssueHttp } from "../src/watch-lifecycle/enrollment-http";
 import { env } from "cloudflare:test";
 import { expect, it } from "vitest";
 import schema from "../src/watch-lifecycle/preference-schema.sql?raw";
@@ -16,14 +17,30 @@ it("activates the exact approved issuer once, only after possession and current 
 		audience:"fixture-api", installation:"home", operator_binding:"a".repeat(64),
 		restore_fence:"b".repeat(64), key_fingerprint:fingerprint, expected_epoch:0, expiry,
 	};
-	const issue = () => issueWatchEnrollmentChallenge(db,intent,new Uint8Array(spki),() => {});
+	const request = () => new Request("https://fixture.invalid", {
+		method: "POST", body: JSON.stringify({installation:"untrusted-body", expected_epoch:5}),
+	});
+	expect((await createWatchEnrollmentIssueHttp(db)(request())).status).toBe(403);
+	expect((await createWatchEnrollmentIssueHttp(db, async () => null)(request())).status).toBe(403);
+	const mismatch = createWatchEnrollmentIssueHttp(db, async () => ({
+		intent: {...intent, key_fingerprint:"f".repeat(64)}, publicSpki:new Uint8Array(spki), assertCurrent() {},
+	}));
+	expect((await mismatch(request())).status).toBe(403);
+	const issue = createWatchEnrollmentIssueHttp(db, async () => ({
+		intent, publicSpki:new Uint8Array(spki), assertCurrent(value) {
+			expect(value).toEqual(intent);
+		},
+	}));
 	await expect(issueWatchEnrollmentChallenge(db,intent,new Uint8Array(spki),() => {
 		throw new Error("operator denied");
 	})).rejects.toThrow("operator denied");
 	expect(await db.prepare("SELECT count(*) AS n FROM watch_lifecycle_enrollment").first("n")).toBe(0);
-	const issued = await Promise.all([issue(),issue()]);
-	expect(issued.filter(Boolean)).toHaveLength(1);
-	const { nonce, challenge_id: challengeId } = issued.find(value => value !== null)!;
+	const issued = await Promise.all([issue(request()),issue(request())]);
+	expect(issued.map(reply => reply.status).sort()).toEqual([201,403]);
+	const { nonce, challenge_id: challengeId, installation, expected_epoch } =
+		await issued.find(reply => reply.status === 201)!.json<{nonce:string;challenge_id:string;installation:string;expected_epoch:number}>();
+	expect(installation).toBe("home");
+	expect(expected_epoch).toBe(0);
 	expect(nonce).toHaveLength(43);
 	expect(await db.prepare("SELECT nonce_hash FROM watch_lifecycle_enrollment").first("nonce_hash"))
 		.toBe(hex(await crypto.subtle.digest("SHA-256",encode(nonce))));
