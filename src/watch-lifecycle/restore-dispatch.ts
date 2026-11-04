@@ -22,7 +22,8 @@ export function createRestoredWatchSender(
 		if (name === null || !actor.id.equals(namespace.idFromName(name))) throw new Error("watch_dispatch_unavailable");
 		const authority = new WatchRestoreAuthority(actor.storage);
 		const fence = new WatchDispatchFence(actor.storage, enrolled);
-		const send = existingRelaySender(env, now, async (input, init) => {
+		let observed: Awaited<ReturnType<typeof readPreference>> = null;
+		async function readPreference() {
 			const row = await env.DB.prepare(`SELECT pairing.revision, pairing.operation, pairing.body_hash,
 				pairing.enabled, pairing.sealed
 				FROM watch_lifecycle_preference AS pairing
@@ -33,14 +34,24 @@ export function createRestoredWatchSender(
 					AND issuer.scope='watch-lifecycle' AND issuer.active=1`)
 				.bind(enrolled.installation, enrolled.receiver, enrolled.incarnation, enrolled.epoch, enrolled.key_fingerprint)
 				.first<{revision: number; operation: string | null; body_hash: string | null; enabled: number; sealed: number}>();
+			return row;
+		}
+		const send = existingRelaySender(env, now, async (input, init) => {
 			context.signal.throwIfAborted();
 			init?.signal?.throwIfAborted();
-			if (!row) throw new Error("watch_dispatch_unavailable");
-			const started = authority.start(enrolled, row, () =>
+			if (!observed) throw new Error("watch_dispatch_unavailable");
+			const started = authority.start(enrolled, observed, () =>
 				fence.start(enrolled, operation, lease, now(), context.expiresAt, () => fetcher(input, init)));
 			if (!started?.result) throw new Error("watch_dispatch_unavailable");
 			return started.result.result;
 		});
-		return send(registration, payload, context);
+		return send(registration, payload, {
+			...context,
+			async beforeFetch() {
+				observed = await readPreference();
+				if (!observed) throw new Error("watch_dispatch_unavailable");
+				return context.beforeFetch();
+			},
+		});
 	};
 }
