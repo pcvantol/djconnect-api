@@ -132,6 +132,40 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	const restoreOld = await signed("replace", "restore-old", { predecessor: "pair-b" });
 	expect(await restoreOld(applyWatchPairing)).toBeNull();
 	expect(await read()).toBeNull();
+	const oldIntent = await signed("preference-write", "delayed-on", {
+		incarnation: "pair-b", expected_version: 0, enabled: true,
+	});
+	const newIntent = await signed("preference-write", "newer-off", {
+		incarnation: "pair-b", expected_version: 0, enabled: false,
+	});
+	const atCas = Promise.withResolvers<void>();
+	const resumeCas = Promise.withResolvers<void>();
+	const pausedDb = new Proxy(db, {
+		get(target, property, receiver) {
+			if (property !== "batch") return Reflect.get(target, property, receiver);
+			return async (statements: D1PreparedStatement[]) => {
+				atCas.resolve();
+				await resumeCas.promise;
+				return target.batch(statements);
+			};
+		},
+	});
+	const replacedAdmission = { ...admission, incarnation: "pair-b" };
+	const delayedHttp = createWatchPreferenceHttp(pausedDb, audience, () => {}, replacedAdmission);
+	const latestHttp = createWatchPreferenceHttp(db, audience, () => {}, replacedAdmission);
+	const delayed = delayedHttp(oldIntent.request());
+	try {
+		await Promise.race([atCas.promise, delayed.then(() => { throw new Error("opt-in never reached CAS"); })]);
+		const latest = await latestHttp(newIntent.request());
+		expect(latest.status).toBe(200);
+		expect(await latest.json()).toMatchObject({ revision: 1, operation: "newer-off", enabled: 0 });
+	} finally {
+		resumeCas.resolve();
+	}
+	expect((await delayed).status).toBe(403);
+	expect((await latestHttp(oldIntent.request())).status).toBe(403);
+	expect(await db.prepare("SELECT revision, operation, enabled FROM watch_lifecycle_preference").first())
+		.toEqual({ revision: 1, operation: "newer-off", enabled: 0 });
 	await db.prepare(`WITH RECURSIVE n(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM n WHERE x<4094)
 		INSERT INTO watch_lifecycle_incarnation SELECT 'home','watch','seed-incarnation-'||x FROM n`).run();
 	const overCapacity = await signed("replace", "over-capacity", { incarnation: "pair-d", predecessor: "pair-b" });
