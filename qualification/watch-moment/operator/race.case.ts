@@ -1,3 +1,4 @@
+import {WatchEnrollmentAuthority} from "../../../src/watch-lifecycle/enrollment-authority";
 import {env, runInDurableObject} from "cloudflare:test";
 import {createOwnedInitialWatchEnrollment} from "../../../src/watch-lifecycle/owned-enrollment";
 import {watchRestoreActorName} from "../../../src/watch-lifecycle/dispatch-identity";
@@ -60,9 +61,13 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
   const request = () => new Request("https://fixture.invalid/issue",{method:"POST"});
   await runInDurableObject(actor, async (_instance,ctx) => {
     let witness = false;
+    let interrupt = false;
+    let witnessChecks = 0;
     const owner = {db,actor:ctx,namespace:ns,
       assertOperatorCurrent() {},
-      assertRestoreWitnessCurrent() { if (!witness) throw new Error("fixture witness unavailable"); },
+      assertRestoreWitnessCurrent() {
+        if (!witness || (interrupt && ++witnessChecks === 2)) throw new Error("fixture witness unavailable");
+      },
     };
     expect(await createOwnedInitialWatchEnrollment(undefined,scope,intent,spki)).toBeNull();
     expect(await createOwnedInitialWatchEnrollment(owner,{...scope,receiver:"different"},intent,spki)).toBeNull();
@@ -71,9 +76,21 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     expect(await enrollment!.prepare()).toBe(false);
     witness = true;
     expect((await enrollment!.issue(request())).status).toBe(403);
-    expect(await enrollment!.prepare()).toBe(true);
+    const conflicting = { ...intent, operator_binding: "f".repeat(64) };
+    expect(await new WatchEnrollmentAuthority(ctx.storage, scope.installation)
+      .authorize({ ...conflicting, restore_fence: "c".repeat(64) })).toBe(true);
+    const blocked = await createOwnedInitialWatchEnrollment(owner,scope,conflicting,spki);
+    expect(await blocked!.prepare()).toBe(false);
+    expect(new WatchRestoreAuthority(ctx.storage).classifyObservation(scope,
+      {revision:0,operation:null,body_hash:null,enabled:0,sealed:0})).toBe("unavailable");
+    interrupt = true;
     expect(await enrollment!.prepare()).toBe(false);
-    const issued = await enrollment!.issue(request());
+    interrupt = false;
+    const freshIntent = { ...intent, operator_binding: "e".repeat(64) };
+    const retry = await createOwnedInitialWatchEnrollment(owner,scope,freshIntent,spki);
+    expect(await retry!.prepare()).toBe(true);
+    expect(await retry!.prepare()).toBe(true);
+    const issued = await retry!.issue(request());
     expect(issued.status).toBe(201);
     const {nonce,challenge_id} = await issued.json<{nonce:string;challenge_id:string}>();
     const parts = ["DJC-WATCH-ENROLLMENT-V1\0"];
@@ -81,7 +98,7 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
       parts.push(String.fromCharCode(0,0,0,field.length),field);
     const signed = await crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},key.privateKey,new TextEncoder().encode(parts.join("")));
     const signature = btoa(String.fromCharCode(...new Uint8Array(signed))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-    const redeem = () => enrollment!.redeem(new Request("https://fixture.invalid/redeem",{
+    const redeem = () => retry!.redeem(new Request("https://fixture.invalid/redeem",{
       method:"POST",body:JSON.stringify({challenge_id,nonce}),
       headers:{"content-type":"application/json","djc-watch-lifecycle-signature":signature},
     }));

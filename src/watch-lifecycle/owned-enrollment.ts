@@ -65,12 +65,18 @@ export async function createOwnedInitialWatchEnrollment(
 	return {
 		async prepare() {
 			try {
-				assertExternal();
-				// A pre-existing actor cannot be reset to disabled by this initial-only entrypoint.
-				if (!restore.initializeDisabled(scope)) return false;
+				owner.actor.storage.transactionSync(() => {
+					assertExternal();
+					// Retry may reuse this exact disabled baseline, but must never reset actor state.
+					if (restore.classifyObservation(scope, baseline) !== "confirmed" &&
+						!restore.initializeDisabled(scope)) throw new Error("Watch baseline unavailable");
+					if (!enrollment.isAdmitted(intent) && !enrollment.insertGrant(intent)) {
+						throw new Error("Watch grant unavailable");
+					}
+				});
 				await owner.actor.storage.sync();
-				assertExternal();
-				return await enrollment.authorize(intent);
+				assertCurrent(intent);
+				return true;
 			} catch {
 				return false;
 			}
