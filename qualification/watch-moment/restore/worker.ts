@@ -7,6 +7,7 @@ import {createRestoredWatchSender} from "../../../src/watch-lifecycle/restore-di
 import {WatchDispatchFence} from "../../../src/watch-lifecycle/dispatch-fence";
 import {watchRestoreActorName,watchDispatchActorName} from "../../../src/watch-lifecycle/dispatch-identity";
 import { DurableObject } from "cloudflare:workers";
+import { runWatchRestoreTransition } from "../../../src/watch-lifecycle/restore-transition";
 import { WatchRestoreAuthority } from "../../../src/watch-lifecycle/restore-authority";
 export class DispatchActor extends DurableObject {
   private release: (() => void) | undefined;
@@ -29,6 +30,9 @@ export class DispatchActor extends DurableObject {
       return handler(req);
     }
     const payload: any = await req.json();
+    const storage = this.ctx.storage;
+    if (new URL(req.url).pathname === "/transition")
+      this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS fixture_submissions (id INTEGER PRIMARY KEY)");
     switch (new URL(req.url).pathname) {
       case "/ready": return Response.json(this.release !== undefined);
       case "/resume": this.release?.(); return Response.json(true);
@@ -70,6 +74,18 @@ export class DispatchActor extends DurableObject {
       case "/begin": return Response.json(await authority.begin(scope, payload.previous, payload.next));
       case "/confirm": return Response.json(authority.confirm(scope, payload));
       case "/observe": return Response.json(authority.classifyObservation(scope, payload));
+      case "/transition": return Response.json(await runWatchRestoreTransition(authority, scope, payload.previous, payload.next, {
+        readback: () => env.DB.prepare("SELECT revision,operation,body_hash,enabled,sealed FROM transition_fixture WHERE epoch=1").first(),
+        assertCurrent() {},
+        async submit() {
+          const next = payload.next;
+          await env.DB.prepare("UPDATE transition_fixture SET revision=?,operation=?,body_hash=?,enabled=?,sealed=? WHERE epoch=1 AND revision=?")
+            .bind(next.revision,next.operation,next.body_hash,next.enabled,next.sealed,payload.previous.revision).run();
+          storage.sql.exec("INSERT INTO fixture_submissions DEFAULT VALUES");
+          if (payload.loseReply) throw new Error("fixture lost D1 acknowledgement");
+        },
+      }));
+      case "/submissions": return Response.json(this.ctx.storage.sql.exec("SELECT count(*) AS count FROM fixture_submissions").one().count);
       case "/advance": return Response.json(authority.advanceGeneration(scope, fixtureScope(scope.epoch+1)));
       default: {
         const sql = this.ctx.storage.sql;
