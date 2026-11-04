@@ -3,11 +3,13 @@ import { expect, it } from "vitest";
 import schema from "../../../src/watch-lifecycle/preference-schema.sql?raw";
 import { frameLifecycleProof } from "../../../src/watch-lifecycle/proof";
 import { applyWatchPairing } from "../../../src/watch-lifecycle/pairing";
+import { watchRestoreActorName } from "../../../src/watch-lifecycle/dispatch-identity";
+import type { WatchPrivatePreference } from "../../../src/watch-lifecycle/private-entrypoint";
 import type { PreferenceActor, PrivatePreference } from "./worker";
 
 it("runs signed preference ordering and expiry through a named Worker binding and owning DO", async () => {
-	const { DB, PREFERENCE, ACTOR } = env as unknown as {
-		DB: D1Database; PREFERENCE: Service<PrivatePreference>; ACTOR: DurableObjectNamespace<PreferenceActor>;
+	const { DB, PREFERENCE, ROUTED, ACTOR } = env as unknown as {
+		DB: D1Database; PREFERENCE: Service<PrivatePreference>; ROUTED: Service<WatchPrivatePreference>; ACTOR: DurableObjectNamespace<PreferenceActor>;
 	};
 	for (const sql of schema.trim().split(/;\s*(?=CREATE)/)) await DB.prepare(sql).run();
 	const actor = ACTOR.getByName("fixture-home:fixture-watch");
@@ -39,7 +41,20 @@ it("runs signed preference ordering and expiry through a named Worker binding an
 	const send = (signed: Awaited<ReturnType<typeof sign>>, overrides = {}) =>
 		PREFERENCE.preference({ ...context(), ...overrides }, signed.body, signed.proof);
 	expect((await send(old)).status).toBe(403);
-	await actor.admit({ ...scope, credentialId: "fixture-machine", credentialGeneration: 1 });
+	const fixtureAdmission = { ...scope, credentialId: "fixture-machine", credentialGeneration: 1 };
+	await actor.admit(fixtureAdmission);
+	const ownerName = await watchRestoreActorName(scope);
+	expect(ownerName).not.toBeNull();
+	const owner = ACTOR.getByName(ownerName!);
+	const read = await sign("preference-read", "status");
+	const readContext = { ...context(), action: "preference-read" as const };
+	expect((await ROUTED.preference(readContext, read.body, read.proof)).status).toBe(403);
+	await owner.admit(fixtureAdmission);
+	const wrongReceiver = await sign("preference-read", "other-status", { receiver: "other-watch" });
+	expect((await ROUTED.preference(readContext, wrongReceiver.body, wrongReceiver.proof)).status).toBe(403);
+	const routed = await ROUTED.preference(readContext, read.body, read.proof);
+	expect(routed.status).toBe(200);
+	expect(await routed.json()).toMatchObject({ revision: 0, enabled: 0 });
 	expect((await send(old, { credentialGeneration: 2 })).status).toBe(403);
 	const delayed = send(old, { pauseBeforeBatch: true });
 	try {

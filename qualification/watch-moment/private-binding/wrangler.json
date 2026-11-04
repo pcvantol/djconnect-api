@@ -2,8 +2,16 @@
   "name": "watch-private-binding-lab",
   "main": "worker.ts",
   "compatibility_date": "2026-06-20",
-  "durable_objects": { "bindings": [{ "name": "ACTOR", "class_name": "PreferenceActor" }] },
+  "durable_objects": { "bindings": [
+    { "name": "ACTOR", "class_name": "PreferenceActor" },
+    { "name": "WATCH_PREFERENCE_ACTOR", "class_name": "PreferenceActor" }
+  ] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["PreferenceActor"] }],
-  "services": [{ "binding": "PREFERENCE", "service": "watch-private-binding-lab", "entrypoint": "PrivatePreference" }],
+  "vars": { "WATCH_LIFECYCLE_AUDIENCE": "lab" },
+  "services": [
+    { "binding": "PREFERENCE", "service": "watch-private-binding-lab", "entrypoint": "PrivatePreference" },
+    { "binding": "ROUTED", "service": "watch-private-binding-lab", "entrypoint": "WatchPrivatePreference" },
+    { "binding": "WATCH_PAIRING_AUTHORITY", "service": "watch-private-binding-lab", "entrypoint": "FixturePairing" }
+  ],
   "d1_databases": [{ "binding": "DB", "database_name": "fixture", "database_id": "00000000-0000-4000-8000-000000000001" }]
 }

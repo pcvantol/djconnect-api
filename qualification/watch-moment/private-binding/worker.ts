@@ -3,6 +3,9 @@ import { createWatchPreferenceHttp, type WatchPreferenceAdmission } from "../../
 
 import type { WatchMachineContext } from "../../../src/watch-lifecycle/access-ingress";
 
+import { watchDispatchScopeBinding, type WatchDispatchScope } from "../../../src/watch-lifecycle/dispatch-identity";
+export { WatchPrivatePreference } from "../../../src/watch-lifecycle/private-entrypoint";
+
 type Scope = Omit<WatchPreferenceAdmission, "action" | "expiresAt" | "submitBeforeMs">;
 type LabContext = WatchMachineContext & {
 	pauseBeforeLookup?: boolean;
@@ -17,7 +20,13 @@ interface LabEnv {
 
 export class PrivatePreference extends WorkerEntrypoint<LabEnv> {
 	preference(context: LabContext, body: Uint8Array<ArrayBuffer>, proof: Uint8Array<ArrayBuffer>) {
-		return this.env.ACTOR.getByName("fixture-home:fixture-watch").preference(context, body, proof);
+		return this.env.ACTOR.getByName("fixture-home:fixture-watch").preference(context, null, body, proof);
+	}
+}
+
+export class FixturePairing extends WorkerEntrypoint<LabEnv> {
+	resolvePreferenceScope(context: WatchMachineContext, receiver: string) {
+		return this.env.ACTOR.getByName("fixture-home:fixture-watch").lookup(context, receiver);
 	}
 }
 
@@ -44,7 +53,16 @@ export class PreferenceActor extends DurableObject<LabEnv> {
 		this.pause?.();
 	}
 
-	async preference(call: LabContext, body: Uint8Array<ArrayBuffer>, proof: Uint8Array<ArrayBuffer>) {
+	lookup(context: WatchMachineContext, receiver: string): WatchDispatchScope | null {
+		const entry = this.ctx.storage.sql.exec<{ scope: string }>("SELECT scope FROM fixture_admission WHERE id=1").toArray()[0];
+		if (!entry) return null;
+		const scope = JSON.parse(entry.scope) as Scope;
+		if (scope.installation !== context.installation || scope.receiver !== receiver ||
+			scope.credentialId !== context.credentialId || scope.credentialGeneration !== context.credentialGeneration) return null;
+		return scope;
+	}
+
+	async preference(call: LabContext, resolved: WatchDispatchScope | null, body: Uint8Array<ArrayBuffer>, proof: Uint8Array<ArrayBuffer>) {
 		const sql = this.ctx.storage.sql;
 		sql.exec("CREATE TABLE IF NOT EXISTS fixture_admission (id INTEGER PRIMARY KEY, scope TEXT)");
 		const admitted = () => sql.exec<{ scope: string }>("SELECT scope FROM fixture_admission WHERE id=1").toArray()[0]?.scope;
@@ -53,6 +71,7 @@ export class PreferenceActor extends DurableObject<LabEnv> {
 		const scope = JSON.parse(original) as Scope;
 		if (scope.installation !== call.installation || scope.credentialId !== call.credentialId ||
 			scope.credentialGeneration !== call.credentialGeneration) return new Response(null, { status: 403 });
+		if (resolved && watchDispatchScopeBinding(resolved) !== watchDispatchScopeBinding(scope)) return new Response(null, { status: 403 });
 		const signature = btoa(String.fromCharCode(...proof)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 		const db = new Proxy(this.env.DB, {
 			get: (target, name, receiver) => {
