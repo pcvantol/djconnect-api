@@ -49,6 +49,30 @@ it("blocks pending, mismatched and same-epoch rolled-back D1 observations", asyn
   expect(await rpc("begin",{previous:on,next:off})).toBe(false);
 });
 
+it("reserves before D1 and reconciles an exact lost acknowledgement without resubmitting", async () => {
+  const ns = (env as unknown as {ACTOR: DurableObjectNamespace}).ACTOR;
+  const actor = ns.getByName("transition");
+  const rpc = async (action: string, payload = {}) =>
+    (await actor.fetch("http://fixture/" + action, {method:"POST",body:JSON.stringify(payload)})).json();
+  const db = env.DB;
+  await db.prepare("CREATE TABLE transition_fixture(epoch INTEGER, revision INTEGER, operation TEXT, body_hash TEXT, enabled INTEGER, sealed INTEGER)").run();
+  await db.prepare("INSERT INTO transition_fixture VALUES (1,0,NULL,NULL,0,0)").run();
+  const previous = {revision:0,operation:null,body_hash:null,enabled:0,sealed:0};
+  const next = {revision:1,operation:"on",body_hash:"a".repeat(64),enabled:1,sealed:0};
+  expect(await rpc("transition",{previous,next})).toBe("unavailable");
+  expect(await rpc("submissions")).toBe(0);
+  expect(await rpc("init")).toBe(true);
+  expect(await rpc("transition",{previous,next,loseReply:true})).toBe("unknown");
+  expect(await rpc("observe",next)).toBe("pending");
+  expect(await rpc("dispatch",next)).toBe(false);
+  expect(await rpc("transition",{previous,next:{...next,body_hash:"b".repeat(64)}})).toBe("unavailable");
+  expect(await rpc("observe",next)).toBe("pending");
+  expect(await rpc("transition",{previous,next})).toBe("confirmed");
+  expect(await rpc("observe",next)).toBe("confirmed");
+  expect(await rpc("submissions")).toBe(1);
+  expect(await rpc("dispatch",next)).toBe(true);
+});
+
 it("does not route restored D1 to the old actor across a generation change", async () => {
   const rpc = async (path: string, body = {}) => (await SELF.fetch("http://fixture/"+path, {
     method:"POST",body:JSON.stringify(body),
