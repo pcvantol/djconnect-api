@@ -1,3 +1,7 @@
+import momentSchema from "../../../src/watch-moment/schema.sql?raw";
+import proposal from "../../../docs/push/watch-moment-alert-proposal-v1.json";
+import {frameLifecycleProof} from "../../../src/watch-lifecycle/proof";
+import {encryptSecret, sha256Hex} from "../../../src/crypto";
 import schema from "../../../src/watch-lifecycle/preference-schema.sql?raw";
 import {env, SELF} from "cloudflare:test";
 import {expect,it} from "vitest";
@@ -62,14 +66,19 @@ it("does not route restored D1 to the old actor across a generation change", asy
 it("blocks a normal relay after revoke wins over a paused D1 observation", async () => {
   const db = env.DB;
   for (const sql of schema.trim().split(/;\s*(?=CREATE)/)) await db.prepare(sql).run();
-  await db.prepare("INSERT INTO watch_lifecycle_issuer VALUES ('lab',1,?,'watch-lifecycle',1,NULL)").bind("a".repeat(64)).run();
+  for (const sql of momentSchema.split(";").map(v=>v.trim()).filter(Boolean)) await db.prepare(sql).run();
+  await db.prepare(`CREATE TABLE registrations(id TEXT PRIMARY KEY, apns_token_hash TEXT, ha_install_id TEXT, ha_user_hash TEXT,
+    device_id TEXT, topic TEXT, apns_environment TEXT, disabled INTEGER, invalid INTEGER, last_error_code TEXT,
+    client_type TEXT, app_bundle_id TEXT, categories_json TEXT, apns_token_ciphertext TEXT, apns_token_nonce TEXT)`).run();
   const key = await crypto.subtle.generateKey({name:"ECDSA",namedCurve:"P-256"},true,["sign","verify"]);
   const raw = await crypto.subtle.exportKey("pkcs8",key.privateKey);
   const pem = "-----BEGIN PRIVATE KEY-----\n"+btoa(String.fromCharCode(...new Uint8Array(raw)))+"\n-----END PRIVATE KEY-----";
-  const registration = {apns_environment:"sandbox",topic:"dev.djconnect.ios.watch",apns_token:"a".repeat(64),
-    apns_token_hash:Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode("a".repeat(64)))),x=>x.toString(16).padStart(2,"0")).join("")};
+  const spki = await crypto.subtle.exportKey("spki",key.publicKey);
+  const hex = (b:ArrayBuffer) => Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,"0")).join("");
+  const fingerprint = hex(await crypto.subtle.digest("SHA-256",spki));
+  await db.prepare("INSERT INTO watch_lifecycle_issuer VALUES ('lab',1,?,'watch-lifecycle',1,?)").bind(fingerprint,hex(spki)).run();
   for (const receiver of ["control","revoked"]) {
-    const rpc = async (path: string, body = {}) => (await SELF.fetch("http://fixture/"+path+"?receiver="+receiver,{
+    const rpc = async (path: string, body = {}) => (await SELF.fetch("http://fixture/"+path+"?receiver="+receiver+"&fingerprint="+fingerprint,{
       method:"POST",body:JSON.stringify(body),
     })).json();
     const baseline = {revision:0,operation:null,body_hash:null,enabled:0,sealed:0};
@@ -78,14 +87,33 @@ it("blocks a normal relay after revoke wins over a paused D1 observation", async
     expect(await rpc("init")).toBe(true);
     expect(await rpc("begin",{previous:baseline,next:on})).toBe(true);
     expect(await rpc("confirm",on)).toBe(true);
+    const now = Date.now();
+    const event = {...proposal.shared_synthetic_fixture.event,ha_install_id:"lab",device_id:receiver,event_id:receiver,
+      moment_id:"moment-"+receiver,created_at_ms:now-1000,expires_at_ms:now+30000};
+    const encryptionKey = btoa("0123456789abcdef0123456789abcdef");
+    const encrypted = await encryptSecret("a".repeat(64), encryptionKey);
+    const registration = {id:receiver, ha_install_id:"lab", ha_user_hash:event.ha_user_hash,device_id:receiver,
+      apns_environment:"sandbox",topic:"dev.djconnect.ios.watch",app_bundle_id:"dev.djconnect.ios.watch",client_type:"watchos",
+      disabled:0, invalid:0,categories_json:'["dj_moments_v1"]',apns_token:null,apns_token_ciphertext:encrypted.ciphertext,apns_token_nonce:encrypted.nonce,apns_token_hash:await sha256Hex("a".repeat(64))};
+    await db.prepare("INSERT INTO registrations VALUES(?,?,?,?,?,?,?,0,0,NULL,?,?,?,?,?)")
+      .bind(receiver,registration.apns_token_hash,"lab",event.ha_user_hash,receiver,registration.topic,"sandbox","watchos",registration.topic,registration.categories_json,encrypted.ciphertext,encrypted.nonce).run();
     const pause = receiver==="revoked";
-    const send = rpc("send",{pause,registration,env:{APNS_TEAM_ID:"lab",APNS_KEY_ID:"lab",APNS_PRIVATE_KEY:pem}});
+    const send = rpc("send",{pause,event,registration,env:{APNS_TEAM_ID:"lab",APNS_KEY_ID:"lab",APNS_PRIVATE_KEY:pem,APNS_TOKEN_ENCRYPTION_KEY:encryptionKey}});
     if (pause) {
       await expect.poll(() => Promise.race([rpc("ready"),send.then(()=>{throw Error("provider preparation ended early");})])).toBe(true);
-      expect(await rpc("revoke")).toBe(true);
+      const t = Math.floor(Date.now()/1000);
+      const body = new TextEncoder().encode(JSON.stringify({installation:"lab",receiver,incarnation:"pair-1",epoch:1,
+        key_fingerprint:fingerprint,audience:"lab",action:"retire",operation:"revoke",expiry:t+25}));
+      const signature = await crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},key.privateKey,await frameLifecycleProof(body,"lab",t));
+      const encoded = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+      const response = await SELF.fetch("http://fixture/revoke?receiver="+receiver+"&fingerprint="+fingerprint,{
+        method:"POST",body,headers:{"content-type":"application/json","djc-watch-lifecycle-signature":encoded},
+      });
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({outcome:"committed"});
       await rpc("resume");
     }
-    expect(await send).toBe(pause ? 0 : 200);
+    expect(await send).toBe(pause ? "unknown" : "provider_accepted");
     expect(await rpc("count")).toBe(pause ? 0 : 1);
   }
 });

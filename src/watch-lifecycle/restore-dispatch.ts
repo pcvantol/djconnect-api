@@ -5,19 +5,15 @@ import { WatchDispatchFence } from "./dispatch-fence";
 import { watchRestoreActorName, type WatchDispatchScope } from "./dispatch-identity";
 import { WatchRestoreAuthority } from "./restore-authority";
 
-interface DispatchAttempt {
-	operation: string;
-	lease: string;
-}
-
 /** Closed sender inside the stable actor. Its owner must authorize the exact attempt and scope. */
 export function createRestoredWatchSender(
 	env: AppEnv, actor: DurableObjectState, namespace: DurableObjectNamespace,
-	scope: WatchDispatchScope, attempt: Readonly<DispatchAttempt>, now: () => number, fetcher: Fetcher = fetch,
+	scope: WatchDispatchScope, now: () => number, fetcher: Fetcher = fetch,
 ): Sender {
 	const enrolled = Object.freeze({ ...scope });
-	const { operation, lease } = attempt;
 	return async (registration, payload, context) => {
+		if (!context.attempt) throw new Error("watch_dispatch_unavailable");
+		const { operation, lease } = context.attempt;
 		const name = await watchRestoreActorName(enrolled);
 		if (name === null || !actor.id.equals(namespace.idFromName(name))) throw new Error("watch_dispatch_unavailable");
 		const authority = new WatchRestoreAuthority(actor.storage);
