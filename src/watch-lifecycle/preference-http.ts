@@ -9,6 +9,7 @@ export type WatchPreferenceAdmission = Pick<LifecycleClaims,
 	"installation" | "receiver" | "incarnation" | "epoch" | "key_fingerprint"> & Readonly<{
 	action: "preference-read" | "preference-write";
 	expiresAt: number;
+	submitBeforeMs: number;
 	credentialId: string;
 	credentialGeneration: number;
 }>;
@@ -26,6 +27,8 @@ export function createWatchPreferenceHttp(
 	assertMachineCurrent: (scope: WatchPreferenceAdmission) => void,
 ) {
 	const scope = Object.freeze({ ...admission });
+	const withinSubmissionWindow = () =>
+		Number.isSafeInteger(scope.submitBeforeMs) && scope.submitBeforeMs > Date.now();
 	const admits = (claims: LifecycleClaims) =>
 		Number.isSafeInteger(scope.expiresAt) && Math.min(scope.expiresAt, claims.expiry) > Math.floor(Date.now() / 1000)
 		&& scope.action === claims.action && scope.installation === claims.installation
@@ -41,7 +44,7 @@ export function createWatchPreferenceHttp(
 			const { body, proof } = await readSignedWatchRequest(request, signal);
 			const now = Math.floor(Date.now() / 1000);
 			const claims = decodeLifecycleClaims(body, audience, now);
-			if (!admits(claims)) return unavailable();
+			if (!admits(claims) || !withinSubmissionWindow()) return unavailable();
 			requireSynchronous(assertMachineCurrent(scope));
 			const issuer = await db.prepare(`SELECT public_spki_hex FROM watch_lifecycle_issuer
 				WHERE installation=? AND epoch=? AND key_fingerprint=? AND scope='watch-lifecycle' AND active=1`)
@@ -53,6 +56,7 @@ export function createWatchPreferenceHttp(
 				if (!admits(verified)) throw new Error("watch_preference_admission_expired");
 				requireSynchronous(assertRestoreCurrent(verified));
 				requireSynchronous(assertMachineCurrent(scope));
+				if (!withinSubmissionWindow()) throw new Error("Watch preference submission deadline elapsed");
 			};
 			const receipt = await applyWatchPreference(db, body, proof, spki, audience, now, verified => {
 				check(verified);

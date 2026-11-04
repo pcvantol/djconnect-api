@@ -10,6 +10,7 @@ type MachineContext = Readonly<{
 	credentialGeneration: number;
 	action: PreferenceAction;
 	expiresAt: number;
+	submitBeforeMs: number;
 }>;
 
 interface WatchPreferenceBinding {
@@ -65,6 +66,7 @@ export function createWatchAccessIngress(
 
 		let writeForwarded = false;
 		try {
+			const submitBeforeMs = Date.now() + 3000;
 			const signal = AbortSignal.any([request.signal, AbortSignal.timeout(3000)]);
 			const token = request.headers.get("cf-access-jwt-assertion");
 			if (!token || token.length > 8192) return unavailable();
@@ -93,7 +95,7 @@ export function createWatchAccessIngress(
 			const operation = decodeLifecycleClaims(body, policy.lifecycleAudience, now());
 			if (operation.installation !== policy.installation ||
 				(operation.action !== "preference-read" && operation.action !== "preference-write") ||
-				expiresAt <= now()) return unavailable();
+				expiresAt <= now() || Date.now() >= submitBeforeMs) return unavailable();
 			signal.throwIfAborted();
 			// The internal recipient must independently resolve receiver and recheck the credential generation.
 			writeForwarded = operation.action === "preference-write";
@@ -107,9 +109,10 @@ export function createWatchAccessIngress(
 					credentialGeneration: policy.credentialGeneration,
 					action: operation.action,
 					expiresAt,
+					submitBeforeMs,
 				}, body, proof)]);
 				signal.throwIfAborted();
-				if (Math.min(expiresAt, operation.expiry) <= now()) throw new Error("Watch preference admission expired");
+				if (Date.now() >= submitBeforeMs || Math.min(expiresAt, operation.expiry) <= now()) throw new Error("Watch preference admission expired");
 				return response;
 			} finally {
 				signal.removeEventListener("abort", onAbort);

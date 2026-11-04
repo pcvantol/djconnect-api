@@ -59,8 +59,9 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 			}
 			expect(context).toEqual({
 				installation: "home", credentialId: "machine.access", credentialGeneration: 3,
-				action: "preference-read", expiresAt: now + 19,
+				action: "preference-read", expiresAt: now + 19, submitBeforeMs: expect.any(Number),
 			});
+			expect(context.submitBeforeMs).toBeGreaterThan(Date.now());
 			expect(new TextDecoder().decode(body)).toBe(rawBody);
 			expect(signature).toEqual(proof);
 			return new Response(null, { status: 204 });

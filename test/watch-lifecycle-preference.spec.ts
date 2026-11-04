@@ -1,5 +1,5 @@
 import { env } from "cloudflare:test";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import schema from "../src/watch-lifecycle/preference-schema.sql?raw";
 import { applyWatchPairing } from "../src/watch-lifecycle/pairing";
 import { createWatchPreferenceHttp } from "../src/watch-lifecycle/preference-http";
@@ -52,7 +52,7 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	const admission = {
 		action: "preference-write" as const, installation: "home", receiver: "watch", incarnation: "pair-a",
 		epoch: 1, key_fingerprint: fingerprint, expiresAt: now + 30,
-		credentialId: "fixture-access-client", credentialGeneration: 1,
+		credentialId: "fixture-access-client", credentialGeneration: 1, submitBeforeMs: Date.now() + 3000,
 	};
 	for (const scope of [
 		{ ...admission, installation: "other-home" },
@@ -96,6 +96,17 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	expect(batches).toBe(0);
 	expect(await db.prepare("SELECT revision, enabled FROM watch_lifecycle_preference").first())
 		.toEqual({ revision: 0, enabled: 0 });
+	const deadline = Date.now() + 1000;
+	const clock = vi.spyOn(Date, "now");
+	try {
+		const late = createWatchPreferenceHttp(guardedDb, audience, () => {
+			clock.mockReturnValue(deadline);
+		}, { ...admission, submitBeforeMs: deadline }, () => {});
+		expect((await late(optIn.request())).status).toBe(403);
+		expect(batches).toBe(0);
+	} finally {
+		clock.mockRestore();
+	}
 	const abort = new AbortController();
 	const delayedDb = new Proxy(db, {
 		get(target, property, receiver) {
