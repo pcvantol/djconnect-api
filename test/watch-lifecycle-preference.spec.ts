@@ -49,7 +49,31 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	});
 	expect(await wrongDigest(applyWatchPairing)).toBeNull();
 	const optIn = await signed("preference-write", "on", { expected_version: 0, enabled: true });
-	const deny = createWatchPreferenceHttp(db, audience, () => { throw new Error("private restore denial"); });
+	const admission = {
+		action: "preference-write" as const, installation: "home", receiver: "watch", incarnation: "pair-a",
+		epoch: 1, key_fingerprint: fingerprint, expiresAt: now + 30,
+	};
+	for (const scope of [
+		{ ...admission, installation: "other-home" },
+		{ ...admission, receiver: "other-watch" },
+		{ ...admission, incarnation: "old-pair" },
+		{ ...admission, epoch: 2 },
+		{ ...admission, key_fingerprint: "0".repeat(64) },
+		{ ...admission, action: "preference-read" as const },
+		{ ...admission, expiresAt: now - 1 },
+	]) {
+		let reads = 0;
+		const dbWithoutAccess = new Proxy(db, {
+			get() {
+				reads++;
+				throw new Error("out-of-scope request touched D1");
+			},
+		});
+		const rejected = await createWatchPreferenceHttp(dbWithoutAccess, audience, () => {}, scope)(optIn.request());
+		expect(rejected.status).toBe(403);
+		expect(reads).toBe(0);
+	}
+	const deny = createWatchPreferenceHttp(db, audience, () => { throw new Error("private restore denial"); }, admission);
 	const rejected = await deny(optIn.request());
 	expect(rejected.status).toBe(403);
 	expect(await rejected.json()).toEqual({error:"watch_preference_unavailable"});
@@ -65,7 +89,7 @@ it("stores only the current signed preference and keeps opt-out available at cap
 			};
 		},
 	});
-	const lateAbort = createWatchPreferenceHttp(delayedDb, audience, () => {});
+	const lateAbort = createWatchPreferenceHttp(delayedDb, audience, () => {}, admission);
 	const aborted = await lateAbort(optIn.request(abort.signal));
 	expect(aborted.status).toBe(503);
 	expect(await aborted.json()).toEqual({error:"watch_preference_outcome_unknown"});
@@ -74,12 +98,12 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	let checks = 0;
 	const loseBeforeResponse = createWatchPreferenceHttp(db, audience, () => {
 		if (++checks === 2) throw new Error("restore authority withdrawn before reply");
-	});
+	}, admission);
 	const uncertain = await loseBeforeResponse(optIn.request());
 	expect(uncertain.status).toBe(503);
 	expect(await uncertain.json()).toEqual({error:"watch_preference_outcome_unknown"});
 	expect(await db.prepare("SELECT revision FROM watch_lifecycle_preference").first("revision")).toBe(1);
-	const http = createWatchPreferenceHttp(db, audience, () => {});
+	const http = createWatchPreferenceHttp(db, audience, () => {}, admission);
 	const response = await http(optIn.request());
 	expect(response.status).toBe(200);
 	expect(response.headers.get("cache-control")).toBe("no-store");
@@ -96,6 +120,8 @@ it("stores only the current signed preference and keeps opt-out available at cap
 	expect(await optOut()).toBeNull();
 	const read = await signed("preference-read", "read");
 	expect(await read()).toMatchObject({ revision: 2, operation: "off", enabled: 0 });
+	const readHttp = createWatchPreferenceHttp(db, audience, () => {}, { ...admission, action: "preference-read" });
+	expect(await (await readHttp(read.request())).json()).toMatchObject({ revision: 2, operation: "off", enabled: 0 });
 	const replace = await signed("replace", "replace", { incarnation: "pair-b", predecessor: "pair-a" });
 	expect(await replace(applyWatchPairing)).toMatchObject({ incarnation: "pair-b", revision: 0, enabled: 0 });
 	expect(await pairStatus(applyWatchPairing)).toEqual({ state: "superseded" });
