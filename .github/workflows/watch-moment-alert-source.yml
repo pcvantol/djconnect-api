@@ -53,6 +53,9 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
         run: bash qualification/watch-moment/check-dispatch-fence.sh | tee "${{ runner.temp }}/watch-dispatch-fence.log"
+      - name: Watch restore and dispatch against SQLite Durable Objects and D1
+        if: matrix.layer == 'workerd'
+        run: node_modules/.bin/vitest run --config qualification/watch-moment/restore/vitest.config.mts qualification/watch-moment/restore/restore.case.ts
       - name: Package exact source and check emitted module with native SQLite
         if: matrix.layer == 'package'
         run: |

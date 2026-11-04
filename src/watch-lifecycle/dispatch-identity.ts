@@ -21,3 +21,9 @@ export async function watchDispatchActorName(scope: WatchDispatchScope): Promise
 	const binding = watchDispatchScopeBinding(scope);
 	return binding === null ? null : sha256Hex("DJC-WATCH-DISPATCH-ACTOR-V1\0" + binding);
 }
+
+/** Stable owner of restore admission and provider entry across Watch generations. */
+export async function watchRestoreActorName(scope: WatchDispatchScope): Promise<string | null> {
+	if (watchDispatchScopeBinding(scope) === null) return null;
+	return sha256Hex("DJC-WATCH-RESTORE-ACTOR-V1\0" + JSON.stringify([scope.installation, scope.receiver]));
+}

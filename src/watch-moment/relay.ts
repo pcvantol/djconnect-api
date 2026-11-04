@@ -6,6 +6,7 @@ import { need } from "./wire";
 export interface ProviderReply { status: number; reason?: string; retryAfterMs?: number }
 export interface SendContext {
 	headers: Record<string, string>; expiresAt: number; signal: AbortSignal;
+	attempt?: Readonly<{ operation: string; lease: string }>;
 	/** Must run after decryption/signing, immediately before the provider effect. */
 	beforeFetch(): Promise<number>;
 }
