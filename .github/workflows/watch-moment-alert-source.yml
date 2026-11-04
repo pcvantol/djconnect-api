@@ -59,6 +59,9 @@ jobs:
       - name: Watch enrollment and operator revocation
         if: matrix.layer == 'workerd'
         run: node_modules/.bin/vitest run --config qualification/watch-moment/operator/vitest.config.mts qualification/watch-moment/operator/race.case.ts
+      - name: Watch preference through a named Worker and owning Durable Object
+        if: matrix.layer == 'workerd'
+        run: node_modules/.bin/vitest run --config qualification/watch-moment/private-binding/vitest.config.mts
       - name: Package exact source and check emitted module with native SQLite
         if: matrix.layer == 'package'
         run: |

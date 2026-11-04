@@ -4,7 +4,7 @@ import { decodeLifecycleClaims } from "./proof";
 import { readSignedWatchRequest } from "./signed-http";
 
 type PreferenceAction = "preference-read" | "preference-write";
-type MachineContext = Readonly<{
+export type WatchMachineContext = Readonly<{
 	installation: string;
 	credentialId: string;
 	credentialGeneration: number;
@@ -14,7 +14,7 @@ type MachineContext = Readonly<{
 }>;
 
 interface WatchPreferenceBinding {
-	preference(context: MachineContext, body: Uint8Array, proof: Uint8Array): Promise<Response>;
+	preference(context: WatchMachineContext, body: Uint8Array, proof: Uint8Array): Promise<Response>;
 }
 
 interface WatchAccessConfiguration {
