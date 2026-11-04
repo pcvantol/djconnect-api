@@ -1,4 +1,5 @@
 import { expect, it } from "vitest";
+import { createWatchAccessKeyResolver } from "../src/watch-lifecycle/access-jwks";
 import { createWatchAccessIngress } from "../src/watch-lifecycle/access-ingress";
 
 const encoder = new TextEncoder();
@@ -12,7 +13,7 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	const issuer = "https://fixture.cloudflareaccess.com";
 	const pair = await crypto.subtle.generateKey({
 		name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: Uint8Array.of(1, 0, 1), hash: "SHA-256",
-	}, false, ["sign", "verify"]);
+	}, true, ["sign", "verify"]);
 	const claims = {
 		iss: issuer, aud: ["watch-access"], common_name: "machine.access", type: "app", sub: "", iat: now - 1, exp: now + 60,
 	};
@@ -37,10 +38,18 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	let calls = 0;
 	const rpcStarted = Promise.withResolvers<void>();
 	const rpcReply = Promise.withResolvers<Response>();
+	const jwk = { ...await crypto.subtle.exportKey("jwk", pair.publicKey), kid: "fixture-key", use: "sig" };
+	let jwks = () => Response.json({ keys: [jwk] });
+	const fetchKeys: typeof fetch = async (url, options) => {
+		expect(url).toBe(issuer + "/cdn-cgi/access/certs");
+		expect(options).toMatchObject({ redirect: "error", cache: "no-store", headers: { accept: "application/json" } });
+		return jwks();
+	};
+	const resolver = createWatchAccessKeyResolver(issuer, fetchKeys);
 	const ingress = createWatchAccessIngress({
 		endpoint, issuer, accessAudience: "watch-access", lifecycleAudience: "watch-lifecycle",
 		installation: "home", credentialId: "machine.access", credentialGeneration: 3, maxAssertionAgeSeconds: 20,
-		async resolveVerificationKey(kid) { return kid === "fixture-key" ? pair.publicKey : null; },
+		resolveVerificationKey: resolver,
 	}, {
 		async preference(context, body, signature) {
 			calls++;
@@ -70,6 +79,18 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	const forged = [header, segment({ ...claims, exp: now + 100 }), signature].join(".");
 	expect((await ingress(request(forged), access)).status).toBe(403);
 	expect((await ingress(request(valid, endpoint, JSON.stringify({ ...operation, installation: "other" })), access)).status).toBe(403);
+	expect(await createWatchAccessKeyResolver(issuer + "/unexpected", fetchKeys)("fixture-key", new AbortController().signal)).toBeNull();
+	for (const invalid of [
+		() => Response.json({ keys: [{ ...jwk, kid: "other-key" }] }),
+		() => Response.json({ keys: [jwk, jwk] }),
+		() => Response.json({ keys: [{ ...jwk, alg: "RS512" }] }),
+		() => new Response(" ".repeat(65537)),
+		() => Response.redirect("https://elsewhere.invalid/certs"),
+	]) {
+		jwks = invalid;
+		expect((await ingress(request(valid), access)).status).toBe(403);
+	}
+	jwks = () => Response.json({ keys: [{ ...jwk, kid: "previous-key" }, jwk] });
 	expect(calls).toBe(0);
 	expect((await ingress(request(valid), access)).status).toBe(204);
 	expect(calls).toBe(1);

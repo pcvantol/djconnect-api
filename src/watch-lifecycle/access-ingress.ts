@@ -1,3 +1,4 @@
+import { createWatchAccessKeyResolver } from "./access-jwks";
 import { parseStrictJson } from "../surface-push/wire";
 import { decodeLifecycleClaims } from "./proof";
 import { readSignedWatchRequest } from "./signed-http";
@@ -25,7 +26,7 @@ interface WatchAccessConfiguration {
 	credentialGeneration: number;
 	maxAssertionAgeSeconds: number;
 	/** Only use signing keys from the configured issuer, indexed by key ID. */
-	resolveVerificationKey(kid: string, signal: AbortSignal): Promise<CryptoKey | null>;
+	resolveVerificationKey?(kid: string, signal: AbortSignal): Promise<CryptoKey | null>;
 }
 
 const unavailable = () => Response.json({ error: "watch_preference_unavailable" }, {
@@ -52,7 +53,10 @@ function decodeObject(segment: string): Record<string, unknown> {
 export function createWatchAccessIngress(
 	config?: WatchAccessConfiguration, binding?: WatchPreferenceBinding,
 ) {
-	const policy = config && Object.freeze({ ...config });
+	const policy = config && Object.freeze({
+		...config,
+		resolveVerificationKey: config.resolveVerificationKey ?? createWatchAccessKeyResolver(config.issuer),
+	});
 	return async (request: Request, ctx: Pick<ExecutionContext, "access">): Promise<Response> => {
 		if (!policy || !binding || !ctx.access || request.url !== policy.endpoint ||
 			new URL(request.url).protocol !== "https:" || request.method !== "POST" ||
