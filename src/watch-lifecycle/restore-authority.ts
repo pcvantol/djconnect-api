@@ -8,6 +8,8 @@ interface PreferenceState {
 	sealed: number;
 }
 
+const disabledBaseline = JSON.stringify([0, null, null, 0, 0]);
+
 function stateKey(state: PreferenceState): string | null {
 	const { revision, operation, body_hash, enabled, sealed } = state;
 	if (!Number.isSafeInteger(revision) || revision < 0 ||
@@ -35,8 +37,19 @@ export class WatchRestoreAuthority {
 		if (binding === null) return false;
 		return this.storage.sql.exec(
 			"INSERT OR IGNORE INTO watch_restore_authority VALUES (1,?,?,NULL) RETURNING id",
-			binding, JSON.stringify([0, null, null, 0, 0]),
+			binding, disabledBaseline,
 		).toArray().length === 1;
+	}
+
+	/** Only for independently approved enrollment; a generation change begins disabled. */
+	advanceGeneration(previous: WatchDispatchScope, next: WatchDispatchScope): boolean {
+		const before = watchDispatchScopeBinding(previous);
+		const after = watchDispatchScopeBinding(next);
+		if (before === null || after === null || previous.installation !== next.installation ||
+			previous.receiver !== next.receiver || next.epoch <= previous.epoch ||
+			next.incarnation === previous.incarnation) return false;
+		return this.storage.sql.exec(`UPDATE watch_restore_authority SET scope=?1,confirmed=?2
+			WHERE id=1 AND scope=?3 AND pending IS NULL RETURNING id`, after, disabledBaseline, before).toArray().length === 1;
 	}
 
 	/** Persist the exact transition before the caller may submit its D1 CAS. */
@@ -62,12 +75,13 @@ export class WatchRestoreAuthority {
 			WHERE id=1 AND scope=?2 AND pending=?1 RETURNING id`, state, binding).toArray().length === 1;
 	}
 
-	/** Check in the same actor turn as dispatch, using the current D1 observation. */
-	allowsDispatch(scope: WatchDispatchScope, observed: PreferenceState): boolean {
+	/** Invoke the prepared provider entry in this same actor turn, with no intervening await. */
+	start<T>(scope: WatchDispatchScope, observed: PreferenceState, enterProvider: () => T): { result: T } | null {
 		const binding = watchDispatchScopeBinding(scope);
 		const state = stateKey(observed);
-		return binding !== null && state !== null && observed.enabled === 1 &&
+		const allowed = binding !== null && state !== null && observed.enabled === 1 &&
 			this.storage.sql.exec(`SELECT 1 FROM watch_restore_authority
 				WHERE id=1 AND scope=? AND confirmed=? AND pending IS NULL`, binding, state).toArray().length === 1;
+		return allowed ? { result: enterProvider() } : null;
 	}
 }
