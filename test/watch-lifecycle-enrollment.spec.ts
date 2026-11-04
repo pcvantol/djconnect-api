@@ -1,4 +1,4 @@
-import { createWatchEnrollmentIssueHttp } from "../src/watch-lifecycle/enrollment-http";
+import { createWatchEnrollmentIssueHttp, createWatchEnrollmentRedeemHttp } from "../src/watch-lifecycle/enrollment-http";
 import { env } from "cloudflare:test";
 import { expect, it } from "vitest";
 import schema from "../src/watch-lifecycle/preference-schema.sql?raw";
@@ -58,11 +58,24 @@ it("activates the exact approved issuer once, only after possession and current 
 		if (++checks === 2) throw new Error("authority revoked");
 	} })).rejects.toThrow("authority revoked");
 	expect(await db.prepare("SELECT count(*) AS n FROM watch_lifecycle_issuer").first("n")).toBe(0);
-	const receipts = await Promise.all([
-		redeemWatchEnrollment(db, challengeId, nonce, signature, allow),
-		redeemWatchEnrollment(db, challengeId, nonce, signature, allow),
-	]);
-	expect(receipts.filter(Boolean)).toEqual([{installation:"home",epoch:1,key_fingerprint:fingerprint,scope:"watch-lifecycle"}]);
+	const redeemRequest = () => new Request("https://fixture.invalid", {
+		method:"POST", body:JSON.stringify({challenge_id:challengeId,nonce}),
+		headers:{"content-type":"application/json","djc-watch-lifecycle-signature":btoa(String.fromCharCode(...signature))
+			.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")},
+	});
+	expect((await createWatchEnrollmentRedeemHttp(db)(redeemRequest())).status).toBe(403);
+	let restoreChecks = 0;
+	const revoked = createWatchEnrollmentRedeemHttp(db, {assertCurrent() {
+		if (++restoreChecks === 2) throw new Error("authority revoked before commit");
+	}});
+	expect((await revoked(redeemRequest())).status).toBe(403);
+	expect(restoreChecks).toBe(2);
+	expect(await db.prepare("SELECT count(*) AS n FROM watch_lifecycle_issuer").first("n")).toBe(0);
+	const redeem = createWatchEnrollmentRedeemHttp(db, allow);
+	const receipts = await Promise.all([redeem(redeemRequest()),redeem(redeemRequest())]);
+	expect(receipts.map(reply => reply.status).sort()).toEqual([200,403]);
+	expect(await receipts.find(reply => reply.status === 200)!.json())
+		.toEqual({installation:"home",epoch:1,key_fingerprint:fingerprint,scope:"watch-lifecycle"});
 	expect(await db.prepare("SELECT consumed FROM watch_lifecycle_enrollment").first("consumed")).toBe(1);
 	expect(await db.prepare("SELECT epoch,active,public_spki_hex FROM watch_lifecycle_issuer").first())
 		.toEqual({epoch:1,active:1,public_spki_hex:hex(spki)});
