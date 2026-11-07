@@ -7,6 +7,7 @@
   "preview_urls": false,
   "send_metrics": false,
   "observability": { "enabled": false },
+  "version_metadata": { "binding": "WIDGET_WORKER_VERSION" },
   "vars": { "WIDGET_PILOT_MODE": "closed" },
   "d1_databases": [
     {

@@ -5,6 +5,7 @@ import { ENROLLMENT_PREFIX } from "./enrollment-wire";
 import { createPrivateWidgetIngress } from "./private-widget-ingress";
 
 interface WidgetPilotBindings {
+	WIDGET_WORKER_VERSION?: WorkerVersionMetadata;
 	WIDGET_PILOT_MODE?: string;
 	WIDGET_PILOT_ORIGIN?: string;
 	WIDGET_ACCESS_ISSUER?: string;
@@ -28,7 +29,7 @@ function closed(status: 404 | 503) {
 	{ status, headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" } });
 }
 
-function transportPilot(bindings: WidgetPilotBindings) {
+function composePilot(bindings: WidgetPilotBindings, version: string) {
 	const { WIDGET_PILOT_ORIGIN: origin, WIDGET_ACCESS_ISSUER: issuer, WIDGET_ACCESS_AUDIENCE: audience,
 		WIDGET_ACCESS_CLIENT_ID: clientId, WIDGET_ACCESS_GENERATION: generation,
 		WIDGET_PILOT_EXPIRES_AT_MS: expiration, WIDGET_HA_DEV_DB: db,
@@ -39,18 +40,48 @@ function transportPilot(bindings: WidgetPilotBindings) {
 		String(credentialGeneration) !== generation || !Number.isSafeInteger(expiresAt) ||
 		String(expiresAt) !== expiration) return null;
 
-	const current = () => bindings.WIDGET_PILOT_MODE === "transport-v1" && Date.now() < expiresAt &&
-		bindings.WIDGET_PILOT_EXPIRES_AT_MS === expiration && bindings.WIDGET_ACCESS_GENERATION === generation &&
-		bindings.WIDGET_PILOT_ORIGIN === origin && bindings.WIDGET_ACCESS_ISSUER === issuer &&
-		bindings.WIDGET_ACCESS_AUDIENCE === audience && bindings.WIDGET_ACCESS_CLIENT_ID === clientId &&
-		bindings.WIDGET_HA_DEV_DB === db && bindings.WIDGET_TOKEN_ENCRYPTION_KEY === encryptionKey &&
-		bindings.WIDGET_ENROLLMENT_OPERATOR_SECRET === operator;
+	const matches = (candidate: WidgetPilotBindings) =>
+		candidate.WIDGET_WORKER_VERSION?.id === version && candidate.WIDGET_PILOT_MODE === "transport-v1" &&
+		candidate.WIDGET_PILOT_EXPIRES_AT_MS === expiration && candidate.WIDGET_ACCESS_GENERATION === generation &&
+		candidate.WIDGET_PILOT_ORIGIN === origin && candidate.WIDGET_ACCESS_ISSUER === issuer &&
+		candidate.WIDGET_ACCESS_AUDIENCE === audience && candidate.WIDGET_ACCESS_CLIENT_ID === clientId &&
+		candidate.WIDGET_HA_DEV_DB === db && candidate.WIDGET_TOKEN_ENCRYPTION_KEY === encryptionKey &&
+		candidate.WIDGET_ENROLLMENT_OPERATOR_SECRET === operator;
+	let retired = false;
+	const current = (candidate = bindings) => {
+		retired ||= Date.now() >= expiresAt || !matches(bindings) || !matches(candidate);
+		return !retired;
+	};
 	if (!current()) return null;
 
-	// The pilot accepts only dedicated bindings. Provider configuration is absent.
+	// Both entrypoints use this captured database, with no provider bindings.
 	const env = Object.freeze({ DB: db, APNS_TOKEN_ENCRYPTION_KEY: encryptionKey,
 		DJCONNECT_RELAY_SECRET: operator }) as AppEnv;
-	return { env, origin, issuer, audience, clientId, credentialGeneration, current, operator };
+	const ingress = createPrivateWidgetIngress({
+		env, origin, issuer, audience, clientId, credentialGeneration, maxAssertionAgeSeconds: 30,
+		isCredentialCurrent: generation => generation === credentialGeneration && current(),
+		fetcher: async () => { throw new Error("Provider egress disabled in WidgetKit transport pilot"); },
+	});
+	const enrollment = operator ? createSurfaceEnrollment({ env, isCurrent: () => current() }) : null;
+	return { current, ingress, enrollment };
+}
+
+// Worker versions pin bindings across isolates. This latch additionally retires
+// an observed mismatch for the remainder of this version's life in an isolate.
+const pilots = new Map<string, ReturnType<typeof composePilot>>();
+
+function transportPilot(bindings: WidgetPilotBindings) {
+	const version = bindings.WIDGET_WORKER_VERSION?.id;
+	if (!version) return null;
+	if (!pilots.has(version)) {
+		try {
+			pilots.set(version, composePilot(bindings, version));
+		} catch {
+			pilots.set(version, null);
+		}
+	}
+	const pilot = pilots.get(version);
+	return pilot?.current(bindings) ? pilot : null;
 }
 
 /** Named service binding. The public fetch entrypoint never forwards operator requests. */
@@ -60,8 +91,8 @@ export class WidgetEnrollmentOperator extends WorkerEntrypoint<WidgetPilotBindin
 		if ((path !== authorize && path !== revoke) || request.url !== operatorOrigin + path ||
 			request.method !== "POST") return closed(404);
 		const pilot = transportPilot(this.env);
-		if (!pilot?.operator) return closed(503);
-		return createSurfaceEnrollment({ env: pilot.env, isCurrent: pilot.current })(
+		if (!pilot?.enrollment) return closed(503);
+		return pilot.enrollment(
 			new Request("https://api.djconnect.dev" + path, request));
 	}
 }
@@ -71,17 +102,6 @@ export default {
 		if (new URL(request.url).pathname === relayEvent) return closed(404);
 		const pilot = transportPilot(env);
 		if (!pilot) return closed(503);
-		try {
-			const ingress = createPrivateWidgetIngress({
-				env: pilot.env, origin: pilot.origin, issuer: pilot.issuer, audience: pilot.audience,
-				clientId: pilot.clientId, credentialGeneration: pilot.credentialGeneration,
-				maxAssertionAgeSeconds: 30,
-				isCredentialCurrent: generation => generation === pilot.credentialGeneration && pilot.current(),
-				fetcher: async () => { throw new Error("Provider egress disabled in WidgetKit transport pilot"); },
-			});
-			return await ingress(request, ctx);
-		} catch {
-			return closed(503);
-		}
+		return pilot.ingress(request, ctx);
 	},
 } satisfies ExportedHandler<WidgetPilotBindings>;
