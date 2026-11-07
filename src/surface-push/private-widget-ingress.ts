@@ -1,6 +1,6 @@
 import { base64Url } from "../crypto";
 import { createWatchAccessKeyResolver } from "../watch-lifecycle/access-jwks";
-import { createSurfaceService, type SurfaceServiceOptions } from "./composition";
+import { createSurfaceService, surfaceEnvironmentFields, type SurfaceServiceOptions } from "./composition";
 import { parseStrictJson } from "./wire";
 
 const prefix = "/v1/push/surface/";
@@ -47,8 +47,20 @@ export function createPrivateWidgetIngress(options: WidgetAccessConfiguration) {
 	const policy = Object.freeze({ ...options });
 	const resolveKey = policy.resolveVerificationKey ?? createWatchAccessKeyResolver(policy.issuer);
 	const now = policy.now ?? Date.now;
-	const matches = () => (Object.keys(policy) as (keyof WidgetAccessConfiguration)[])
-		.every(key => options[key] === policy[key]);
+	const environment = surfaceEnvironmentFields.map(name => policy.env[name]);
+	const optionNames = Object.keys(policy) as (keyof WidgetAccessConfiguration)[];
+	let retired = false;
+	const matches = () => {
+		if (!retired) {
+			try {
+				retired = !optionNames.every(key => options[key] === policy[key]) ||
+					!surfaceEnvironmentFields.every((name, index) => policy.env[name] === environment[index]);
+			} catch {
+				retired = true;
+			}
+		}
+		return !retired;
+	};
 	const origin = new URL(policy.origin);
 	if (origin.protocol !== "https:" || origin.origin !== policy.origin || origin.port ||
 		policy.origin === "https://api.djconnect.dev" || !policy.audience ||

@@ -195,3 +195,28 @@ it("rechecks the credential generation after key resolution", async () => {
 	const proof = "Bearer djcs_" + "A".repeat(43);
 	expect((await old(request("status", {}, await jwt(), proof), context)).status).toBe(403);
 });
+
+it.each(["DB", "APNS_KEY_ID"] as const)("retires the ingress after in-place %s drift", async field => {
+	const config = configuration();
+	const ingress = createPrivateWidgetIngress(config);
+	const assertion = await jwt();
+	const proof = "Bearer djcs_" + "A".repeat(43);
+	const status = () => ingress(request("status", {}, assertion, proof), context);
+	expect((await status()).status).toBe(401);
+
+	const { DB, APNS_KEY_ID } = config.env;
+	if (field === "DB") {
+		config.env.DB = { prepare: vi.fn(() => { throw Error("Replacement DB must not be used"); }) } as unknown as D1Database;
+	} else {
+		config.env.APNS_KEY_ID = "replacement-provider-key";
+	}
+	const compose = vi.spyOn(composition, "createSurfaceService");
+	try {
+		expect((await status()).status).toBe(403);
+		config.env.DB = DB;
+		config.env.APNS_KEY_ID = APNS_KEY_ID;
+		expect((await status()).status).toBe(403);
+		expect(compose).not.toHaveBeenCalled();
+		expect(config.fetcher).not.toHaveBeenCalled();
+	} finally { compose.mockRestore(); }
+});

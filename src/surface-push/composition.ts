@@ -7,8 +7,8 @@ import { createSurfacePushHandler } from "./handler";
 import { createSurfaceProvider, type SurfaceProvider } from "./provider";
 import { need } from "./wire";
 
-const fields = ["DB", "APNS_TEAM_ID", "APNS_KEY_ID", "APNS_PRIVATE_KEY", "APNS_TOKEN_ENCRYPTION_KEY",
-    "DJCONNECT_RELAY_SECRET", "APNS_ENVIRONMENT", "APNS_TOPIC_IOS", "APNS_TOPIC_MACOS", "APNS_TOPIC_WATCHOS"] as const;
+export const surfaceEnvironmentFields = Object.freeze( ["DB", "APNS_TEAM_ID", "APNS_KEY_ID", "APNS_PRIVATE_KEY", "APNS_TOKEN_ENCRYPTION_KEY",
+    "DJCONNECT_RELAY_SECRET", "APNS_ENVIRONMENT", "APNS_TOPIC_IOS", "APNS_TOPIC_MACOS", "APNS_TOPIC_WATCHOS"] as const);
 export interface SurfaceServiceOptions {
     env: AppEnv;
     now?: () => number;
@@ -22,10 +22,10 @@ export interface SurfaceService {
 }
 export function createSurfaceService(options: SurfaceServiceOptions): SurfaceService {
     const originalEnv = options.env, originalNow = options.now, originalFetch = options.fetcher, originalCurrent = options.isCurrent;
-    const env = Object.freeze(Object.fromEntries(fields.map(name => [name, originalEnv[name]]))) as unknown as AppEnv;
+    const env = Object.freeze(Object.fromEntries(surfaceEnvironmentFields.map(name => [name, originalEnv[name]]))) as unknown as AppEnv;
     const time = originalNow ?? Date.now, transport = originalFetch ?? fetch;
     let closed = false, highWater = 0, provider: SurfaceProvider | undefined;
-    const same = (candidate: AppEnv) => fields.every(name => candidate[name] === env[name]);
+    const same = (candidate: AppEnv) => surfaceEnvironmentFields.every(name => candidate[name] === env[name]);
     const active = () => {
         let valid = false;
         try { valid = !closed && options.env === originalEnv && options.now === originalNow &&
