@@ -1,7 +1,13 @@
 import { base64Url } from "../crypto";
 import { createWatchAccessKeyResolver } from "../watch-lifecycle/access-jwks";
-import { createSurfaceService, surfaceEnvironmentFields, type SurfaceServiceOptions } from "./composition";
+import { createSurfaceService, type SurfaceServiceOptions } from "./composition";
 import { parseStrictJson } from "./wire";
+
+// Pin the bindings consumed by Surface Push for this ingress generation.
+const surfaceEnvironmentFields = [
+	"DB", "DJCONNECT_RELAY_SECRET", "APNS_TOKEN_ENCRYPTION_KEY", "APNS_TEAM_ID", "APNS_KEY_ID",
+	"APNS_PRIVATE_KEY", "APNS_ENVIRONMENT", "APNS_TOPIC_IOS", "APNS_TOPIC_MACOS", "APNS_TOPIC_WATCHOS",
+] as const;
 
 const prefix = "/v1/push/surface/";
 const relayPaths = new Set(["register", "revoke", "event", "status"].map(action => prefix + action));
