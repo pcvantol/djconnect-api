@@ -1,3 +1,4 @@
+import {isWatchEnrollmentRegistryEmpty} from "../../../src/watch-lifecycle/enrollment";
 import {WatchEnrollmentAuthority} from "../../../src/watch-lifecycle/enrollment-authority";
 import {env, runInDurableObject} from "cloudflare:test";
 import {createOwnedInitialWatchEnrollment, createSignedInitialWatchEnrollment, frameInitialWatchAdmission} from "../../../src/watch-lifecycle/owned-enrollment";
@@ -12,6 +13,7 @@ beforeAll(async () => {
 it("revocation after D1 commit suppresses enrollment acknowledgement and independent admission", async () => {
   const db = env.DB;
   const ns = (env as unknown as {ACTOR:DurableObjectNamespace}).ACTOR;
+  expect(await isWatchEnrollmentRegistryEmpty(db,"home")).toBe(true);
   const actor = ns.get(ns.idFromName("home"));
   const send = (path:string, body:unknown, signature?:string) => actor.fetch("http://fixture/"+path,{
     method:"POST", body:JSON.stringify(body), headers:{"content-type":"application/json",...(signature?{"djc-watch-lifecycle-signature":signature}:{})},
@@ -75,6 +77,15 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     expect(enrollment).not.toBeNull();
     expect(await enrollment!.prepare()).toBe(false);
     witness = true;
+    const leaveHistory = () => db.prepare("INSERT INTO watch_lifecycle_incarnation VALUES (?, 'old-watch', 'prior')")
+      .bind(scope.installation).run();
+    const clearFixtureHistory = () => db.prepare("DELETE FROM watch_lifecycle_incarnation WHERE installation=? AND receiver='old-watch'")
+      .bind(scope.installation).run();
+    await leaveHistory();
+    expect(await enrollment!.prepare()).toBe(false);
+    expect(new WatchRestoreAuthority(ctx.storage).classifyObservation(scope,
+      {revision:0,operation:null,body_hash:null,enabled:0,sealed:0})).toBe("unavailable");
+    await clearFixtureHistory();
     expect((await enrollment!.issue(request())).status).toBe(403);
     const conflicting = { ...intent, operator_binding: "f".repeat(64) };
     expect(await new WatchEnrollmentAuthority(ctx.storage, scope.installation)
@@ -105,6 +116,9 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     const retry = await createSignedInitialWatchEnrollment(signedOwner, scope, freshIntent, spki, signatures);
     expect(await retry!.prepare()).toBe(true);
     expect(await retry!.prepare()).toBe(true);
+    await leaveHistory();
+    expect((await retry!.issue(request())).status).toBe(403);
+    await clearFixtureHistory();
     const issued = await retry!.issue(request());
     expect(issued.status).toBe(201);
     const {nonce,challenge_id} = await issued.json<{nonce:string;challenge_id:string}>();
@@ -120,6 +134,9 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     witness = false;
     expect((await redeem()).status).toBe(403);
     witness = true;
+    await leaveHistory();
+    expect((await redeem()).status).toBe(403);
+    await clearFixtureHistory();
     const receipt = await redeem();
     expect(receipt.status).toBe(200);
     expect(await receipt.json()).toEqual({installation:scope.installation,epoch:1,key_fingerprint:fingerprint,scope:"watch-lifecycle"});

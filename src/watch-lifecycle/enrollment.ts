@@ -60,6 +60,26 @@ export interface EnrollmentIntent {
 	expiry: number;
 }
 
+// An absent issuer does not imply a new installation if any committed lifecycle
+// record remains. An unused challenge is not a committed enrollment.
+function noEnrollmentHistory(installation: "?1" | "?2" | "?3"): string {
+	return `(
+		NOT EXISTS (SELECT 1 FROM watch_lifecycle_issuer WHERE installation=${installation})
+		AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_preference WHERE installation=${installation})
+		AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_incarnation WHERE installation=${installation})
+		AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_intent WHERE installation=${installation})
+		AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_receipt WHERE installation=${installation})
+		AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_recovery WHERE installation=${installation})
+		AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_enrollment WHERE installation=${installation} AND consumed=1)
+	)`;
+}
+
+/** A registry observation only. The independent restore witness is still required. */
+export async function isWatchEnrollmentRegistryEmpty(db: D1Database, installation: string): Promise<boolean> {
+	return await db.prepare(`SELECT ${noEnrollmentHistory("?1")} AS empty`)
+		.bind(installation).first<number>("empty") === 1;
+}
+
 /** Creates a challenge only for an independently admitted operator decision. */
 export async function issueWatchEnrollmentChallenge(
 	db: D1Database, intent: EnrollmentIntent, publicSpki: Uint8Array,
@@ -86,7 +106,7 @@ export async function issueWatchEnrollmentChallenge(
 			key_fingerprint,public_spki_hex,epoch,predecessor_epoch,expires_at)
 		SELECT ?1,?2,?3,?4,?5,?6,?7,?8,?9,NULLIF(?10,0),?11
 		WHERE ?11-unixepoch() BETWEEN 1 AND 30
-			AND ((?10=0 AND NOT EXISTS (SELECT 1 FROM watch_lifecycle_issuer WHERE installation=?3))
+			AND ((?10=0 AND ${noEnrollmentHistory("?3")})
 				OR (?10>0 AND EXISTS (SELECT 1 FROM watch_lifecycle_issuer
 					WHERE installation=?3 AND epoch=?10 AND active=0)))
 			AND (SELECT count(*) FROM watch_lifecycle_enrollment WHERE installation=?3) < 4096
@@ -141,8 +161,7 @@ export async function redeemWatchEnrollment(
 		WHERE challenge_id=?1 AND installation=?2 AND operator_binding=?3 AND restore_fence=?4 AND nonce_hash=?5
 			AND key_fingerprint=?6 AND public_spki_hex=?7 AND epoch=?8 AND predecessor_epoch IS ?9 AND expires_at=?10
 			AND audience=?11 AND consumed=0 AND expires_at-unixepoch() BETWEEN 1 AND 30
-			AND ((predecessor_epoch IS NULL AND epoch=1 AND NOT EXISTS (
-				SELECT 1 FROM watch_lifecycle_issuer WHERE installation=?2))
+			AND ((predecessor_epoch IS NULL AND epoch=1 AND ${noEnrollmentHistory("?2")})
 				OR (epoch=predecessor_epoch+1 AND EXISTS (
 				SELECT 1 FROM watch_lifecycle_issuer WHERE installation=?2 AND epoch=?9 AND active=0)))
 		RETURNING installation,epoch,key_fingerprint,'watch-lifecycle' AS scope`)

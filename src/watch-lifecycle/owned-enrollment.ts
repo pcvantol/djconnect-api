@@ -1,5 +1,5 @@
 import { watchDispatchScopeBinding, watchRestoreActorName, type WatchDispatchScope } from "./dispatch-identity";
-import type { EnrollmentChallenge, EnrollmentIntent } from "./enrollment";
+import { isWatchEnrollmentRegistryEmpty, type EnrollmentChallenge, type EnrollmentIntent } from "./enrollment";
 import { WatchEnrollmentAuthority } from "./enrollment-authority";
 import { createWatchEnrollmentIssueHttp, createWatchEnrollmentRedeemHttp } from "./enrollment-http";
 import { WatchRestoreAuthority } from "./restore-authority";
@@ -65,6 +65,7 @@ export async function createOwnedInitialWatchEnrollment(
 	return {
 		async prepare() {
 			try {
+				if (!await isWatchEnrollmentRegistryEmpty(owner.db, scope.installation)) return false;
 				owner.actor.storage.transactionSync(() => {
 					assertExternal();
 					// Retry may reuse this exact disabled baseline, but must never reset actor state.
