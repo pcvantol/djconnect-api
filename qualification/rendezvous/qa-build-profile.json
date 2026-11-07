@@ -70,7 +70,7 @@
         "ZEML4LPXH4.dev.djconnect.ios": 1,
         "const BUILDS = new Set(['40227', '40228', '40230']);": 1
       },
-      "derived_sha256": "5bd36e83941554785adf362eb3240e6ce9039fdf360fb83ac0204b660c4361a1"
+      "derived_sha256": "fd26b1a5db327b617a872bb17ae75ed33a68fce5ed688dbf5ada39d7b8d7223b"
     },
     "qualification/rendezvous/receipt-cms-candidate.mjs": {
       "source_sha256": "0dadf10ef3055862ef952dd551907d15f6aedc66f19400d8ed268e3c9daf5dd0",
@@ -103,7 +103,7 @@
   },
   "qa_verifier_identity": {
     "application_identifier": "ZEML4LPXH4.dev.djconnect.ios.vibecastqa",
-    "build": "40408",
+    "build": "40510",
     "app_policy": "ios-vibecast-qa-development/1",
     "environment": "development"
   },
@@ -118,5 +118,13 @@
     "bundle_manifest_sha256": "c6070104a5588bb39e9b25c7f31812acbcbb2dd0e83fb68cfed89f8decb623d8",
     "source_sha": "b406d366f34622282fb5235ffd888f2d42a09af6",
     "disposition": "HISTORICAL_SIGNED_READBACK_ONLY_EXPIRED_WINDOW_NO_ADMISSION"
+  },
+  "signed_apple_candidate": {
+    "build": "40510",
+    "full_app_id": "ZEML4LPXH4.dev.djconnect.ios.vibecastqa",
+    "source_sha": "6236e1cf5760c7caa067efa1660a27bc2459e619",
+    "archive_sha256": "c0e638c3565f8c2d83007a092fab6edf95049fff720ae6343704cd83e596d4bc",
+    "profile_sha256": "360cd855d18b010760f221fc6adba0d5cb53588fe4e816b68b4995d2ce830073",
+    "disposition": "SIGNED_READBACK_ONLY_NO_ADMISSION"
   }
 }

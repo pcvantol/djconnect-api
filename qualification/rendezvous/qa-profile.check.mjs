@@ -19,10 +19,10 @@ async function signed(app,build){
  const signature=new Uint8Array(pki.createCMSECDSASignature(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},pair.privateKey,nonce)));
  return {proof:new Uint8Array(cbor.encode(new Map([['signature',Buffer.from(signature)],['authenticatorData',Buffer.from(data)]]))),point,client};
 }
-for(const [app,build,qa,production]of [[qaApp,'40408',true,false],[prodApp,'40408',false,false],[prodApp,'40230',false,true],[qaApp,'40230',false,false],[qaApp,'40407',false,false],[qaApp,'40409',false,false],['OTHER.dev.djconnect.ios.vibecastqa','40408',false,false]]){
+for(const [app,build,qa,production]of [[qaApp,'40510',true,false],[prodApp,'40510',false,false],[prodApp,'40230',false,true],[qaApp,'40230',false,false],[qaApp,'40408',false,false],[qaApp,'40509',false,false],[qaApp,'40511',false,false],['OTHER.dev.djconnect.ios.vibecastqa','40510',false,false]]){
  test('QA profile correctly signed app/build '+app+'/'+build,async()=>{const f=await signed(app,build);expect(Boolean(await qualifyAssertionCore(f.proof,f.client,f.point,0))).toBe(qa);expect(Boolean(await productionCore(f.proof,f.client,f.point,0))).toBe(production);});
 }
-for(const variant of ['replay','clientData','signature'])test('QA profile synthetic assertion preserves '+variant,async()=>{const f=await signed(qaApp,'40408');if(variant==='clientData')f.client[0]^=1;if(variant==='signature'){const object=cbor.decodeFirstSync(Buffer.from(f.proof),{preferMap:true});object.get('signature')[10]^=1;f.proof=new Uint8Array(cbor.encode(object));}expect(await qualifyAssertionCore(f.proof,f.client,f.point,variant==='replay'?1:0)).toBeNull();});
+for(const variant of ['replay','clientData','signature'])test('QA profile synthetic assertion preserves '+variant,async()=>{const f=await signed(qaApp,'40510');if(variant==='clientData')f.client[0]^=1;if(variant==='signature'){const object=cbor.decodeFirstSync(Buffer.from(f.proof),{preferMap:true});object.get('signature')[10]^=1;f.proof=new Uint8Array(cbor.encode(object));}expect(await qualifyAssertionCore(f.proof,f.client,f.point,variant==='replay'?1:0)).toBeNull();});
 for(const label of ['qa','production']){
  const raw=fixtures.cases[label];const value=()=>({...raw,...Object.fromEntries(['encoded','attestedCert','clientData','anchor'].map(k=>[k,bytes(raw[k])]))});
  test('QA profile independently signed CMS app '+label,async()=>{expect(Boolean(await qualifySyntheticReceipt(value()))).toBe(label==='qa');expect(Boolean(await productionCms(value()))).toBe(label==='production');});

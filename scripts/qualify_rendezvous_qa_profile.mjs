@@ -12,7 +12,7 @@ assert.deepEqual(profile.qa_verifier_identity,fixedQaIdentity);assert.equal(prof
 const env=Object.fromEntries(Object.entries(process.env).filter(([k])=>!k.startsWith('GIT_')));
 const listed=spawnSync('git',['--no-replace-objects','ls-files','qualification/rendezvous','docs/rendezvous/wire-request-schemas-v1.json','docs/rendezvous/wire-schema-cases-v1.json','docs/rendezvous/capacity-browser-traces-v1.json','src/crypto.ts','worker-configuration.d.ts'],{cwd:repo,env,encoding:'utf8'});assert.equal(listed.status,0);
 const maps={};
-const fixtureReplacements={'ios-dev-qualification/1':fixedQaIdentity.app_policy,'ZEML4LPXH4.dev.djconnect.ios':fixedQaIdentity.application_identifier,'https://api.djconnect.dev':profile.service_origin,'https://vibecast.tv':profile.browser_origin,"'40230'":"'40408'"};
+const fixtureReplacements={'ios-dev-qualification/1':fixedQaIdentity.app_policy,'ZEML4LPXH4.dev.djconnect.ios':fixedQaIdentity.application_identifier,'https://api.djconnect.dev':profile.service_origin,'https://vibecast.tv':profile.browser_origin,"'40230'":"'" + fixedQaIdentity.build + "'"};
 // Unchanged runtime files are copied exactly. ONLY explicit tests/harnesses/runners
 // and their public fixtures receive QA inputs; those are never product imports.
 const fixturePath=name=>/\.check\.|-harness\.|\/run_|\/generate_destination_vector\.mjs$|\/pre-qr-replacement-reference\.ts$|\/wire-schema-cases-v1\.json$|\/capacity-browser-traces-v1\.json$/.test(name);

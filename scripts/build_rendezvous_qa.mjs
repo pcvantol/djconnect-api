@@ -10,9 +10,9 @@ import * as esbuild from 'esbuild';
 
 export const repo=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 export const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-// This is a fixed historical source variant, never a runtime/profile selector.
-export const fixedQaIdentity=Object.freeze({application_identifier:'ZEML4LPXH4.dev.djconnect.ios.vibecastqa',build:'40408',app_policy:'ios-vibecast-qa-development/1',environment:'development'});
-const replacements={"https://api.djconnect.dev":"https://api-vibecast-qa.djconnect.dev","https://vibecast.tv":"https://qa.vibecast.tv","ZEML4LPXH4.dev.djconnect.ios":"ZEML4LPXH4.dev.djconnect.ios.vibecastqa","ios-dev-qualification/1":"ios-vibecast-qa-development/1","const BUILDS = new Set(['40227', '40228', '40230']);":"const BUILDS = new Set(['40408']);"};
+// This is a fixed QA source variant, never a runtime/profile selector.
+export const fixedQaIdentity=Object.freeze({application_identifier:'ZEML4LPXH4.dev.djconnect.ios.vibecastqa',build:'40510',app_policy:'ios-vibecast-qa-development/1',environment:'development'});
+const replacements={"https://api.djconnect.dev":"https://api-vibecast-qa.djconnect.dev","https://vibecast.tv":"https://qa.vibecast.tv","ZEML4LPXH4.dev.djconnect.ios":"ZEML4LPXH4.dev.djconnect.ios.vibecastqa","ios-dev-qualification/1":"ios-vibecast-qa-development/1","const BUILDS = new Set(['40227', '40228', '40230']);":"const BUILDS = new Set(['40510']);"};
 const expected={"src/rendezvous/composition.ts":{"https://api.djconnect.dev":1,"ios-dev-qualification/1":1},"qualification/rendezvous/http-ingress.ts":{"https://api.djconnect.dev":1,"https://vibecast.tv":1},"qualification/rendezvous/assertion-key-state.ts":{"https://api.djconnect.dev":1,"ios-dev-qualification/1":1},"qualification/rendezvous/transaction-state.ts":{"https://api.djconnect.dev":1,"ios-dev-qualification/1":1},"docs/rendezvous/wire-request-schemas-v1.json":{"https://api.djconnect.dev":4,"https://vibecast.tv":1},"qualification/rendezvous/key-routing.ts":{"ios-dev-qualification/1":1},"qualification/rendezvous/receipt-key-store.ts":{"ios-dev-qualification/1":1},"qualification/rendezvous/app-attest-core-candidate.mjs":{"ZEML4LPXH4.dev.djconnect.ios":1,"const BUILDS = new Set(['40227', '40228', '40230']);":1},"qualification/rendezvous/receipt-cms-candidate.mjs":{"ZEML4LPXH4.dev.djconnect.ios":1},"qualification/rendezvous/enrollment-evidence-candidate.mjs":{"ios-dev-qualification/1":1},"qualification/rendezvous/enrollment-key-state.ts":{"ios-dev-qualification/1":1},"qualification/rendezvous/enrollment-evidence-candidate.d.mts":{"ios-dev-qualification/1":2}};
 function gitRead(args){
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('GIT_')));
@@ -47,6 +47,9 @@ export async function buildFixedQa(){
  assert.equal(profile.schema_version,1);assert.equal(profile.service,'djconnect-api-vibecast-qa');
  assert.equal(profile.service_origin,replacements['https://api.djconnect.dev']);assert.equal(profile.browser_origin,replacements['https://vibecast.tv']);
  assert.deepEqual(profile.qa_verifier_identity,fixedQaIdentity);
+ assert.equal(profile.signed_apple_candidate.build,fixedQaIdentity.build);
+ assert.equal(profile.signed_apple_candidate.full_app_id,fixedQaIdentity.application_identifier);
+ assert.equal(profile.signed_apple_candidate.disposition,'SIGNED_READBACK_ONLY_NO_ADMISSION');
  assert.equal(profile.historical_apple_artifact.disposition,'HISTORICAL_SIGNED_READBACK_ONLY_EXPIRED_WINDOW_NO_ADMISSION');
  assert.equal(profile.activation_allowed,false);assert.equal(profile.current_apple_profile,null);assert.equal(profile.operational_admission,null);
  assert.deepEqual(Object.keys(profile.transforms).sort(),Object.keys(expected).sort());
