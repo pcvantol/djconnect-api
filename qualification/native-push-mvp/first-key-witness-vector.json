@@ -1,0 +1,56 @@
+{
+  "challengeRequest": {
+    "contract_version": 1,
+    "operation_id": "first-key-operation-1",
+    "pairing_generation": "opaque-pairing-generation-1",
+    "pair_binding": "14cd40c754cf0ba8771449e21d54f2cb84bdd94eeadc058d974294e74bb7a5ee",
+    "owner_binding": "f6950244a3a83f6942ee19da138ab6ee5795d91793304663c72a800ca5f48463",
+    "device_binding": "80b2f897e93e81f769edd02733c0f3e41ecf29e43d76d10a263c67b726b1fe67",
+    "core_key_thumbprint": "150f9a3bf43619d1ae283994c2fa6f3d3ca46501d62680ee980d14efec428dbf"
+  },
+  "challengeResponse": {
+    "contract_version": 1,
+    "api_audience": "djc-native-push-ha-dev/1",
+    "operation_id": "first-key-operation-1",
+    "api_installation_id": "api-issued-installation-1",
+    "install_credential_id": "api-issued-credential-1",
+    "challenge_id": "api-issued-challenge-1",
+    "challenge_nonce": "DQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0",
+    "expires_at_ms": 1700000060000,
+    "expected_key_revision": 0
+  },
+  "register": {
+    "contract_version": 1,
+    "api_audience": "djc-native-push-ha-dev/1",
+    "operation_id": "first-key-operation-1",
+    "api_installation_id": "api-issued-installation-1",
+    "install_credential_id": "api-issued-credential-1",
+    "challenge_id": "api-issued-challenge-1",
+    "challenge_nonce": "DQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0",
+    "expires_at_ms": 1700000060000,
+    "expected_key_revision": 0,
+    "pairing_generation": "opaque-pairing-generation-1",
+    "pair_binding": "14cd40c754cf0ba8771449e21d54f2cb84bdd94eeadc058d974294e74bb7a5ee",
+    "owner_binding": "f6950244a3a83f6942ee19da138ab6ee5795d91793304663c72a800ca5f48463",
+    "device_binding": "80b2f897e93e81f769edd02733c0f3e41ecf29e43d76d10a263c67b726b1fe67",
+    "core_key_thumbprint": "150f9a3bf43619d1ae283994c2fa6f3d3ca46501d62680ee980d14efec428dbf",
+    "core_public_key_spki_b64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEB3I+JGYGpFkJ0BpgUXdM9kIYM+SMUJy5Mp0WJaTryprcYlkSc7yV9NcRfAsRhggruvV/paus9N/XFaF71q/VmQ==",
+    "core_signature_b64url": "9dfeqv20rmcCvFJSwef4MrvLyD_MX6xM4_Bu_fy9VbduluHlmrIyh7TGVh5HIHo-ySvIfK8neqYlV7guOA9lYA"
+  },
+  "canonicalUtf8": "[\"djc-native-pair-witness/1\",\"djc-native-push-ha-dev/1\",\"POST\",\"/v1/push/native/key/register\",\"widget-first-key\",\"first-key-operation-1\",\"api-issued-installation-1\",\"api-issued-credential-1\",\"api-issued-challenge-1\",\"DQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0\",1700000060000,0,\"opaque-pairing-generation-1\",\"14cd40c754cf0ba8771449e21d54f2cb84bdd94eeadc058d974294e74bb7a5ee\",\"f6950244a3a83f6942ee19da138ab6ee5795d91793304663c72a800ca5f48463\",\"80b2f897e93e81f769edd02733c0f3e41ecf29e43d76d10a263c67b726b1fe67\",\"150f9a3bf43619d1ae283994c2fa6f3d3ca46501d62680ee980d14efec428dbf\"]",
+  "transcriptSha256": "17d37a802cf64c238f65c7c9cc83cb3723459e79224b79008e70c2654eecdb2d",
+  "appleClientDataHashB64": "F9N6gCz2TCOPZcfJzIPLNyNFnnkiS3kAjnDCZU7s2y0=",
+  "committedReceipt": {
+    "contract_version": 1,
+    "operation_id": "first-key-operation-1",
+    "api_installation_id": "api-issued-installation-1",
+    "install_credential_id": "api-issued-credential-1",
+    "pairing_generation": "opaque-pairing-generation-1",
+    "registry_generation": "api-issued-registry-generation-1",
+    "key_revision": 1,
+    "core_key_thumbprint": "150f9a3bf43619d1ae283994c2fa6f3d3ca46501d62680ee980d14efec428dbf",
+    "transcript_sha256": "17d37a802cf64c238f65c7c9cc83cb3723459e79224b79008e70c2654eecdb2d",
+    "expires_at_ms": 1700000060000,
+    "state": "registered"
+  }
+}
