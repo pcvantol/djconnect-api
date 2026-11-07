@@ -1,0 +1,19 @@
+{
+  // Offline dry-run template. The D1 ID is a local fixture.
+  "name": "djc-widget-ha-dev-dry-run",
+  "main": "../../src/surface-push/widget-ha-dev-worker.ts",
+  "compatibility_date": "2026-06-20",
+  "workers_dev": false,
+  "preview_urls": false,
+  "send_metrics": false,
+  "observability": { "enabled": false },
+  "vars": { "WIDGET_PILOT_MODE": "closed" },
+  "d1_databases": [
+    {
+      "binding": "WIDGET_HA_DEV_DB",
+      "database_name": "widget-ha-dev-local-fixture",
+      "database_id": "00000000-0000-4000-8000-000000000001",
+      "migrations_dir": "isolated-migrations-not-in-template"
+    }
+  ]
+}
