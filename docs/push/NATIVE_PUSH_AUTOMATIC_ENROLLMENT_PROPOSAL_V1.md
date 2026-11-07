@@ -10,6 +10,14 @@ First key registration needs an independently trusted pairing witness. API must 
 
 Push defaults to off. One consent coordinate is installation, owner, physical device, pairing generation, channel and consent generation. Target digest, role, public purpose key thumbprint and original deadline are also bound. A different device, role or pairing needs its own consent. The Core signer must represent the actual explicit user action under the current native pairing. Local display, retained content, an OS notification permission, shared settings and pairing alone cannot authorize push. Separate Apple proof binds the exact target where required.
 
+## Native proof by platform
+
+Core's HOST_WAKE_FIRST_KEY_V1 and DIRECT_RICH_HOST_WAKE_PROXY_V1 describe native key custody, original challenges and durable proof acknowledgements. The API's NATIVE_PROOF_TRANSCRIPT codec supplies canonical bytes and digests. It does not verify attestation. The genuine Rendezvous App Attest verifier can be evaluated for supported iPhone and iPad host apps after binding the exact production-equivalent app ID, attestation environment and nonce. The existing verifier qualifies the native app and key. First trust still requires independent proof that the same challenge belongs to the current HA pairing, owner and installation.
+
+Apple reports App Attest unavailable on Mac, including Mac Catalyst and iOS/iPadOS apps running on Apple silicon. The existing Mac widget can only be admitted after a separate independently verified pairing and native target proof is selected. Apple documents support for watchOS extensions starting in watchOS 9, with restrictions on generating keys in an extension. The exact signed Watch target and usable SDK path need their own runtime qualification. Watch Smart Stack also requires the existing signed preference and restore witness for the exact Watch. Missing proof closes the affected role.
+
+Source: [Apple App Attest availability](https://developer.apple.com/documentation/devicecheck/dcappattestservice/issupported).
+
 ## Proposed API routes and proof
 
 Use POST for every route below, with the existing per-installation bearer and strict JSON. Route names are proposed and unmounted. Every signed statement binds protocol version, method, path, environment audience, original installation and pairing generation, operation ID and API challenge. Sign using P-256 over the agreed canonical encoding. Return no-store responses. Keep assertions and credentials out of shared logs.
