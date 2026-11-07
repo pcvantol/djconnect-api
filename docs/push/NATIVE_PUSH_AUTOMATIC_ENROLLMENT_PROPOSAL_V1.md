@@ -22,6 +22,25 @@ App Attest authenticates the host app and its binding to the transcript. It does
 
 The API stores the challenge, exact credential, pending operation, captured key and original deadline. It rechecks them at commit, consumes the challenge once, and atomically registers the first key or returns a conflict. Lost response uses exact status with proof of the same key. An expired or retired pairing never restarts from status. A lost or retired key requires explicit recovery against the current independently authorized pairing, a fresh nonce and a new key revision. Retire the previous revision and dependent grants, retain the tombstones, and require new explicit consent when the pairing or relevant device/channel binding changes.
 
+## Independent issuer review and minimum broker
+
+No qualified issuer was found in the reviewed API and Core sources. The legacy bootstrap endpoint validates input and limits issuance. The separate `requirePairingIssuerAuth` helper can check a configured shared secret or HMAC, but has no production call site here and does not observe an owner decision. The HA PairJournal records local currentness. Rendezvous App Attest proves app and key scope. The existing WidgetKit enrollment operator is a separate privileged pilot path. None supplies an independent assertion of the same current, durably confirmed HA owner pairing. Core draft #1530 at `2bf6d194` identifies the same gap.
+
+The smallest broker would reuse an existing independently verifiable HA owner login and installation relationship, if Core can supply one. The broker checks that relationship directly with its authority, then verifies the original durable pairing acknowledgement using an authenticated, prebound HA installation channel. That channel must authenticate the actual installation and protect the acknowledgement's currentness. The broker cannot use an arbitrary HA URL, claimed owner/installation ID, legacy bearer or a client-provided copy of the local journal as its trust anchor. If there is no such authority and channel, those are prerequisites to build before issuing a receipt. Adding a signing service to the legacy bootstrap would preserve the original trust gap.
+
+The broker receives the API's saved one-use challenge and the exact current owner/installation relation and pairing commitment. Before signing, it independently checks the durable pairing generation, original confirmed owner decision, active installation channel, Core key thumbprint, API audience and deadline. The signed receipt binds its own issuer/key ID and receipt ID, operation and challenge IDs, API nonce and audience, API-assigned principal reservation, exact install credential ID, original pairing generation and opaque owner/device bindings, Core key thumbprint and original expiry. Use a dedicated server-owned broker signing key and pin its public key and issuer in the API. Core and Apple receive no signing secret. Host App Attest and Core key possession still bind to the same original transcript.
+
+Revocation has a separate authenticated operation and monotonically ordered record scoped to the original owner/installation and pairing generation. The API must record the issuer's retirement fence before allowing a later registration or provider handoff under that scope. Lost or stale currentness closes the affected scope. An unexpired signature cannot override retirement. Re-pairing requires a new verified generation. Recovery of an existing principal still uses the independent restore path below.
+
+Required negative acceptance cases before activation:
+
+- Legacy bearer and valid self-selected Core proof, with no independent owner decision.
+- Valid App Attest over a substituted owner, installation, pairing generation, device, Core key, nonce or audience.
+- Setup-pending success, status-only success, absent durable acknowledgement, or generic options replacement after capture.
+- Receipt from an untrusted issuer or key, expired or replayed nonce, conflicting operation, changed installation credential or owner retirement between verification and commit.
+- Loss of broker currentness, delayed receipt after confirmed revocation, retired generation restored from backup, and attempted adoption of a different principal through a claimed legacy HA ID.
+- Valid pairing receipt without explicit opt-in, opt-in for another physical device or channel, or revoked target at dispatch. Preserve the separately signed Watch preference and restore witness.
+
 ## Durable acknowledgements and order
 
 1. Ordinary pairing completes. Core finishes the installation credential bootstrap and verifies durable storage before it captures the positive pairing witness. Core then retains the committed, current PairJournal acknowledgement for the exact runtime, original paired credential, config entry and auth generation. It checks currentness before requesting the API challenge, before handing the transcript to the paired Apple host, and again before forwarding the witness. A `/pair` success, `setup_pending` response, status read or restored local acknowledgement cannot replace this check.
