@@ -1,6 +1,6 @@
 import {WatchEnrollmentAuthority} from "../../../src/watch-lifecycle/enrollment-authority";
 import {env, runInDurableObject} from "cloudflare:test";
-import {createOwnedInitialWatchEnrollment} from "../../../src/watch-lifecycle/owned-enrollment";
+import {createOwnedInitialWatchEnrollment, createSignedInitialWatchEnrollment, frameInitialWatchAdmission} from "../../../src/watch-lifecycle/owned-enrollment";
 import {watchRestoreActorName} from "../../../src/watch-lifecycle/dispatch-identity";
 import {WatchRestoreAuthority} from "../../../src/watch-lifecycle/restore-authority";
 import {beforeAll,expect,it} from "vitest";
@@ -87,7 +87,22 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     expect(await enrollment!.prepare()).toBe(false);
     interrupt = false;
     const freshIntent = { ...intent, operator_binding: "e".repeat(64) };
-    const retry = await createOwnedInitialWatchEnrollment(owner,scope,freshIntent,spki);
+    const algorithm = { name: "ECDSA", namedCurve: "P-256" };
+    const signAlgorithm = { name: "ECDSA", hash: "SHA-256" };
+    const operator = await crypto.subtle.generateKey(algorithm, true, ["sign", "verify"]);
+    const restore = await crypto.subtle.generateKey(algorithm, true, ["sign", "verify"]);
+    const signedOwner = { ...owner, trustedAdmissionKeys: {
+      operator: new Uint8Array(await crypto.subtle.exportKey("spki", operator.publicKey)),
+      restore: new Uint8Array(await crypto.subtle.exportKey("spki", restore.publicKey)),
+    }};
+    const sign = async (role: "operator" | "restore", key: CryptoKey) =>
+      new Uint8Array(await crypto.subtle.sign(signAlgorithm, key, frameInitialWatchAdmission(role, scope, freshIntent)));
+    const signatures = { operator: await sign("operator", operator.privateKey), restore: await sign("restore", restore.privateKey) };
+    expect(await createSignedInitialWatchEnrollment(signedOwner, scope, freshIntent, spki,
+      { ...signatures, restore: await sign("restore", operator.privateKey) })).toBeNull();
+    expect(await createSignedInitialWatchEnrollment(signedOwner, { ...scope, receiver: "other-watch" },
+      freshIntent, spki, signatures)).toBeNull();
+    const retry = await createSignedInitialWatchEnrollment(signedOwner, scope, freshIntent, spki, signatures);
     expect(await retry!.prepare()).toBe(true);
     expect(await retry!.prepare()).toBe(true);
     const issued = await retry!.issue(request());

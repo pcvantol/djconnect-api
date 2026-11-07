@@ -1,4 +1,4 @@
-import { watchRestoreActorName, type WatchDispatchScope } from "./dispatch-identity";
+import { watchDispatchScopeBinding, watchRestoreActorName, type WatchDispatchScope } from "./dispatch-identity";
 import type { EnrollmentChallenge, EnrollmentIntent } from "./enrollment";
 import { WatchEnrollmentAuthority } from "./enrollment-authority";
 import { createWatchEnrollmentIssueHttp, createWatchEnrollmentRedeemHttp } from "./enrollment-http";
@@ -84,4 +84,55 @@ export async function createOwnedInitialWatchEnrollment(
 		issue: createWatchEnrollmentIssueHttp(owner.db, async () => ({ intent, publicSpki, assertCurrent })),
 		redeem: createWatchEnrollmentRedeemHttp(owner.db, { assertCurrent }),
 	};
+}
+
+type AdmissionRole = "operator" | "restore";
+type AdmissionKeys = Readonly<Record<AdmissionRole, Uint8Array>>;
+type AdmissionSignatures = Readonly<Record<AdmissionRole, Uint8Array>>;
+
+export function frameInitialWatchAdmission(role: AdmissionRole, scope: WatchDispatchScope, intent: EnrollmentIntent) {
+	const binding = watchDispatchScopeBinding(scope);
+	if (binding === null) throw new TypeError("invalid Watch admission scope");
+	return new TextEncoder().encode("DJC-WATCH-HA-DEV-INITIAL-ADMISSION-V1\0" + JSON.stringify([
+		role, binding, intent.audience, intent.installation, intent.operator_binding,
+		intent.restore_fence, intent.key_fingerprint, intent.expected_epoch, intent.expiry,
+	]));
+}
+
+/** The stable owner supplies pinned keys and still checks current operator and restore state on every use. */
+export async function createSignedInitialWatchEnrollment(
+	owner: InitialWatchEnrollmentOwner & { readonly trustedAdmissionKeys: AdmissionKeys },
+	pairing: WatchDispatchScope, admitted: EnrollmentIntent, spki: Uint8Array, signatures: AdmissionSignatures,
+) {
+	const scope = Object.freeze({ ...pairing });
+	const intent = Object.freeze({ ...admitted });
+	const receiverKey = new Uint8Array(spki);
+	const operatorKey = new Uint8Array(owner.trustedAdmissionKeys.operator);
+	const restoreKey = new Uint8Array(owner.trustedAdmissionKeys.restore);
+	const operatorProof = new Uint8Array(signatures.operator);
+	const restoreProof = new Uint8Array(signatures.restore);
+	const sameKey = (left: Uint8Array, right: Uint8Array) => left.every((byte, index) => byte === right[index]);
+	if ([receiverKey, operatorKey, restoreKey].some(key => key.length !== 91) ||
+		operatorProof.length !== 64 || restoreProof.length !== 64 ||
+		sameKey(operatorKey, restoreKey) || sameKey(receiverKey, operatorKey) || sameKey(receiverKey, restoreKey)) return null;
+	const current = () => {
+		const remaining = intent.expiry - Math.floor(Date.now() / 1000);
+		return Number.isSafeInteger(intent.expiry) && remaining > 0 && remaining <= 30;
+	};
+	if (!current()) return null;
+	async function verify(role: AdmissionRole, keyBytes: Uint8Array<ArrayBuffer>, signature: Uint8Array<ArrayBuffer>) {
+		const key = await crypto.subtle.importKey("spki", keyBytes, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+		return crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, key, signature,
+			frameInitialWatchAdmission(role, scope, intent));
+	}
+	try {
+		const [operator, restore] = await Promise.all([
+			verify("operator", operatorKey, operatorProof),
+			verify("restore", restoreKey, restoreProof),
+		]);
+		if (!operator || !restore || !current()) return null;
+	} catch {
+		return null;
+	}
+	return createOwnedInitialWatchEnrollment(owner, scope, intent, receiverKey);
 }
