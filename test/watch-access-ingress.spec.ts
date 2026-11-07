@@ -43,7 +43,7 @@ it("forwards only original proof bytes and server admission from verified HA Acc
 	let jwks = () => Response.json({ keys: [jwk] });
 	const fetchKeys: typeof fetch = async (url, options) => {
 		expect(url).toBe(issuer + "/cdn-cgi/access/certs");
-		expect(options).toMatchObject({ redirect: "error", cache: "no-store", headers: { accept: "application/json" } });
+		expect(options).toMatchObject({ redirect: "manual", cache: "no-store", headers: { accept: "application/json" } });
 		return jwks();
 	};
 	const resolver = createWatchAccessKeyResolver(issuer, fetchKeys);
