@@ -1,3 +1,5 @@
+import {verifyCorePairingDeclaration} from "../../../src/watch-lifecycle/core-pairing";
+import corePairing from "./core-pairing-fixture.json";
 import {isWatchEnrollmentRegistryEmpty} from "../../../src/watch-lifecycle/enrollment";
 import {WatchEnrollmentAuthority} from "../../../src/watch-lifecycle/enrollment-authority";
 import {env, runInDurableObject} from "cloudflare:test";
@@ -144,4 +146,33 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     expect(new WatchRestoreAuthority(ctx.storage).classifyObservation(scope,
       {revision:0,operation:null,body_hash:null,enabled:0,sealed:0})).toBe("confirmed");
   });
+});
+
+it("verifies the original Core declaration against the API's pinned request and signer", async () => {
+  const {declaration, declarationSignature, declarationHash, coreSpkiBase64} = corePairing;
+  const coreSpki = Uint8Array.from(atob(coreSpkiBase64), c => c.charCodeAt(0));
+  const pending = {
+    registryId: declaration.registry_id, declarationId: declaration.declaration_id,
+    installation: declaration.ha_install_id, deviceId: declaration.device_id,
+    expiresAt: declaration.expires_at, coreSpki,
+  };
+  const encode = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
+  const body = encode(declaration);
+  const now = () => declaration.issued_at + 1;
+  const verify = (bytes = body, signature = declarationSignature, request = pending, clock = now) =>
+    verifyCorePairingDeclaration(bytes, signature, request, clock);
+
+  expect(corePairing.fixture_only).toBe(true);
+  expect(await verify()).toEqual({declaration, declarationHash});
+  expect(await verify(encode({...declaration, binding_generation: "2".repeat(32)}))).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, deviceId: "another-watch"})).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, declarationId: "other-request"})).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, expiresAt: pending.expiresAt - 1})).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, coreSpki: new Uint8Array(91)})).toBeNull();
+  expect(await verify(body, declarationSignature + "==")).toBeNull();
+  expect(await verify(new TextEncoder().encode(`{"device_id":"duplicate",${JSON.stringify(declaration).slice(1)}`))).toBeNull();
+  expect(await verify(body, declarationSignature, pending, () => declaration.expires_at)).toBeNull();
+  let clockReads = 0;
+  expect(await verify(body, declarationSignature, pending,
+    () => clockReads++ === 0 ? now() : declaration.expires_at)).toBeNull();
 });

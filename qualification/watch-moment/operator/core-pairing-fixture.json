@@ -1,0 +1,19 @@
+{
+  "fixture_only": true,
+  "declaration": {
+    "version": "djc-watch-ha-dev-core-pairing/1",
+    "audience": "djconnect-watch-ha-dev:core-pairing:v1",
+    "registry_id": "11111111-1111-4111-8111-111111111111",
+    "declaration_id": "fixture-once",
+    "ha_install_id": "ha_fixture",
+    "device_id": "djconnect-watchos-fixture",
+    "binding_generation": "11111111111111111111111111111111",
+    "key_fingerprint": "4dd77782a7046a4a17de1fdf4ca2e34283c73efccf874bdc16193022907c75a3",
+    "issued_at": 1794053971,
+    "expires_at": 1794054000
+  },
+  "declarationSignature": "M5dTN300EBAt7bXLlZGLpV_tj5o2Gpjhhzf8T970B2EUseLCnZmNoNTFyVtjQy0MbDt05VOGN1cACYIr1NLESg",
+  "coreSpkiBase64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxJNRMIOyXmYJoAvvWWA2YY3qLi94IxA65DW0MNo1DgN006h8PHJySw03lPk6B96AHZMszQTGjv4p7e//fljWg==",
+  "frameBase64": "REpDLVdBVENILUhBLURFVi1DT1JFLVBBSVJJTkctVjEAWyJkamMtd2F0Y2gtaGEtZGV2LWNvcmUtcGFpcmluZy8xIiwiZGpjb25uZWN0LXdhdGNoLWhhLWRldjpjb3JlLXBhaXJpbmc6djEiLCIxMTExMTExMS0xMTExLTQxMTEtODExMS0xMTExMTExMTExMTEiLCJmaXh0dXJlLW9uY2UiLCJoYV9maXh0dXJlIiwiZGpjb25uZWN0LXdhdGNob3MtZml4dHVyZSIsIjExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExIiwiNGRkNzc3ODJhNzA0NmE0YTE3ZGUxZmRmNGNhMmUzNDI4M2M3M2VmY2NmODc0YmRjMTYxOTMwMjI5MDdjNzVhMyIsMTc5NDA1Mzk3MSwxNzk0MDU0MDAwXQ==",
+  "declarationHash": "0e3a674bf8eb7d72d58bb5551921a93ba8521e7f365515fc0805f50546862d31"
+}
