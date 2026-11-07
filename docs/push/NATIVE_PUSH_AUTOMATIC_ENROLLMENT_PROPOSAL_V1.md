@@ -28,6 +28,16 @@ No qualified issuer was found in the reviewed API and Core sources. The legacy b
 
 The smallest broker would reuse an existing independently verifiable HA owner login and installation relationship, if Core can supply one. The broker checks that relationship directly with its authority, then verifies the original durable pairing acknowledgement using an authenticated, prebound HA installation channel. That channel must authenticate the actual installation and protect the acknowledgement's currentness. The broker cannot use an arbitrary HA URL, claimed owner/installation ID, legacy bearer or a client-provided copy of the local journal as its trust anchor. If there is no such authority and channel, those are prerequisites to build before issuing a receipt. Adding a signing service to the legacy bootstrap would preserve the original trust gap.
 
+The authority and installation channel are separate broker inputs. Both must be configured and verified before accepting a request:
+
+| Input | What the broker verifies |
+| --- | --- |
+| Independent owner authority | A server-selected authority confirms the current owner's permission for this exact HA installation and the original pairing decision. The broker resolves that relationship through a trusted channel using server-owned configuration. |
+| Pretrusted HA installation channel | The authenticated installation endpoint is bound to that same installation by an independently established trust record. The broker reads the original durable, current PairJournal acknowledgement through that channel. A copied acknowledgement has no authority on its own. |
+| Central API challenge | The broker matches the saved nonce, audience, credential and reserved principal to the original operation and key. It checks that the two independent inputs resolve to the same installation and pairing before signing. |
+
+Core and API found no qualified owner authority or pretrusted HA installation channel to select. Home Assistant OAuth authenticates against the instance selected for the OAuth flow. Nabu Casa documents remote access and cloud webhooks. The reviewed documentation establishes access to an endpoint, while this broker requires verification of the original owner decision for the same pretrusted installation. The authority and installation channel remain unselected, so the broker cannot issue a receipt and the API routes remain closed. [Home Assistant Authentication API](https://contributors.home-assistant.io/core/internals/auth-api/) · [Nabu Casa Remote Access](https://support.nabucasa.com/hc/en-us/sections/26496346499997)
+
 The broker receives the API's saved one-use challenge and the exact current owner/installation relation and pairing commitment. Before signing, it independently checks the durable pairing generation, original confirmed owner decision, active installation channel, Core key thumbprint, API audience and deadline. The signed receipt binds its own issuer/key ID and receipt ID, operation and challenge IDs, API nonce and audience, API-assigned principal reservation, exact install credential ID, original pairing generation and opaque owner/device bindings, Core key thumbprint and original expiry. Use a dedicated server-owned broker signing key and pin its public key and issuer in the API. Core and Apple receive no signing secret. Host App Attest and Core key possession still bind to the same original transcript.
 
 Revocation has a separate authenticated operation and monotonically ordered record scoped to the original owner/installation and pairing generation. The API must record the issuer's retirement fence before allowing a later registration or provider handoff under that scope. Lost or stale currentness closes the affected scope. An unexpired signature cannot override retirement. Re-pairing requires a new verified generation. Recovery of an existing principal still uses the independent restore path below.
@@ -35,6 +45,9 @@ Revocation has a separate authenticated operation and monotonically ordered reco
 Required negative acceptance cases before activation:
 
 - Legacy bearer and valid self-selected Core proof, with no independent owner decision.
+- A self-claimed HA origin, even with valid TLS, or valid OAuth from an arbitrary client-selected HA instance.
+- A durable local PairJournal acknowledgement without independent owner authority, or a valid native app attestation without the verified owner-to-installation binding.
+- Two individually valid inputs from different installations, owners or pairing generations. In every case the broker issues no receipt and the API creates no active key or grant.
 - Valid App Attest over a substituted owner, installation, pairing generation, device, Core key, nonce or audience.
 - Setup-pending success, status-only success, absent durable acknowledgement, or generic options replacement after capture.
 - Receipt from an untrusted issuer or key, expired or replayed nonce, conflicting operation, changed installation credential or owner retirement between verification and commit.
