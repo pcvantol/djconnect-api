@@ -14,9 +14,9 @@ Push defaults to off. One consent coordinate is installation, owner, physical de
 
 Core's HOST_WAKE_FIRST_KEY_V1 and DIRECT_RICH_HOST_WAKE_PROXY_V1 describe native key custody, original challenges and durable proof acknowledgements. The API's NATIVE_PROOF_TRANSCRIPT codec supplies canonical bytes and digests. It does not verify attestation. The genuine Rendezvous App Attest verifier can be evaluated for supported iPhone and iPad host apps after binding the exact production-equivalent app ID, attestation environment and nonce. The existing verifier qualifies the native app and key. First trust still requires independent proof that the same challenge belongs to the current HA pairing, owner and installation.
 
-Apple reports App Attest unavailable on Mac, including Mac Catalyst and iOS/iPadOS apps running on Apple silicon. The existing Mac widget can only be admitted after a separate independently verified pairing and native target proof is selected. Apple documents support for watchOS extensions starting in watchOS 9, with restrictions on generating keys in an extension. The exact signed Watch target and usable SDK path need their own runtime qualification. Watch Smart Stack also requires the existing signed preference and restore witness for the exact Watch. Missing proof closes the affected role.
+Apple announced App Attest support starting with macOS 27 for eligible app types. For the signed native Mac host, check runtime `isSupported`, obtain proof for a real challenge, and qualify server verification for the exact app ID and launch category. Older macOS and unsupported processes need a separately qualified proof path. Host app attestation and proof of the exact WidgetKit target are distinct. On Watch, qualify the exact signed target and SDK key lifecycle. Watch Smart Stack also requires the existing signed preference and restore witness for the exact Watch. Missing proof closes the affected role.
 
-Source: [Apple App Attest availability](https://developer.apple.com/documentation/devicecheck/dcappattestservice/issupported).
+[Apple WWDC26 App Attest availability](https://developer.apple.com/videos/play/wwdc2026/201/?time=671)
 
 ## Proposed API routes and proof
 
