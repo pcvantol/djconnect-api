@@ -62,7 +62,9 @@ export function createWidgetWireTrial({ db, now, capturePair, verifyHostProof }:
 	const liveCredential = `EXISTS (SELECT 1 FROM install_tokens
 		WHERE id = ? AND token_hash = ? AND disabled = 0)`;
 	const currentPair = `NOT EXISTS (SELECT 1 FROM trial_retired_pair WHERE pair = ?)`;
-	const selectedWidget = "pair = ? AND device = ? AND target = ?";
+	const selectedWidget = "installation = ? AND pair = ? AND device = ? AND app_key = ? AND target = ?";
+	const widgetBindings = (scope: Scope) => [scope.installation, scope.pair, scope.device, scope.appKey, scope.target];
+	const revocable = "(state = 'active' OR (state = 'pending' AND expires > ?))";
 	const denied = "widget_trial_denied";
 	const challengeRow = (id: string) =>
 		db.prepare("SELECT * FROM trial_widget_challenge WHERE id = ?").bind(id).first<Saved>();
@@ -120,7 +122,7 @@ export function createWidgetWireTrial({ db, now, capturePair, verifyHostProof }:
 				AND ${liveCredential} AND ${currentPair}
 				AND NOT EXISTS (SELECT 1 FROM trial_widget_challenge WHERE ${selectedWidget} AND state = 'active')`).bind(
 				original.id, now(), verified.credential.id, verified.credential.token_hash, original.pair,
-				original.pair, original.device, original.target,
+				...widgetBindings(original),
 			).run();
 			need(write.meta.changes === 1, denied, 409);
 			return { registrationId: original.id, state: "active" };
@@ -129,13 +131,16 @@ export function createWidgetWireTrial({ db, now, capturePair, verifyHostProof }:
 			const verified = await verify("opt_out", bearer, challenge, proof);
 			const original = verified.challenge;
 			const { id, token_hash: hash } = verified.credential;
+			const time = now();
 			const [, write] = await db.batch([
+				// Preserve the original row until the second statement so both
+				// statements require the same current, revocable witness.
 				db.prepare(`UPDATE trial_widget_challenge SET state = 'revoked'
-					WHERE ${selectedWidget} AND state = 'pending' AND ${liveCredential}
-					AND EXISTS (SELECT 1 FROM trial_widget_challenge WHERE id = ? AND state = 'active')`)
-					.bind(original.pair, original.device, original.target, id, hash, original.id),
+					WHERE ${selectedWidget} AND id != ? AND state IN ('pending', 'active') AND ${liveCredential}
+					AND EXISTS (SELECT 1 FROM trial_widget_challenge WHERE id = ? AND ${revocable})`)
+					.bind(...widgetBindings(original), original.id, id, hash, original.id, time),
 				db.prepare(`UPDATE trial_widget_challenge SET state = 'revoked'
-					WHERE id = ? AND state = 'active' AND ${liveCredential}`).bind(original.id, id, hash),
+					WHERE id = ? AND ${revocable} AND ${liveCredential}`).bind(original.id, time, id, hash),
 			]);
 			need(write.meta.changes === 1, denied, 409);
 			return { registrationId: verified.challenge.id, state: "revoked" };
