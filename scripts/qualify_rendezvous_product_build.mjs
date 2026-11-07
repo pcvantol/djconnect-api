@@ -48,18 +48,26 @@ async function main(){
 	const pkg=await load('package.json'),lock=await load('package-lock.json');
 	assert.deepEqual(pkg.dependencies,inputs.dependencies);
 	for(const [name,version] of Object.entries(inputs.dependencies))assert.equal(lock.packages['node_modules/'+name].version,version);
-	for(const file of ['compatible-runtime-dependency-provenance-v4.json']){
-		const provenance=await load('qualification/rendezvous/'+file);
-		assert.equal(sha(await readFile(join(repo,'package-lock.json'))),provenance.dependency_lock_sha256);
-		assert.equal(Object.keys(provenance.installed_inputs_sha256).length,50);
-		for(const [name,pin] of Object.entries(provenance.installed_inputs_sha256))assert.equal(sha(await readFile(join(repo,name))),pin);
-		for(const p of provenance.packages){
-			assert.equal(lock.packages[p.path]?.version,p.version);
-			assert.equal(lock.packages[p.path]?.integrity,p.integrity);
-		}
+	const priorPath='qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json';
+	const updatePath='qualification/rendezvous/maintenance-dependency-provenance-v1.json';
+	const provenance=await load(priorPath),update=await load(updatePath);
+	assert.equal(update.scope,'DEVELOPMENT_DEPENDENCY_PATCHES_ONLY');
+	assert.equal(sha(await readFile(join(repo,priorPath))),update.previous_provenance_sha256);
+	assert.equal(provenance.dependency_lock_sha256,update.previous_lock_sha256);
+	assert.equal(sha(await readFile(join(repo,'package-lock.json'))),update.dependency_lock_sha256);
+	assert.equal(Object.keys(provenance.installed_inputs_sha256).length,50);
+	for(const [name,pin] of Object.entries(provenance.installed_inputs_sha256))assert.equal(sha(await readFile(join(repo,name))),pin);
+	assert.deepEqual(update.packages.map(p=>p.path),['node_modules/undici','node_modules/zod']);
+	for(const p of [...provenance.packages,...update.packages]){
+		assert.equal(lock.packages[p.path]?.version,p.version);
+		assert.equal(lock.packages[p.path]?.integrity,p.integrity);
+	}
+	for(const p of update.packages){
+		const installed=await readFile(join(repo,p.path,'package.json'));
+		assert.equal(sha(installed),p.package_json_sha256);
 	}
 	const sources={};
-	for(const file of ['src/index.ts','src/rendezvous/perimeter.ts','src/rendezvous/coordinators.ts','src/rendezvous/trust.ts','package.json','package-lock.json','wrangler.jsonc','tsconfig.json','vitest.config.mts','rendezvous-build-inputs.json','scripts/qualify_rendezvous_product_build.mjs','qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json','qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json'])sources[file]=sha(await readFile(join(repo,file)));
+	for(const file of ['src/index.ts','src/rendezvous/perimeter.ts','src/rendezvous/coordinators.ts','src/rendezvous/trust.ts','package.json','package-lock.json','wrangler.jsonc','tsconfig.json','vitest.config.mts','rendezvous-build-inputs.json','scripts/qualify_rendezvous_product_build.mjs','qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json',priorPath,updatePath])sources[file]=sha(await readFile(join(repo,file)));
 	phase='actual-product-dry-run';
 	const built=spawnSync(process.execPath,[join(repo,'node_modules/wrangler/bin/wrangler.js'),'deploy','--dry-run','--outdir',output,'--metafile',join(output,'metafile.json')],{cwd:repo,encoding:'utf8'});
 	await writeFile(join(output,'private-build.log'),built.stdout+built.stderr,{mode:0o600});

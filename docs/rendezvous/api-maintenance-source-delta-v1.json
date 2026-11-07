@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION",
+  "base_source": "2274d2875c2ea5c324427c8014ade0c05b0fbead",
+  "baseline_source_map_sha256": "95ed9d508a33a905d807bc422c525a3b8a6fc5ee3920e8e0020f174c6a23cfc5",
+  "effective_source_map_sha256": "e1beb00c88f3fcd5f9002f8759098fe4b481b3563ef4f29a986818321c9c8390",
+  "changes": {
+    "package-lock.json": {
+      "before": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
+      "after": "4956db35ef0bb7fb1ee9c605c6cca725fd94988af4179d143a599f192745047d"
+    },
+    "package.json": {
+      "before": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
+      "after": "7da700035c9ffabba897854610d1ebaf556ed4b653b2d33358aa49244c9b3e39"
+    },
+    "scripts/qualify_rendezvous_product_build.mjs": {
+      "before": "7935beb7a67f5b0d6ade26edc5c82c10e4359cc5140160487918952ebd6f0a42",
+      "after": "8554f5f181d4e59af88d517d05bb6403cf2c49e944e7e435b8c0805faa5cc828"
+    },
+    "src/auth.ts": {
+      "before": "3ea011df8bdc5bad6796047b15566b459a5cc4f7fc3effda6eb2f2deab22dbd0",
+      "after": "affc544f3d5b401086cd8086a8832ac9927d4ed76a0fd3ca51de309f932f42c8"
+    },
+    "src/handlers/install.ts": {
+      "before": "f290aabf68aad588399912a268df40675dce5565a9f5da1a48d186e1beb04d8b",
+      "after": "cb3aba1d0209b08f4ec44b3619890de0fd614309a2e4033e685a57f58d263cc7"
+    },
+    "src/messages.ts": {
+      "before": "980ab421315143a27ca1e3605310fd043779fe0e175ef0e0d9f7844f5eeadb79",
+      "after": "b9d1c33651d56182156913ca5b1e5bc5d8dc6dfff705186f4e2ad320f47eb675"
+    },
+    "src/repositories/installTokens.ts": {
+      "before": "c21ef52d84cd833cef7fbd2bca8edfb2f5da2f6d527ce5ce1fa115f4c87f8c2b",
+      "after": "acabad69cf6b1dd0b78fd7bf80be8d4a91df152201f28799d8ce1c60bce5cdf9"
+    },
+    "src/repositories/registrations.ts": {
+      "before": "4f46e18fcae5433896e2443fb4022000f03d639cc076910a04dc3da0143e8a80",
+      "after": "e102137ae2b8a376058da013a87d45f7668a54909aa716ee67f9ca409399bb65"
+    }
+  },
+  "reference_sha256": "12872c9560ac70d9e3ff3f31e2b999edc84be3a02f2f0afba5e74dae8ff3824d",
+  "public_activation_allowed": false
+}

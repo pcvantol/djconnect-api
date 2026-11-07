@@ -310,6 +310,45 @@ describe("DJConnect API worker", () => {
 		expect(newRegister.status).toBe(200);
 	});
 
+	it("allows only one rotation from the same token and preserves other installations", async () => {
+		const oldAuth = await issueInstallAuth("example-ha-install");
+		await issueInstallAuth("other-ha-install");
+		const input = { ha_install_id: "example-ha-install" };
+		const rotations = await Promise.all([
+			dispatch("/v1/install/rotate", input, oldAuth),
+			dispatch("/v1/install/rotate", input, oldAuth),
+		]);
+		expect(rotations.map(response => response.status).sort()).toEqual([200, 401]);
+		const successful = rotations.find(response => response.status === 200)!;
+		const { id } = await successful.json<{ id: string }>();
+		const active = await env.DB.prepare("SELECT id FROM install_tokens WHERE ha_install_id = ? AND disabled = 0")
+			.bind(input.ha_install_id).all<{ id: string }>();
+		expect(active.results).toEqual([{ id }]);
+		const other = await env.DB.prepare("SELECT COUNT(*) AS active FROM install_tokens WHERE ha_install_id = ? AND disabled = 0")
+			.bind("other-ha-install").first<{ active: number }>();
+		expect(other?.active).toBe(1);
+	});
+
+	it.each([
+		["creating the replacement", "BEFORE INSERT ON install_tokens"],
+		["retiring the old token", "BEFORE UPDATE OF disabled ON install_tokens WHEN NEW.disabled = 1"],
+	])("preserves the old install token if %s fails", async (_operation, trigger) => {
+		const oldAuth = await issueInstallAuth("example-ha-install");
+		await env.DB.prepare(`
+			CREATE TRIGGER deny_test_token_rotation ${trigger}
+			BEGIN SELECT RAISE(ABORT, 'test rotation failure'); END
+		`).run();
+		try {
+			const failed = await dispatch("/v1/install/rotate", { ha_install_id: "example-ha-install" }, oldAuth);
+			expect(failed.status).toBe(500);
+			const rows = await env.DB.prepare("SELECT disabled, rotated_at FROM install_tokens").all();
+			expect(rows.results).toEqual([{ disabled: 0, rotated_at: null }]);
+			expect((await dispatch("/v1/push/register", registerPayload(), oldAuth)).status).toBe(200);
+		} finally {
+			await env.DB.prepare("DROP TRIGGER deny_test_token_rotation").run();
+		}
+	});
+
 	it("lets an operator revoke a compromised install token without issuing a replacement", async () => {
 		const proof = await issueBootstrapProof();
 		const tokenResponse = await dispatch("/v1/install/token", installTokenPayload({ bootstrap_proof: proof }));

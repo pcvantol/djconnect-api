@@ -1,37 +1,44 @@
 import { cryptoRandomId, cryptoRandomToken, sha256Hex } from "../crypto";
 import type { InstallTokenRecord, InstallTokenRequest, RevokeInstallTokenRequest } from "../types";
 
-export async function issueInstallToken(db: D1Database, input: InstallTokenRequest): Promise<{ id: string; token: string; tokenHash: string }> {
+async function prepareInstallToken(db: D1Database, input: InstallTokenRequest, currentTokenId?: string) {
 	const id = cryptoRandomId();
 	const token = cryptoRandomToken("djci");
 	const tokenHash = await sha256Hex(token);
-	const tokenPrefix = token.slice(0, 12);
+	const parameters = [id, input.ha_install_id, input.ha_user_hash ?? null, tokenHash, token.slice(0, 12), input.label ?? null];
 
-	await db.prepare(`
+	const insert = db.prepare(`
 		INSERT INTO install_tokens (
 			id, ha_install_id, ha_user_hash, token_hash, token_prefix,
 			label, disabled, created_at, updated_at
 		)
-		VALUES (?, ?, ?, ?, ?, ?, 0, datetime('now'), datetime('now'))
-	`).bind(
-		id,
-		input.ha_install_id,
-		input.ha_user_hash ?? null,
-		tokenHash,
-		tokenPrefix,
-		input.label ?? null,
-	).run();
+		SELECT ?, ?, ?, ?, ?, ?, 0, datetime('now'), datetime('now')
+		${currentTokenId === undefined ? "" : `WHERE EXISTS (
+			SELECT 1 FROM install_tokens WHERE id = ? AND ha_install_id = ? AND disabled = 0
+		)`}
+	`).bind(...parameters, ...(currentTokenId === undefined ? [] : [currentTokenId, input.ha_install_id]));
 
-	return { id, token, tokenHash };
+	return { credential: { id, token, tokenHash }, insert };
 }
 
-export async function rotateInstallToken(db: D1Database, input: InstallTokenRequest): Promise<{ id: string; token: string; tokenHash: string }> {
-	await db.prepare(`
+export async function issueInstallToken(db: D1Database, input: InstallTokenRequest): Promise<{ id: string; token: string; tokenHash: string }> {
+	const { credential, insert } = await prepareInstallToken(db, input);
+	await insert.run();
+	return credential;
+}
+
+export async function rotateInstallToken(db: D1Database, input: InstallTokenRequest, currentTokenId: string) {
+	const { credential, insert } = await prepareInstallToken(db, input, currentTokenId);
+	// Retire the old tokens only if this batch inserted the replacement.
+	const retire = db.prepare(`
 		UPDATE install_tokens
 		SET disabled = 1, rotated_at = datetime('now'), updated_at = datetime('now')
-		WHERE ha_install_id = ? AND disabled = 0
-	`).bind(input.ha_install_id).run();
-	return issueInstallToken(db, input);
+		WHERE ha_install_id = ? AND disabled = 0 AND id <> ?
+			AND EXISTS (SELECT 1 FROM install_tokens WHERE id = ? AND token_hash = ?)
+	`).bind(input.ha_install_id, credential.id, credential.id, credential.tokenHash);
+
+	const [created] = await db.batch([insert, retire]);
+	return created.meta.changes === 1 ? credential : null;
 }
 
 export async function revokeInstallToken(db: D1Database, input: RevokeInstallTokenRequest): Promise<{ revoked: number }> {

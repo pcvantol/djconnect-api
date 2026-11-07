@@ -37,7 +37,6 @@ export type ApiMessageKey =
 	| "missing_pairing_session_id"
 	| "missing_token_id"
 	| "not_found"
-	| "pairing_issuer_secret_not_configured"
 	| "relay_secret_not_configured"
 	| "unsafe_payload"
 	| "unsupported_media_type";
@@ -83,7 +82,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_pairing_session_id: "The pairing session ID is required.",
 		missing_token_id: "The token ID is required.",
 		not_found: "The requested endpoint was not found.",
-		pairing_issuer_secret_not_configured: "The pairing issuer secret is not configured.",
 		relay_secret_not_configured: "The relay secret is not configured.",
 		unsafe_payload: "The request contains unsupported sensitive fields.",
 		unsupported_media_type: "The request must use application/json.",
@@ -124,7 +122,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_pairing_session_id: "De pairing session-ID is vereist.",
 		missing_token_id: "De token-ID is vereist.",
 		not_found: "Het gevraagde endpoint is niet gevonden.",
-		pairing_issuer_secret_not_configured: "Het pairing-issuergeheim is niet geconfigureerd.",
 		relay_secret_not_configured: "Het relaygeheim is niet geconfigureerd.",
 		unsafe_payload: "Het verzoek bevat niet-ondersteunde gevoelige velden.",
 		unsupported_media_type: "Het verzoek moet application/json gebruiken.",
@@ -165,7 +162,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_pairing_session_id: "Die Pairing-Session-ID ist erforderlich.",
 		missing_token_id: "Die Token-ID ist erforderlich.",
 		not_found: "Der angeforderte Endpunkt wurde nicht gefunden.",
-		pairing_issuer_secret_not_configured: "Das Pairing-Issuer-Geheimnis ist nicht konfiguriert.",
 		relay_secret_not_configured: "Das Relay-Geheimnis ist nicht konfiguriert.",
 		unsafe_payload: "Die Anfrage enthält nicht unterstützte sensible Felder.",
 		unsupported_media_type: "Die Anfrage muss application/json verwenden.",
@@ -206,7 +202,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_pairing_session_id: "L'ID de session de jumelage est requis.",
 		missing_token_id: "L'ID du jeton est requis.",
 		not_found: "Le point de terminaison demandé est introuvable.",
-		pairing_issuer_secret_not_configured: "Le secret de l'émetteur de jumelage n'est pas configuré.",
 		relay_secret_not_configured: "Le secret du relais n'est pas configuré.",
 		unsafe_payload: "La requête contient des champs sensibles non pris en charge.",
 		unsupported_media_type: "La requête doit utiliser application/json.",
@@ -247,7 +242,6 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_pairing_session_id: "Se requiere el ID de sesión de emparejamiento.",
 		missing_token_id: "Se requiere el ID del token.",
 		not_found: "No se encontró el endpoint solicitado.",
-		pairing_issuer_secret_not_configured: "El secreto del emisor de emparejamiento no está configurado.",
 		relay_secret_not_configured: "El secreto del relay no está configurado.",
 		unsafe_payload: "La solicitud contiene campos sensibles no admitidos.",
 		unsupported_media_type: "La solicitud debe usar application/json.",

@@ -1,5 +1,5 @@
 import { requireAdminAuth, requireInstallAuth } from "../auth";
-import { json, readJson } from "../http";
+import { HttpError, json, readJson } from "../http";
 import { consumeBootstrapProof, enforceBootstrapRateLimit, issueBootstrapProof, issueInstallToken, rotateInstallToken } from "../repository";
 import type { AppEnv, BootstrapProofRequest, InstallTokenRequest, RotateInstallTokenRequest } from "../types";
 import { requireBearerHeader, validateBootstrapProofRequest, validateInstallTokenRequest, validatePairingBootstrapProofRequest, validateRotateInstallToken } from "../validation";
@@ -49,8 +49,11 @@ export async function rotateInstallTokenHandler(request: Request, env: AppEnv): 
 	const input = await readJson<RotateInstallTokenRequest>(request);
 	requireBearerHeader(request);
 	validateRotateInstallToken(input);
-	await requireInstallAuth(request, env, input.ha_install_id);
-	const result = await rotateInstallToken(env.DB, input);
+	const currentTokenId = await requireInstallAuth(request, env, input.ha_install_id);
+	const result = await rotateInstallToken(env.DB, input, currentTokenId);
+	if (!result) {
+		throw new HttpError(401, "install_auth_required");
+	}
 	return json({ ok: true, id: result.id, token: result.token, token_hash: result.tokenHash });
 }
 
