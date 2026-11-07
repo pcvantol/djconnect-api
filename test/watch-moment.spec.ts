@@ -307,6 +307,24 @@ describe("Watch Moment transport — actual local SQLite, synthetic original aut
 		const token = h.get("authorization")!.slice("bearer ".length).split(".");
 		const bytesOf = (v: string) => Uint8Array.from(atob(v.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
 		expect(await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pair.publicKey, bytesOf(token[2]!), new TextEncoder().encode(token.slice(0, 2).join(".")))).toBe(true);
+		const relay = existingRelaySender(appEnv, () => now, fetcher);
+		const revoked = setup({
+			send: (target, body, context) => relay(target, body, {
+				...context,
+				async beforeFetch() {
+					const checkedAt = await context.beforeFetch();
+					allowed = false;
+					return checkedAt;
+				},
+			}),
+		});
+		const revokedEvent = publish({ event_id: "revoked-after-database-check" });
+		expect((await revoked.service.dispatch(revokedEvent, signal())).state).toBe("unknown");
+		expect(fetcher).toHaveBeenCalledOnce();
+		allowed = true;
+		expect((await revoked.service.dispatch(revokedEvent, signal())).state).toBe("unknown");
+		expect(fetcher).toHaveBeenCalledOnce();
+
 		registration.apns_token_hash = "f".repeat(64);
 		await env.DB.prepare("UPDATE registrations SET apns_token_hash=? WHERE id=?").bind(registration.apns_token_hash, registration.id).run();
 		expect((await service.dispatch(publish({ event_id: "mismatched-token" }), signal())).state).toBe("unknown");

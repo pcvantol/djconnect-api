@@ -7,8 +7,10 @@ export interface ProviderReply { status: number; reason?: string; retryAfterMs?:
 export interface SendContext {
 	headers: Record<string, string>; expiresAt: number; signal: AbortSignal;
 	attempt?: Readonly<{ operation: string; lease: string }>;
-	/** Must run after decryption/signing, immediately before the provider effect. */
+	/** Checks the registration and operation together after decryption and signing. */
 	beforeFetch(): Promise<number>;
+	/** Rechecks owner authority and returns current time with no await before provider entry. */
+	assertBeforeProvider(): number;
 }
 export type Sender = (registration: Registration, payload: Record<string, unknown>, context: SendContext) => Promise<ProviderReply>;
 
@@ -23,12 +25,13 @@ export function existingRelaySender(env: AppEnv, now: () => number, fetcher: Fet
 			const token = url.pathname.slice("/3/device/".length);
 			need(url.pathname.startsWith("/3/device/") && /^(?:[a-fA-F0-9]{2}){16,2048}$/.test(token), "moment_provider_target", 503);
 			need(await sha256Hex(token) === registration.apns_token_hash, "moment_token_binding", 503);
-			const admittedAt = await context.beforeFetch();
+			await context.beforeFetch();
+			const headers = new Headers(init?.headers);
+			for (const [key, value] of Object.entries(context.headers)) headers.set(key, value);
+			const admittedAt = context.assertBeforeProvider();
 			need(Number.isSafeInteger(admittedAt), "moment_clock", 503);
 			const remaining = context.expiresAt - admittedAt;
 			need(remaining > 0 && !context.signal.aborted, "moment_expired", 409);
-			const headers = new Headers(init?.headers);
-			for (const [key, value] of Object.entries(context.headers)) headers.set(key, value);
 			const result = await fetcher(input, { ...init, headers, redirect: "error",
 				signal: AbortSignal.any([context.signal, AbortSignal.timeout(Math.max(1, Math.min(10_000, remaining)))]) });
 			const retry = result.headers.get("retry-after");

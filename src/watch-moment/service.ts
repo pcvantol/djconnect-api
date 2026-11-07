@@ -168,6 +168,7 @@ export function createMomentTransport(ports: MomentPorts) {
 				const result = await boundedWork(ports.send(registration, notification.payload, {
 					headers: notification.headers, expiresAt: selected.expires_at_ms, signal: providerSignal,
 					attempt: Object.freeze({ operation: selected.operation_key, lease: selected.lease_id }),
+					assertBeforeProvider: () => p.guard(selected.expires_at_ms),
 					async beforeFetch() {
 						// Check both rows in one snapshot, with no further database read before fetch.
 						need(await store.canDispatch(selected, registration), "moment_conflict", 409);
