@@ -1,3 +1,4 @@
+import {createWatchPreferenceHttp} from "../../../src/watch-lifecycle/preference-http";
 import {createMomentTransport} from "../../../src/watch-moment/service";
 import {createWatchRetirementHttp} from "../../../src/watch-lifecycle/retirement-http";
 import {resolveWatchRetirementScope} from "../../../src/watch-lifecycle/registry-scope";
@@ -27,6 +28,13 @@ export class DispatchActor extends DurableObject {
         blockDispatch: (claims, hash) => fence.block(claims, hash),
         async hasDispatchBlock(claims, operation, hash) { return fence.hasBlock(claims, operation, hash); },
       }, (lookup, signal) => resolveWatchRetirementScope(env.DB, lookup, signal));
+      return handler(req);
+    }
+    if (new URL(req.url).pathname === "/preference") {
+      const handler = createWatchPreferenceHttp(env.DB, "lab", () => {}, {
+        ...scope, action:"preference-write", expiresAt:Math.floor(Date.now()/1000)+30,
+        submitBeforeMs:Date.now()+3000, credentialId:"fixture-access", credentialGeneration:1,
+      }, () => {}, authority);
       return handler(req);
     }
     const payload: any = await req.json();

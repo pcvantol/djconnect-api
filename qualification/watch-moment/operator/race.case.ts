@@ -1,6 +1,11 @@
+import {bindWatchPairingEvidence, createOwnedWatchPairing} from "../../../src/watch-lifecycle/owned-pairing";
+import {base64Url} from "../../../src/crypto";
+import {verifyCorePairingDeclaration} from "../../../src/watch-lifecycle/core-pairing";
+import corePairing from "./core-pairing-fixture.json";
+import {isWatchEnrollmentRegistryEmpty} from "../../../src/watch-lifecycle/enrollment";
 import {WatchEnrollmentAuthority} from "../../../src/watch-lifecycle/enrollment-authority";
 import {env, runInDurableObject} from "cloudflare:test";
-import {createOwnedInitialWatchEnrollment} from "../../../src/watch-lifecycle/owned-enrollment";
+import {createOwnedInitialWatchEnrollment, createSignedInitialWatchEnrollment, frameInitialWatchAdmission} from "../../../src/watch-lifecycle/owned-enrollment";
 import {watchRestoreActorName} from "../../../src/watch-lifecycle/dispatch-identity";
 import {WatchRestoreAuthority} from "../../../src/watch-lifecycle/restore-authority";
 import {beforeAll,expect,it} from "vitest";
@@ -12,6 +17,7 @@ beforeAll(async () => {
 it("revocation after D1 commit suppresses enrollment acknowledgement and independent admission", async () => {
   const db = env.DB;
   const ns = (env as unknown as {ACTOR:DurableObjectNamespace}).ACTOR;
+  expect(await isWatchEnrollmentRegistryEmpty(db,"home")).toBe(true);
   const actor = ns.get(ns.idFromName("home"));
   const send = (path:string, body:unknown, signature?:string) => actor.fetch("http://fixture/"+path,{
     method:"POST", body:JSON.stringify(body), headers:{"content-type":"application/json",...(signature?{"djc-watch-lifecycle-signature":signature}:{})},
@@ -75,6 +81,15 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     expect(enrollment).not.toBeNull();
     expect(await enrollment!.prepare()).toBe(false);
     witness = true;
+    const leaveHistory = () => db.prepare("INSERT INTO watch_lifecycle_incarnation VALUES (?, 'old-watch', 'prior')")
+      .bind(scope.installation).run();
+    const clearFixtureHistory = () => db.prepare("DELETE FROM watch_lifecycle_incarnation WHERE installation=? AND receiver='old-watch'")
+      .bind(scope.installation).run();
+    await leaveHistory();
+    expect(await enrollment!.prepare()).toBe(false);
+    expect(new WatchRestoreAuthority(ctx.storage).classifyObservation(scope,
+      {revision:0,operation:null,body_hash:null,enabled:0,sealed:0})).toBe("unavailable");
+    await clearFixtureHistory();
     expect((await enrollment!.issue(request())).status).toBe(403);
     const conflicting = { ...intent, operator_binding: "f".repeat(64) };
     expect(await new WatchEnrollmentAuthority(ctx.storage, scope.installation)
@@ -87,9 +102,27 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     expect(await enrollment!.prepare()).toBe(false);
     interrupt = false;
     const freshIntent = { ...intent, operator_binding: "e".repeat(64) };
-    const retry = await createOwnedInitialWatchEnrollment(owner,scope,freshIntent,spki);
+    const algorithm = { name: "ECDSA", namedCurve: "P-256" };
+    const signAlgorithm = { name: "ECDSA", hash: "SHA-256" };
+    const operator = await crypto.subtle.generateKey(algorithm, true, ["sign", "verify"]);
+    const restore = await crypto.subtle.generateKey(algorithm, true, ["sign", "verify"]);
+    const signedOwner = { ...owner, trustedAdmissionKeys: {
+      operator: new Uint8Array(await crypto.subtle.exportKey("spki", operator.publicKey)),
+      restore: new Uint8Array(await crypto.subtle.exportKey("spki", restore.publicKey)),
+    }};
+    const sign = async (role: "operator" | "restore", key: CryptoKey) =>
+      new Uint8Array(await crypto.subtle.sign(signAlgorithm, key, frameInitialWatchAdmission(role, scope, freshIntent)));
+    const signatures = { operator: await sign("operator", operator.privateKey), restore: await sign("restore", restore.privateKey) };
+    expect(await createSignedInitialWatchEnrollment(signedOwner, scope, freshIntent, spki,
+      { ...signatures, restore: await sign("restore", operator.privateKey) })).toBeNull();
+    expect(await createSignedInitialWatchEnrollment(signedOwner, { ...scope, receiver: "other-watch" },
+      freshIntent, spki, signatures)).toBeNull();
+    const retry = await createSignedInitialWatchEnrollment(signedOwner, scope, freshIntent, spki, signatures);
     expect(await retry!.prepare()).toBe(true);
     expect(await retry!.prepare()).toBe(true);
+    await leaveHistory();
+    expect((await retry!.issue(request())).status).toBe(403);
+    await clearFixtureHistory();
     const issued = await retry!.issue(request());
     expect(issued.status).toBe(201);
     const {nonce,challenge_id} = await issued.json<{nonce:string;challenge_id:string}>();
@@ -105,11 +138,145 @@ it("issues and redeems only the explicitly prepared first scope on its stable ow
     witness = false;
     expect((await redeem()).status).toBe(403);
     witness = true;
+    await leaveHistory();
+    expect((await redeem()).status).toBe(403);
+    await clearFixtureHistory();
     const receipt = await redeem();
     expect(receipt.status).toBe(200);
     expect(await receipt.json()).toEqual({installation:scope.installation,epoch:1,key_fingerprint:fingerprint,scope:"watch-lifecycle"});
     expect((await redeem()).status).toBe(403);
     expect(new WatchRestoreAuthority(ctx.storage).classifyObservation(scope,
       {revision:0,operation:null,body_hash:null,enabled:0,sealed:0})).toBe("confirmed");
+  });
+});
+
+it("verifies the original Core declaration against the API's pinned request and signer", async () => {
+  const {declaration, declarationSignature, declarationHash, coreSpkiBase64} = corePairing;
+  const coreSpki = Uint8Array.from(atob(coreSpkiBase64), c => c.charCodeAt(0));
+  const pending = {
+    registryId: declaration.registry_id, declarationId: declaration.declaration_id,
+    installation: declaration.ha_install_id, deviceId: declaration.device_id,
+    expiresAt: declaration.expires_at, coreSpki,
+  };
+  const encode = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
+  const body = encode(declaration);
+  const now = () => declaration.issued_at + 1;
+  const verify = (bytes = body, signature = declarationSignature, request = pending, clock = now) =>
+    verifyCorePairingDeclaration(bytes, signature, request, clock);
+
+  expect(corePairing.fixture_only).toBe(true);
+  expect(await verify()).toEqual({declaration, declarationHash});
+  expect(await verify(encode({...declaration, binding_generation: "2".repeat(32)}))).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, deviceId: "another-watch"})).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, declarationId: "other-request"})).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, expiresAt: pending.expiresAt - 1})).toBeNull();
+  expect(await verify(body, declarationSignature, {...pending, coreSpki: new Uint8Array(91)})).toBeNull();
+  expect(await verify(body, declarationSignature + "==")).toBeNull();
+  expect(await verify(new TextEncoder().encode(`{"device_id":"duplicate",${JSON.stringify(declaration).slice(1)}`))).toBeNull();
+  expect(await verify(body, declarationSignature, pending, () => declaration.expires_at)).toBeNull();
+  let clockReads = 0;
+  expect(await verify(body, declarationSignature, pending,
+    () => clockReads++ === 0 ? now() : declaration.expires_at)).toBeNull();
+});
+
+it("consumes the original Core fixture once in the stable owner and preserves the original deadline", async () => {
+  const {declaration, declarationSignature, declarationHash, coreSpkiBase64} = corePairing;
+  const scope = {installation:declaration.ha_install_id, receiver:"series-11", incarnation:"pilot-pair",
+    epoch:1, key_fingerprint:declaration.key_fingerprint};
+  const ns = (env as unknown as {ACTOR:DurableObjectNamespace}).ACTOR;
+  const actor = ns.getByName((await watchRestoreActorName(scope))!);
+  await runInDurableObject(actor, async (_instance, ctx) => {
+    let at = declaration.issued_at + 1;
+    let admitted = false;
+    const coreSpki = Uint8Array.from(atob(coreSpkiBase64), c => c.charCodeAt(0));
+    const request = {registryId:declaration.registry_id, declarationId:declaration.declaration_id,
+      installation:scope.installation, deviceId:declaration.device_id, expiresAt:declaration.expires_at, coreSpki};
+    const owner = {db:env.DB, actor:ctx, namespace:ns,
+      trustedAdmissionKeys:{operator:new Uint8Array(),restore:new Uint8Array()},
+      assertOperatorCurrent() {}, assertRestoreWitnessCurrent() {},
+      assertCorePairingCurrent() { if (!admitted) throw Error("fixture pairing withheld"); },
+    };
+    const pairing = (await createOwnedWatchPairing(owner, scope, request, () => at))!;
+    const encode = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
+    const body = encode(declaration);
+    expect(await pairing.admitDeclaration(body, declarationSignature)).toBeNull();
+    expect(await pairing.beginPairingDeclaration()).toBe(true);
+    expect(await pairing.admitDeclaration(body, declarationSignature)).toBeNull();
+    expect(ctx.storage.sql.exec("SELECT declaration_hash FROM watch_core_pairing_request").one().declaration_hash).toBeNull();
+    admitted = true;
+    const receipt = {scope, declarationHash, expiresAt:declaration.expires_at};
+    expect(await Promise.all([
+      pairing.admitDeclaration(body, declarationSignature),
+      pairing.admitDeclaration(body, declarationSignature),
+    ])).toEqual([receipt, receipt]);
+    expect(await pairing.admitDeclaration(encode({...declaration,binding_generation:"3".repeat(32)}), declarationSignature)).toBeNull();
+
+    const replay = (await createOwnedWatchPairing(owner, scope, request, () => at))!;
+    expect(await replay.admitDeclaration(body, declarationSignature)).toEqual(receipt);
+    const extended = (await createOwnedWatchPairing(owner, scope, {...request,expiresAt:request.expiresAt+1}, () => at))!;
+    expect(await extended.beginPairingDeclaration()).toBe(false);
+    expect(await extended.admitDeclaration(body, declarationSignature)).toBeNull();
+    at = declaration.expires_at;
+    expect(await replay.admitDeclaration(body, declarationSignature)).toBeNull();
+  });
+});
+
+it("rejects a conflicting valid Core declaration and requires both proofs bound to the admitted one", async () => {
+  const algorithm = {name:"ECDSA",namedCurve:"P-256"};
+  const signing = {name:"ECDSA",hash:"SHA-256"};
+  const [core, operator, restore] = await Promise.all(
+    Array.from({length:3}, () => crypto.subtle.generateKey(algorithm,true,["sign","verify"])));
+  const spki = async (key:CryptoKey) => new Uint8Array(await crypto.subtle.exportKey("spki",key));
+  const coreSpki = await spki(core.publicKey);
+  const fingerprint = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",coreSpki)),
+    b => b.toString(16).padStart(2,"0")).join("");
+  const scope = {installation:"durable-owner-fixture", receiver:"series-11", incarnation:"pilot-pair",
+    epoch:1, key_fingerprint:fingerprint};
+  const ns = (env as unknown as {ACTOR:DurableObjectNamespace}).ACTOR;
+  const actor = ns.getByName((await watchRestoreActorName(scope))!);
+  await runInDurableObject(actor, async (_instance,ctx) => {
+    const now = Math.floor(Date.now()/1000);
+    const declaration = {...corePairing.declaration,ha_install_id:scope.installation,
+      key_fingerprint:fingerprint,issued_at:now,expires_at:now+25};
+    const request = {registryId:declaration.registry_id,declarationId:declaration.declaration_id,
+      installation:scope.installation,deviceId:declaration.device_id,expiresAt:declaration.expires_at,coreSpki};
+    const encoder = new TextEncoder();
+    const proofFor = async (value:typeof declaration) => {
+      const frame = "DJC-WATCH-HA-DEV-CORE-PAIRING-V1\0" + JSON.stringify(Object.values(value));
+      return base64Url(await crypto.subtle.sign(signing,core.privateKey,encoder.encode(frame)));
+    };
+    const body = encoder.encode(JSON.stringify(declaration));
+    const proof = await proofFor(declaration);
+    let current = true;
+    const pairing = (await createOwnedWatchPairing({db:env.DB,actor:ctx,namespace:ns,
+      trustedAdmissionKeys:{operator:await spki(operator.publicKey),restore:await spki(restore.publicKey)},
+      assertOperatorCurrent() {}, assertRestoreWitnessCurrent() {},
+      assertCorePairingCurrent() { if (!current) throw Error("fixture pairing retired"); },
+    }, scope, request))!;
+    expect(await pairing.beginPairingDeclaration()).toBe(true);
+    const admitted = await pairing.admitDeclaration(body,proof);
+    expect(admitted).not.toBeNull();
+    const conflict = {...declaration,binding_generation:"4".repeat(32)};
+    expect(await pairing.admitDeclaration(encoder.encode(JSON.stringify(conflict)),await proofFor(conflict))).toBeNull();
+    const evidence = {operator:"a".repeat(64),restore:"b".repeat(64)};
+    const intent = {audience:"lab",installation:scope.installation,expected_epoch:0,expiry:declaration.expires_at,
+      key_fingerprint:fingerprint,
+      operator_binding:await bindWatchPairingEvidence("operator",admitted!.declarationHash,evidence.operator),
+      restore_fence:await bindWatchPairingEvidence("restore",admitted!.declarationHash,evidence.restore)};
+    const sign = async (role:"operator"|"restore", key:CryptoKey, claims = intent) =>
+      new Uint8Array(await crypto.subtle.sign(signing,key,frameInitialWatchAdmission(role,scope,claims)));
+    const signatures = {operator:await sign("operator",operator.privateKey),restore:await sign("restore",restore.privateKey)};
+    expect(await pairing.initialEnrollment(body,proof,intent,signatures,{...evidence,restore:evidence.operator})).toBeNull();
+    expect(await pairing.initialEnrollment(body,proof,intent,{...signatures,restore:signatures.operator},evidence)).toBeNull();
+    const wrongIntent = {...intent,restore_fence:await bindWatchPairingEvidence("restore","f".repeat(64),evidence.restore)};
+    expect(await pairing.initialEnrollment(body,proof,wrongIntent,{
+      operator:await sign("operator",operator.privateKey,wrongIntent),restore:await sign("restore",restore.privateKey,wrongIntent),
+    },evidence)).toBeNull();
+    const enrollment = await pairing.initialEnrollment(body,proof,intent,signatures,evidence);
+    expect(enrollment).not.toBeNull();
+    current = false;
+    expect(await enrollment!.prepare()).toBe(false);
+    current = true;
+    expect(await enrollment!.prepare()).toBe(true);
   });
 });

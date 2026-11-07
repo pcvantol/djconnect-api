@@ -95,7 +95,7 @@ it("does not route restored D1 to the old actor across a generation change", asy
   expect(await rpc("dispatch?epoch=1&legacy=1",observed)).toBe(true);
 });
 
-it("blocks a normal relay after revoke wins over a paused D1 observation", async () => {
+it("blocks the normal relay after acknowledged retirement or opt-out wins during a paused D1 observation", async () => {
   const db = env.DB;
   for (const sql of schema.trim().split(/;\s*(?=CREATE)/)) await db.prepare(sql).run();
   for (const sql of momentSchema.split(";").map(v=>v.trim()).filter(Boolean)) await db.prepare(sql).run();
@@ -109,7 +109,7 @@ it("blocks a normal relay after revoke wins over a paused D1 observation", async
   const hex = (b:ArrayBuffer) => Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,"0")).join("");
   const fingerprint = hex(await crypto.subtle.digest("SHA-256",spki));
   await db.prepare("INSERT INTO watch_lifecycle_issuer VALUES ('lab',1,?,'watch-lifecycle',1,?)").bind(fingerprint,hex(spki)).run();
-  for (const receiver of ["control","revoked"]) {
+  for (const receiver of ["control","revoked","opted-out"]) {
     const rpc = async (path: string, body = {}) => (await SELF.fetch("http://fixture/"+path+"?receiver="+receiver+"&fingerprint="+fingerprint,{
       method:"POST",body:JSON.stringify(body),
     })).json();
@@ -129,23 +129,37 @@ it("blocks a normal relay after revoke wins over a paused D1 observation", async
       disabled:0, invalid:0,categories_json:'["dj_moments_v1"]',apns_token:null,apns_token_ciphertext:encrypted.ciphertext,apns_token_nonce:encrypted.nonce,apns_token_hash:await sha256Hex("a".repeat(64))};
     await db.prepare("INSERT INTO registrations VALUES(?,?,?,?,?,?,?,0,0,NULL,?,?,?,?,?)")
       .bind(receiver,registration.apns_token_hash,"lab",event.ha_user_hash,receiver,registration.topic,"sandbox","watchos",registration.topic,registration.categories_json,encrypted.ciphertext,encrypted.nonce).run();
-    const pause = receiver==="revoked";
-    const send = rpc("send",{pause,event,registration,env:{APNS_TEAM_ID:"lab",APNS_KEY_ID:"lab",APNS_PRIVATE_KEY:pem,APNS_TOKEN_ENCRYPTION_KEY:encryptionKey}});
+    const pause = receiver!=="control";
+    const dispatch = {pause,event,registration,env:{APNS_TEAM_ID:"lab",APNS_KEY_ID:"lab",APNS_PRIVATE_KEY:pem,APNS_TOKEN_ENCRYPTION_KEY:encryptionKey}};
+    const send = rpc("send",dispatch);
     if (pause) {
       await expect.poll(() => Promise.race([rpc("ready"),send.then(()=>{throw Error("provider preparation ended early");})])).toBe(true);
       const t = Math.floor(Date.now()/1000);
+      const optOut = receiver==="opted-out";
       const body = new TextEncoder().encode(JSON.stringify({installation:"lab",receiver,incarnation:"pair-1",epoch:1,
-        key_fingerprint:fingerprint,audience:"lab",action:"retire",operation:"revoke",expiry:t+25}));
+        key_fingerprint:fingerprint,audience:"lab",operation:"revoke",expiry:t+25,
+        ...(optOut ? {action:"preference-write",expected_version:1,enabled:false} : {action:"retire"})}));
       const signature = await crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},key.privateKey,await frameLifecycleProof(body,"lab",t));
       const encoded = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-      const response = await SELF.fetch("http://fixture/revoke?receiver="+receiver+"&fingerprint="+fingerprint,{
+      const action = optOut ? "preference" : "revoke";
+      const submit = () => SELF.fetch("http://fixture/"+action+"?receiver="+receiver+"&fingerprint="+fingerprint,{
         method:"POST",body,headers:{"content-type":"application/json","djc-watch-lifecycle-signature":encoded},
       });
+      const expected = optOut
+        ? {incarnation:"pair-1",revision:2,operation:"revoke",enabled:0,sealed:0}
+        : {outcome:"committed"};
+      const response = await submit();
       expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({outcome:"committed"});
+      expect(await response.json()).toEqual(expected);
+      if (optOut) {
+        const replay = await submit();
+        expect(replay.status).toBe(200);
+        expect(await replay.json()).toEqual(expected);
+      }
       await rpc("resume");
     }
     expect(await send).toBe(pause ? "unknown" : "provider_accepted");
+    if (pause) expect(await rpc("send",{...dispatch,pause:false})).toBe("unknown");
     expect(await rpc("count")).toBe(pause ? 0 : 1);
   }
 });
