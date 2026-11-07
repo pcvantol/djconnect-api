@@ -30,6 +30,12 @@ The positive path creates one fresh principal and a grant for that exact device 
 
 The unmounted local Workerd/D1 trial in `qualification/native-push-mvp/widget-wire.ts` exercises the challenge and exact signed target. Its Core capture is a fixture of the original durable pairing. A software ES256 key stands in for the host verifier. The trial checks atomic challenge consumption, one active widget for the exact target, credential retirement at commit, and revocation of older pending operations for the same target. It exercises no Apple SDK, provider or HA-dev route. The supported device matrix and live verdict require the actual Core capture and Apple proof.
 
+### Core confirmation at commit and delivery
+
+The local capture can check `isCurrent()` directly. A deployed API must obtain a verifiable answer across the Core boundary. Core must bind its actual current durable acknowledgement and exact installation credential to the saved API challenge. For delivery, require current confirmation for the exact registration, publication and device/channel generation at the provider handoff. An earlier positive registration receipt cannot serve as this confirmation. Core closes its local scope immediately on opt-out or unlink. API closes on missing, delayed, stale or invalid confirmation and records revocation durably when it receives it.
+
+Test local retirement after the last successful status check and before API commit or provider handoff, with the retirement message delayed or lost. The API must reject if the current confirmation is unavailable or refused. A delivery already handed to APNs is outside the scope of cancellation. The live integration must identify and qualify the ordering point between authority confirmation and handoff before claiming that concurrent unlink blocks an in-flight operation.
+
 ## Durable acknowledgements and order
 
 1. Ordinary pairing completes. Core finishes the installation credential bootstrap and verifies durable storage before it captures the positive pairing witness. Core then retains the committed, current PairJournal acknowledgement for the exact runtime, original paired credential, config entry and auth generation. It checks currentness before requesting the API challenge, before handing the transcript to the paired Apple host, and again before forwarding the witness. A `/pair` success, `setup_pending` response, status read or restored local acknowledgement cannot replace this check.
