@@ -41,14 +41,22 @@ interface Saved {
 }
 interface AppleProof { kind: "attestation"; key_id_b64: string; proof_b64: string }
 
+/** The caller supplies a pairing binding already resolved by trusted Core authority. */
+export async function retireWidgetFirstKeyPair(db: D1Database, pairBinding: string): Promise<void> {
+	need(hexDigest(pairBinding));
+	await db.prepare(`INSERT INTO widget_first_key_retirements (pair_binding) VALUES (?)
+		ON CONFLICT(pair_binding) DO NOTHING`).bind(pairBinding).run();
+}
+
 /** Trusted composition, never selected by the request. The live implementation must bind
- * this policy ID to the signed app selection and verify App Attest against clientDataHash. */
+ * this policy ID to the signed app selection and verify App Attest against the saved transcript. */
 export interface WidgetFirstKeyPolicy {
 	readonly id: string;
 	readonly expiresAt: number;
 	isCurrent(): boolean;
 	isPairCurrent(credentialId: string, original: Readonly<Original>): Promise<boolean>;
-	verifyApple(proof: Readonly<AppleProof>, clientDataHash: Uint8Array<ArrayBuffer>): Promise<boolean>;
+	verifyApple(attestation: Uint8Array<ArrayBuffer>, keyId: string, transcript: Uint8Array<ArrayBuffer>,
+		expiresAt: number, signal: AbortSignal): Promise<boolean>;
 }
 
 function fields(value: unknown, keys: readonly string[]): asserts value is Json {
@@ -116,9 +124,12 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 	const policyId = policy?.id;
 	const policyExpiry = policy?.expiresAt;
 	const credentialGuard = `EXISTS (SELECT 1 FROM install_tokens WHERE id = ? AND token_hash = ? AND disabled = 0)`;
+	const pairGuard = `NOT EXISTS (SELECT 1 FROM widget_first_key_retirements WHERE pair_binding = ?)`;
 	const credentialValues = (credential: Credential) => [credential.id, credential.token_hash] as const;
 	const activeRow = `credential_id = ? AND operation_id = ? AND policy_id = ? AND retired = 0
-		AND expires_at_ms > ? AND ${credentialGuard}`;
+		AND expires_at_ms > ? AND ${credentialGuard}
+		AND NOT EXISTS (SELECT 1 FROM widget_first_key_retirements
+			WHERE pair_binding = widget_first_key.pair_binding)`;
 	const activeValues = (credential: Credential, operation: string) =>
 		[credential.id, operation, policyId!, Date.now(), ...credentialValues(credential)] as const;
 	const unavailable = "widget_first_key_unavailable";
@@ -151,16 +162,17 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		};
 		await db.prepare(`INSERT INTO widget_first_key
 			(credential_id, operation_id, installation_id, policy_id, pair_binding, original_request, challenge, expires_at_ms)
-			SELECT ?, ?, ?, ?, ?, ?, ?, ? WHERE ${credentialGuard}
+			SELECT ?, ?, ?, ?, ?, ?, ?, ? WHERE ${credentialGuard} AND ${pairGuard}
 			ON CONFLICT(credential_id, operation_id) DO NOTHING`)
 			.bind(credential.id, original.operation_id, challenge.api_installation_id, policyId!,
-				original.pair_binding, canonical(original), canonical(challenge), challenge.expires_at_ms, ...credentialValues(credential)).run();
+				original.pair_binding, canonical(original), canonical(challenge), challenge.expires_at_ms,
+				...credentialValues(credential), original.pair_binding).run();
 		const saved = await load(credential, original.operation_id);
 		need(saved && saved.original_request === canonical(original) && !saved.receipt, conflict, 409);
 		return JSON.parse(saved.challenge) as FirstKeyChallenge;
 	}
 
-	async function register(input: Json, credential: Credential, proof: AppleProof) {
+	async function register(input: Json, credential: Credential, proof: AppleProof, signal: AbortSignal) {
 		need(id(input.operation_id));
 		const saved = await load(credential, input.operation_id as string);
 		need(saved && !saved.receipt, conflict, 409);
@@ -173,10 +185,13 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		need(hex(await digest(spki)) === original.core_key_thumbprint, "widget_first_key_proof_rejected", 403);
 		await verifyCore(bytes, spki, decode64(input.core_signature_b64url, 64, true));
 		need(decode64(proof.key_id_b64, 32).length === 32);
-		decode64(proof.proof_b64, appleProofLimit);
+		const attestation = decode64(proof.proof_b64, appleProofLimit);
 		const hash = await digest(bytes);
-		need(await checkWorker().verifyApple(Object.freeze(proof), hash.slice()), "widget_first_key_proof_rejected", 403);
 		await checkPair(credential, original);
+		need(await checkWorker().verifyApple(attestation, proof.key_id_b64, bytes, challenge.expires_at_ms, signal),
+			"widget_first_key_proof_rejected", 403);
+		await checkPair(credential, original);
+		need(!signal.aborted, conflict, 409);
 		const receipt = {
 			contract_version: 1, operation_id: original.operation_id, api_installation_id: challenge.api_installation_id,
 			install_credential_id: credential.id, pairing_generation: original.pairing_generation,
@@ -271,7 +286,7 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 				fields(input.apple_proof, ["kind", "key_id_b64", "proof_b64"]);
 				need(input.apple_proof.kind !== "assertion", "widget_first_key_proof_rejected", 403);
 				need(input.apple_proof.kind === "attestation");
-				result = await register(input, await authenticate(), input.apple_proof as unknown as AppleProof);
+				result = await register(input, await authenticate(), input.apple_proof as unknown as AppleProof, request.signal);
 			} else {
 				const credential = await authenticate();
 				const input = await readBody(request, standardBodyLimit);

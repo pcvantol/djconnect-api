@@ -1,3 +1,7 @@
+CREATE TABLE widget_first_key_retirements (
+    pair_binding TEXT NOT NULL PRIMARY KEY
+);
+
 CREATE TABLE widget_first_key (
     credential_id TEXT NOT NULL,
     operation_id TEXT NOT NULL,

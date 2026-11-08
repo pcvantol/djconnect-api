@@ -6,6 +6,8 @@ import credentialSchema from "../../migrations/0002_install_tokens.sql?raw";
 import { issueInstallToken } from "../../src/repositories/installTokens";
 import { base64Encode, base64Url } from "../../src/crypto";
 import { firstKeyRegisterBytes, firstKeyStatusBytes, type FirstKeyChallenge, type FirstKeyStatusChallenge } from "../../src/native-push/first-key-wire";
+import { retireWidgetFirstKeyPair, type WidgetFirstKeyPolicy } from "../../src/native-push/first-key-service";
+import { createWidgetFirstKeyAppleVerifier } from "../../src/native-push/first-key-apple";
 
 const origin = "https://widget.fixture.invalid";
 const operatorOrigin = "https://widget-enrollment.internal";
@@ -104,7 +106,7 @@ beforeAll(async () => {
 	}
 });
 
-async function firstKeyFixture() {
+async function firstKeyFixture(verifier: WidgetFirstKeyPolicy["verifyApple"] = async () => true) {
 	const config = fixture();
 	config.WIDGET_PILOT_EXPIRES_AT_MS = String(Date.now() + 300_000);
 	const db = config.WIDGET_HA_DEV_DB;
@@ -120,10 +122,12 @@ async function firstKeyFixture() {
 	};
 	const sign = async (bytes: BufferSource) => base64Url(await crypto.subtle.sign(es256, signer.privateKey, bytes));
 	let current = true;
-	const verifyApple = vi.fn(async (_proof: unknown, _hash: Uint8Array) => true);
+	const verifyApple = vi.fn(verifier);
+	const isPairCurrent = vi.fn<WidgetFirstKeyPolicy["isPairCurrent"]>(async (credentialId, received) =>
+		current && credentialId === credential.id && received.pair_binding === original.pair_binding);
 	const selected = createWidgetHaDevWorker({
 		id: crypto.randomUUID(), expiresAt: Date.now() + 240_000, isCurrent: () => true,
-		isPairCurrent: async (credentialId, received) => current && credentialId === credential.id && received.pair_binding === original.pair_binding,
+		isPairCurrent,
 		verifyApple,
 	});
 	const dispatchRaw = (path: string, body: string, bearer = credential.token) => selected.fetch(new Request(origin + keyPrefix + path, {
@@ -141,7 +145,8 @@ async function firstKeyFixture() {
 			core_signature_b64url: await sign(transcript),
 			apple_proof: { kind: "attestation", key_id_b64: base64Encode(new Uint8Array(32)), proof_b64: "AA==" } } };
 	}
-	return { db, credential, original, sign, dispatch, dispatchRaw, registerInput, prepare, verifyApple, retirePair() { current = false; } };
+	return { db, credential, original, sign, dispatch, dispatchRaw, registerInput, prepare, verifyApple, isPairCurrent,
+		retirePair() { current = false; } };
 }
 
 it.each(["challenge", "register", "status/challenge", "status"])("leaves first-key %s closed without a selected verifier", async path => {
@@ -167,7 +172,9 @@ it("commits one registration and consumes each status nonce once through the act
 		"key_revision", "operation_id", "pairing_generation", "registry_generation", "state", "transcript_sha256",
 	]);
 	expect(receipt.transcript_sha256).toBe(hex(await digest(transcript)));
-	expect(f.verifyApple.mock.calls[0][1]).toEqual(await digest(transcript));
+	expect(f.verifyApple.mock.calls[0].slice(0, 4)).toEqual([
+		new Uint8Array([0]), input.apple_proof.key_id_b64, transcript, challenge.expires_at_ms,
+	]);
 	const lookup = {
 		contract_version: 1, operation_id: receipt.operation_id,
 		api_installation_id: receipt.api_installation_id, transcript_sha256: receipt.transcript_sha256,
@@ -235,6 +242,70 @@ it("refuses a rejected Apple proof and rechecks the exact D1 credential after su
 	expect((await f.dispatch("register", input)).status).toBe(409);
 	expect(await f.db.prepare("SELECT receipt FROM widget_first_key WHERE credential_id = ?")
 		.bind(f.credential.id).first("receipt")).toBeNull();
+});
+
+it("uses the real Apple verifier and rejects invalid attestation before any Apple network lookup", async () => {
+	const f = await firstKeyFixture(createWidgetFirstKeyAppleVerifier({
+		profile: "host_wake_apple_properties_attestation_v2",
+		app_identifier: "ABCDEFGHIJ.example.fixture.host",
+		app_attest_environment: "development",
+		bundle_version: "1.0",
+		launch_validation_category_b64: "AwAAAA==",
+	}));
+	const { input } = await f.registerInput();
+	const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Unexpected network access"));
+	try {
+		const response = await f.dispatch("register", input);
+		expect(response.status).toBe(403);
+		expect(await response.json()).toEqual({ error: "widget_first_key_proof_rejected" });
+		expect(f.verifyApple).toHaveBeenCalledOnce();
+		expect(fetchSpy).not.toHaveBeenCalled();
+		expect(await f.db.prepare("SELECT receipt FROM widget_first_key WHERE credential_id = ?")
+			.bind(f.credential.id).first("receipt")).toBeNull();
+	} finally {
+		fetchSpy.mockRestore();
+	}
+});
+
+it("fences a retired pairing before reservation and at the registration write even when the Core check allows it", async () => {
+	const f = await firstKeyFixture();
+	const { input } = await f.registerInput();
+	f.verifyApple.mockImplementationOnce(async () => {
+		await retireWidgetFirstKeyPair(f.db, f.original.pair_binding);
+		return true;
+	});
+	expect((await f.dispatch("register", input)).status).toBe(409);
+	expect(await f.db.prepare("SELECT receipt FROM widget_first_key WHERE credential_id = ?")
+		.bind(f.credential.id).first("receipt")).toBeNull();
+	const newOperation = { ...f.original, operation_id: crypto.randomUUID() };
+	expect((await f.dispatch("challenge", newOperation)).status).toBe(409);
+	expect(await f.db.prepare("SELECT operation_id FROM widget_first_key WHERE operation_id = ?")
+		.bind(newOperation.operation_id).first()).toBeNull();
+	await retireWidgetFirstKeyPair(f.db, f.original.pair_binding);
+	expect(await f.db.prepare("SELECT COUNT(*) AS count FROM widget_first_key_retirements WHERE pair_binding = ?")
+		.bind(f.original.pair_binding).first("count")).toBe(1);
+	const independent = await firstKeyFixture();
+	expect((await independent.dispatch("challenge", independent.original)).status).toBe(200);
+});
+
+it("blocks the original receipt and its already issued status nonce after durable retirement", async () => {
+	const f = await firstKeyFixture();
+	const { input } = await f.registerInput();
+	const receipt = await (await f.dispatch("register", input)).json<Record<string, unknown>>();
+	const lookup = {
+		contract_version: 1, operation_id: receipt.operation_id,
+		api_installation_id: receipt.api_installation_id, transcript_sha256: receipt.transcript_sha256,
+	};
+	const status = await (await f.dispatch("status/challenge", lookup)).json<FirstKeyStatusChallenge>();
+	const signed = { ...status, core_signature_b64url: await f.sign(firstKeyStatusBytes(status)) };
+	f.isPairCurrent.mockImplementationOnce(async () => {
+		await retireWidgetFirstKeyPair(f.db, f.original.pair_binding);
+		return true;
+	});
+	expect((await f.dispatch("status", signed)).status).toBe(409);
+	expect((await f.dispatch("status/challenge", lookup)).status).toBe(409);
+	expect(await f.db.prepare("SELECT receipt FROM widget_first_key WHERE credential_id = ?")
+		.bind(f.credential.id).first("receipt")).toBeTypeOf("string");
 });
 
 it("cannot renew an expired registration challenge or commit at its original deadline", async () => {
