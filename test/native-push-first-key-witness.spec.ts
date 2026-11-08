@@ -3,7 +3,7 @@ import vector from "../qualification/native-push-mvp/first-key-witness-vector.js
 import statusVector from "../qualification/native-push-mvp/first-key-status-vector.json";
 import {
 	firstKeyRegisterBytes, firstKeyStatusBytes, type FirstKeyChallenge, type FirstKeyStatusChallenge,
-} from "../qualification/native-push-mvp/first-key-witness";
+} from "../src/native-push/first-key-wire";
 
 const challenge = vector.challengeResponse as FirstKeyChallenge;
 const decode = (value: string) => Uint8Array.from(atob(value), char => char.charCodeAt(0));
