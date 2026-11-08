@@ -4,6 +4,7 @@ import worker, { createWidgetHaDevWorker, WidgetEnrollmentOperator } from "../..
 import firstKeySchema from "./first-key.sql?raw";
 import credentialSchema from "../../migrations/0002_install_tokens.sql?raw";
 import bootstrapSchema from "../../migrations/0004_bootstrap_proofs.sql?raw";
+import retirementVector from "../native-push-mvp/first-key-retirement-vector.json";
 import { issueBootstrapProofHandler, issueInstallTokenHandler } from "../../src/handlers/install";
 import type { AppEnv } from "../../src/types";
 import { issueInstallToken } from "../../src/repositories/installTokens";
@@ -375,6 +376,17 @@ it("authenticates a canonical retirement and acknowledges the exact event after 
 	}
 	expect(await f.db.prepare("SELECT COUNT(*) AS count FROM widget_first_key_retirements WHERE pair_binding = ?")
 		.bind(event.pair_binding).first("count")).toBe(1);
+});
+
+it("returns the exact acknowledgement encoded by Core for retire v1", async () => {
+	const db = local.WIDGET_HA_DEV_DB;
+	const retire = createWidgetFirstKeyRetirementHandler(db, origin, async (_request, event) =>
+		canonical(event) === retirementVector.request);
+	const response = await retire(new Request(origin + retirementVector.path, {
+		method: "POST", headers: { "content-type": "application/json" }, body: retirementVector.request,
+	}));
+	expect(response.status).toBe(200);
+	expect(await response.text()).toBe(retirementVector.ack);
 });
 
 it("cannot renew an expired registration challenge or commit at its original deadline", async () => {
