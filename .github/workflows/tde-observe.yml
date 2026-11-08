@@ -55,8 +55,10 @@ jobs:
             sleep 15
           done
           mkdir -p "$RUNNER_TEMP/tde-tools"
+          # The upstream release asset is identical to this pinned v2.10 source.
           curl --fail --silent --show-error --location \
-            https://github.com/AlDanial/cloc/releases/download/v2.10/cloc-2.10.pl \
+            --retry 3 --retry-max-time 60 --connect-timeout 10 --max-time 30 \
+            https://raw.githubusercontent.com/AlDanial/cloc/eb5cef64db2b2d4380f501568cc584b7cab4ba50/cloc \
             --output "$RUNNER_TEMP/tde-tools/cloc"
           echo "bf59272455172108072a0a106379f7509fd4349bdcfd85203bac038ccd286d83  $RUNNER_TEMP/tde-tools/cloc" | sha256sum --check
           chmod +x "$RUNNER_TEMP/tde-tools/cloc"
