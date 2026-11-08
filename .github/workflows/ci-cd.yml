@@ -98,6 +98,9 @@ jobs:
       - name: Test
         if: matrix.suite == 'worker'
         run: npm test -- --run
+      - name: Isolated WidgetKit first-key Worker and D1
+        if: matrix.suite == 'worker'
+        run: npm test -- --run --config qualification/widget-ha-dev/vitest.config.mts
       - name: Generate post-merge coverage evidence
         if: matrix.suite == 'worker' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
         run: |
