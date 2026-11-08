@@ -109,6 +109,8 @@ async function firstKeyFixture() {
 	config.WIDGET_PILOT_EXPIRES_AT_MS = String(Date.now() + 300_000);
 	const db = config.WIDGET_HA_DEV_DB;
 	const credential = await issueInstallToken(db, { ha_install_id: crypto.randomUUID() });
+	const prepare = vi.fn((sql: string) => db.prepare(sql));
+	config.WIDGET_HA_DEV_DB = { prepare } as unknown as D1Database;
 	const signer = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, false, ["sign", "verify"]);
 	const spki = await crypto.subtle.exportKey("spki", signer.publicKey);
 	const original = {
@@ -124,10 +126,11 @@ async function firstKeyFixture() {
 		isPairCurrent: async (credentialId, received) => current && credentialId === credential.id && received.pair_binding === original.pair_binding,
 		verifyApple,
 	});
-	const dispatch = (path: string, body: unknown, bearer = credential.token) => selected.fetch(new Request(origin + keyPrefix + path, {
+	const dispatchRaw = (path: string, body: string, bearer = credential.token) => selected.fetch(new Request(origin + keyPrefix + path, {
 		method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + bearer },
-		body: JSON.stringify(body),
+		body,
 	}), config, createExecutionContext());
+	const dispatch = (path: string, body: unknown, bearer = credential.token) => dispatchRaw(path, JSON.stringify(body), bearer);
 	async function registerInput() {
 		const response = await dispatch("challenge", original);
 		expect(response.status).toBe(200);
@@ -138,7 +141,7 @@ async function firstKeyFixture() {
 			core_signature_b64url: await sign(transcript),
 			apple_proof: { kind: "attestation", key_id_b64: base64Encode(new Uint8Array(32)), proof_b64: "AA==" } } };
 	}
-	return { db, credential, original, sign, dispatch, registerInput, verifyApple, retirePair() { current = false; } };
+	return { db, credential, original, sign, dispatch, dispatchRaw, registerInput, prepare, verifyApple, retirePair() { current = false; } };
 }
 
 it.each(["challenge", "register", "status/challenge", "status"])("leaves first-key %s closed without a selected verifier", async path => {
@@ -181,6 +184,43 @@ it("commits one registration and consumes each status nonce once through the act
 	expect((await f.dispatch("status", statusInput)).status).toBe(409);
 	f.retirePair();
 	expect((await f.dispatch("status", { ...next, core_signature_b64url: await f.sign(firstKeyStatusBytes(next)) })).status).toBe(403);
+});
+
+it("refuses an assertion before any D1 access or Apple verification and leaves the challenge usable", async () => {
+	const f = await firstKeyFixture();
+	const { input } = await f.registerInput();
+	f.prepare.mockClear();
+	const response = await f.dispatch("register", { ...input, apple_proof: { ...input.apple_proof, kind: "assertion" } });
+	expect(response.status).toBe(403);
+	expect(await response.json()).toEqual({ error: "widget_first_key_proof_rejected" });
+	expect(f.prepare).not.toHaveBeenCalled();
+	expect(f.verifyApple).not.toHaveBeenCalled();
+	expect((await f.dispatch("register", input)).status).toBe(200);
+});
+
+it("allows the full Apple proof within the register envelope and enforces the route byte limits", async () => {
+	const f = await firstKeyFixture();
+	const challengeBody = JSON.stringify(f.original);
+	expect((await f.dispatchRaw("challenge", challengeBody.padEnd(16_384))).status).toBe(200);
+	for (const route of ["challenge", "status/challenge", "status"]) {
+		const response = await f.dispatchRaw(route, challengeBody.padEnd(16_385));
+		expect(response.status).toBe(413);
+		expect(await response.json()).toEqual({ error: "payload_too_large" });
+	}
+
+	const { input } = await f.registerInput();
+	const withProof = (size: number) => JSON.stringify({
+		...input, apple_proof: { ...input.apple_proof, proof_b64: base64Encode(new Uint8Array(size)) },
+	});
+	expect((await f.dispatchRaw("register", withProof(16_385))).status).toBe(400);
+	const body = withProof(16_384);
+	expect(body.length).toBeGreaterThan(16_384);
+	const response = await f.dispatchRaw("register", body.padEnd(32_769));
+	expect(response.status).toBe(413);
+	expect(await response.json()).toEqual({ error: "payload_too_large" });
+	expect(f.verifyApple).not.toHaveBeenCalled();
+	expect((await f.dispatchRaw("register", body.padEnd(32_768))).status).toBe(200);
+	expect(f.verifyApple).toHaveBeenCalledOnce();
 });
 
 it("refuses a rejected Apple proof and rechecks the exact D1 credential after successful verification", async () => {

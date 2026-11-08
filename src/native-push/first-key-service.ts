@@ -8,6 +8,9 @@ import {
 
 const prefix = "/v1/push/native/key/";
 const routes = ["challenge", "register", "status/challenge", "status"] as const;
+const registerBodyLimit = 32_768;
+const standardBodyLimit = 16_384;
+const appleProofLimit = 16_384;
 const originalWindowMs = 120_000;
 const statusWindowMs = 15_000;
 const bindingFields = ["pairing_generation", "pair_binding", "owner_binding", "device_binding", "core_key_thumbprint"] as const;
@@ -36,7 +39,7 @@ interface Saved {
 	status_nonce_id: string | null;
 	status_expires_at_ms: number | null;
 }
-interface AppleProof { kind: "attestation" | "assertion"; key_id_b64: string; proof_b64: string }
+interface AppleProof { kind: "attestation"; key_id_b64: string; proof_b64: string }
 
 /** Trusted composition, never selected by the request. The live implementation must bind
  * this policy ID to the signed app selection and verify App Attest against clientDataHash. */
@@ -72,7 +75,7 @@ function decode64(value: unknown, size: number, url = false) {
 	return bytes;
 }
 
-async function readBody(request: Request) {
+async function readBody(request: Request, limit: number) {
 	need(request.headers.get("content-type")?.toLowerCase() === "application/json", "unsupported_media_type", 415);
 	need(!request.headers.has("content-encoding"));
 	const reader = request.body?.getReader();
@@ -85,7 +88,7 @@ async function readBody(request: Request) {
 			const { value, done } = await reader.read();
 			if (done) break;
 			size += value.byteLength;
-			need(size <= 32768, "payload_too_large", 413);
+			need(size <= limit, "payload_too_large", 413);
 			text += decoder.decode(value, { stream: true });
 		}
 		return parseStrictJson(text + decoder.decode());
@@ -157,8 +160,7 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		return JSON.parse(saved.challenge) as FirstKeyChallenge;
 	}
 
-	async function register(input: unknown, credential: Credential) {
-		fields(input, [...challengeFields, ...bindingFields, "core_public_key_spki_b64", "core_signature_b64url", "apple_proof"]);
+	async function register(input: Json, credential: Credential, proof: AppleProof) {
 		need(id(input.operation_id));
 		const saved = await load(credential, input.operation_id as string);
 		need(saved && !saved.receipt, conflict, 409);
@@ -170,11 +172,8 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		const spki = decode64(input.core_public_key_spki_b64, 160);
 		need(hex(await digest(spki)) === original.core_key_thumbprint, "widget_first_key_proof_rejected", 403);
 		await verifyCore(bytes, spki, decode64(input.core_signature_b64url, 64, true));
-		fields(input.apple_proof, ["kind", "key_id_b64", "proof_b64"]);
-		const proof = input.apple_proof as unknown as AppleProof;
-		need(proof.kind === "attestation" || proof.kind === "assertion");
 		need(decode64(proof.key_id_b64, 32).length === 32);
-		decode64(proof.proof_b64, 16384);
+		decode64(proof.proof_b64, appleProofLimit);
 		const hash = await digest(bytes);
 		need(await checkWorker().verifyApple(Object.freeze(proof), hash.slice()), "widget_first_key_proof_rejected", 403);
 		await checkPair(credential, original);
@@ -257,12 +256,29 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 			checkWorker();
 			const match = /^Bearer (djci_[A-Za-z0-9_-]{1,256})$/.exec(request.headers.get("authorization") ?? "");
 			need(match, "install_auth_required", 401);
-			const credential = await findInstallTokenByBearer(db, match[1]);
-			need(credential, "install_auth_required", 401);
-			const input = await readBody(request);
-			checkWorker();
-			const handlers = { challenge: issueChallenge, register, "status/challenge": issueStatus, status: readStatus };
-			const result = await handlers[pathname.slice(prefix.length) as typeof routes[number]](input, credential);
+			const route = pathname.slice(prefix.length) as typeof routes[number];
+			const authenticate = async () => {
+				checkWorker();
+				const credential = await findInstallTokenByBearer(db, match[1]);
+				need(credential, "install_auth_required", 401);
+				checkWorker();
+				return credential;
+			};
+			let result: unknown;
+			if (route === "register") {
+				const input = await readBody(request, registerBodyLimit);
+				fields(input, [...challengeFields, ...bindingFields, "core_public_key_spki_b64", "core_signature_b64url", "apple_proof"]);
+				fields(input.apple_proof, ["kind", "key_id_b64", "proof_b64"]);
+				need(input.apple_proof.kind !== "assertion", "widget_first_key_proof_rejected", 403);
+				need(input.apple_proof.kind === "attestation");
+				result = await register(input, await authenticate(), input.apple_proof as unknown as AppleProof);
+			} else {
+				const credential = await authenticate();
+				const input = await readBody(request, standardBodyLimit);
+				checkWorker();
+				const handlers = { challenge: issueChallenge, "status/challenge": issueStatus, status: readStatus };
+				result = await handlers[route](input, credential);
+			}
 			checkWorker();
 			return json(result);
 		} catch (error) {
