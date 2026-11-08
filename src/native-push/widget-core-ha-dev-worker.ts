@@ -62,7 +62,7 @@ export function createWidgetCoreHaDevWorker(resolveKeys?: Parameters<typeof veri
 						env.WIDGET_CORE_POLICY_ID === policyId && env.WIDGET_CORE_EXPIRES_AT_MS === expiration &&
 						env.WIDGET_CORE_APP_ID === appId && env.WIDGET_CORE_APP_BUILD === build, resolveKeys);
 				if (!access) return reply(403);
-				const { current } = access;
+				const { current, expiresAt: accessExpiresAt } = access;
 
 				const machine = await db.prepare(`SELECT scope_id, ha_install_id, device_id
 					FROM widget_core_machines WHERE access_client_id = ? AND enabled = 1`).bind(clientId).first<Machine>();
@@ -89,9 +89,8 @@ export function createWidgetCoreHaDevWorker(resolveKeys?: Parameters<typeof veri
 							pair.pairing_generation, pair.pair_binding, pair.owner_binding, pair.device_binding,
 							pair.core_key_thumbprint, ...(retirementDeadline === null ? [] : [retirementDeadline])] };
 				};
-				const allowedPair = async (credentialId: string, pair: FirstKeyPairBinding & { operation_id: string },
-					retirementDeadline: number | null = null) => {
-					const query = pairQuery(credentialId, pair, retirementDeadline);
+				const allowedPair = async (credentialId: string, pair: FirstKeyPairBinding & { operation_id: string }) => {
+					const query = pairQuery(credentialId, pair, null);
 					const result = await db.prepare(query.sql).bind(...query.values).first();
 					return !!result && current();
 				};
@@ -103,8 +102,14 @@ export function createWidgetCoreHaDevWorker(resolveKeys?: Parameters<typeof veri
 					})(request);
 				}
 				if (pathname === retirementPath) {
-					return await createWidgetFirstKeyRetirementHandler(db, origin, async (_request, event) =>
-						allowedPair(event.install_credential_id, event, event.request_expires_at_ms))(request);
+					return await createWidgetFirstKeyRetirementHandler(db, origin, event => {
+						if (!current()) return null;
+						const query = pairQuery(event.install_credential_id, event, event.request_expires_at_ms);
+						return {
+							sql: `EXISTS (${query.sql}) AND ? > CAST(unixepoch('subsec') * 1000 AS INTEGER)`,
+							values: [...query.values, accessExpiresAt],
+						};
+					})(request);
 				}
 				return await createWidgetFirstKeyHandler(db, origin, current, {
 					id: policyId, expiresAt, isCurrent: current, isPairCurrent: allowedPair,

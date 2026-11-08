@@ -149,7 +149,7 @@ function json(body: unknown, status = 200) {
 /** Candidate for a private ingress. Authorization must resolve the exact historical
  * pairing from a separately authenticated Core identity, including after token rotation. */
 export function createWidgetFirstKeyRetirementHandler(db: D1Database, origin: string,
-	authorize: (request: Request, event: Readonly<Retirement>) => Promise<boolean>) {
+	authorize: (event: Readonly<Retirement>) => PairSqlGuard | null) {
 	return async (request: Request) => {
 		try {
 			need(request.method === "POST" && request.url === origin + prefix + "retire",
@@ -163,10 +163,15 @@ export function createWidgetFirstKeyRetirementHandler(db: D1Database, origin: st
 				typeof input.request_expires_at_ms === "number" && Number.isSafeInteger(input.request_expires_at_ms) &&
 				input.request_expires_at_ms > 0);
 			const event = Object.freeze(input as unknown as Retirement);
-			need(await authorize(request, event) === true, "widget_first_key_proof_rejected", 403);
 			const eventDigest = hex(await digest(Uint8Array.from(new TextEncoder().encode(canonical(event)))));
 			need(!request.signal.aborted, "widget_first_key_conflict", 409);
-			await retireWidgetFirstKeyPair(db, event.pair_binding);
+			const guard = authorize(event);
+			need(guard, "widget_first_key_proof_rejected", 403);
+			const retired = await db.prepare(`INSERT INTO widget_first_key_retirements (pair_binding)
+				SELECT ? WHERE ${guard.sql}
+				ON CONFLICT(pair_binding) DO UPDATE SET pair_binding = excluded.pair_binding
+				RETURNING pair_binding`).bind(event.pair_binding, ...guard.values).first();
+			need(retired, "widget_first_key_proof_rejected", 403);
 			return new Response(canonical({
 				contract_version: 1, api_audience: firstKeyAudience, event_id: event.event_id,
 				pair_binding: event.pair_binding, event_sha256: eventDigest, state: "retired",

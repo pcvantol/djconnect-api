@@ -293,7 +293,52 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	expect((await send(retire, { ...retirement, owner_binding: "e".repeat(64) })).status).toBe(403);
 	expect((await send(retire, retirement, { bearer: token })).status).toBe(403);
 	await db.prepare("UPDATE install_tokens SET disabled = 1 WHERE id = ?").bind(id).run();
-	expect((await send(retire, retirement)).status).toBe(200);
+	let revokedAtWrite = false;
+	const revokeAtRetirement = {
+		prepare(sql: string) {
+			const statement = db.prepare(sql);
+			if (!sql.startsWith("INSERT INTO widget_first_key_retirements")) return statement;
+			return {
+				bind(...values: unknown[]) {
+					const bound = statement.bind(...values);
+					const revoke = async () => {
+						await db.prepare("UPDATE widget_core_machines SET enabled = 0 WHERE access_client_id = ?").bind(clientId).run();
+						revokedAtWrite = true;
+					};
+					return {
+						async first() { await revoke(); return bound.first(); },
+						async run() { await revoke(); return bound.run(); },
+					};
+				},
+			};
+		},
+	} as unknown as D1Database;
+	const raceConfig = { ...config, WIDGET_HA_DEV_DB: revokeAtRetirement };
+	expect((await send(retire, retirement, { config: raceConfig })).status).toBe(403);
+	expect(revokedAtWrite).toBe(true);
+	expect(await db.prepare("SELECT 1 FROM widget_first_key_retirements WHERE pair_binding = ?")
+		.bind(pair.pair_binding).first()).toBeNull();
+	await db.prepare("UPDATE widget_core_machines SET enabled = 1 WHERE access_client_id = ?").bind(clientId).run();
+
+	const retirementClock = vi.spyOn(Date, "now").mockReturnValue(past);
+	try {
+		const token = await makeJwt();
+		const expired = { ...config, WIDGET_CORE_EXPIRES_AT_MS: String(past + 1000) };
+		expect((await send(retire, retirement, { jwt: token, config: expired })).status).toBe(403);
+	} finally {
+		retirementClock.mockRestore();
+	}
+	expect(await db.prepare("SELECT 1 FROM widget_first_key_retirements WHERE pair_binding = ?")
+		.bind(pair.pair_binding).first()).toBeNull();
+
+	const retired = await send(retire, retirement);
+	const replay = await send(retire, retirement);
+	expect(retired.status).toBe(200);
+	expect(replay.status).toBe(200);
+	expect(await replay.text()).toBe(await retired.text());
+	revokedAtWrite = false;
+	expect((await send(retire, retirement, { config: raceConfig })).status).toBe(403);
+	expect(revokedAtWrite).toBe(true);
 	expect(await db.prepare("SELECT pair_binding FROM widget_first_key_retirements WHERE pair_binding = ?")
 		.bind(pair.pair_binding).first("pair_binding")).toBe(pair.pair_binding);
 	await db.prepare("UPDATE widget_core_machines SET enabled = 0 WHERE access_client_id = ?").bind(clientId).run();
@@ -572,7 +617,7 @@ it("authenticates a canonical retirement and acknowledges the exact event after 
 		method: "POST", headers: { "content-type": "application/json" }, body: raw,
 	});
 	let admitted = false;
-	const authorize = vi.fn(async (_request: Request, received: unknown) => admitted && canonical(received) === body);
+	const authorize = vi.fn((received: unknown) => admitted && canonical(received) === body ? { sql: "1", values: [] } : null);
 	const retire = createWidgetFirstKeyRetirementHandler(f.db, origin, authorize);
 
 	expect((await worker.fetch(request(), fixture(), createExecutionContext())).status).toBe(404);
@@ -600,8 +645,8 @@ it("authenticates a canonical retirement and acknowledges the exact event after 
 
 it("returns the exact acknowledgement encoded by Core for retire v1", async () => {
 	const db = local.WIDGET_HA_DEV_DB;
-	const retire = createWidgetFirstKeyRetirementHandler(db, origin, async (_request, event) =>
-		canonical(event) === retirementVector.request);
+	const retire = createWidgetFirstKeyRetirementHandler(db, origin, event =>
+		canonical(event) === retirementVector.request ? { sql: "1", values: [] } : null);
 	const response = await retire(new Request(origin + retirementVector.path, {
 		method: "POST", headers: { "content-type": "application/json" }, body: retirementVector.request,
 	}));
