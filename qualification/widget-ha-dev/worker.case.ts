@@ -17,7 +17,7 @@ import { createWidgetFirstKeyRetirementHandler, retireWidgetFirstKeyPair,
 import { createWidgetFirstKeyAppleVerifier } from "../../src/native-push/first-key-apple";
 import { createWidgetInstallIssuer } from "../../src/native-push/widget-install-issuer";
 import { createWidgetCoreHaDevWorker } from "../../src/native-push/widget-core-ha-dev-worker";
-import { createWidgetCorePublisher } from "../../src/native-push/widget-core-publisher";
+import { createWidgetCorePublisherWorker } from "../../src/native-push/widget-core-publisher-worker";
 import { canonical } from "../../src/surface-push/wire";
 
 const origin = "https://widget.fixture.invalid";
@@ -123,7 +123,7 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 		publicExponent: Uint8Array.of(1, 0, 1), hash: "SHA-256" }, false, ["sign", "verify"]);
 	const resolve = vi.fn(async () => signing.publicKey);
 	const selected = createWidgetCoreHaDevWorker(() => resolve);
-	const clientId = crypto.randomUUID();
+	const clientId = crypto.randomUUID() + ".access";
 	const install = { ha_install_id: crypto.randomUUID(), device_id: crypto.randomUUID(), client_type: "ios",
 		integration: "djconnect_hacs", integration_version: "fixture" };
 	const config = {
@@ -153,12 +153,27 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	}), options.config ?? config, options.ctx ?? ctx);
 	const bootstrap = "/v1/install/bootstrap-proof";
 	const exchange = "/v1/install/token";
-	const publisher = createWidgetCorePublisher(db, origin, async request =>
-		request.headers.get("x-fixture-publisher") === "authorized" ? clientId : null);
-	const publication = (action: string, body: unknown, authorized = true) => new Request(origin + "/v1/internal/widget-core/" + action, {
-		method: "POST", headers: { "content-type": "application/json",
-			"x-fixture-publisher": authorized ? "authorized" : "ordinary-core" }, body: canonical(body),
-	});
+	const publisherOrigin = "https://publisher.widget-fixture.example";
+	const publisherWorker = createWidgetCorePublisherWorker(() => resolve);
+	const publisherConfig = {
+		WIDGET_PUBLISHER_MODE: "publisher-v1", WIDGET_PUBLISHER_ORIGIN: publisherOrigin,
+		WIDGET_PUBLISHER_ACCESS_ISSUER: config.WIDGET_CORE_ACCESS_ISSUER,
+		WIDGET_PUBLISHER_ACCESS_AUDIENCE: "publisher-only",
+		WIDGET_PUBLISHER_ACCESS_CLIENT_ID: crypto.randomUUID() + ".access",
+		WIDGET_PUBLISHER_EXPIRES_AT_MS: config.WIDGET_CORE_EXPIRES_AT_MS,
+		WIDGET_CORE_ORIGIN: origin, WIDGET_CORE_ACCESS_AUDIENCE: config.WIDGET_CORE_ACCESS_AUDIENCE,
+		WIDGET_CORE_ACCESS_CLIENT_ID: clientId, WIDGET_HA_DEV_DB: db,
+	};
+	const publisherClaims = { aud: [publisherConfig.WIDGET_PUBLISHER_ACCESS_AUDIENCE],
+		common_name: publisherConfig.WIDGET_PUBLISHER_ACCESS_CLIENT_ID };
+	const publisherJwt = await makeJwt(publisherClaims);
+	const publication = (action: string, body: unknown, token = publisherJwt) =>
+		new Request(publisherOrigin + "/v1/internal/widget-core/" + action, {
+			method: "POST", headers: { "content-type": "application/json", "cf-access-jwt-assertion": token },
+			body: canonical(body),
+		});
+	const publisher = (request: Request, env = publisherConfig, context = ctx) =>
+		publisherWorker.fetch(request, env, context);
 	expect((await send(bootstrap, install, { config: { ...config, WIDGET_CORE_MODE: "closed" } })).status).toBe(503);
 	expect((await send(bootstrap, install, { ctx: createExecutionContext() })).status).toBe(403);
 	expect((await send(bootstrap, install, { jwt: await makeJwt({ aud: ["another-service"] }) })).status).toBe(403);
@@ -169,9 +184,34 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	expect((await send(bootstrap, install, { jwt: jwtParts.join(".") })).status).toBe(403);
 	expect((await send(bootstrap, install)).status).toBe(403);
 	const binding = { contract_version: 1, ha_install_id: install.ha_install_id, device_id: install.device_id };
-	expect((await createWidgetCorePublisher()(publication("bind", binding))).status).toBe(503);
+	expect((await publisher(publication("bind", binding), { ...publisherConfig, WIDGET_PUBLISHER_MODE: "closed" })).status).toBe(503);
+	expect((await publisher(publication("bind", binding), { ...publisherConfig, WIDGET_PUBLISHER_ORIGIN: origin })).status).toBe(503);
+	expect((await publisher(publication("bind", binding), { ...publisherConfig, WIDGET_PUBLISHER_ACCESS_AUDIENCE: config.WIDGET_CORE_ACCESS_AUDIENCE })).status).toBe(503);
+	expect((await publisher(publication("bind", binding), { ...publisherConfig, WIDGET_PUBLISHER_ACCESS_CLIENT_ID: clientId })).status).toBe(503);
+	expect((await publisher(publication("bind", binding), publisherConfig, createExecutionContext())).status).toBe(403);
+	expect((await publisher(publication("bind", binding, await makeJwt({ ...publisherClaims, common_name: clientId })))).status).toBe(403);
+	expect((await publisher(publication("bind", binding, await makeJwt({ ...publisherClaims, aud: [config.WIDGET_CORE_ACCESS_AUDIENCE] })))).status).toBe(403);
+	expect((await publisher(publication("bind", binding, await makeJwt({ ...publisherClaims, iat: Math.floor(Date.now() / 1000) - 31 })))).status).toBe(403);
+	expect((await send(bootstrap, install, { jwt: publisherJwt })).status).toBe(403);
+	const browser = publication("bind", binding);
+	browser.headers.set("origin", publisherOrigin);
+	expect((await publisher(browser)).status).toBe(403);
+	const bearer = publication("bind", binding);
+	bearer.headers.set("authorization", "Bearer fixture");
+	expect((await publisher(bearer)).status).toBe(403);
 	expect((await send("/v1/internal/widget-core/bind", binding)).status).toBe(404);
-	expect((await publisher(publication("bind", binding, false))).status).toBe(403);
+	expect((await publisher(publication("bind", binding, jwt))).status).toBe(403);
+	// Exercise D1's own deadline check with a request clock still inside the validity window.
+	const past = Date.now() - 10_000;
+	const clock = vi.spyOn(Date, "now").mockReturnValue(past);
+	try {
+		const token = await makeJwt(publisherClaims);
+		const expiredAtDatabase = { ...publisherConfig, WIDGET_PUBLISHER_EXPIRES_AT_MS: String(past + 1000) };
+		expect((await publisher(publication("bind", binding, token), expiredAtDatabase)).status).toBe(409);
+	} finally {
+		clock.mockRestore();
+	}
+	expect(await db.prepare("SELECT 1 FROM widget_core_machines WHERE access_client_id = ?").bind(clientId).first()).toBeNull();
 	expect((await publisher(publication("bind", { ...binding, scope_id: "caller-scope" }))).status).toBe(400);
 	expect((await publisher(publication("bind", binding))).status).toBe(200);
 	expect((await publisher(publication("bind", binding))).status).toBe(200);

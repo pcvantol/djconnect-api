@@ -1,10 +1,9 @@
-import { base64Url } from "../crypto";
-import { parseStrictJson } from "../surface-push/wire";
 import { createWatchAccessKeyResolver } from "../watch-lifecycle/access-jwks";
 import { createWidgetFirstKeyAppleVerifier } from "./first-key-apple";
 import { createWidgetFirstKeyHandler, createWidgetFirstKeyRetirementHandler, isWidgetFirstKeyRoute } from "./first-key-service";
 import type { FirstKeyPairBinding } from "./first-key-wire";
 import { createWidgetInstallIssuer } from "./widget-install-issuer";
+import { verifyWidgetCoreAccess } from "./widget-core-access";
 
 interface Bindings {
 	WIDGET_CORE_MODE?: string;
@@ -28,7 +27,6 @@ interface Machine {
 const installPaths = new Set(["/v1/install/bootstrap-proof", "/v1/install/token"]);
 const retirementPath = "/v1/push/native/key/retire";
 const identifier = /^[A-Za-z0-9_-]{1,128}$/;
-const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
 function reply(status: number) {
 	const error = status === 404 ? "widget_core_not_found" :
@@ -36,21 +34,8 @@ function reply(status: number) {
 	return Response.json({ error }, { status, headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" } });
 }
 
-function decodeSegment(value: string): Uint8Array<ArrayBuffer> {
-	if (!/^[A-Za-z0-9_-]+$/.test(value)) throw new TypeError("invalid Access segment");
-	const decoded = Uint8Array.from(atob(value.replaceAll("-", "+").replaceAll("_", "/")), char => char.charCodeAt(0));
-	if (base64Url(decoded.buffer) !== value) throw new TypeError("noncanonical Access segment");
-	return decoded;
-}
-
-function claims(value: string): Record<string, unknown> {
-	const parsed = parseStrictJson(decoder.decode(decodeSegment(value)));
-	if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new TypeError("invalid Access claims");
-	return parsed as Record<string, unknown>;
-}
-
 /** Standalone HA-dev entry. Binding the D1 database alone does not enable it. */
-export function createWidgetCoreHaDevWorker(resolveKeys = createWatchAccessKeyResolver) {
+export function createWidgetCoreHaDevWorker(resolveKeys?: Parameters<typeof verifyWidgetCoreAccess>[7]) {
 	return {
 		async fetch(request: Request, env: Bindings, ctx: ExecutionContext): Promise<Response> {
 			const { pathname } = new URL(request.url);
@@ -69,34 +54,15 @@ export function createWidgetCoreHaDevWorker(resolveKeys = createWatchAccessKeyRe
 				if (selectedOrigin.origin !== origin || selectedOrigin.protocol !== "https:" || selectedOrigin.port ||
 					selectedOrigin.hostname === "api.djconnect.dev" || !selectedOrigin.hostname.includes(".")) return reply(503);
 				if (request.method !== "POST" || request.url !== origin + pathname) return reply(404);
-				if (!ctx.access || request.headers.has("cookie") || request.headers.has("origin") ||
-					request.headers.has("content-encoding")) return reply(403);
 				if ((installPaths.has(pathname) || pathname === retirementPath) && request.headers.has("authorization")) return reply(403);
-				const token = request.headers.get("cf-access-jwt-assertion");
-				if (!token || token.length > 8192) return reply(403);
-				const parts = token.split(".");
-				if (parts.length !== 3) return reply(403);
-				const [header, payload, signature] = parts;
-				const { alg, kid, crit } = claims(header);
-				const { iss, aud, common_name, type, sub, exp, iat } = claims(payload);
-				if (alg !== "RS256" || crit !== undefined || typeof kid !== "string" || !identifier.test(kid) ||
-					iss !== issuer || !Array.isArray(aud) || aud.length !== 1 || aud[0] !== audience ||
-					common_name !== clientId || type !== "app" || sub !== "" ||
-					typeof exp !== "number" || typeof iat !== "number" || !Number.isSafeInteger(exp) ||
-					!Number.isSafeInteger(iat)) return reply(403);
-				const requestExpiry = Math.min(expiresAt, exp * 1000, (iat + 30) * 1000);
-				const current = () => !request.signal.aborted && iat <= Math.floor(Date.now() / 1000) &&
-					Date.now() < requestExpiry && env.WIDGET_CORE_MODE === mode && env.WIDGET_HA_DEV_DB === db &&
-					env.WIDGET_CORE_ORIGIN === origin && env.WIDGET_CORE_ACCESS_ISSUER === issuer &&
-					env.WIDGET_CORE_ACCESS_AUDIENCE === audience && env.WIDGET_CORE_ACCESS_CLIENT_ID === clientId &&
-					env.WIDGET_CORE_POLICY_ID === policyId && env.WIDGET_CORE_EXPIRES_AT_MS === expiration &&
-					env.WIDGET_CORE_APP_ID === appId && env.WIDGET_CORE_APP_BUILD === build;
-				if (!current()) return reply(403);
-				const key = await resolveKeys(issuer)(kid, AbortSignal.any([request.signal, AbortSignal.timeout(3000)]));
-				if (!key || key.type !== "public" ||
-					(key.algorithm as { hash?: { name: string } }).hash?.name !== "SHA-256" ||
-					!await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, decodeSegment(signature),
-						Uint8Array.from(new TextEncoder().encode(header + "." + payload))) || !current()) return reply(403);
+				const access = await verifyWidgetCoreAccess(request, ctx, issuer, audience, clientId, expiresAt,
+					() => env.WIDGET_CORE_MODE === mode && env.WIDGET_HA_DEV_DB === db &&
+						env.WIDGET_CORE_ORIGIN === origin && env.WIDGET_CORE_ACCESS_ISSUER === issuer &&
+						env.WIDGET_CORE_ACCESS_AUDIENCE === audience && env.WIDGET_CORE_ACCESS_CLIENT_ID === clientId &&
+						env.WIDGET_CORE_POLICY_ID === policyId && env.WIDGET_CORE_EXPIRES_AT_MS === expiration &&
+						env.WIDGET_CORE_APP_ID === appId && env.WIDGET_CORE_APP_BUILD === build, resolveKeys);
+				if (!access) return reply(403);
+				const { current } = access;
 
 				const machine = await db.prepare(`SELECT scope_id, ha_install_id, device_id
 					FROM widget_core_machines WHERE access_client_id = ? AND enabled = 1`).bind(clientId).first<Machine>();
