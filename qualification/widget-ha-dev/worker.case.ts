@@ -1,6 +1,11 @@
 import { createExecutionContext, env } from "cloudflare:test";
-import { expect, it, vi } from "vitest";
-import worker, { WidgetEnrollmentOperator } from "../../src/surface-push/widget-ha-dev-worker";
+import { beforeAll, expect, it, vi } from "vitest";
+import worker, { createWidgetHaDevWorker, WidgetEnrollmentOperator } from "../../src/surface-push/widget-ha-dev-worker";
+import firstKeySchema from "./first-key.sql?raw";
+import credentialSchema from "../../migrations/0002_install_tokens.sql?raw";
+import { issueInstallToken } from "../../src/repositories/installTokens";
+import { base64Encode, base64Url } from "../../src/crypto";
+import { firstKeyRegisterBytes, firstKeyStatusBytes, type FirstKeyChallenge, type FirstKeyStatusChallenge } from "../../src/native-push/first-key-wire";
 
 const origin = "https://widget.fixture.invalid";
 const operatorOrigin = "https://widget-enrollment.internal";
@@ -86,4 +91,161 @@ it.each(["public", "operator"] as const)("latches a shared D1 replacement detect
 	expect((await worker.fetch(post("status"), { ...config }, ctx)).status).toBe(503);
 	// A new immutable Worker version has its own captured composition.
 	expect((await worker.fetch(post("status"), fixture(), ctx)).status).toBe(403);
+});
+
+const keyPrefix = "/v1/push/native/key/";
+const es256 = { name: "ECDSA", hash: "SHA-256" };
+const digest = async (value: BufferSource) => new Uint8Array(await crypto.subtle.digest("SHA-256", value));
+const hex = (value: Uint8Array) => Array.from(value, byte => byte.toString(16).padStart(2, "0")).join("");
+
+beforeAll(async () => {
+	for (const statement of (credentialSchema + firstKeySchema).split(";").filter(part => part.trim())) {
+		await local.WIDGET_HA_DEV_DB.prepare(statement).run();
+	}
+});
+
+async function firstKeyFixture() {
+	const config = fixture();
+	config.WIDGET_PILOT_EXPIRES_AT_MS = String(Date.now() + 300_000);
+	const db = config.WIDGET_HA_DEV_DB;
+	const credential = await issueInstallToken(db, { ha_install_id: crypto.randomUUID() });
+	const prepare = vi.fn((sql: string) => db.prepare(sql));
+	config.WIDGET_HA_DEV_DB = { prepare } as unknown as D1Database;
+	const signer = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, false, ["sign", "verify"]);
+	const spki = await crypto.subtle.exportKey("spki", signer.publicKey);
+	const original = {
+		contract_version: 1 as const, operation_id: crypto.randomUUID(), pairing_generation: crypto.randomUUID(),
+		pair_binding: hex(await digest(new TextEncoder().encode(crypto.randomUUID()))),
+		owner_binding: "b".repeat(64), device_binding: "c".repeat(64), core_key_thumbprint: hex(await digest(spki)),
+	};
+	const sign = async (bytes: BufferSource) => base64Url(await crypto.subtle.sign(es256, signer.privateKey, bytes));
+	let current = true;
+	const verifyApple = vi.fn(async (_proof: unknown, _hash: Uint8Array) => true);
+	const selected = createWidgetHaDevWorker({
+		id: crypto.randomUUID(), expiresAt: Date.now() + 240_000, isCurrent: () => true,
+		isPairCurrent: async (credentialId, received) => current && credentialId === credential.id && received.pair_binding === original.pair_binding,
+		verifyApple,
+	});
+	const dispatchRaw = (path: string, body: string, bearer = credential.token) => selected.fetch(new Request(origin + keyPrefix + path, {
+		method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + bearer },
+		body,
+	}), config, createExecutionContext());
+	const dispatch = (path: string, body: unknown, bearer = credential.token) => dispatchRaw(path, JSON.stringify(body), bearer);
+	async function registerInput() {
+		const response = await dispatch("challenge", original);
+		expect(response.status).toBe(200);
+		const challenge = await response.json<FirstKeyChallenge>();
+		expect(challenge.install_credential_id).toBe(credential.id);
+		const transcript = firstKeyRegisterBytes(challenge, original);
+		return { challenge, transcript, input: { ...original, ...challenge, core_public_key_spki_b64: base64Encode(spki),
+			core_signature_b64url: await sign(transcript),
+			apple_proof: { kind: "attestation", key_id_b64: base64Encode(new Uint8Array(32)), proof_b64: "AA==" } } };
+	}
+	return { db, credential, original, sign, dispatch, dispatchRaw, registerInput, prepare, verifyApple, retirePair() { current = false; } };
+}
+
+it.each(["challenge", "register", "status/challenge", "status"])("leaves first-key %s closed without a selected verifier", async path => {
+	const config = fixture();
+	const request = new Request(origin + keyPrefix + path, { method: "POST", body: "unread" });
+	const response = await worker.fetch(request, config, createExecutionContext());
+	expect(response.status).toBe(503);
+	expect(await response.json()).toEqual({ error: "widget_first_key_unavailable" });
+	expect(request.bodyUsed).toBe(false);
+});
+
+it("commits one registration and consumes each status nonce once through the actual Worker and D1", async () => {
+	const f = await firstKeyFixture();
+	const { challenge, transcript, input } = await f.registerInput();
+	expect(await (await f.dispatch("challenge", f.original)).json()).toEqual(challenge);
+	expect((await f.dispatch("register", { ...input, owner_binding: "d".repeat(64) })).status).toBe(409);
+	expect(f.verifyApple).not.toHaveBeenCalled();
+	const responses = await Promise.all([f.dispatch("register", input), f.dispatch("register", input)]);
+	expect(responses.map(response => response.status).sort()).toEqual([200, 409]);
+	const receipt = await responses.find(response => response.ok)!.json<Record<string, unknown>>();
+	expect(Object.keys(receipt).sort()).toEqual([
+		"api_installation_id", "contract_version", "core_key_thumbprint", "expires_at_ms", "install_credential_id",
+		"key_revision", "operation_id", "pairing_generation", "registry_generation", "state", "transcript_sha256",
+	]);
+	expect(receipt.transcript_sha256).toBe(hex(await digest(transcript)));
+	expect(f.verifyApple.mock.calls[0][1]).toEqual(await digest(transcript));
+	const lookup = {
+		contract_version: 1, operation_id: receipt.operation_id,
+		api_installation_id: receipt.api_installation_id, transcript_sha256: receipt.transcript_sha256,
+	};
+	const status = await (await f.dispatch("status/challenge", lookup)).json<FirstKeyStatusChallenge>();
+	expect(status.status_nonce_expires_at_ms).toBeLessThanOrEqual(challenge.expires_at_ms);
+	expect(await (await f.dispatch("status/challenge", lookup)).json()).toEqual(status);
+	const statusInput = { ...status, core_signature_b64url: await f.sign(firstKeyStatusBytes(status)) };
+	const reads = await Promise.all([f.dispatch("status", statusInput), f.dispatch("status", statusInput)]);
+	expect(reads.map(response => response.status).sort()).toEqual([200, 409]);
+	expect(await reads.find(response => response.ok)!.json()).toEqual(receipt);
+	const next = await (await f.dispatch("status/challenge", lookup)).json<FirstKeyStatusChallenge>();
+	expect(next.status_nonce_id).not.toBe(status.status_nonce_id);
+	expect((await f.dispatch("status", statusInput)).status).toBe(409);
+	f.retirePair();
+	expect((await f.dispatch("status", { ...next, core_signature_b64url: await f.sign(firstKeyStatusBytes(next)) })).status).toBe(403);
+});
+
+it("refuses an assertion before any D1 access or Apple verification and leaves the challenge usable", async () => {
+	const f = await firstKeyFixture();
+	const { input } = await f.registerInput();
+	f.prepare.mockClear();
+	const response = await f.dispatch("register", { ...input, apple_proof: { ...input.apple_proof, kind: "assertion" } });
+	expect(response.status).toBe(403);
+	expect(await response.json()).toEqual({ error: "widget_first_key_proof_rejected" });
+	expect(f.prepare).not.toHaveBeenCalled();
+	expect(f.verifyApple).not.toHaveBeenCalled();
+	expect((await f.dispatch("register", input)).status).toBe(200);
+});
+
+it("allows the full Apple proof within the register envelope and enforces the route byte limits", async () => {
+	const f = await firstKeyFixture();
+	const challengeBody = JSON.stringify(f.original);
+	expect((await f.dispatchRaw("challenge", challengeBody.padEnd(16_384))).status).toBe(200);
+	for (const route of ["challenge", "status/challenge", "status"]) {
+		const response = await f.dispatchRaw(route, challengeBody.padEnd(16_385));
+		expect(response.status).toBe(413);
+		expect(await response.json()).toEqual({ error: "payload_too_large" });
+	}
+
+	const { input } = await f.registerInput();
+	const withProof = (size: number) => JSON.stringify({
+		...input, apple_proof: { ...input.apple_proof, proof_b64: base64Encode(new Uint8Array(size)) },
+	});
+	expect((await f.dispatchRaw("register", withProof(16_385))).status).toBe(400);
+	const body = withProof(16_384);
+	expect(body.length).toBeGreaterThan(16_384);
+	const response = await f.dispatchRaw("register", body.padEnd(32_769));
+	expect(response.status).toBe(413);
+	expect(await response.json()).toEqual({ error: "payload_too_large" });
+	expect(f.verifyApple).not.toHaveBeenCalled();
+	expect((await f.dispatchRaw("register", body.padEnd(32_768))).status).toBe(200);
+	expect(f.verifyApple).toHaveBeenCalledOnce();
+});
+
+it("refuses a rejected Apple proof and rechecks the exact D1 credential after successful verification", async () => {
+	const f = await firstKeyFixture();
+	const { input } = await f.registerInput();
+	f.verifyApple.mockResolvedValueOnce(false);
+	expect((await f.dispatch("register", input)).status).toBe(403);
+	f.verifyApple.mockImplementationOnce(async () => {
+		await f.db.prepare("UPDATE install_tokens SET disabled = 1 WHERE id = ?").bind(f.credential.id).run();
+		return true;
+	});
+	expect((await f.dispatch("register", input)).status).toBe(409);
+	expect(await f.db.prepare("SELECT receipt FROM widget_first_key WHERE credential_id = ?")
+		.bind(f.credential.id).first("receipt")).toBeNull();
+});
+
+it("cannot renew an expired registration challenge or commit at its original deadline", async () => {
+	const f = await firstKeyFixture();
+	const { challenge, input } = await f.registerInput();
+	const clock = vi.spyOn(Date, "now").mockReturnValue(challenge.expires_at_ms);
+	try {
+		expect((await f.dispatch("challenge", f.original)).status).toBe(409);
+		expect((await f.dispatch("register", input)).status).toBe(409);
+		expect(f.verifyApple).not.toHaveBeenCalled();
+	} finally {
+		clock.mockRestore();
+	}
 });
