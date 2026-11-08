@@ -3,6 +3,9 @@ import { beforeAll, expect, it, vi } from "vitest";
 import worker, { createWidgetHaDevWorker, WidgetEnrollmentOperator } from "../../src/surface-push/widget-ha-dev-worker";
 import firstKeySchema from "./first-key.sql?raw";
 import credentialSchema from "../../migrations/0002_install_tokens.sql?raw";
+import bootstrapSchema from "../../migrations/0004_bootstrap_proofs.sql?raw";
+import { issueBootstrapProofHandler, issueInstallTokenHandler } from "../../src/handlers/install";
+import type { AppEnv } from "../../src/types";
 import { issueInstallToken } from "../../src/repositories/installTokens";
 import { base64Encode, base64Url } from "../../src/crypto";
 import { firstKeyRegisterBytes, firstKeyStatusBytes, type FirstKeyChallenge, type FirstKeyStatusChallenge } from "../../src/native-push/first-key-wire";
@@ -101,16 +104,18 @@ const digest = async (value: BufferSource) => new Uint8Array(await crypto.subtle
 const hex = (value: Uint8Array) => Array.from(value, byte => byte.toString(16).padStart(2, "0")).join("");
 
 beforeAll(async () => {
-	for (const statement of (credentialSchema + firstKeySchema).split(";").filter(part => part.trim())) {
+	for (const statement of (credentialSchema + bootstrapSchema + firstKeySchema).split(";").filter(part => part.trim())) {
 		await local.WIDGET_HA_DEV_DB.prepare(statement).run();
 	}
 });
 
-async function firstKeyFixture(verifier: WidgetFirstKeyPolicy["verifyApple"] = async () => true) {
+async function firstKeyFixture(verifier: WidgetFirstKeyPolicy["verifyApple"] = async () => true,
+	issueCredential: (db: D1Database) => Promise<{ id: string; token: string }> =
+		db => issueInstallToken(db, { ha_install_id: crypto.randomUUID() })) {
 	const config = fixture();
 	config.WIDGET_PILOT_EXPIRES_AT_MS = String(Date.now() + 300_000);
 	const db = config.WIDGET_HA_DEV_DB;
-	const credential = await issueInstallToken(db, { ha_install_id: crypto.randomUUID() });
+	const credential = await issueCredential(db);
 	const prepare = vi.fn((sql: string) => db.prepare(sql));
 	config.WIDGET_HA_DEV_DB = { prepare } as unknown as D1Database;
 	const signer = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, false, ["sign", "verify"]);
@@ -148,6 +153,32 @@ async function firstKeyFixture(verifier: WidgetFirstKeyPolicy["verifyApple"] = a
 	return { db, credential, original, sign, dispatch, dispatchRaw, registerInput, prepare, verifyApple, isPairCurrent,
 		retirePair() { current = false; } };
 }
+
+it("accepts a credential issued by the existing install handlers on the isolated D1 without exposing an issuer route", async () => {
+	const payload = { ha_install_id: crypto.randomUUID(), device_id: crypto.randomUUID(), client_type: "ios" };
+	const request = (path: string, body: unknown, bearer?: string) => new Request(origin + path, {
+		method: "POST",
+		headers: { "content-type": "application/json", ...(bearer ? { authorization: "Bearer " + bearer } : {}) },
+		body: JSON.stringify(body),
+	});
+	const f = await firstKeyFixture(undefined, async db => {
+		const issuerEnv = { DB: db, DJCONNECT_RELAY_SECRET: operatorSecret } as AppEnv;
+		const bootstrap = await issueBootstrapProofHandler(request("/v1/install/bootstrap-proof", payload, operatorSecret), issuerEnv);
+		expect(bootstrap.status).toBe(200);
+		const { bootstrap_proof } = await bootstrap.json<{ bootstrap_proof: string }>();
+		const installRequest = () => request("/v1/install/token", { ...payload, bootstrap_proof });
+		const token = await issueInstallTokenHandler(installRequest(), issuerEnv);
+		expect(token.status).toBe(200);
+		await expect(issueInstallTokenHandler(installRequest(), issuerEnv)).rejects.toMatchObject({ status: 409 });
+		return token.json<{ id: string; token: string }>();
+	});
+	const { challenge } = await f.registerInput();
+	expect(challenge.install_credential_id).toBe(f.credential.id);
+	const config = fixture();
+	for (const path of ["/v1/install/bootstrap-proof", "/v1/pairing/bootstrap-proof", "/v1/install/token"]) {
+		expect((await worker.fetch(request(path, payload, operatorSecret), config, createExecutionContext())).status).toBe(404);
+	}
+});
 
 it.each(["challenge", "register", "status/challenge", "status"])("leaves first-key %s closed without a selected verifier", async path => {
 	const config = fixture();
