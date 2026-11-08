@@ -81,6 +81,23 @@ Retirement has a separate purpose. Core sends a stable event ID and the exact or
 
 The proposed issuer uses the existing install bootstrap and token handlers behind the dedicated ingress or an internal Worker binding. Set the issuer's `env.DB` and the first-key Worker's `WIDGET_HA_DEV_DB` to the same isolated D1 database, with the install-token, bootstrap-proof, rate-limit and first-key tables. Issue a one-use bootstrap proof only after authorized server-side admission, then exchange it through `POST /v1/install/token`. The exchange returns the normal `djci_` bearer and API credential ID. The central public pairing bootstrap does not establish that admission. The WidgetKit Worker does not currently expose either bootstrap path or the token exchange. The isolated test exercises the real handlers on the same D1 binding and confirms that the WidgetKit Worker resolves the credential they issue.
 
+#### Candidate private routes for Core review
+
+For the HA-dev trial, the proposed Core ingress uses its own Cloudflare Access application and machine identity. The ingress verifies that identity and resolves its API-managed scope. The four existing first-key paths and `POST /v1/install/token` are candidates on that ingress. The existing installation bearer is still required for the four first-key requests. Positive pairing authority also requires the exact currentness decision described above. The install exchange still consumes a bootstrap proof issued behind the same authorized boundary.
+
+The retirement candidate is `POST /v1/push/native/key/retire` with `Content-Type: application/json` and a maximum body of 4,096 bytes. Send compact UTF-8 JSON with lexicographically sorted keys, no BOM, whitespace or duplicate keys. Version 1 has exactly these fields.
+
+| Field | Value |
+| --- | --- |
+| `contract_version` | Integer `1` |
+| `api_audience` | `djc-native-push-ha-dev/1` |
+| `event_id`, `operation_id` | The same stable original Core operation ID |
+| `install_credential_id`, `pairing_generation` | Original credential ID and opaque pairing generation |
+| `pair_binding`, `owner_binding`, `device_binding`, `core_key_thumbprint` | Original lowercase SHA-256 hex values |
+| `request_expires_at_ms` | Original Core request deadline as a positive integer in milliseconds |
+
+The ingress authenticates each delivery and checks the entire historical tuple against the selected Core authority. Retirement requires no live installation bearer. The request deadline is part of the identity of the event and can be in the past. After the durable write the API returns HTTP 200 with compact canonical JSON containing exactly `contract_version`, `api_audience`, `event_id`, `pair_binding`, `event_sha256` and `state`. The digest is lowercase SHA-256 hex over the exact canonical request bytes. The state is `retired`. Core matches all fields on the selected HTTPS origin before marking its outbox record delivered. A retry of the same authorized event receives the same acknowledgement. Malformed input returns 400, oversized input 413, a denial 403 and unavailable authority or storage 503. The retirement handler is qualified with injected authority and remains unmounted pending agreement on the wire and the live identity mapping.
+
 ## Fresh WidgetKit acceptance wire
 
 The paired Apple app starts the request after its user explicitly opts in. Core supplies the current durable PairJournal acknowledgement from the original completed pairing after install credential storage. The API challenge is single-use and tied to the exact active installation credential, app key, pairing commitment and widget target. The attested app proves the exact signed opt-in transcript. The API validates the same pairing against the trusted Core input and verifies the platform-specific host proof. A caller-provided pairing ID is insufficient. No legacy grant is imported.

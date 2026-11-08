@@ -27,6 +27,12 @@ export function isWidgetFirstKeyRoute(path: string) {
 type Json = Record<string, unknown>;
 type Credential = NonNullable<Awaited<ReturnType<typeof findInstallTokenByBearer>>>;
 interface Original extends FirstKeyPairBinding { contract_version: 1; operation_id: string }
+interface Retirement extends Original {
+	api_audience: typeof firstKeyAudience;
+	event_id: string;
+	install_credential_id: string;
+	request_expires_at_ms: number;
+}
 interface Lookup { contract_version: 1; operation_id: string; api_installation_id: string; transcript_sha256: string }
 interface Saved {
 	original_request: string;
@@ -83,7 +89,7 @@ function decode64(value: unknown, size: number, url = false) {
 	return bytes;
 }
 
-async function readBody(request: Request, limit: number) {
+async function readBody(request: Request, limit: number, requireCanonical = false) {
 	need(request.headers.get("content-type")?.toLowerCase() === "application/json", "unsupported_media_type", 415);
 	need(!request.headers.has("content-encoding"));
 	const reader = request.body?.getReader();
@@ -99,7 +105,10 @@ async function readBody(request: Request, limit: number) {
 			need(size <= limit, "payload_too_large", 413);
 			text += decoder.decode(value, { stream: true });
 		}
-		return parseStrictJson(text + decoder.decode());
+		text += decoder.decode();
+		const value = parseStrictJson(text);
+		need(!requireCanonical || canonical(value) === text);
+		return value;
 	} catch (error) {
 		await reader.cancel().catch(() => {});
 		throw error instanceof SurfaceError ? error : new SurfaceError(400, "invalid_json");
@@ -117,6 +126,38 @@ async function verifyCore(bytes: Uint8Array<ArrayBuffer>, spki: Uint8Array<Array
 
 function json(body: unknown, status = 200) {
 	return Response.json(body, { status, headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" } });
+}
+
+/** Candidate for a private ingress. Authorization must resolve the exact historical
+ * pairing from a separately authenticated Core identity, including after token rotation. */
+export function createWidgetFirstKeyRetirementHandler(db: D1Database, origin: string,
+	authorize: (request: Request, event: Readonly<Retirement>) => Promise<boolean>) {
+	return async (request: Request) => {
+		try {
+			need(request.method === "POST" && request.url === origin + prefix + "retire",
+				"widget_first_key_not_found", 404);
+			const input = await readBody(request, 4096, true);
+			fields(input, ["contract_version", "api_audience", "event_id", "operation_id", "install_credential_id",
+				"request_expires_at_ms", ...bindingFields]);
+			need(input.contract_version === 1 && input.api_audience === firstKeyAudience &&
+				id(input.operation_id) && input.event_id === input.operation_id && id(input.install_credential_id) &&
+				id(input.pairing_generation) && bindingFields.slice(1).every(key => hexDigest(input[key])) &&
+				typeof input.request_expires_at_ms === "number" && Number.isSafeInteger(input.request_expires_at_ms) &&
+				input.request_expires_at_ms > 0);
+			const event = Object.freeze(input as unknown as Retirement);
+			need(await authorize(request, event) === true, "widget_first_key_proof_rejected", 403);
+			const eventDigest = hex(await digest(Uint8Array.from(new TextEncoder().encode(canonical(event)))));
+			need(!request.signal.aborted, "widget_first_key_conflict", 409);
+			await retireWidgetFirstKeyPair(db, event.pair_binding);
+			return new Response(canonical({
+				contract_version: 1, api_audience: firstKeyAudience, event_id: event.event_id,
+				pair_binding: event.pair_binding, event_sha256: eventDigest, state: "retired",
+			}), { headers: { "content-type": "application/json", "cache-control": "no-store", "x-content-type-options": "nosniff" } });
+		} catch (error) {
+			return error instanceof SurfaceError ? json({ error: error.code }, error.status)
+				: json({ error: "widget_first_key_unavailable" }, 503);
+		}
+	};
 }
 
 export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWorkerCurrent: () => boolean,

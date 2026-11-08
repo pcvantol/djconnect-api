@@ -8,9 +8,10 @@ import { issueBootstrapProofHandler, issueInstallTokenHandler } from "../../src/
 import type { AppEnv } from "../../src/types";
 import { issueInstallToken } from "../../src/repositories/installTokens";
 import { base64Encode, base64Url } from "../../src/crypto";
-import { firstKeyRegisterBytes, firstKeyStatusBytes, type FirstKeyChallenge, type FirstKeyStatusChallenge } from "../../src/native-push/first-key-wire";
-import { retireWidgetFirstKeyPair, type WidgetFirstKeyPolicy } from "../../src/native-push/first-key-service";
+import { firstKeyAudience, firstKeyRegisterBytes, firstKeyStatusBytes, type FirstKeyChallenge, type FirstKeyStatusChallenge } from "../../src/native-push/first-key-wire";
+import { createWidgetFirstKeyRetirementHandler, retireWidgetFirstKeyPair, type WidgetFirstKeyPolicy } from "../../src/native-push/first-key-service";
 import { createWidgetFirstKeyAppleVerifier } from "../../src/native-push/first-key-apple";
+import { canonical } from "../../src/surface-push/wire";
 
 const origin = "https://widget.fixture.invalid";
 const operatorOrigin = "https://widget-enrollment.internal";
@@ -337,6 +338,43 @@ it("blocks the original receipt and its already issued status nonce after durabl
 	expect((await f.dispatch("status/challenge", lookup)).status).toBe(409);
 	expect(await f.db.prepare("SELECT receipt FROM widget_first_key WHERE credential_id = ?")
 		.bind(f.credential.id).first("receipt")).toBeTypeOf("string");
+});
+
+it("authenticates a canonical retirement and acknowledges the exact event after writing D1", async () => {
+	const f = await firstKeyFixture();
+	const event = {
+		...f.original, api_audience: firstKeyAudience, event_id: f.original.operation_id,
+		install_credential_id: f.credential.id, request_expires_at_ms: 1,
+	};
+	const body = canonical(event);
+	const request = (raw = body) => new Request(origin + keyPrefix + "retire", {
+		method: "POST", headers: { "content-type": "application/json" }, body: raw,
+	});
+	let admitted = false;
+	const authorize = vi.fn(async (_request: Request, received: unknown) => admitted && canonical(received) === body);
+	const retire = createWidgetFirstKeyRetirementHandler(f.db, origin, authorize);
+
+	expect((await worker.fetch(request(), fixture(), createExecutionContext())).status).toBe(404);
+	expect((await retire(request(body + "\n"))).status).toBe(400);
+	expect(authorize).not.toHaveBeenCalled();
+	expect((await retire(request())).status).toBe(403);
+	admitted = true;
+	expect((await retire(request(canonical({ ...event, owner_binding: "d".repeat(64) })))).status).toBe(403);
+	expect(await f.db.prepare("SELECT pair_binding FROM widget_first_key_retirements WHERE pair_binding = ?")
+		.bind(event.pair_binding).first()).toBeNull();
+
+	// No reservation or active bearer is required once trusted authority resolves the historical tuple.
+	await f.db.prepare("UPDATE install_tokens SET disabled = 1 WHERE id = ?").bind(f.credential.id).run();
+	const expected = canonical({
+		contract_version: 1, api_audience: firstKeyAudience, event_id: event.event_id,
+		pair_binding: event.pair_binding, event_sha256: hex(await digest(new TextEncoder().encode(body))), state: "retired",
+	});
+	for (const response of await Promise.all([retire(request()), retire(request())])) {
+		expect(response.status).toBe(200);
+		expect(await response.text()).toBe(expected);
+	}
+	expect(await f.db.prepare("SELECT COUNT(*) AS count FROM widget_first_key_retirements WHERE pair_binding = ?")
+		.bind(event.pair_binding).first("count")).toBe(1);
 });
 
 it("cannot renew an expired registration challenge or commit at its original deadline", async () => {
