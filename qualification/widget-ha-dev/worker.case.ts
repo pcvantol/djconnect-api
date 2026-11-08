@@ -14,6 +14,7 @@ import { firstKeyAudience, firstKeyRegisterBytes, firstKeyStatusBytes, type Firs
 import { createWidgetFirstKeyRetirementHandler, retireWidgetFirstKeyPair,
 	type CoreCurrentnessAuthority, type WidgetFirstKeyPolicy } from "../../src/native-push/first-key-service";
 import { createWidgetFirstKeyAppleVerifier } from "../../src/native-push/first-key-apple";
+import { createWidgetInstallIssuer } from "../../src/native-push/widget-install-issuer";
 import { canonical } from "../../src/surface-push/wire";
 
 const origin = "https://widget.fixture.invalid";
@@ -184,6 +185,35 @@ it("accepts a credential issued by the existing install handlers on the isolated
 	for (const path of ["/v1/install/bootstrap-proof", "/v1/pairing/bootstrap-proof", "/v1/install/token"]) {
 		expect((await worker.fetch(request(path, payload, operatorSecret), config, createExecutionContext())).status).toBe(404);
 	}
+});
+
+it("issues and exchanges a private bootstrap proof only under the original machine mapping", async () => {
+	const payload = { ha_install_id: crypto.randomUUID(), device_id: crypto.randomUUID(), client_type: "ios",
+		integration: "djconnect_hacs", integration_version: "fixture" };
+	const request = (path: string, body: unknown, scope?: string) => new Request(origin + path, {
+		method: "POST", headers: { "content-type": "application/json", ...(scope ? { "x-fixture-machine": scope } : {}) },
+		body: canonical(body),
+	});
+	const f = await firstKeyFixture(undefined, async db => {
+		const issuer = createWidgetInstallIssuer(db, origin, async (request, coordinates) => {
+			const scopeId = request.headers.get("x-fixture-machine");
+			return scopeId && canonical(coordinates) === canonical(payload) ? { scopeId, isCurrent: () => true } : null;
+		});
+		const bootstrap = "/v1/install/bootstrap-proof";
+		const exchange = "/v1/install/token";
+		expect((await issuer(request(bootstrap, payload))).status).toBe(403);
+		expect((await issuer(request(bootstrap, { ...payload, device_id: "other" }, "first"))).status).toBe(403);
+		const issued = await issuer(request(bootstrap, payload, "first"));
+		expect(issued.status).toBe(200);
+		const { bootstrap_proof, expires_at } = await issued.json<{ bootstrap_proof: string; expires_at: string }>();
+		expect(Date.parse(expires_at) - Date.now()).toBeLessThanOrEqual(60_000);
+		const body = { ...payload, bootstrap_proof };
+		expect((await issuer(request(exchange, body, "changed-generation"))).status).toBe(403);
+		const attempts = await Promise.all([issuer(request(exchange, body, "first")), issuer(request(exchange, body, "first"))]);
+		expect(attempts.map(response => response.status).sort()).toEqual([200, 409]);
+		return attempts.find(response => response.ok)!.json<{ id: string; token: string }>();
+	});
+	expect((await f.registerInput()).challenge.install_credential_id).toBe(f.credential.id);
 });
 
 it.each(["challenge", "register", "status/challenge", "status"])("leaves first-key %s closed without a selected verifier", async path => {

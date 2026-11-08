@@ -104,7 +104,7 @@ function decode64(value: unknown, size: number, url = false) {
 	return bytes;
 }
 
-async function readBody(request: Request, limit: number, requireCanonical = false) {
+export async function readFirstKeyBody(request: Request, limit: number, requireCanonical = false) {
 	need(request.headers.get("content-type")?.toLowerCase() === "application/json", "unsupported_media_type", 415);
 	need(!request.headers.has("content-encoding"));
 	const reader = request.body?.getReader();
@@ -151,7 +151,7 @@ export function createWidgetFirstKeyRetirementHandler(db: D1Database, origin: st
 		try {
 			need(request.method === "POST" && request.url === origin + prefix + "retire",
 				"widget_first_key_not_found", 404);
-			const input = await readBody(request, 4096, true);
+			const input = await readFirstKeyBody(request, 4096, true);
 			fields(input, ["contract_version", "api_audience", "event_id", "operation_id", "install_credential_id",
 				"request_expires_at_ms", ...bindingFields]);
 			need(input.contract_version === 1 && input.api_audience === firstKeyAudience &&
@@ -341,7 +341,7 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 				return credential;
 			};
 			const authenticated = route !== "register" ? await authenticate() : undefined;
-			const input = await readBody(request, route === "register" ? registerBodyLimit : standardBodyLimit, !!authorizeCore);
+			const input = await readFirstKeyBody(request, route === "register" ? registerBodyLimit : standardBodyLimit, !!authorizeCore);
 			let proof: AppleProof | undefined;
 			if (route === "register") {
 				fields(input, [...challengeFields, ...bindingFields, "core_public_key_spki_b64", "core_signature_b64url", "apple_proof"]);
