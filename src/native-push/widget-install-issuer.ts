@@ -22,7 +22,7 @@ interface InstallCoordinates {
 type InstallAuthority = (request: Request, input: Readonly<InstallCoordinates>) => Promise<{
 	/** Opaque server-managed identity and generation for this exact installation and device. */
 	scopeId: string;
-	isCurrent(): boolean;
+	isCurrent(): boolean | Promise<boolean>;
 } | null>;
 
 function reply(body: unknown, status = 200) {
@@ -55,13 +55,13 @@ export function createWidgetInstallIssuer(db: D1Database, origin: string, author
 			const authority = await authorize(request, coordinates);
 			need(authority && /^[A-Za-z0-9_-]{1,128}$/.test(authority.scopeId), denied, 403);
 			const proofScope = "widget-install/1:" + authority.scopeId;
-			const check = () => need(!request.signal.aborted && authority.isCurrent() === true, denied, 403);
-			check();
+			const check = async () => need(await authority.isCurrent() === true && !request.signal.aborted, denied, 403);
+			await check();
 			await enforceBootstrapRateLimit(db, { ip: "widget-install:" + authority.scopeId, ...coordinates });
-			check();
+			await check();
 			if (!exchange) {
 				const result = await issueBootstrapProof(db, { ...coordinates, pairing_session_id: proofScope, ttl_seconds: 60 });
-				check();
+				await check();
 				return reply({ ok: true, bootstrap_proof: result.proof, expires_at: result.expiresAt });
 			}
 			const proof = value.bootstrap_proof;
@@ -69,11 +69,11 @@ export function createWidgetInstallIssuer(db: D1Database, origin: string, author
 			const scoped = await db.prepare("SELECT 1 FROM bootstrap_proofs WHERE proof_hash = ? AND pairing_session_id = ?")
 				.bind(await sha256Hex(proof), proofScope).first();
 			need(scoped, denied, 403);
-			check();
+			await check();
 			await consumeBootstrapProof(db, { ...coordinates, bootstrap_proof: proof });
-			check();
-			const token = await issueInstallToken(db, coordinates);
-			check();
+			await check();
+			const token = await issueInstallToken(db, { ...coordinates, label: proofScope });
+			await check();
 			return reply({ ok: true, success: true, id: token.id, token: token.token, install_token: token.token,
 				token_hash: token.tokenHash, expires_at: null });
 		} catch (error) {

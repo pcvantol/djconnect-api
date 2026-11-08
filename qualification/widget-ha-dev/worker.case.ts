@@ -2,6 +2,7 @@ import { createExecutionContext, env } from "cloudflare:test";
 import { beforeAll, expect, it, vi } from "vitest";
 import worker, { createWidgetHaDevWorker, WidgetEnrollmentOperator } from "../../src/surface-push/widget-ha-dev-worker";
 import firstKeySchema from "./first-key.sql?raw";
+import coreAuthoritySchema from "./core-authority.sql?raw";
 import credentialSchema from "../../migrations/0002_install_tokens.sql?raw";
 import bootstrapSchema from "../../migrations/0004_bootstrap_proofs.sql?raw";
 import retirementVector from "../native-push-mvp/first-key-retirement-vector.json";
@@ -15,6 +16,7 @@ import { createWidgetFirstKeyRetirementHandler, retireWidgetFirstKeyPair,
 	type CoreCurrentnessAuthority, type WidgetFirstKeyPolicy } from "../../src/native-push/first-key-service";
 import { createWidgetFirstKeyAppleVerifier } from "../../src/native-push/first-key-apple";
 import { createWidgetInstallIssuer } from "../../src/native-push/widget-install-issuer";
+import { createWidgetCoreHaDevWorker } from "../../src/native-push/widget-core-ha-dev-worker";
 import { canonical } from "../../src/surface-push/wire";
 
 const origin = "https://widget.fixture.invalid";
@@ -109,9 +111,96 @@ const digest = async (value: BufferSource) => new Uint8Array(await crypto.subtle
 const hex = (value: Uint8Array) => Array.from(value, byte => byte.toString(16).padStart(2, "0")).join("");
 
 beforeAll(async () => {
-	for (const statement of (credentialSchema + bootstrapSchema + firstKeySchema).split(";").filter(part => part.trim())) {
+	for (const statement of (credentialSchema + bootstrapSchema + firstKeySchema + coreAuthoritySchema).split(";").filter(part => part.trim())) {
 		await local.WIDGET_HA_DEV_DB.prepare(statement).run();
 	}
+});
+
+it("closes the dedicated Core Worker and binds signed Access, issuer, first key and retirement to one D1", async () => {
+	const db = local.WIDGET_HA_DEV_DB;
+	const signing = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048,
+		publicExponent: Uint8Array.of(1, 0, 1), hash: "SHA-256" }, false, ["sign", "verify"]);
+	const resolve = vi.fn(async () => signing.publicKey);
+	const selected = createWidgetCoreHaDevWorker(() => resolve);
+	const clientId = crypto.randomUUID();
+	const scope = crypto.randomUUID();
+	const install = { ha_install_id: crypto.randomUUID(), device_id: crypto.randomUUID(), client_type: "ios",
+		integration: "djconnect_hacs", integration_version: "fixture" };
+	const config = {
+		WIDGET_CORE_MODE: "first-key-v1", WIDGET_CORE_ORIGIN: origin, WIDGET_CORE_ACCESS_ISSUER: "https://core-fixture.cloudflareaccess.com",
+		WIDGET_CORE_ACCESS_AUDIENCE: "core-only", WIDGET_CORE_ACCESS_CLIENT_ID: clientId, WIDGET_CORE_POLICY_ID: "policy-fixture",
+		WIDGET_CORE_EXPIRES_AT_MS: String(Date.now() + 120_000),
+		WIDGET_CORE_APP_ID: "ABCDEFGHIJ.example.widget", WIDGET_CORE_APP_BUILD: "1", WIDGET_HA_DEV_DB: db,
+	};
+	const makeJwt = async (changes: Record<string, unknown> = {}) => {
+		const encoded = (value: unknown) => base64Url(new TextEncoder().encode(JSON.stringify(value)).buffer as ArrayBuffer);
+		const now = Math.floor(Date.now() / 1000);
+		const data = encoded({ alg: "RS256", kid: "fixture-key" }) + "." + encoded({
+			iss: config.WIDGET_CORE_ACCESS_ISSUER, aud: [config.WIDGET_CORE_ACCESS_AUDIENCE],
+			common_name: clientId, type: "app", sub: "", iat: now, exp: now + 60, ...changes,
+		});
+		return data + "." + base64Url(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", signing.privateKey,
+			new TextEncoder().encode(data)));
+	};
+	const jwt = await makeJwt();
+	const ctx = { access: {} } as ExecutionContext;
+	const send = (path: string, body: unknown, options: { jwt?: string; bearer?: string; decision?: string;
+		ctx?: ExecutionContext; config?: typeof config } = {}) => selected.fetch(new Request(origin + path, {
+		method: "POST", headers: { "content-type": "application/json", "cf-access-jwt-assertion": options.jwt ?? jwt,
+			...(options.bearer ? { authorization: "Bearer " + options.bearer } : {}),
+			...(options.decision ? { "x-djc-first-key-currentness": options.decision } : {}) },
+		body: canonical(body),
+	}), options.config ?? config, options.ctx ?? ctx);
+	const bootstrap = "/v1/install/bootstrap-proof";
+	const exchange = "/v1/install/token";
+	expect((await send(bootstrap, install, { config: { ...config, WIDGET_CORE_MODE: "closed" } })).status).toBe(503);
+	expect((await send(bootstrap, install, { ctx: createExecutionContext() })).status).toBe(403);
+	expect((await send(bootstrap, install, { jwt: await makeJwt({ aud: ["another-service"] }) })).status).toBe(403);
+	expect((await send(bootstrap, install, { jwt: await makeJwt({ iat: Math.floor(Date.now() / 1000) - 31 }) })).status).toBe(403);
+	expect(resolve).not.toHaveBeenCalled();
+	const jwtParts = jwt.split(".");
+	jwtParts[2] = (jwtParts[2][0] === "A" ? "B" : "A") + jwtParts[2].slice(1);
+	expect((await send(bootstrap, install, { jwt: jwtParts.join(".") })).status).toBe(403);
+	expect((await send(bootstrap, install)).status).toBe(403);
+	await db.prepare("INSERT INTO widget_core_machines VALUES (?, ?, ?, ?, 1)").bind(clientId, scope, install.ha_install_id, install.device_id).run();
+	expect((await send(bootstrap, { ...install, device_id: "foreign-device" })).status).toBe(403);
+	expect((await send("/v1/push/surface/event", {})).status).toBe(404);
+	const issued = await send(bootstrap, install);
+	expect(issued.status).toBe(200);
+	const { bootstrap_proof } = await issued.json<{ bootstrap_proof: string }>();
+	const exchanged = await send(exchange, { ...install, bootstrap_proof });
+	expect(exchanged.status).toBe(200);
+	const { id, token } = await exchanged.json<{ id: string; token: string }>();
+	const pair = {
+		contract_version: 1, operation_id: crypto.randomUUID(), pairing_generation: crypto.randomUUID(),
+		pair_binding: hex(await digest(new TextEncoder().encode(scope))), owner_binding: "b".repeat(64),
+		device_binding: "c".repeat(64), core_key_thumbprint: "d".repeat(64),
+	};
+	const now = Date.now();
+	const decision = canonical({
+		...pair, api_audience: firstKeyAudience, action: "challenge", decision_id: crypto.randomUUID(),
+		install_credential_id: id, request_sha256: hex(await digest(new TextEncoder().encode(canonical(pair)))),
+		issued_at_ms: now, expires_at_ms: now + 10_000, operation_expires_at_ms: null,
+	});
+	const challenge = keyPrefix + "challenge";
+	expect((await send(challenge, pair, { bearer: token, decision })).status).toBe(403);
+	await db.prepare("INSERT INTO widget_core_pair_authority VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)")
+		.bind(scope, id, pair.operation_id, pair.pairing_generation, pair.pair_binding, pair.owner_binding,
+			pair.device_binding, pair.core_key_thumbprint, 1).run();
+	const reserved = await send(challenge, pair, { bearer: token, decision });
+	expect(reserved.status).toBe(200);
+	expect((await reserved.json<FirstKeyChallenge>()).install_credential_id).toBe(id);
+	const retirement = { ...pair, api_audience: firstKeyAudience, event_id: pair.operation_id,
+		install_credential_id: id, request_expires_at_ms: 1 };
+	const retire = keyPrefix + "retire";
+	expect((await send(retire, { ...retirement, owner_binding: "e".repeat(64) })).status).toBe(403);
+	expect((await send(retire, retirement, { bearer: token })).status).toBe(403);
+	await db.prepare("UPDATE install_tokens SET disabled = 1 WHERE id = ?").bind(id).run();
+	expect((await send(retire, retirement)).status).toBe(200);
+	expect(await db.prepare("SELECT pair_binding FROM widget_first_key_retirements WHERE pair_binding = ?")
+		.bind(pair.pair_binding).first("pair_binding")).toBe(pair.pair_binding);
+	await db.prepare("UPDATE widget_core_machines SET enabled = 0 WHERE access_client_id = ?").bind(clientId).run();
+	expect((await send(bootstrap, install)).status).toBe(403);
 });
 
 async function firstKeyFixture(verifier: WidgetFirstKeyPolicy["verifyApple"] = async () => true,
