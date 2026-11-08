@@ -42,6 +42,7 @@ interface Currentness extends Original {
 }
 export type CoreCurrentnessAuthority = (request: Request, decision: Readonly<Currentness>) => Promise<boolean>;
 type CheckCurrentness = (original: Original, operationExpiry: number | null, nonceExpiry?: number) => Promise<number>;
+interface PairSqlGuard { sql: string; values: readonly (string | number)[] }
 interface Retirement extends Original {
 	api_audience: typeof firstKeyAudience;
 	event_id: string;
@@ -76,6 +77,8 @@ export interface WidgetFirstKeyPolicy {
 	readonly expiresAt: number;
 	isCurrent(): boolean;
 	isPairCurrent(credentialId: string, original: Readonly<Original>): Promise<boolean>;
+	/** Trusted server SQL and bound coordinates for the same-statement authority check. */
+	pairSqlGuard?(credentialId: string, original: Readonly<Original>): PairSqlGuard;
 	verifyApple(attestation: Uint8Array<ArrayBuffer>, keyId: string, transcript: Uint8Array<ArrayBuffer>,
 		expiresAt: number, signal: AbortSignal): Promise<boolean>;
 }
@@ -201,8 +204,11 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		need(await checkWorker().isPairCurrent(credential.id, Object.freeze(original)), "widget_first_key_proof_rejected", 403);
 		checkWorker();
 	}
-	const load = (credential: Credential, operation: string) =>
-		db.prepare(`SELECT * FROM widget_first_key WHERE ${activeRow}`).bind(...activeValues(credential, operation)).first<Saved>();
+	const pairSqlGuard = (credential: Credential, original: Original) =>
+		policy?.pairSqlGuard?.(credential.id, original) ?? { sql: "1", values: [] };
+	const load = (credential: Credential, operation: string, guard: PairSqlGuard = { sql: "1", values: [] }) =>
+		db.prepare(`SELECT * FROM widget_first_key WHERE ${activeRow} AND ${guard.sql}`)
+			.bind(...activeValues(credential, operation), ...guard.values).first<Saved>();
 
 	async function issueChallenge(input: unknown, credential: Credential, currentness: CheckCurrentness) {
 		fields(input, ["contract_version", "operation_id", ...bindingFields]);
@@ -211,6 +217,7 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		const original = input as unknown as Original;
 		await checkPair(credential, original);
 		const decisionExpiry = await currentness(original, null);
+		const guard = pairSqlGuard(credential, original);
 		const challenge: FirstKeyChallenge = {
 			contract_version: 1, api_audience: firstKeyAudience, operation_id: original.operation_id,
 			api_installation_id: crypto.randomUUID(), install_credential_id: credential.id,
@@ -219,12 +226,12 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		};
 		await db.prepare(`INSERT INTO widget_first_key
 			(credential_id, operation_id, installation_id, policy_id, pair_binding, original_request, challenge, expires_at_ms)
-			SELECT ?, ?, ?, ?, ?, ?, ?, ? WHERE ${credentialGuard} AND ${pairGuard} AND ? > ${databaseNowMs}
+			SELECT ?, ?, ?, ?, ?, ?, ?, ? WHERE ${credentialGuard} AND ${pairGuard} AND ? > ${databaseNowMs} AND ${guard.sql}
 			ON CONFLICT(credential_id, operation_id) DO NOTHING`)
 			.bind(credential.id, original.operation_id, challenge.api_installation_id, policyId!,
 				original.pair_binding, canonical(original), canonical(challenge), challenge.expires_at_ms,
-				...credentialValues(credential), original.pair_binding, decisionExpiry).run();
-		const saved = await load(credential, original.operation_id);
+				...credentialValues(credential), original.pair_binding, decisionExpiry, ...guard.values).run();
+		const saved = await load(credential, original.operation_id, guard);
 		need(saved && saved.original_request === canonical(original) && !saved.receipt, conflict, 409);
 		return JSON.parse(saved.challenge) as FirstKeyChallenge;
 	}
@@ -250,6 +257,7 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 			"widget_first_key_proof_rejected", 403);
 		await checkPair(credential, original);
 		const decisionExpiry = await currentness(original, challenge.expires_at_ms);
+		const guard = pairSqlGuard(credential, original);
 		need(!signal.aborted, conflict, 409);
 		const receipt = {
 			contract_version: 1, operation_id: original.operation_id, api_installation_id: challenge.api_installation_id,
@@ -259,9 +267,10 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		};
 		const result = await db.prepare(`UPDATE widget_first_key SET key_spki = ?, transcript_sha256 = ?, receipt = ?
 			WHERE ${activeRow} AND challenge = ? AND receipt IS NULL AND ? > ${databaseNowMs}
-			AND NOT EXISTS (SELECT 1 FROM widget_first_key WHERE pair_binding = ? AND receipt IS NOT NULL)
+			AND NOT EXISTS (SELECT 1 FROM widget_first_key WHERE pair_binding = ? AND receipt IS NOT NULL) AND ${guard.sql}
 			RETURNING receipt`).bind(input.core_public_key_spki_b64, receipt.transcript_sha256, canonical(receipt),
-			...activeValues(credential, original.operation_id), saved.challenge, decisionExpiry, original.pair_binding).first<{ receipt: string }>();
+			...activeValues(credential, original.operation_id), saved.challenge, decisionExpiry, original.pair_binding,
+			...guard.values).first<{ receipt: string }>();
 		need(result, conflict, 409);
 		return JSON.parse(result.receipt) as typeof receipt;
 	}
@@ -281,13 +290,16 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		const original = JSON.parse(saved.original_request) as Original;
 		await checkPair(credential, original);
 		const decisionExpiry = await currentness(original, saved.expires_at_ms);
+		const guard = pairSqlGuard(credential, original);
 		const now = Date.now();
 		const newNonce = nonce(), newId = crypto.randomUUID(), expires = Math.min(now + statusWindowMs, saved.expires_at_ms);
 		const issued = await db.prepare(`UPDATE widget_first_key SET status_nonce = ?, status_nonce_id = ?, status_expires_at_ms = ?
 			WHERE ${activeRow} AND receipt = ? AND (status_nonce_id IS NULL OR status_expires_at_ms <= ?) AND ? > ${databaseNowMs}
+			AND ${guard.sql}
 			RETURNING status_nonce, status_nonce_id, status_expires_at_ms`)
-			.bind(newNonce, newId, expires, ...activeValues(credential, query.operation_id), saved.receipt, now, decisionExpiry).first<Saved>();
-		const outstanding = issued ?? await load(credential, query.operation_id);
+			.bind(newNonce, newId, expires, ...activeValues(credential, query.operation_id), saved.receipt, now,
+				decisionExpiry, ...guard.values).first<Saved>();
+		const outstanding = issued ?? await load(credential, query.operation_id, guard);
 		need(outstanding?.status_nonce && outstanding.status_nonce_id &&
 			outstanding.status_expires_at_ms && outstanding.status_expires_at_ms > Date.now(), conflict, 409);
 		return { ...query, api_audience: firstKeyAudience, install_credential_id: credential.id,
@@ -315,11 +327,13 @@ export function createWidgetFirstKeyHandler(db: D1Database, origin: string, isWo
 		await verifyCore(firstKeyStatusBytes(expected), decode64(saved.key_spki, 160), decode64(input.core_signature_b64url, 64, true));
 		await checkPair(credential, original);
 		const decisionExpiry = await currentness(original, saved.expires_at_ms, saved.status_expires_at_ms);
+		const guard = pairSqlGuard(credential, original);
 		const consumed = await db.prepare(`UPDATE widget_first_key
 			SET status_nonce = NULL, status_nonce_id = NULL, status_expires_at_ms = NULL
 			WHERE ${activeRow} AND receipt = ? AND status_nonce_id = ? AND status_expires_at_ms > ? AND ? > ${databaseNowMs}
+			AND ${guard.sql}
 			RETURNING receipt`).bind(...activeValues(credential, query.operation_id), saved.receipt,
-			saved.status_nonce_id, Date.now(), decisionExpiry).first<{ receipt: string }>();
+			saved.status_nonce_id, Date.now(), decisionExpiry, ...guard.values).first<{ receipt: string }>();
 		need(consumed, conflict, 409);
 		return JSON.parse(consumed.receipt);
 	}

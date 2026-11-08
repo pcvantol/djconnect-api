@@ -190,6 +190,43 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	const reserved = await send(challenge, pair, { bearer: token, decision });
 	expect(reserved.status).toBe(200);
 	expect((await reserved.json<FirstKeyChallenge>()).install_credential_id).toBe(id);
+	let withdrewAtWrite = false;
+	let withdrawnOperation = pair.operation_id;
+	const withdrawAtInsert = {
+		prepare(sql: string) {
+			const statement = db.prepare(sql);
+			if (!sql.startsWith("INSERT INTO widget_first_key\n")) return statement;
+			return {
+				bind(...values: unknown[]) {
+					const bound = statement.bind(...values);
+					return { async run() {
+						await db.prepare("UPDATE widget_core_pair_authority SET current = 0 WHERE scope_id = ? AND operation_id = ?")
+							.bind(scope, withdrawnOperation).run();
+						withdrewAtWrite = true;
+						return bound.run();
+					} };
+				},
+			};
+		},
+	} as unknown as D1Database;
+	const retryDecision = canonical({ ...JSON.parse(decision), decision_id: crypto.randomUUID() });
+	expect((await send(challenge, pair, {
+		bearer: token, decision: retryDecision, config: { ...config, WIDGET_HA_DEV_DB: withdrawAtInsert },
+	})).status).toBe(409);
+	expect(withdrewAtWrite).toBe(true);
+	const freshPair = { ...pair, operation_id: crypto.randomUUID() };
+	withdrawnOperation = freshPair.operation_id;
+	await db.prepare("INSERT INTO widget_core_pair_authority VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)")
+		.bind(scope, id, freshPair.operation_id, freshPair.pairing_generation, freshPair.pair_binding,
+			freshPair.owner_binding, freshPair.device_binding, freshPair.core_key_thumbprint, 1).run();
+	const freshDecision = canonical({
+		...JSON.parse(retryDecision), operation_id: freshPair.operation_id, decision_id: crypto.randomUUID(),
+		request_sha256: hex(await digest(new TextEncoder().encode(canonical(freshPair)))),
+	});
+	expect((await send(challenge, freshPair, {
+		bearer: token, decision: freshDecision, config: { ...config, WIDGET_HA_DEV_DB: withdrawAtInsert },
+	})).status).toBe(409);
+	expect(await db.prepare("SELECT 1 FROM widget_first_key WHERE operation_id = ?").bind(freshPair.operation_id).first()).toBeNull();
 	const retirement = { ...pair, api_audience: firstKeyAudience, event_id: pair.operation_id,
 		install_credential_id: id, request_expires_at_ms: 1 };
 	const retire = keyPrefix + "retire";

@@ -105,20 +105,25 @@ export function createWidgetCoreHaDevWorker(resolveKeys = createWatchAccessKeyRe
 					WHERE access_client_id = ? AND scope_id = ? AND ha_install_id = ? AND device_id = ? AND enabled = 1`)
 					.bind(clientId, machine.scope_id, machine.ha_install_id, machine.device_id).first() && current();
 
-				const allowedPair = async (credentialId: string, pair: FirstKeyPairBinding & { operation_id: string },
-					retirementDeadline: number | null = null) => {
+				const pairQuery = (credentialId: string, pair: FirstKeyPairBinding & { operation_id: string },
+					retirementDeadline: number | null) => {
 					const lifecycle = retirementDeadline === null
 						? "p.current = 1 AND i.disabled = 0 AND i.label = 'widget-install/1:' || m.scope_id"
 						: "p.retirement_request_expires_at_ms = ?";
-					const result = await db.prepare(`SELECT 1 FROM widget_core_pair_authority p
+					return { sql: `SELECT 1 FROM widget_core_pair_authority p
 						JOIN widget_core_machines m ON m.scope_id = p.scope_id AND m.enabled = 1
 						JOIN install_tokens i ON i.id = p.credential_id AND i.ha_install_id = m.ha_install_id
-						WHERE m.access_client_id = ? AND m.scope_id = ? AND m.device_id = ? AND p.credential_id = ?
+						WHERE m.access_client_id = ? AND m.scope_id = ? AND m.ha_install_id = ? AND m.device_id = ? AND p.credential_id = ?
 						AND p.operation_id = ? AND p.pairing_generation = ? AND p.pair_binding = ?
-						AND p.owner_binding = ? AND p.device_binding = ? AND p.core_key_thumbprint = ? AND ${lifecycle}`)
-						.bind(clientId, machine.scope_id, machine.device_id, credentialId, pair.operation_id,
+						AND p.owner_binding = ? AND p.device_binding = ? AND p.core_key_thumbprint = ? AND ${lifecycle}`,
+						values: [clientId, machine.scope_id, machine.ha_install_id, machine.device_id, credentialId, pair.operation_id,
 							pair.pairing_generation, pair.pair_binding, pair.owner_binding, pair.device_binding,
-							pair.core_key_thumbprint, ...(retirementDeadline === null ? [] : [retirementDeadline])).first();
+							pair.core_key_thumbprint, ...(retirementDeadline === null ? [] : [retirementDeadline])] };
+				};
+				const allowedPair = async (credentialId: string, pair: FirstKeyPairBinding & { operation_id: string },
+					retirementDeadline: number | null = null) => {
+					const query = pairQuery(credentialId, pair, retirementDeadline);
+					const result = await db.prepare(query.sql).bind(...query.values).first();
 					return !!result && current();
 				};
 				if (installPaths.has(pathname)) {
@@ -134,6 +139,10 @@ export function createWidgetCoreHaDevWorker(resolveKeys = createWatchAccessKeyRe
 				}
 				return await createWidgetFirstKeyHandler(db, origin, current, {
 					id: policyId, expiresAt, isCurrent: current, isPairCurrent: allowedPair,
+					pairSqlGuard: (credentialId, pair) => {
+						const query = pairQuery(credentialId, pair, null);
+						return { sql: `EXISTS (${query.sql})`, values: query.values };
+					},
 					verifyApple: createWidgetFirstKeyAppleVerifier({
 						profile: "host_wake_apple_properties_attestation_v2", app_identifier: appId,
 						app_attest_environment: "development", bundle_version: build, launch_validation_category_b64: "AwAAAA==",
