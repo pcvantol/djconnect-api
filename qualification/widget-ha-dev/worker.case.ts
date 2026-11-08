@@ -5,12 +5,14 @@ import firstKeySchema from "./first-key.sql?raw";
 import credentialSchema from "../../migrations/0002_install_tokens.sql?raw";
 import bootstrapSchema from "../../migrations/0004_bootstrap_proofs.sql?raw";
 import retirementVector from "../native-push-mvp/first-key-retirement-vector.json";
+import currentnessVector from "../native-push-mvp/first-key-currentness-vector.json";
 import { issueBootstrapProofHandler, issueInstallTokenHandler } from "../../src/handlers/install";
 import type { AppEnv } from "../../src/types";
 import { issueInstallToken } from "../../src/repositories/installTokens";
 import { base64Encode, base64Url } from "../../src/crypto";
 import { firstKeyAudience, firstKeyRegisterBytes, firstKeyStatusBytes, type FirstKeyChallenge, type FirstKeyStatusChallenge } from "../../src/native-push/first-key-wire";
-import { createWidgetFirstKeyRetirementHandler, retireWidgetFirstKeyPair, type WidgetFirstKeyPolicy } from "../../src/native-push/first-key-service";
+import { createWidgetFirstKeyRetirementHandler, retireWidgetFirstKeyPair,
+	type CoreCurrentnessAuthority, type WidgetFirstKeyPolicy } from "../../src/native-push/first-key-service";
 import { createWidgetFirstKeyAppleVerifier } from "../../src/native-push/first-key-apple";
 import { canonical } from "../../src/surface-push/wire";
 
@@ -113,7 +115,8 @@ beforeAll(async () => {
 
 async function firstKeyFixture(verifier: WidgetFirstKeyPolicy["verifyApple"] = async () => true,
 	issueCredential: (db: D1Database) => Promise<{ id: string; token: string }> =
-		db => issueInstallToken(db, { ha_install_id: crypto.randomUUID() })) {
+		db => issueInstallToken(db, { ha_install_id: crypto.randomUUID() }),
+	authorizeCore?: CoreCurrentnessAuthority) {
 	const config = fixture();
 	config.WIDGET_PILOT_EXPIRES_AT_MS = String(Date.now() + 300_000);
 	const db = config.WIDGET_HA_DEV_DB;
@@ -136,14 +139,15 @@ async function firstKeyFixture(verifier: WidgetFirstKeyPolicy["verifyApple"] = a
 		id: crypto.randomUUID(), expiresAt: Date.now() + 240_000, isCurrent: () => true,
 		isPairCurrent,
 		verifyApple,
-	});
-	const dispatchRaw = (path: string, body: string, bearer = credential.token) => selected.fetch(new Request(origin + keyPrefix + path, {
-		method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + bearer },
+	}, authorizeCore);
+	const dispatchRaw = (path: string, body: string, bearer = credential.token, headers?: Record<string, string>) =>
+		selected.fetch(new Request(origin + keyPrefix + path, {
+		method: "POST", headers: { ...headers, "content-type": "application/json", authorization: "Bearer " + bearer },
 		body,
 	}), config, createExecutionContext());
 	const dispatch = (path: string, body: unknown, bearer = credential.token) => dispatchRaw(path, JSON.stringify(body), bearer);
-	async function registerInput() {
-		const response = await dispatch("challenge", original);
+	async function registerInput(requestChallenge = () => dispatch("challenge", original)) {
+		const response = await requestChallenge();
 		expect(response.status).toBe(200);
 		const challenge = await response.json<FirstKeyChallenge>();
 		expect(challenge.install_credential_id).toBe(credential.id);
@@ -387,6 +391,87 @@ it("returns the exact acknowledgement encoded by Core for retire v1", async () =
 	}));
 	expect(response.status).toBe(200);
 	expect(await response.text()).toBe(retirementVector.ack);
+});
+
+it("requires independent currentness bound to each exact request and consumes each decision once", async () => {
+	const f = await firstKeyFixture(undefined, undefined, async request =>
+		request.headers.get("x-fixture-core-identity") === "admitted");
+	const encodeDecision = async (action: string, body: unknown, originalDeadline: number | null,
+		changes: Record<string, unknown> = {}) => {
+		const now = Date.now();
+		return canonical({
+			...f.original, api_audience: firstKeyAudience, action, decision_id: crypto.randomUUID(),
+			install_credential_id: f.credential.id, issued_at_ms: now,
+			expires_at_ms: Math.min(now + 10_000, originalDeadline ?? Infinity),
+			operation_expires_at_ms: originalDeadline,
+			request_sha256: hex(await digest(new TextEncoder().encode(canonical(body)))), ...changes,
+		});
+	};
+	const send = async (action: string, body: unknown, decision: string, admitted = true) =>
+		f.dispatchRaw(action, canonical(body), f.credential.token, {
+			"x-djc-first-key-currentness": decision,
+			"x-fixture-core-identity": admitted ? "admitted" : "untrusted",
+		});
+
+	const decision = await encodeDecision("challenge", f.original, null);
+	expect((await send("challenge", f.original, decision, false)).status).toBe(403);
+	const expiredAt = Date.now() - 1;
+	expect((await send("challenge", f.original, await encodeDecision("challenge", f.original, null,
+		{ issued_at_ms: expiredAt - 1000, expires_at_ms: expiredAt }))).status).toBe(403);
+	expect((await send("challenge", f.original, await encodeDecision("challenge", f.original, null,
+		{ owner_binding: "d".repeat(64) }))).status).toBe(403);
+	const { input, challenge } = await f.registerInput(async () => {
+		const attempts = await Promise.all([send("challenge", f.original, decision), send("challenge", f.original, decision)]);
+		expect(attempts.map(response => response.status).sort()).toEqual([200, 409]);
+		return attempts.find(response => response.ok)!;
+	});
+	expect((await send("challenge", f.original, decision)).status).toBe(409);
+	const freshRetry = await send("challenge", f.original, await encodeDecision("challenge", f.original, null));
+	expect(await freshRetry.json()).toEqual(challenge);
+	expect((await send("register", input, await encodeDecision("status", input, challenge.expires_at_ms))).status).toBe(403);
+	expect(f.verifyApple).not.toHaveBeenCalled();
+	const expiringDecision = await encodeDecision("register", input, challenge.expires_at_ms);
+	const clock = vi.spyOn(Date, "now");
+	try {
+		f.verifyApple.mockImplementationOnce(async () => {
+			clock.mockReturnValue(JSON.parse(expiringDecision).expires_at_ms);
+			return true;
+		});
+		expect((await send("register", input, expiringDecision)).status).toBe(403);
+	} finally {
+		clock.mockRestore();
+	}
+	expect(await f.db.prepare("SELECT receipt FROM widget_first_key WHERE credential_id = ?")
+		.bind(f.credential.id).first("receipt")).toBeNull();
+	const accepted = await send("register", input, await encodeDecision("register", input, challenge.expires_at_ms));
+	expect(accepted.status).toBe(200);
+	const receipt = await accepted.json<Record<string, unknown>>();
+	const lookup = {
+		contract_version: 1, operation_id: receipt.operation_id,
+		api_installation_id: receipt.api_installation_id, transcript_sha256: receipt.transcript_sha256,
+	};
+	const nonceDecision = await encodeDecision("status/challenge", lookup, challenge.expires_at_ms);
+	const status = await (await send("status/challenge", lookup, nonceDecision)).json<FirstKeyStatusChallenge>();
+	const statusRequest = { ...status, core_signature_b64url: await f.sign(firstKeyStatusBytes(status)) };
+	const statusDecision = await encodeDecision("status", statusRequest, challenge.expires_at_ms, {
+		expires_at_ms: Math.min(Date.now() + 9_000, status.status_nonce_expires_at_ms),
+	});
+	const substituted = { ...statusRequest, status_nonce: "A".repeat(43) };
+	expect((await send("status", substituted, statusDecision)).status).toBe(403);
+	expect(await (await send("status", statusRequest, statusDecision)).json()).toEqual(receipt);
+	expect((await send("status/challenge", lookup, nonceDecision)).status).toBe(409);
+	expect((await send("status", statusRequest, statusDecision)).status).toBe(409);
+	await retireWidgetFirstKeyPair(f.db, f.original.pair_binding);
+	expect((await send("status/challenge", lookup, await encodeDecision("status/challenge", lookup, challenge.expires_at_ms))).status).toBe(409);
+});
+
+it("matches the portable currentness header and canonical status request vector", async () => {
+	const request = JSON.parse(currentnessVector.request);
+	const decision = JSON.parse(currentnessVector.header);
+	expect(canonical(request)).toBe(currentnessVector.request);
+	expect(canonical(decision)).toBe(currentnessVector.header);
+	expect(decision.request_sha256).toBe(hex(await digest(new TextEncoder().encode(currentnessVector.request))));
+	expect(decision.expires_at_ms).toBe(request.status_nonce_expires_at_ms);
 });
 
 it("cannot renew an expired registration challenge or commit at its original deadline", async () => {

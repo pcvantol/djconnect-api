@@ -2,6 +2,15 @@ CREATE TABLE widget_first_key_retirements (
     pair_binding TEXT NOT NULL PRIMARY KEY
 );
 
+CREATE TABLE widget_first_key_decisions (
+    credential_id TEXT NOT NULL,
+    decision_id TEXT NOT NULL,
+    expires_at_ms INTEGER NOT NULL,
+    PRIMARY KEY (credential_id, decision_id)
+);
+
+CREATE INDEX widget_first_key_decision_expiry ON widget_first_key_decisions(expires_at_ms);
+
 CREATE TABLE widget_first_key (
     credential_id TEXT NOT NULL,
     operation_id TEXT NOT NULL,
