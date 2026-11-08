@@ -17,6 +17,14 @@ CREATE TABLE widget_core_pair_authority (
     device_binding TEXT NOT NULL,
     core_key_thumbprint TEXT NOT NULL,
     retirement_request_expires_at_ms INTEGER NOT NULL,
+    consent_revision INTEGER NOT NULL CHECK (consent_revision > 0),
     current INTEGER NOT NULL CHECK (current IN (0, 1)),
     PRIMARY KEY (scope_id, credential_id, operation_id)
+);
+
+CREATE TABLE widget_core_consent_withdrawals (
+    scope_id TEXT NOT NULL,
+    pair_binding TEXT NOT NULL,
+    through_revision INTEGER NOT NULL CHECK (through_revision > 0),
+    PRIMARY KEY (scope_id, pair_binding)
 );

@@ -108,7 +108,10 @@ export function createWidgetCoreHaDevWorker(resolveKeys = createWatchAccessKeyRe
 				const pairQuery = (credentialId: string, pair: FirstKeyPairBinding & { operation_id: string },
 					retirementDeadline: number | null) => {
 					const lifecycle = retirementDeadline === null
-						? "p.current = 1 AND i.disabled = 0 AND i.label = 'widget-install/1:' || m.scope_id"
+						? `p.current = 1 AND i.disabled = 0 AND i.label = 'widget-install/1:' || m.scope_id
+							AND NOT EXISTS (SELECT 1 FROM widget_core_consent_withdrawals w
+								WHERE w.scope_id = p.scope_id AND w.pair_binding = p.pair_binding
+								AND w.through_revision >= p.consent_revision)`
 						: "p.retirement_request_expires_at_ms = ?";
 					return { sql: `SELECT 1 FROM widget_core_pair_authority p
 						JOIN widget_core_machines m ON m.scope_id = p.scope_id AND m.enabled = 1

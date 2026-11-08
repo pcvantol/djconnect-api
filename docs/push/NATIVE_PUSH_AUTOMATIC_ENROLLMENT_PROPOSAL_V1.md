@@ -147,6 +147,20 @@ One environment assignment selects a single HA-dev Core runtime, the private ori
 
 Qualification must trace one ordinary fresh pairing through publisher readback, bootstrap and challenge without an operator-created per-installation credential. It must also refuse a caller-supplied or restored pairing and a device owner change followed by a return to the old owner. The isolated D1 test withdraws the operation after the last successful authority check and immediately before the write. It verifies that the Worker neither creates a new challenge nor returns a previously saved challenge. The live trial must still exercise the full consent-to-mapping path, delayed retirement before any challenge, retirement after credential rotation and revocation before provider handoff. The trusted publisher and provider ordering still require implementation and verification. The source candidate stays closed until their provenance is established.
 
+##### Candidate publisher wire for one selected HA-dev runtime
+
+The publisher uses a separate private ingress or a named service binding. The server resolves the ordinary Core Access client ID from the independently authenticated publisher identity and its environment assignment. The publisher must have verified the original durable PairJournal and applicable consent before invoking this boundary. The ordinary Core machine credential and installation bearer confer no publisher access. Requests contain neither the Access client ID nor a scope ID.
+
+All three operations use POST and compact canonical JSON with a 4,096-byte limit. The candidate API accepts exactly these fields.
+
+| Path | Body | Durable result |
+| --- | --- | --- |
+| `/v1/internal/widget-core/bind` | `contract_version=1`, `ha_install_id`, `device_id` | Allocate the server scope for the configured Core machine. Identical retry succeeds. A changed binding or disabled mapping conflicts. |
+| `/v1/internal/widget-core/operation` | The exact retire v1 object without `api_audience` and `event_id`, plus positive `consent_revision` | Store the immutable current and historical operation under the issued credential and server scope. The credential must be active and belong to that scope. Identical active retry succeeds. A conflicting or withdrawn revision fails. |
+| `/v1/internal/widget-core/withdraw` | `contract_version=1`, `pair_binding`, positive `consent_revision` | Persist a monotonically increasing withdrawal through that revision for the exact WidgetKit pairing in this scope. An older duplicate leaves the greater revision in force. |
+
+A successful response is HTTP 200 with `{"ok":true}` after durable write or matching readback. Withdrawal fences both newly proposed operations and all first-key writes at the withdrawn revision or earlier. It preserves the historical tuple for retire v1. A fresh higher revision needs a new operation ID. The ordinary ingress does not route publisher operations. The [server-only publisher](../../src/native-push/widget-core-publisher.ts) remains unavailable until a separate authority supplies the selected runtime and verifies durable provenance. The isolated test starts with no device row and exercises binding, bootstrap, exchange, operation publication, challenge and withdrawal under synthetic trusted publisher input.
+
 ## Fresh WidgetKit acceptance wire
 
 The paired Apple app starts the request after its user explicitly opts in. Core supplies the current durable PairJournal acknowledgement from the original completed pairing after install credential storage. The API challenge is single-use and tied to the exact active installation credential, app key, pairing commitment and widget target. The attested app proves the exact signed opt-in transcript. The API validates the same pairing against the trusted Core input and verifies the platform-specific host proof. A caller-provided pairing ID is insufficient. No legacy grant is imported.

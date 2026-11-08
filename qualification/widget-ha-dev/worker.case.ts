@@ -17,6 +17,7 @@ import { createWidgetFirstKeyRetirementHandler, retireWidgetFirstKeyPair,
 import { createWidgetFirstKeyAppleVerifier } from "../../src/native-push/first-key-apple";
 import { createWidgetInstallIssuer } from "../../src/native-push/widget-install-issuer";
 import { createWidgetCoreHaDevWorker } from "../../src/native-push/widget-core-ha-dev-worker";
+import { createWidgetCorePublisher } from "../../src/native-push/widget-core-publisher";
 import { canonical } from "../../src/surface-push/wire";
 
 const origin = "https://widget.fixture.invalid";
@@ -123,7 +124,6 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	const resolve = vi.fn(async () => signing.publicKey);
 	const selected = createWidgetCoreHaDevWorker(() => resolve);
 	const clientId = crypto.randomUUID();
-	const scope = crypto.randomUUID();
 	const install = { ha_install_id: crypto.randomUUID(), device_id: crypto.randomUUID(), client_type: "ios",
 		integration: "djconnect_hacs", integration_version: "fixture" };
 	const config = {
@@ -153,6 +153,12 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	}), options.config ?? config, options.ctx ?? ctx);
 	const bootstrap = "/v1/install/bootstrap-proof";
 	const exchange = "/v1/install/token";
+	const publisher = createWidgetCorePublisher(db, origin, async request =>
+		request.headers.get("x-fixture-publisher") === "authorized" ? clientId : null);
+	const publication = (action: string, body: unknown, authorized = true) => new Request(origin + "/v1/internal/widget-core/" + action, {
+		method: "POST", headers: { "content-type": "application/json",
+			"x-fixture-publisher": authorized ? "authorized" : "ordinary-core" }, body: canonical(body),
+	});
 	expect((await send(bootstrap, install, { config: { ...config, WIDGET_CORE_MODE: "closed" } })).status).toBe(503);
 	expect((await send(bootstrap, install, { ctx: createExecutionContext() })).status).toBe(403);
 	expect((await send(bootstrap, install, { jwt: await makeJwt({ aud: ["another-service"] }) })).status).toBe(403);
@@ -162,7 +168,14 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	jwtParts[2] = (jwtParts[2][0] === "A" ? "B" : "A") + jwtParts[2].slice(1);
 	expect((await send(bootstrap, install, { jwt: jwtParts.join(".") })).status).toBe(403);
 	expect((await send(bootstrap, install)).status).toBe(403);
-	await db.prepare("INSERT INTO widget_core_machines VALUES (?, ?, ?, ?, 1)").bind(clientId, scope, install.ha_install_id, install.device_id).run();
+	const binding = { contract_version: 1, ha_install_id: install.ha_install_id, device_id: install.device_id };
+	expect((await createWidgetCorePublisher()(publication("bind", binding))).status).toBe(503);
+	expect((await send("/v1/internal/widget-core/bind", binding)).status).toBe(404);
+	expect((await publisher(publication("bind", binding, false))).status).toBe(403);
+	expect((await publisher(publication("bind", { ...binding, scope_id: "caller-scope" }))).status).toBe(400);
+	expect((await publisher(publication("bind", binding))).status).toBe(200);
+	expect((await publisher(publication("bind", binding))).status).toBe(200);
+	expect((await publisher(publication("bind", { ...binding, device_id: "foreign" }))).status).toBe(409);
 	expect((await send(bootstrap, { ...install, device_id: "foreign-device" })).status).toBe(403);
 	expect((await send("/v1/push/surface/event", {})).status).toBe(404);
 	const issued = await send(bootstrap, install);
@@ -173,7 +186,7 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	const { id, token } = await exchanged.json<{ id: string; token: string }>();
 	const pair = {
 		contract_version: 1, operation_id: crypto.randomUUID(), pairing_generation: crypto.randomUUID(),
-		pair_binding: hex(await digest(new TextEncoder().encode(scope))), owner_binding: "b".repeat(64),
+		pair_binding: hex(await digest(new TextEncoder().encode(clientId))), owner_binding: "b".repeat(64),
 		device_binding: "c".repeat(64), core_key_thumbprint: "d".repeat(64),
 	};
 	const now = Date.now();
@@ -184,14 +197,16 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	});
 	const challenge = keyPrefix + "challenge";
 	expect((await send(challenge, pair, { bearer: token, decision })).status).toBe(403);
-	await db.prepare("INSERT INTO widget_core_pair_authority VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)")
-		.bind(scope, id, pair.operation_id, pair.pairing_generation, pair.pair_binding, pair.owner_binding,
-			pair.device_binding, pair.core_key_thumbprint, 1).run();
+	const operation = { ...pair, install_credential_id: id, request_expires_at_ms: now + 60_000, consent_revision: 1 };
+	expect((await publisher(publication("operation", { ...operation, install_credential_id: "foreign" }))).status).toBe(409);
+	expect((await publisher(publication("operation", operation))).status).toBe(200);
+	expect((await publisher(publication("operation", operation))).status).toBe(200);
+	expect((await publisher(publication("operation", { ...operation, owner_binding: "e".repeat(64) }))).status).toBe(409);
 	const reserved = await send(challenge, pair, { bearer: token, decision });
 	expect(reserved.status).toBe(200);
 	expect((await reserved.json<FirstKeyChallenge>()).install_credential_id).toBe(id);
 	let withdrewAtWrite = false;
-	let withdrawnOperation = pair.operation_id;
+	let withdrawnRevision = 1;
 	const withdrawAtInsert = {
 		prepare(sql: string) {
 			const statement = db.prepare(sql);
@@ -200,8 +215,9 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 				bind(...values: unknown[]) {
 					const bound = statement.bind(...values);
 					return { async run() {
-						await db.prepare("UPDATE widget_core_pair_authority SET current = 0 WHERE scope_id = ? AND operation_id = ?")
-							.bind(scope, withdrawnOperation).run();
+						expect((await publisher(publication("withdraw", {
+							contract_version: 1, pair_binding: pair.pair_binding, consent_revision: withdrawnRevision,
+						}))).status).toBe(200);
 						withdrewAtWrite = true;
 						return bound.run();
 					} };
@@ -214,11 +230,11 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 		bearer: token, decision: retryDecision, config: { ...config, WIDGET_HA_DEV_DB: withdrawAtInsert },
 	})).status).toBe(409);
 	expect(withdrewAtWrite).toBe(true);
+	expect((await publisher(publication("operation", operation))).status).toBe(409);
 	const freshPair = { ...pair, operation_id: crypto.randomUUID() };
-	withdrawnOperation = freshPair.operation_id;
-	await db.prepare("INSERT INTO widget_core_pair_authority VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)")
-		.bind(scope, id, freshPair.operation_id, freshPair.pairing_generation, freshPair.pair_binding,
-			freshPair.owner_binding, freshPair.device_binding, freshPair.core_key_thumbprint, 1).run();
+	withdrawnRevision = 2;
+	expect((await publisher(publication("operation", { ...operation, operation_id: freshPair.operation_id,
+		consent_revision: withdrawnRevision }))).status).toBe(200);
 	const freshDecision = canonical({
 		...JSON.parse(retryDecision), operation_id: freshPair.operation_id, decision_id: crypto.randomUUID(),
 		request_sha256: hex(await digest(new TextEncoder().encode(canonical(freshPair)))),
@@ -227,8 +243,12 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 		bearer: token, decision: freshDecision, config: { ...config, WIDGET_HA_DEV_DB: withdrawAtInsert },
 	})).status).toBe(409);
 	expect(await db.prepare("SELECT 1 FROM widget_first_key WHERE operation_id = ?").bind(freshPair.operation_id).first()).toBeNull();
+	expect((await publisher(publication("withdraw", { contract_version: 1, pair_binding: pair.pair_binding,
+		consent_revision: 1 }))).status).toBe(200);
+	expect(await db.prepare("SELECT through_revision FROM widget_core_consent_withdrawals WHERE pair_binding = ?")
+		.bind(pair.pair_binding).first("through_revision")).toBe(2);
 	const retirement = { ...pair, api_audience: firstKeyAudience, event_id: pair.operation_id,
-		install_credential_id: id, request_expires_at_ms: 1 };
+		install_credential_id: id, request_expires_at_ms: operation.request_expires_at_ms };
 	const retire = keyPrefix + "retire";
 	expect((await send(retire, { ...retirement, owner_binding: "e".repeat(64) })).status).toBe(403);
 	expect((await send(retire, retirement, { bearer: token })).status).toBe(403);
