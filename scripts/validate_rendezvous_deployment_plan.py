@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -641,7 +641,7 @@ SOURCE_PROVENANCE.update(toolchain_refresh_delta_sha256=TOOLCHAIN_REFRESH_DELTA_
                          toolchain_refresh_source_map_sha256=TOOLCHAIN_REFRESH_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_api_maintenance():
     sources, refs = baseline_before_toolchain_refresh()
     delta = pinned_working_proof(TOOLCHAIN_REFRESH_DELTA_PATH, TOOLCHAIN_REFRESH_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
@@ -677,6 +677,49 @@ def baseline():
             and current['installed_changes'] == {} and current['unchanged_installed_inputs'] == 50
             and current['real_native_or_production_effect'] is False)
     refs[TOOLCHAIN_REFRESH_DELTA_PATH] = TOOLCHAIN_REFRESH_DELTA_SHA256
+    return sources, refs
+
+
+API_MAINTENANCE_DELTA_PATH = 'docs/rendezvous/api-maintenance-source-delta-v1.json'
+API_MAINTENANCE_DELTA_SHA256 = 'cd9128297a6aa9332e71bf3c2a3ce25dcd7cd4499cb68d79dd5d3905f63dc0be'
+API_MAINTENANCE_SOURCE_MAP_SHA256 = 'dee84f1d4f8208c3d1e5444a6cbe7c89f6df707413e6c325d01d550cf1aa0387'
+API_MAINTENANCE_SOURCES = frozenset((
+    'src/auth.ts', 'src/handlers/install.ts', 'src/messages.ts',
+    'src/repositories/installTokens.ts', 'src/repositories/registrations.ts',
+))
+SOURCE_PROVENANCE.update(api_maintenance_delta_sha256=API_MAINTENANCE_DELTA_SHA256,
+                         api_maintenance_source_map_sha256=API_MAINTENANCE_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_api_maintenance()
+    delta = pinned_working_proof(API_MAINTENANCE_DELTA_PATH, API_MAINTENANCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['base_source'] == '663318ad6405d41de88ff7495113cbdc63e077ca'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == API_MAINTENANCE_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        sources[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == API_MAINTENANCE_SOURCE_MAP_SHA256)
+    require(set(delta['reference_changes']) == {'coordinator/host-app-wake-receiving/runtime/source-inputs.json',
+                                                    'qualification/watch-moment/source-manifest.json'})
+    for name, change in delta['reference_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and change['before'] != change['after']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        refs[name] = change['after']
+    refs[API_MAINTENANCE_DELTA_PATH] = API_MAINTENANCE_DELTA_SHA256
     return sources, refs
 
 

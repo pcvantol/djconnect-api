@@ -15,18 +15,6 @@ export async function requireBootstrapAuth(request: Request, env: AppEnv): Promi
 	throw new HttpError(401, "auth_required");
 }
 
-export async function requirePairingIssuerAuth(request: Request, env: AppEnv): Promise<void> {
-	const authorized = await verifySharedSecretAuth(request, env.DJCONNECT_PAIRING_ISSUER_SECRET);
-	if (authorized === "missing_secret") {
-		throw new HttpError(500, "pairing_issuer_secret_not_configured");
-	}
-	if (authorized) {
-		return;
-	}
-
-	throw new HttpError(401, "auth_required");
-}
-
 export async function requireAdminAuth(request: Request, env: AppEnv): Promise<void> {
 	const authorization = request.headers.get("authorization") ?? "";
 	if (authorization.startsWith("Bearer ")) {
@@ -38,7 +26,7 @@ export async function requireAdminAuth(request: Request, env: AppEnv): Promise<v
 	await requireBootstrapAuth(request, env);
 }
 
-export async function requireInstallAuth(request: Request, env: AppEnv, haInstallId: string): Promise<void> {
+export async function requireInstallAuth(request: Request, env: AppEnv, haInstallId: string): Promise<string> {
 	const authorization = request.headers.get("authorization") ?? "";
 	if (!authorization.startsWith("Bearer ")) {
 		throw new HttpError(401, "install_auth_required");
@@ -59,6 +47,7 @@ export async function requireInstallAuth(request: Request, env: AppEnv, haInstal
 	}
 
 	await markInstallTokenUsed(env.DB, record.id);
+	return record.id;
 }
 
 async function verifySharedSecretAuth(request: Request, expected: string | undefined): Promise<boolean | "missing_secret"> {

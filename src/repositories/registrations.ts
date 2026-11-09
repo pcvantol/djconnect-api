@@ -1,7 +1,7 @@
 import { cryptoRandomId, encryptSecret, sha256Hex } from "../crypto";
 import type { ApnsEnvironment, ClientType, PushEventRequest, RegisterRequest, Registration, UnregisterRequest } from "../types";
 
-export function topicForClientType(env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MACOS: string; APNS_TOPIC_WATCHOS: string }, clientType: ClientType): string {
+function topicForClientType(env: { APNS_TOPIC_IOS: string; APNS_TOPIC_MACOS: string; APNS_TOPIC_WATCHOS: string }, clientType: ClientType): string {
 	switch (clientType) {
 		case "ios":
 			return env.APNS_TOPIC_IOS;

@@ -30,10 +30,10 @@ migrations/
 - Wrangler through the project dependency (`npx wrangler ...`).
 - GitHub CLI (`gh`) for release cleanup and GitHub Release operations.
 
-Install dependencies with:
+Install the versions recorded in the lockfile with:
 
 ```sh
-npm install
+npm ci
 ```
 
 ## Local Checks
@@ -43,7 +43,7 @@ Run these before release or non-trivial code changes:
 ```sh
 npx wrangler types
 npx tsc --noEmit
-npm test
+npm test -- --run
 npm run test:rendezvous-product
 npm run test:rendezvous-composition
 npx wrangler d1 migrations apply djconnect_api --local
@@ -52,6 +52,11 @@ git diff --check
 
 The Worker test runner may need permission to write Wrangler logs under
 `~/.wrangler` and start a local runtime listener.
+
+To check install-token rotation in isolation, run
+`npm test -- --run test/index.spec.ts -t 'rotation|rotates|rotating|preserves the old install token'`.
+These tests use local D1 to check concurrent requests and rollback when either
+database write fails.
 
 The rendezvous product check builds the actual root Worker and probes its five
 private Durable Object facades in isolated local SQLite storage. Its temporary

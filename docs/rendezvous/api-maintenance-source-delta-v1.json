@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION",
+  "base_source": "663318ad6405d41de88ff7495113cbdc63e077ca",
+  "baseline_source_map_sha256": "2205d9fcf236b9e179b376cad0a1739725bdcdb09bd1721366508f5ed411056b",
+  "effective_source_map_sha256": "dee84f1d4f8208c3d1e5444a6cbe7c89f6df707413e6c325d01d550cf1aa0387",
+  "changes": {
+    "src/auth.ts": {
+      "before": "3ea011df8bdc5bad6796047b15566b459a5cc4f7fc3effda6eb2f2deab22dbd0",
+      "after": "affc544f3d5b401086cd8086a8832ac9927d4ed76a0fd3ca51de309f932f42c8"
+    },
+    "src/handlers/install.ts": {
+      "before": "f290aabf68aad588399912a268df40675dce5565a9f5da1a48d186e1beb04d8b",
+      "after": "cb3aba1d0209b08f4ec44b3619890de0fd614309a2e4033e685a57f58d263cc7"
+    },
+    "src/messages.ts": {
+      "before": "980ab421315143a27ca1e3605310fd043779fe0e175ef0e0d9f7844f5eeadb79",
+      "after": "b9d1c33651d56182156913ca5b1e5bc5d8dc6dfff705186f4e2ad320f47eb675"
+    },
+    "src/repositories/installTokens.ts": {
+      "before": "c21ef52d84cd833cef7fbd2bca8edfb2f5da2f6d527ce5ce1fa115f4c87f8c2b",
+      "after": "acabad69cf6b1dd0b78fd7bf80be8d4a91df152201f28799d8ce1c60bce5cdf9"
+    },
+    "src/repositories/registrations.ts": {
+      "before": "4f46e18fcae5433896e2443fb4022000f03d639cc076910a04dc3da0143e8a80",
+      "after": "e102137ae2b8a376058da013a87d45f7668a54909aa716ee67f9ca409399bb65"
+    }
+  },
+  "public_activation_allowed": false,
+  "reference_changes": {
+    "coordinator/host-app-wake-receiving/runtime/source-inputs.json": {
+      "before": "22be88dc6216e657671d729d7650ffa79a324e5a5bd107a265e1deea8f726e54",
+      "after": "0ea52e53e508e1cb10ee22dee7a1b54c976da44296707c855b575f63c7936069"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "40206c5d5bf8ee8c0b941ba53deb05a150708a944b595fd96d0cb1e43ca53fba",
+      "after": "762755198c73b2268357281cd5884783800fd47140bce68a3172afb6d8976174"
+    }
+  }
+}

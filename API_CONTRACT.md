@@ -216,6 +216,12 @@ Failure codes:
 Rotates the token for one Home Assistant installation. Requires the current
 per-install token for the same `ha_install_id`.
 
+The replacement and retirement of the installation's earlier tokens commit
+together. If the write fails, the earlier tokens keep their previous state.
+Concurrent requests using the same token can produce only one replacement.
+Once that rotation commits, the earlier token receives HTTP 401
+`install_auth_required` on another rotation attempt.
+
 Request:
 
 ```json

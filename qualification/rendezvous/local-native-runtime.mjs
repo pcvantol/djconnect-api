@@ -83,6 +83,14 @@ export async function sourceSnapshot(){
  need(toolchain.baseline_source_map_sha256===bindings.effective_source_map_sha256&&toolchain.effective_source_map_sha256===provenance.toolchain_refresh_source_map_sha256);
  const toolchainFiles=["package-lock.json","package.json","scripts/qualify_rendezvous_product_build.mjs"];
  need(Object.keys(toolchain.changes).length===toolchainFiles.length&&toolchainFiles.every(name=>Object.hasOwn(toolchain.changes,name)&&Object.hasOwn(root.source_hashes,name)));
+ const maintenancePath='docs/rendezvous/api-maintenance-source-delta-v1.json';
+ const maintenanceRaw=await readFile(join(repo,maintenancePath));
+ need(plan.reference_hashes[maintenancePath]===sha(maintenanceRaw)&&sha(maintenanceRaw)===provenance.api_maintenance_delta_sha256);
+ const maintenance=JSON.parse(maintenanceRaw);
+ need(maintenance.scope==='EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION'&&maintenance.public_activation_allowed===false);
+ need(maintenance.baseline_source_map_sha256===toolchain.effective_source_map_sha256&&maintenance.effective_source_map_sha256===provenance.api_maintenance_source_map_sha256);
+ const maintenanceFiles=["src/auth.ts","src/handlers/install.ts","src/messages.ts","src/repositories/installTokens.ts","src/repositories/registrations.ts"];
+ need(Object.keys(maintenance.changes).length===maintenanceFiles.length&&maintenanceFiles.every(name=>Object.hasOwn(maintenance.changes,name)&&Object.hasOwn(root.source_hashes,name)));
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -96,6 +104,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(releaseRetention.changes,name)){need(releaseRetention.changes[name].before===expected);expected=releaseRetention.changes[name].after;}
   if(Object.hasOwn(bindings.changes,name)){need(bindings.changes[name].before===expected);expected=bindings.changes[name].after;}
   if(Object.hasOwn(toolchain.changes,name)){need(toolchain.changes[name].before===expected);expected=toolchain.changes[name].after;}
+  if(Object.hasOwn(maintenance.changes,name)){need(maintenance.changes[name].before===expected);expected=maintenance.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
