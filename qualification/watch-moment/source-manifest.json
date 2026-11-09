@@ -20,8 +20,8 @@
   "inputs_sha256": {
     "docs/push/WATCH_MOMENT_ALERT_TRANSPORT_V1.md": "8fdaf8039be494f68c585f86c1888ea34201d23296011d09d4cc7c6664dd55c2",
     "docs/push/watch-moment-alert-proposal-v1.json": "236f9a840015463e8d2f6962c7f759bb6bc24999c373ec697a076b9632da982c",
-    "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
-    "package.json": "9ed53515da2427fc8488c3476caff092993a512f96a4deb9c1583e699011e0ca",
+    "package-lock.json": "0e756477e6ae46368a1bba97fbb5010360faaffc6b6004becb1542bb5374657e",
+    "package.json": "5946dbd9f69b22d4a2ddccb5a62a243e017dcfe486a83adfe1f797fc414e2650",
     "qualification/watch-moment/build-source.mjs": "aea682510b1d45bf736258775c7255e30ec6aab6db8c9d71311047d1211d4620",
     "qualification/watch-moment/check-package.mjs": "144c23123dd3d050dea1ea0105e7ca3fbfbf30e62d343feac9b48ac3a395c3fb",
     "qualification/watch-moment/tsconfig.json": "2d75bf4d47a042df344e7419df0a0af066dd6ad63eed7ead8dc8fd85959b558a",
