@@ -177,6 +177,8 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	expect((await send(bootstrap, install, { config: { ...config, WIDGET_CORE_MODE: "closed" } })).status).toBe(503);
 	expect((await send(bootstrap, install, { ctx: createExecutionContext() })).status).toBe(403);
 	expect((await send(bootstrap, install, { jwt: await makeJwt({ aud: ["another-service"] }) })).status).toBe(403);
+	expect((await send(bootstrap, install, { jwt: await makeJwt({ aud: "another-service" }) })).status).toBe(403);
+	expect((await send(bootstrap, install, { jwt: await makeJwt({ aud: [config.WIDGET_CORE_ACCESS_AUDIENCE, "another-service"] }) })).status).toBe(403);
 	expect((await send(bootstrap, install, { jwt: await makeJwt({ iat: Math.floor(Date.now() / 1000) - 31 }) })).status).toBe(403);
 	expect(resolve).not.toHaveBeenCalled();
 	const jwtParts = jwt.split(".");
@@ -191,6 +193,7 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	expect((await publisher(publication("bind", binding), publisherConfig, createExecutionContext())).status).toBe(403);
 	expect((await publisher(publication("bind", binding, await makeJwt({ ...publisherClaims, common_name: clientId })))).status).toBe(403);
 	expect((await publisher(publication("bind", binding, await makeJwt({ ...publisherClaims, aud: [config.WIDGET_CORE_ACCESS_AUDIENCE] })))).status).toBe(403);
+	expect((await publisher(publication("bind", binding, await makeJwt({ ...publisherClaims, aud: config.WIDGET_CORE_ACCESS_AUDIENCE })))).status).toBe(403);
 	expect((await publisher(publication("bind", binding, await makeJwt({ ...publisherClaims, iat: Math.floor(Date.now() / 1000) - 31 })))).status).toBe(403);
 	expect((await send(bootstrap, install, { jwt: publisherJwt })).status).toBe(403);
 	const browser = publication("bind", binding);
@@ -213,12 +216,16 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	}
 	expect(await db.prepare("SELECT 1 FROM widget_core_machines WHERE access_client_id = ?").bind(clientId).first()).toBeNull();
 	expect((await publisher(publication("bind", { ...binding, scope_id: "caller-scope" }))).status).toBe(400);
-	expect((await publisher(publication("bind", binding))).status).toBe(200);
+	const publisherStringJwt = await makeJwt({ ...publisherClaims, aud: publisherConfig.WIDGET_PUBLISHER_ACCESS_AUDIENCE });
+	expect((await publisher(publication("bind", binding, publisherStringJwt))).status).toBe(200);
 	expect((await publisher(publication("bind", binding))).status).toBe(200);
 	expect((await publisher(publication("bind", { ...binding, device_id: "foreign" }))).status).toBe(409);
 	expect((await send(bootstrap, { ...install, device_id: "foreign-device" })).status).toBe(403);
 	expect((await send("/v1/push/surface/event", {})).status).toBe(404);
-	const issued = await send(bootstrap, install);
+	const coreStringJwt = await makeJwt({ aud: config.WIDGET_CORE_ACCESS_AUDIENCE });
+	expect((await publisher(publication("bind", binding, coreStringJwt))).status).toBe(403);
+	expect((await send(bootstrap, install, { jwt: publisherStringJwt })).status).toBe(403);
+	const issued = await send(bootstrap, install, { jwt: coreStringJwt });
 	expect(issued.status).toBe(200);
 	const { bootstrap_proof } = await issued.json<{ bootstrap_proof: string }>();
 	const exchanged = await send(exchange, { ...install, bootstrap_proof });
