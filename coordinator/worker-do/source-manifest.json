@@ -4,8 +4,8 @@
   "Core_passive_contract_sha256": "af201f6a74f358b09460f3cea026b6104aef93d54d8ac9ea05bac32d43874492",
   "owning_Core_join_sha256": "39b9c478a95df770d889fcae5071bef5143a3b8afa695f313e36fb6866257347",
   "Worker_only_assessment_sha256": "a58edbda51815f31ed439b1b8ae541af94b742b1c221be934a72f745d088c54a",
-  "wrangler_version": "4.154.0",
-  "wrangler_schema_sha256": "c860b006a33f3bfa669eb72c600daa8ca36a1b338159413df847a52d775e851c",
+  "wrangler_version": "4.157.0",
+  "wrangler_schema_sha256": "57b91625cbaa059d39c30033c8f06df7a334348ccf019267e32ff3defd835d57",
   "inputs_sha256": {
     "coordinator/worker-do/README.md": "aefdde3b3fc45602ef486082c0fdd8b650b973408f864ea2bfc6e811b71cd42b",
     "coordinator/worker-do/build-source.mjs": "2d120315d01ff3d7d828b990176a36d245e8e6034299eaae062d92bac0029e00",
@@ -17,7 +17,7 @@
     "coordinator/worker-do/registry.ts": "de457d315db7746be016a202c35a5eb3e4de4064d7a37d688dd68c29968a187b",
     "coordinator/worker-do/worker.ts": "8a007aca2501c7a9f685a10b59db2117d4fa8563a484729bc6703aa261d6a4ca",
     ".github/workflows/worker-do-registry-source.yml": "a03dfa56e4cf2f5e12c0450b561a398309173c618872a1d36deb17c98a512b1f",
-    "package-lock.json": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
+    "package-lock.json": "0e756477e6ae46368a1bba97fbb5010360faaffc6b6004becb1542bb5374657e",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8"

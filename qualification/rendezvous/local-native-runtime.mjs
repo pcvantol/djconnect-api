@@ -69,12 +69,26 @@ export async function sourceSnapshot(){
  need(plan.reference_hashes[releaseRetentionPath]===sha(releaseRetentionRaw)&&sha(releaseRetentionRaw)===provenance.release_ci_retention_delta_sha256);
  const releaseRetention=JSON.parse(releaseRetentionRaw);need(releaseRetention.scope==='EXACT_RELEASE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'&&releaseRetention.public_activation_allowed===false);
  need(releaseRetention.baseline_source_map_sha256===receipt.effective_source_map_sha256&&releaseRetention.effective_source_map_sha256===provenance.release_ci_retention_source_map_sha256);
+ const bindingsPath='docs/rendezvous/closed-production-bindings-source-delta-v1.json';
+ const bindingsRaw=await readFile(join(repo,bindingsPath));
+ need(plan.reference_hashes[bindingsPath]===sha(bindingsRaw)&&sha(bindingsRaw)===provenance.closed_production_bindings_delta_sha256);
+ const bindings=JSON.parse(bindingsRaw);
+ need(bindings.scope==='EXACT_CLOSED_PRODUCTION_BINDINGS_SOURCE_ONLY'&&bindings.public_activation_allowed===false&&bindings.production_effect_authorized===false);
+ need(bindings.baseline_source_map_sha256===releaseRetention.effective_source_map_sha256&&bindings.effective_source_map_sha256===provenance.closed_production_bindings_source_map_sha256);
+ const toolchainPath='docs/rendezvous/toolchain-development-dependency-refresh-v1.json';
+ const toolchainRaw=await readFile(join(repo,toolchainPath));
+ need(plan.reference_hashes[toolchainPath]===sha(toolchainRaw)&&sha(toolchainRaw)===provenance.toolchain_refresh_delta_sha256);
+ const toolchain=JSON.parse(toolchainRaw);
+ need(toolchain.scope==='EXACT_TOOLCHAIN_AND_DEVELOPMENT_DEPENDENCY_REFRESH_NOT_ACTIVATION'&&toolchain.public_activation_allowed===false);
+ need(toolchain.baseline_source_map_sha256===bindings.effective_source_map_sha256&&toolchain.effective_source_map_sha256===provenance.toolchain_refresh_source_map_sha256);
+ const toolchainFiles=["package-lock.json","package.json","scripts/qualify_rendezvous_product_build.mjs"];
+ need(Object.keys(toolchain.changes).length===toolchainFiles.length&&toolchainFiles.every(name=>Object.hasOwn(toolchain.changes,name)&&Object.hasOwn(root.source_hashes,name)));
  const maintenancePath='docs/rendezvous/api-maintenance-source-delta-v1.json';
  const maintenanceRaw=await readFile(join(repo,maintenancePath));
  need(plan.reference_hashes[maintenancePath]===sha(maintenanceRaw)&&sha(maintenanceRaw)===provenance.api_maintenance_delta_sha256);
  const maintenance=JSON.parse(maintenanceRaw);
  need(maintenance.scope==='EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION'&&maintenance.public_activation_allowed===false);
- need(maintenance.baseline_source_map_sha256===releaseRetention.effective_source_map_sha256&&maintenance.effective_source_map_sha256===provenance.api_maintenance_source_map_sha256);
+ need(maintenance.baseline_source_map_sha256===toolchain.effective_source_map_sha256&&maintenance.effective_source_map_sha256===provenance.api_maintenance_source_map_sha256);
  const maintenanceFiles=["src/auth.ts","src/handlers/install.ts","src/messages.ts","src/repositories/installTokens.ts","src/repositories/registrations.ts"];
  need(Object.keys(maintenance.changes).length===maintenanceFiles.length&&maintenanceFiles.every(name=>Object.hasOwn(maintenance.changes,name)&&Object.hasOwn(root.source_hashes,name)));
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
@@ -88,7 +102,9 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(watch.source_changes,name)){need(watch.source_changes[name].before===expected);expected=watch.source_changes[name].after;}
   if(Object.hasOwn(receipt.source_changes,name)){need(receipt.source_changes[name].before===expected);expected=receipt.source_changes[name].after;}
   if(Object.hasOwn(releaseRetention.changes,name)){need(releaseRetention.changes[name].before===expected);expected=releaseRetention.changes[name].after;}
-  if(Object.hasOwn(maintenance.changes,name)){need(maintenance.changes[name].before===expected);expected=maintenance.changes[name].after;}
+  if(Object.hasOwn(bindings.changes,name)){need(bindings.changes[name].before===expected);expected=bindings.changes[name].after;}
+  if(Object.hasOwn(toolchain.changes,name)){need(toolchain.changes[name].before===expected);expected=toolchain.changes[name].after;}
+ need(Object.keys(maintenance.changes).length===maintenanceFiles.length&&maintenanceFiles.every(name=>Object.hasOwn(maintenance.changes,name)&&Object.hasOwn(root.source_hashes,name)));
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

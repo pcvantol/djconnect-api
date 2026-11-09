@@ -59,8 +59,10 @@ class PreparationTests(unittest.TestCase):
                          v.DEPENDENCY_DELTA_PATH, *v.WATCH_SOURCES,
                          *v.WATCH_REFERENCES, v.WATCH_DELTA_PATH, *v.RECEIPT_SOURCES,
                          *v.RECEIPT_REFERENCES, v.RECEIPT_DELTA_PATH, v.RELEASE_RETENTION_DELTA_PATH,
-                         *v.API_MAINTENANCE_SOURCES, v.API_MAINTENANCE_DELTA_PATH,
-                         'coordinator/host-app-wake-receiving/runtime/source-inputs.json')
+                         v.CLOSED_PRODUCTION_BINDINGS_DELTA_PATH,
+                         *v.TOOLCHAIN_REFRESH_SOURCES, *v.TOOLCHAIN_REFRESH_REFERENCES,
+                         *v.TOOLCHAIN_REFRESH_ADDITIONS, v.TOOLCHAIN_REFRESH_DELTA_PATH,
+                         *v.API_MAINTENANCE_SOURCES, v.API_MAINTENANCE_DELTA_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
@@ -286,7 +288,7 @@ class PreparationTests(unittest.TestCase):
         original = Path.read_bytes
         for name in (v.DELTA_PATH, *(record[0] for record in v.DELTA_PROOFS),
                          *v.CLOSED_RECEIVING_MAP_CHANGES, v.CLOSED_RECEIVING_DELTA_PATH,
-                         v.CLOSED_RECEIVING_PRODUCT_PATH):
+                         v.CLOSED_RECEIVING_PRODUCT_PATH, v.CLOSED_PRODUCTION_BINDINGS_DELTA_PATH):
             with self.subTest(name=name):
                 def changed(path):
                     return b'{}' if path == v.ROOT / name else original(path)
@@ -315,7 +317,7 @@ class PreparationTests(unittest.TestCase):
 
     def test_each_current_delta_source_byte_is_verified(self):
         original = Path.read_bytes
-        for name in v.DELTA_SOURCES | v.DELTA_ADDITIONS:
+        for name in v.DELTA_SOURCES | v.DELTA_ADDITIONS | v.CLOSED_PRODUCTION_BINDINGS_SOURCES:
             with self.subTest(name=name):
                 def changed(path):
                     return b'changed source' if path == v.ROOT / name else original(path)

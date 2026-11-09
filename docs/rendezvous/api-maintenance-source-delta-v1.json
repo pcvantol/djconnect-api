@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "scope": "EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION",
-  "base_source": "d0827f5f84d765d87f6d29f61add7a4d9570c9e2",
-  "baseline_source_map_sha256": "95ed9d508a33a905d807bc422c525a3b8a6fc5ee3920e8e0020f174c6a23cfc5",
-  "effective_source_map_sha256": "988d28ba2349751899b6648a367f7e68103b52ee77f3ce1f8bc1fe0161f15609",
+  "base_source": "663318ad6405d41de88ff7495113cbdc63e077ca",
+  "baseline_source_map_sha256": "2205d9fcf236b9e179b376cad0a1739725bdcdb09bd1721366508f5ed411056b",
+  "effective_source_map_sha256": "dee84f1d4f8208c3d1e5444a6cbe7c89f6df707413e6c325d01d550cf1aa0387",
   "changes": {
     "src/auth.ts": {
       "before": "3ea011df8bdc5bad6796047b15566b459a5cc4f7fc3effda6eb2f2deab22dbd0",
@@ -29,8 +29,12 @@
   "public_activation_allowed": false,
   "reference_changes": {
     "coordinator/host-app-wake-receiving/runtime/source-inputs.json": {
-      "before": "e0e0e688b681d468b660c26c4aad440a27c3b2c66e2523d7130974abf9213e1a",
-      "after": "e12ff41195537966da74f36a30eb79f808c8c07400e9485e794f20cc21fc6e24"
+      "before": "22be88dc6216e657671d729d7650ffa79a324e5a5bd107a265e1deea8f726e54",
+      "after": "0ea52e53e508e1cb10ee22dee7a1b54c976da44296707c855b575f63c7936069"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "40206c5d5bf8ee8c0b941ba53deb05a150708a944b595fd96d0cb1e43ca53fba",
+      "after": "762755198c73b2268357281cd5884783800fd47140bce68a3172afb6d8976174"
     }
   }
 }

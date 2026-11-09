@@ -1,0 +1,128 @@
+{
+  "scope": "EXACT_QA_TOOLCHAIN_AND_DEVELOPMENT_DEPENDENCY_REFRESH_NOT_ACTIVATION",
+  "previous_provenance_sha256": "1270c280cca0adadde67da371afeba936d404552a51f7c8929daa34126bf57b3",
+  "previous_lock_sha256": "3e7080aa12befaf5f9a1ac48d9273a51774b52e25839e08a49be57ec36ccda72",
+  "dependency_lock_sha256": "0e756477e6ae46368a1bba97fbb5010360faaffc6b6004becb1542bb5374657e",
+  "packages": [
+    {
+      "path": "node_modules/@noble/hashes",
+      "version": "2.4.0",
+      "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="
+    },
+    {
+      "path": "node_modules/@peculiar/utils",
+      "version": "4.1.0",
+      "integrity": "sha512-y2oDqAwp+VPZMUYFGFFMYlXM8xinwb7ehb69+2EhbEL+n7KsykCQX5F0u3/B+BFHxCkwTyft3T1id0ugyzNHVQ=="
+    },
+    {
+      "path": "node_modules/asn1js",
+      "version": "4.0.0",
+      "integrity": "sha512-81NlooYbXCbBWL2+p1/ivGyT4AR2+bnfKYlPq/3rCoIPJSuLbdS8G70XYt561wOJnbaYfBS2HQDMENaX5hM2vA=="
+    },
+    {
+      "path": "node_modules/bytestreamjs",
+      "version": "3.0.0",
+      "integrity": "sha512-QJYdJHpGNj4dAfRrgQAu8V5OEFVgiALJ8YFR4c1BuNYzvoDU86yEg+9SXu/AbGyMaLAn17qdMmwsCc2Ry2nHPg=="
+    },
+    {
+      "path": "node_modules/cbor",
+      "version": "10.0.12",
+      "integrity": "sha512-exQDevYd7ZQLP4moMQcZkKCVZsXLAtUSflObr3xTh4xzFIv/xBCdvCd6L259kQOUP2kcTC0jvC6PpZIf/WmRXA=="
+    },
+    {
+      "path": "node_modules/nofilter",
+      "version": "3.1.0",
+      "integrity": "sha512-l2NNj07e9afPnhAhvgVrCD/oy2Ai1yfLpuo3EpiO1jFTsB4sFz6oIfAfSZyQzVpkZQ9xS8ZS5g1jCBgq4Hwo0g=="
+    },
+    {
+      "path": "node_modules/pkijs",
+      "version": "4.0.1",
+      "integrity": "sha512-hs6jHBg+Y9ZZ9r5w2CHnKXkGPOr3qWfkLfnZGlbNkP2hceGZ6EgjnTS7tqwbugHXx5mCqoSf4TUH2nu1diirnA=="
+    },
+    {
+      "path": "node_modules/wrangler",
+      "version": "4.157.0",
+      "integrity": "sha512-HUft0VZiUbt/oFZXQRDmJAGzPgfDYpdVmJwCGlGBcXrE5IP0yGcTwc1u/H3+bUYhaX2NHoL1sdQqn3zptxyFkA=="
+    },
+    {
+      "path": "node_modules/wrangler/node_modules/miniflare",
+      "version": "5.20261103.0-beta",
+      "integrity": "sha512-wghSXG3KHzMbAYvcrHFxN6JNI1Or3LSxpBe1qHdnFXFOPIDIlXCNvsRVF2J97rXsfFSJr7EzxRSjoUCmgVDEUA=="
+    },
+    {
+      "path": "node_modules/@types/node",
+      "version": "26.6.6",
+      "integrity": "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog=="
+    },
+    {
+      "path": "node_modules/wrangler/node_modules/workerd",
+      "version": "1.20261103.1",
+      "integrity": "sha512-GgcAnUH94uY8BEDc7CUyX3qsuLVbiidV+SZqJhasxbKi+f2dtR5xrgBC18uLbnaBFarlNFCYfr8JAIL2xJpnZw=="
+    },
+    {
+      "path": "node_modules/undici",
+      "version": "7.30.2",
+      "integrity": "sha512-mLyPQnHwUxaM/rideoK/+KL8DaAJLRl4aBCfmX444aCSLnIaomqPLtNRe2jdCYcsk5wZzXrDIQC8ZeYNRAYyIA=="
+    },
+    {
+      "path": "node_modules/zod",
+      "version": "4.6.7",
+      "integrity": "sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg=="
+    }
+  ],
+  "installed_inputs_sha256": {
+    "node_modules/nofilter/lib/index.js": "b87629040413cb877c60278a7de6a2ec45abfc4ab3120f012b5dc6d5148242db",
+    "node_modules/cbor/lib/constants.js": "977ed5a0934467a170835eef1244bf3e359b9852b0eb2a542a7a33161bc8b17a",
+    "node_modules/cbor/lib/utils.js": "7889f6fb8464e301fcc5c4b7b869ff339ef5825726000e7aad4627b126d367c6",
+    "node_modules/cbor/vendor/binary-parse-stream/index.js": "b617006213b1399f700ec9e49c835aa62b6cff4489669caf24b03a17c348eb5f",
+    "node_modules/cbor/lib/tagged.js": "a7122e7c5621b7230f1832635cf8f60c3d0eac65f7f417bb1635320f34d56f68",
+    "node_modules/cbor/lib/simple.js": "aad14f0e7ffc3fcc66f65117e67d27560ab583817983bd349e60de1b226901fc",
+    "node_modules/cbor/lib/decoder.js": "b350702fc6ea1ba057a0a737e71b923e2a4a66574958adb4a3f2918c3253d0a1",
+    "node_modules/cbor/lib/commented.js": "d292235a1b011a33059a970113954c18e3f3312413bf916ac6293ff70ebed186",
+    "node_modules/cbor/lib/diagnose.js": "1c52fb77376297c74e412fa503f13cd744d3064a1987eb40c1703268d366c5d3",
+    "node_modules/cbor/lib/encoder.js": "6c63bf7b6c6c62a9e30f96acf31d5eae91bd9818fed309ed8000391a251c2881",
+    "node_modules/cbor/lib/map.js": "5aef1d670e7516a12ce7ef4957c59342e3b7302f2d801741b9c3268a0c89b0d7",
+    "node_modules/cbor/lib/objectRecorder.js": "f3814ea1870b77cbeca34dbda6d23df83f81c9b02f97d8e47bd7990968a7c29d",
+    "node_modules/cbor/lib/sharedValueEncoder.js": "b2866badea8d9fb8266b331e82ebc72e51e31d0be1094c045ecf40190f17f163",
+    "node_modules/cbor/lib/cbor.js": "d4709dbdb1ad29cabc4a70fc912a89d81c18aa247033ad5e000f2ad903d31539",
+    "node_modules/@peculiar/utils/build/bytes/buffer-source.js": "d3a77cab2b8426ce297e8429b9d2ba03dbdbe97865b8173c51da0c92226b0f49",
+    "node_modules/@peculiar/utils/build/bytes/concat.js": "0d7017fef27635bed4dfed715736209bdf8e6959953549be15fc79cb103f8ea9",
+    "node_modules/@peculiar/utils/build/bytes/equal.js": "535bd6636af131a226dc59dd3642c4edb787611b71d78b94693b16523c5bd950",
+    "node_modules/@peculiar/utils/build/bytes/sequence.js": "771d13453aa579693ff8f1538ee754a8a21921bd910fe97bb571bddea572a4e1",
+    "node_modules/@peculiar/utils/build/_virtual/_rolldown/runtime.js": "1b10431e13b4eb349c329aba7d2beb6e6c224de569eac52966731c8239a941c9",
+    "node_modules/@peculiar/utils/build/bytes.js": "3257233f9027e4bd4db558cbe9dd29a1bece8395f5c699eabf04169e38b02779",
+    "node_modules/@peculiar/utils/build/encoding/binary.js": "92727e40c10bb92f0bcf9b8841590ef11df1764b3027be3041e44f04edf56794",
+    "node_modules/@peculiar/utils/build/encoding/hex.js": "a7066c019c44348f1d1fa6bb1972bf368a304af41b04e2dff3e4805a5cef81e0",
+    "node_modules/@peculiar/utils/build/encoding/utf8.js": "d0e538af363ad2c92b6578f62902d6a374e94b34c7e90a9f5261743642c7c8a5",
+    "node_modules/@peculiar/utils/build/encoding/utf16.js": "20ce0b98604a618599e5831158f94a032f94aa0a50c0e280dea776656a7f166c",
+    "node_modules/@peculiar/utils/build/encoding/base64.js": "98b0130b60565fcadfed4aa50b8854de6eafe9c224dbd2c5c994c673a50066c4",
+    "node_modules/@peculiar/utils/build/encoding/base64url.js": "a2131390bb30cce0d6ab42ff32e056f7d665552449cb1829787a3001fae9add1",
+    "node_modules/@peculiar/utils/build/integer/uint.js": "53609f035e2e0513d1321147b5dbb8cf8ce483cd0fa3023e61a70dd1e0f85bab",
+    "node_modules/@peculiar/utils/build/integer/int.js": "0b2523f5a56762ebc749a77ecd9f8ad1914d1240300efffd7ac87926b27c31b5",
+    "node_modules/@peculiar/utils/build/pem/pem.js": "4204fe9f301df4cb96ed08ededb41934ec33e784d3aab1a31af3b9867184520b",
+    "node_modules/@peculiar/utils/build/converters/registry.js": "162d1ba3bdbc3d014a9c48bd8c5aa325f5eb8a958104c7fe03d7ea8ef1319b40",
+    "node_modules/@peculiar/utils/build/converters/defaults.js": "1781d65e5ebe30b2340b023bbcfff40fb9cee2e70918ce7e7f0c84999bd2fd7e",
+    "node_modules/@peculiar/utils/build/converters/convert.js": "86c63126f664051c739c52945ce076a4aeb1171da95ddf78dba7d95886b80a8c",
+    "node_modules/@peculiar/utils/build/legacy/buffer-source-converter.js": "61261697f592eefdda6393751447b22db37708d8cef7b42ecb79e69c366c2a67",
+    "node_modules/@peculiar/utils/build/legacy/convert.js": "d604e5ffd876889bb177cf9ec2ebef468bc165ac7ffe28d2ab87736cc4263a6f",
+    "node_modules/@peculiar/utils/build/legacy/functions.js": "be5e4255b7b45de3415b35f136656f3e44a413577740622a90ecea8b32e02b5f",
+    "node_modules/@peculiar/utils/build/index.js": "249fb0a4cf5b6dd1cbc12f2c109d9ad5afa55fc34f6696db8a971b09efc6ad36",
+    "node_modules/asn1js/build/index.js": "4a3cfe45a598edb62cbfcf89426f6a2556dd505bf3838935c106829fbfe32024",
+    "node_modules/bytestreamjs/build/byte_stream.js": "1dec0f7089d75334e9b58ae9b4690879dd88043cd3f377e9af4b20f9f0ff1b39",
+    "node_modules/bytestreamjs/build/seq_stream.js": "6d5446062668db78d3ca06dbf75f5a76544347a93781af69c458f6448b17a6b4",
+    "node_modules/bytestreamjs/build/helpers.js": "0e8003c7739767109d5a4931dde4c3aedec18100b5a3e3bc327d560cb6ef606c",
+    "node_modules/bytestreamjs/build/bit.js": "a3b2c1f5f923a1ed39b55745a4e501b2b6092b081c380acc73a542456e6687f9",
+    "node_modules/bytestreamjs/build/bit_stream.js": "220bc62673ddcbd43073d2f1f056c3da3ed6a4f44dc183af569b2e7a876ecca4",
+    "node_modules/bytestreamjs/build/seq_bit_stream.js": "656eb46b51688d11ca3eb6b673e5d9f7c837727378676447da564b9a9416518e",
+    "node_modules/bytestreamjs/build/index.js": "4794bc465f13842696ec8c1ad027de9c198ad55c3c482059fe1694204833ebc2",
+    "node_modules/@noble/hashes/_u64.js": "b09da8c07fe8187c07649494cdb7cd0bcf13df90b506a9473d19e4d5f8c2e102",
+    "node_modules/@noble/hashes/utils.js": "037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c",
+    "node_modules/@noble/hashes/_md.js": "60cf3010fda89e3e4d3f0e7ff1ce249e9c467f34b4fd41b6fd6101d9f69be763",
+    "node_modules/@noble/hashes/legacy.js": "690553a41af2fdd1e32ff6b534ba8508e95f1861c09c2d62fe762b6b501e09be",
+    "node_modules/@noble/hashes/sha2.js": "471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b",
+    "node_modules/pkijs/build/index.js": "fcd402426e202ea647e51e0a1150cee1e66e41e1e18c2e7ef8cea013c92488c4"
+  },
+  "installed_changes": {},
+  "unchanged_installed_inputs": 50,
+  "real_native_or_production_effect": false
+}
