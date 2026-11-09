@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Actual Bash guard, mocked GitHub only
         run: python3 scripts/test_reusable_workflow_refs.py --scratch "${{ runner.temp }}" --report "${{ runner.temp }}/workflow-guard-regression.json"
+      - name: Production D1 migration guard regression tests
+        run: python3 -m unittest scripts/test_production_d1_migrations.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: reusable-workflow-guard-regression

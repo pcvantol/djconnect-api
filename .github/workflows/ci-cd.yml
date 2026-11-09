@@ -73,9 +73,6 @@ jobs:
       - name: Active CI evidence retention regression tests
         if: matrix.suite == 'static'
         run: python3 -m unittest scripts/test_cleanup_workflow_runs.py
-      - name: Production D1 migration guard regression tests
-        if: matrix.suite == 'static'
-        run: python3 -m unittest scripts/test_production_d1_migrations.py
       - name: Typecheck
         if: matrix.suite == 'static'
         run: npx tsc --noEmit
