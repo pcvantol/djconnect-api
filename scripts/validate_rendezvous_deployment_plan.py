@@ -573,7 +573,7 @@ SOURCE_PROVENANCE.update(release_ci_retention_delta_sha256=RELEASE_RETENTION_DEL
                          release_ci_retention_source_map_sha256=RELEASE_RETENTION_SOURCE_MAP_SHA256)
 
 
-def baseline_before_toolchain_refresh():
+def baseline_before_closed_production_bindings():
     sources, refs = baseline_before_release_retention()
     delta = pinned_working_proof(RELEASE_RETENTION_DELTA_PATH, RELEASE_RETENTION_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source',
@@ -597,9 +597,43 @@ def baseline_before_toolchain_refresh():
     return sources, refs
 
 
+CLOSED_PRODUCTION_BINDINGS_DELTA_PATH = 'docs/rendezvous/closed-production-bindings-source-delta-v1.json'
+CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256 = 'd08c9ebdde24f4e14e9004c96ca17f43663adac0b58e4ed69fb7d5c9c25eca0d'
+CLOSED_PRODUCTION_BINDINGS_SOURCE_MAP_SHA256 = '2ea924a5e904eb1e675f328be9a24ed5453cd62c2b040b7a5f90a31a3f10b950'
+CLOSED_PRODUCTION_BINDINGS_SOURCES = frozenset(('wrangler.jsonc', 'rendezvous-build-inputs.json'))
+SOURCE_PROVENANCE.update(closed_production_bindings_delta_sha256=CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256,
+                         closed_production_bindings_source_map_sha256=CLOSED_PRODUCTION_BINDINGS_SOURCE_MAP_SHA256)
+
+
+def baseline_before_toolchain_refresh():
+    sources, refs = baseline_before_closed_production_bindings()
+    delta = pinned_working_proof(CLOSED_PRODUCTION_BINDINGS_DELTA_PATH,
+                                 CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'public_activation_allowed',
+                           'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_CLOSED_PRODUCTION_BINDINGS_SOURCE_ONLY'
+            and delta['base_source'] == 'd0827f5f84d765d87f6d29f61add7a4d9570c9e2'
+            and delta['public_activation_allowed'] is False
+            and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == CLOSED_PRODUCTION_BINDINGS_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] == digest(safe_path(name).read_bytes())
+                and change['after'] != change['before'])
+        sources[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == CLOSED_PRODUCTION_BINDINGS_SOURCE_MAP_SHA256)
+    refs['wrangler.jsonc'] = sources['wrangler.jsonc']
+    refs[CLOSED_PRODUCTION_BINDINGS_DELTA_PATH] = CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256
+    return sources, refs
+
+
 TOOLCHAIN_REFRESH_DELTA_PATH = 'docs/rendezvous/toolchain-development-dependency-refresh-v1.json'
-TOOLCHAIN_REFRESH_DELTA_SHA256 = 'eac2aa8f486f57c212325999e39bbfe5b0a7e218c065fd8817699fa2ae973274'
-TOOLCHAIN_REFRESH_SOURCE_MAP_SHA256 = '123fcd15abdf23f506f7fc8c792ba6382a624d5768c83ec0bb09e2a5eee2d3fd'
+TOOLCHAIN_REFRESH_DELTA_SHA256 = 'be5be570e953b72f87707d9feea4d6747fdfc2d3dca50cae3ca626953dc92142'
+TOOLCHAIN_REFRESH_SOURCE_MAP_SHA256 = '2205d9fcf236b9e179b376cad0a1739725bdcdb09bd1721366508f5ed411056b'
 TOOLCHAIN_REFRESH_SOURCES = frozenset(('package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs'))
 TOOLCHAIN_REFRESH_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json'))
 TOOLCHAIN_REFRESH_ADDITIONS = frozenset(('coordinator/installation-registry/source-manifest.json', 'qualification/watch-moment/source-manifest.json', 'qualification/rendezvous/compatible-runtime-dependency-provenance-v5.json'))
@@ -615,7 +649,7 @@ def baseline():
                            'reference_additions', 'public_activation_allowed'})
     require(type(delta['schema_version']) is int and delta['schema_version'] == 1
             and delta['scope'] == 'EXACT_TOOLCHAIN_AND_DEVELOPMENT_DEPENDENCY_REFRESH_NOT_ACTIVATION'
-            and delta['base_source'] == 'd0827f5f84d765d87f6d29f61add7a4d9570c9e2'
+            and delta['base_source'] == '1b75d268d9023740c10f89616761232c9e3b9357'
             and delta['public_activation_allowed'] is False
             and delta['baseline_source_map_sha256'] == source_map_digest(sources)
             and set(delta['changes']) == TOOLCHAIN_REFRESH_SOURCES
