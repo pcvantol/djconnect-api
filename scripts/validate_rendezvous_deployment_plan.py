@@ -814,7 +814,7 @@ PRODUCTION_D1_GUARD_ADDITIONS = frozenset((
 SOURCE_PROVENANCE['production_d1_guard_delta_sha256'] = PRODUCTION_D1_GUARD_SHA256
 
 
-def baseline():
+def baseline_before_repository_namespace():
     sources, refs = baseline_before_production_d1_guard()
     delta = pinned_working_proof(PRODUCTION_D1_GUARD_PATH, PRODUCTION_D1_GUARD_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'reference_changes',
@@ -831,6 +831,33 @@ def baseline():
     refs[PRODUCTION_D1_GUARD_REFERENCE] = change['after']
     refs.update(delta['reference_additions'])
     refs[PRODUCTION_D1_GUARD_PATH] = PRODUCTION_D1_GUARD_SHA256
+    return sources, refs
+
+
+
+REPOSITORY_NAMESPACE_DELTA_PATH = 'docs/rendezvous/repository-namespace-release-delta-v1.json'
+REPOSITORY_NAMESPACE_DELTA_SHA256 = '263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504'
+REPOSITORY_NAMESPACE_SMOKE_REFERENCE = '.github/workflows/api-worker-post-deployment-smoke.yml'
+SOURCE_PROVENANCE['repository_namespace_delta_sha256'] = REPOSITORY_NAMESPACE_DELTA_SHA256
+
+
+def baseline():
+    sources, refs = baseline_before_repository_namespace()
+    delta = pinned_working_proof(REPOSITORY_NAMESPACE_DELTA_PATH, REPOSITORY_NAMESPACE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_RELEASE_REPOSITORY_NAMESPACE_DELTA_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False)
+    require(set(delta['reference_changes']) == {PRODUCTION_D1_GUARD_REFERENCE})
+    change = delta['reference_changes'][PRODUCTION_D1_GUARD_REFERENCE]
+    require(set(change) == {'before', 'after'} and change['before'] == refs[PRODUCTION_D1_GUARD_REFERENCE]
+            and change['after'] != change['before'])
+    require(set(delta['reference_additions']) == {REPOSITORY_NAMESPACE_SMOKE_REFERENCE}
+            and REPOSITORY_NAMESPACE_SMOKE_REFERENCE not in refs)
+    refs[PRODUCTION_D1_GUARD_REFERENCE] = change['after']
+    refs.update(delta['reference_additions'])
+    refs[REPOSITORY_NAMESPACE_DELTA_PATH] = REPOSITORY_NAMESPACE_DELTA_SHA256
     return sources, refs
 
 
