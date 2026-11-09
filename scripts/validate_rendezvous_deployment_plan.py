@@ -598,7 +598,7 @@ def baseline_before_toolchain_refresh():
 
 
 TOOLCHAIN_REFRESH_DELTA_PATH = 'docs/rendezvous/toolchain-development-dependency-refresh-v1.json'
-TOOLCHAIN_REFRESH_DELTA_SHA256 = '5fe76c758a6db51939bc640f1c752a5ce4334f6cf7167cbc26166215481ec8a7'
+TOOLCHAIN_REFRESH_DELTA_SHA256 = 'eac2aa8f486f57c212325999e39bbfe5b0a7e218c065fd8817699fa2ae973274'
 TOOLCHAIN_REFRESH_SOURCE_MAP_SHA256 = '123fcd15abdf23f506f7fc8c792ba6382a624d5768c83ec0bb09e2a5eee2d3fd'
 TOOLCHAIN_REFRESH_SOURCES = frozenset(('package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs'))
 TOOLCHAIN_REFRESH_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json'))

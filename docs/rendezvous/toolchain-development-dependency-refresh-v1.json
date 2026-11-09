@@ -21,7 +21,7 @@
   "reference_changes": {
     "coordinator/host-app-wake-receiving/runtime/source-inputs.json": {
       "before": "e0e0e688b681d468b660c26c4aad440a27c3b2c66e2523d7130974abf9213e1a",
-      "after": "8cb4a9cae830bed81d484133cedd9bb4f2bae24c1ab33af63e74c079742f7283"
+      "after": "22be88dc6216e657671d729d7650ffa79a324e5a5bd107a265e1deea8f726e54"
     },
     "coordinator/host-app-wake/source-manifest.json": {
       "before": "77a58eef8c8c5148aec6dd9eceffc3c0cf319a4075a2a12f02e416feb7f5d077",
@@ -45,11 +45,11 @@
     },
     "coordinator/worker-do/source-manifest.json": {
       "before": "a239704b579ce1318e88437271995c9b1d0cb2813ed11fb75321cd6a6460e075",
-      "after": "b7364b4241cacb9cb315f2747f3cd7f1e54867ba4e4b3330c03429f02053330b"
+      "after": "061915f2e54eea89c174854b1c8b3c0f72eda46af87111ab335e19dda39ce28c"
     }
   },
   "reference_additions": {
-    "coordinator/installation-registry/source-manifest.json": "788ce6f230342dfdf08590a1d42c12704d400ae1acf8eebc2f85da3881eb7a15",
+    "coordinator/installation-registry/source-manifest.json": "51dde4199516b88b6ed719214de35e8d4c98a64825e016435367664fb3995f61",
     "qualification/watch-moment/source-manifest.json": "40206c5d5bf8ee8c0b941ba53deb05a150708a944b595fd96d0cb1e43ca53fba",
     "qualification/rendezvous/compatible-runtime-dependency-provenance-v5.json": "92d73772ffbd5f387b9b2a9e8249f0587ffdfbf8e5a0e636e7c1ba51561035db"
   },
