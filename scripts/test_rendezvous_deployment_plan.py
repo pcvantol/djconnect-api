@@ -58,7 +58,9 @@ class PreparationTests(unittest.TestCase):
                          *v.DEPENDENCY_REFERENCE_CHANGES, *v.DEPENDENCY_REFERENCE_ADDITIONS,
                          v.DEPENDENCY_DELTA_PATH, *v.WATCH_SOURCES,
                          *v.WATCH_REFERENCES, v.WATCH_DELTA_PATH, *v.RECEIPT_SOURCES,
-                         *v.RECEIPT_REFERENCES, v.RECEIPT_DELTA_PATH, v.RELEASE_RETENTION_DELTA_PATH)
+                         *v.RECEIPT_REFERENCES, v.RECEIPT_DELTA_PATH, v.RELEASE_RETENTION_DELTA_PATH,
+                         *v.API_MAINTENANCE_SOURCES, v.API_MAINTENANCE_DELTA_PATH,
+                         'coordinator/host-app-wake-receiving/runtime/source-inputs.json')
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
