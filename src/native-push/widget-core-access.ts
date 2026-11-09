@@ -32,8 +32,10 @@ export async function verifyWidgetCoreAccess(
 	const [header, payload, signature] = parts;
 	const { alg, kid, crit } = claims(header);
 	const { iss, aud, common_name, type, sub, exp, iat } = claims(payload);
+	// Access service tokens can encode one audience as a string or a singleton array.
+	const audienceMatches = aud === audience || (Array.isArray(aud) && aud.length === 1 && aud[0] === audience);
 	if (alg !== "RS256" || crit !== undefined || typeof kid !== "string" || !identifier.test(kid) ||
-		iss !== issuer || !Array.isArray(aud) || aud.length !== 1 || aud[0] !== audience ||
+		iss !== issuer || !audienceMatches ||
 		common_name !== clientId || type !== "app" || sub !== "" ||
 		typeof exp !== "number" || typeof iat !== "number" || !Number.isSafeInteger(exp) ||
 		!Number.isSafeInteger(iat)) return null;
