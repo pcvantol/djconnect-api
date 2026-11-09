@@ -23,7 +23,7 @@
     "coordinator/installation-registry/registry.ts": "b72c478f6fe2edf39946c49d0a0c7409055dcd4c836745db3ee44212128c630c",
     "coordinator/installation-registry/worker.ts": "9d793d7693bed6848ecc4d90ab3d1a9691b5431d9f22a36a2c5a91e71343fcf7",
     "coordinator/principal-possession/possession-data.ts": "bca90cf8cafa4200fa7495b3d28fda37c10a4b94031b4c39317add9f82c9687d",
-    "package-lock.json": "0e756477e6ae46368a1bba97fbb5010360faaffc6b6004becb1542bb5374657e",
+    "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "worker-configuration.d.ts": "388f08efd99c9c53e71edfa5b78d7b5c225802d1c415661dc79f060b823ca266"

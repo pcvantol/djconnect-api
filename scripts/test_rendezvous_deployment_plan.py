@@ -62,7 +62,9 @@ class PreparationTests(unittest.TestCase):
                          v.CLOSED_PRODUCTION_BINDINGS_DELTA_PATH,
                          *v.TOOLCHAIN_REFRESH_SOURCES, *v.TOOLCHAIN_REFRESH_REFERENCES,
                          *v.TOOLCHAIN_REFRESH_ADDITIONS, v.TOOLCHAIN_REFRESH_DELTA_PATH,
-                         *v.API_MAINTENANCE_SOURCES, v.API_MAINTENANCE_DELTA_PATH)
+                         *v.API_MAINTENANCE_SOURCES, v.API_MAINTENANCE_DELTA_PATH,
+                         *v.STABLE_RELEASE_SOURCES, v.STABLE_RELEASE_DELTA_PATH,
+                         *v.STABLE_RELEASE_REFERENCES)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],

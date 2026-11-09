@@ -15,7 +15,7 @@
     "coordinator/principal-possession/qualification/vitest.config.mts": "3a4efe06081f28f80d255c4e59d806373de5f5e0f8737f907c97e6d8f515f252",
     ".github/workflows/principal-possession-data.yml": "e3131a4476b6f7cabbabc2aa4f28fbea476a9c0a19aa137b16c454ba1bee4524",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
-    "package-lock.json": "0e756477e6ae46368a1bba97fbb5010360faaffc6b6004becb1542bb5374657e",
+    "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "worker-configuration.d.ts": "388f08efd99c9c53e71edfa5b78d7b5c225802d1c415661dc79f060b823ca266",
     "coordinator/worker-do/qualification/wrangler.jsonc": "136fd9b2cdac6e5fafcff91109844d49adacd1ece79db6f857c758d51ee577a6",
