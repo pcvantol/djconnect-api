@@ -764,8 +764,8 @@ def baseline_before_push_erasure():
 
 
 PUSH_ERASURE_DELTA_PATH = 'docs/rendezvous/push-erasure-source-delta-v1.json'
-PUSH_ERASURE_DELTA_SHA256 = 'fb8ab143425d8b62d3d851e713edc60e49210eeecbaf051308fbcc92a84e5c8a'
-PUSH_ERASURE_SOURCE_MAP_SHA256 = '73d20a644cd871a58a45fbd894dc9c710dc85a54064c0ffc9e27b53e290cbb86'
+PUSH_ERASURE_DELTA_SHA256 = '61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9'
+PUSH_ERASURE_SOURCE_MAP_SHA256 = '95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002'
 PUSH_ERASURE_SOURCES = frozenset(('rendezvous-build-inputs.json', 'src/index.ts', 'src/messages.ts',
     'src/repositories/auditEvents.ts', 'src/repositories/registrations.ts',
     'src/services/pushDelivery.ts', 'src/validation.ts', 'wrangler.jsonc'))

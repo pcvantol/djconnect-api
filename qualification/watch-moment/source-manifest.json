@@ -41,7 +41,7 @@
     "src/watch-moment/wire.ts": "913f61c03efa12982313312048e00be3b68102d9a049fbc2146b485a3cf86c6d",
     "test/watch-moment.spec.ts": "75bbaacfaeacf8b8f04725da0ba4d232dcd817630fe00ec2fbd8d042151632ff",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
-    "worker-configuration.d.ts": "defca1430d1021ecb407fcab553f617fd89c7fd81dd47ef204a314a43d34200f",
+    "worker-configuration.d.ts": "388f08efd99c9c53e71edfa5b78d7b5c225802d1c415661dc79f060b823ca266",
     ".github/workflows/watch-moment-alert-source.yml": "16ef5edd318cebaf25232a8e7e9b5a5b1e804cc92c319ce682c3b5542be502ef",
     "src/watch-moment/http.ts": "2bac13b7ed295b07e8d19cfcb2e3d5a4eb430b3f570713e0567dc12001dbd2d1"
   }

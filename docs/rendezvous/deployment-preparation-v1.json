@@ -99,10 +99,10 @@
     "coordinator/installation-registry/source-manifest.json": "06d03531d4f08cb5110d7239c91c1b475631e4a8d970e1e573b5af74a290d07b",
     "docs/rendezvous/toolchain-development-dependency-refresh-v1.json": "be5be570e953b72f87707d9feea4d6747fdfc2d3dca50cae3ca626953dc92142",
     "qualification/rendezvous/compatible-runtime-dependency-provenance-v5.json": "92d73772ffbd5f387b9b2a9e8249f0587ffdfbf8e5a0e636e7c1ba51561035db",
-    "qualification/watch-moment/source-manifest.json": "75dd8ae204b2b6614d49afb7a65cd8dc1cfac5e68ae06f2eb625ff7386018b9a",
+    "qualification/watch-moment/source-manifest.json": "67f8340015fdd1801e73335e6eac001e46ca1f647fe0ffb8facbfc16cfd04dcd",
     "docs/rendezvous/api-maintenance-source-delta-v1.json": "cd9128297a6aa9332e71bf3c2a3ce25dcd7cd4499cb68d79dd5d3905f63dc0be",
     "docs/rendezvous/stable-api-release-source-delta-v1.json": "accd67d7b485632be51264120fe63cb2c8fd889e26ca1be77ad45bcdd5140d41",
-    "docs/rendezvous/push-erasure-source-delta-v1.json": "fb8ab143425d8b62d3d851e713edc60e49210eeecbaf051308fbcc92a84e5c8a",
+    "docs/rendezvous/push-erasure-source-delta-v1.json": "61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9",
     "migrations/0013_push_registration_erasure.sql": "cc4bab55a2ad48a9335c06355713a5cbb088fbc891fbc2f61b1770c10d7a60a5"
   },
   "schema_version": 1,
@@ -183,7 +183,7 @@
     "qualification/rendezvous/product-composition.check.ts": "9f0459d1d825413936086974f63e22d8b164cc0ff9c8a194aa97872546f93b93",
     "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
     "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
-    "src/index.ts": "1a75cb7dee8a9b9c5e2bf59adc6647e8ab95f173660779f7a315c91d16d49246",
+    "src/index.ts": "3bf44422f5f13cedeaa92b32fd4cdae1cbfad373202d4c374ee1a04f853b95f5",
     "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
     "rendezvous-build-inputs.json": "2b96897393242c9b66def0350f73c6cc91b9e2059757d731b3b8b448c6def8ef",
@@ -291,8 +291,8 @@
     "api_maintenance_source_map_sha256": "dee84f1d4f8208c3d1e5444a6cbe7c89f6df707413e6c325d01d550cf1aa0387",
     "stable_release_delta_sha256": "accd67d7b485632be51264120fe63cb2c8fd889e26ca1be77ad45bcdd5140d41",
     "stable_release_source_map_sha256": "6bd122979c515ed8baca9f9404f2599da49e96512d7178f3fe9f9eaa5df72e70",
-    "push_erasure_delta_sha256": "fb8ab143425d8b62d3d851e713edc60e49210eeecbaf051308fbcc92a84e5c8a",
-    "push_erasure_source_map_sha256": "73d20a644cd871a58a45fbd894dc9c710dc85a54064c0ffc9e27b53e290cbb86"
+    "push_erasure_delta_sha256": "61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9",
+    "push_erasure_source_map_sha256": "95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

@@ -76,7 +76,7 @@ export default {
 		if (issuerUnavailable) return issuerUnavailable;
 		const rendezvousUnavailable = await dispatchRendezvousRequest(request, env);
 		if (rendezvousUnavailable) return rendezvousUnavailable;
-		const appEnv = env as Env & AppEnv;
+		const appEnv = env as AppEnv;
 		const url = new URL(request.url);
 		let routePath = url.pathname;
 		try {
