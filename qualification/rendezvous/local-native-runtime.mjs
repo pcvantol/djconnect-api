@@ -99,6 +99,12 @@ export async function sourceSnapshot(){
  need(stable.baseline_source_map_sha256===maintenance.effective_source_map_sha256&&stable.effective_source_map_sha256===provenance.stable_release_source_map_sha256);
  const stableFiles=["package-lock.json","package.json","scripts/qualify_rendezvous_product_build.mjs","src/releaseMetadata.ts"];
  need(Object.keys(stable.changes).length===stableFiles.length&&stableFiles.every(name=>Object.hasOwn(stable.changes,name)&&Object.hasOwn(root.source_hashes,name)));
+ const erasurePath='docs/rendezvous/push-erasure-source-delta-v1.json';
+ const erasureRaw=await readFile(join(repo,erasurePath));
+ need(plan.reference_hashes[erasurePath]===sha(erasureRaw)&&sha(erasureRaw)===provenance.push_erasure_delta_sha256);
+ const erasure=JSON.parse(erasureRaw);
+ need(erasure.scope==='EXACT_PUSH_ERASURE_SOURCE_NOT_RENDEZVOUS_ACTIVATION'&&erasure.public_activation_allowed===false);
+ need(erasure.baseline_source_map_sha256===stable.effective_source_map_sha256&&erasure.effective_source_map_sha256===provenance.push_erasure_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -114,6 +120,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(toolchain.changes,name)){need(toolchain.changes[name].before===expected);expected=toolchain.changes[name].after;}
   if(Object.hasOwn(maintenance.changes,name)){need(maintenance.changes[name].before===expected);expected=maintenance.changes[name].after;}
   if(Object.hasOwn(stable.changes,name)){need(stable.changes[name].before===expected);expected=stable.changes[name].after;}
+  if(Object.hasOwn(erasure.changes,name)){need(erasure.changes[name].before===expected);expected=erasure.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

@@ -3,6 +3,8 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 import { apnsEndpoint, buildApnsPayload } from "../src/apns";
 import { assertCompleteTranslations, MESSAGES, SUPPORTED_LANGUAGES } from "../src/messages";
+import erasureMigration from "../migrations/0013_push_registration_erasure.sql?raw";
+import { purgePushDeliveryDiagnostics } from "../src/repositories/auditEvents";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 const EXAMPLE_RELAY_SECRET = "example-relay-secret";
@@ -804,11 +806,85 @@ describe("DJConnect API worker", () => {
 		}, installAuth);
 		expect(unregister.status).toBe(200);
 
-		const updated = await env.DB.prepare("SELECT disabled FROM registrations WHERE device_id = ?").bind("example-device").first<{ disabled: number }>();
-		expect(updated?.disabled).toBe(1);
+		expect(await unregister.json()).toEqual({ ok: true, disabled: 1 });
+		const updated = await env.DB.prepare("SELECT * FROM registrations WHERE device_id = ?").bind("example-device").first();
+		expect(updated).toBeNull();
 	});
 
-	it("disables a registration when APNs reports an invalid token", async () => {
+	it("does not erase a fresh opt-in when the previous registration's unregister is retried", async () => {
+		const authorization = await issueInstallAuth("example-ha-install");
+		const input = registerPayload();
+		const initial = await dispatch("/v1/push/register", input, authorization);
+		const { id } = await initial.json<{ id: string }>();
+		const unregister = () => dispatch("/v1/push/unregister", {
+			ha_install_id: input.ha_install_id, device_id: input.device_id,
+			apns_token: input.apns_token, registration_id: id,
+		}, authorization);
+		expect(await (await unregister()).json()).toEqual({ ok: true, disabled: 1 });
+		const [retry, optIn] = await Promise.all([unregister(), dispatch("/v1/push/register", input, authorization)]);
+		expect(await retry.json()).toEqual({ ok: true, disabled: 0 });
+		const { id: replacement } = await optIn.json<{ id: string }>();
+		expect(replacement).not.toBe(id);
+		expect(await (await unregister()).json()).toEqual({ ok: true, disabled: 0 });
+		expect(await env.DB.prepare("SELECT id FROM registrations").first()).toEqual({ id: replacement });
+	});
+
+	it("erases legacy deactivated rows without using updated_at as the deactivation date", async () => {
+		const authorization = await issueInstallAuth("example-ha-install");
+		for (const device_id of ["active", "disabled", "invalid"]) {
+			await registerDevice(authorization, { device_id });
+		}
+		await env.DB.exec("UPDATE registrations SET disabled=1 WHERE device_id='disabled'");
+		await env.DB.exec("UPDATE registrations SET invalid=1, updated_at='unknown' WHERE device_id='invalid'");
+		const statements = erasureMigration.replace(/^--.*\n/gm, "").trim()
+			.match(/CREATE TRIGGER[\s\S]*?\bEND;|\S[^;]*;/g) ?? [];
+		try {
+			for (const statement of statements) await env.DB.prepare(statement).run();
+			expect((await env.DB.prepare("SELECT device_id FROM registrations").all()).results).toEqual([{ device_id: "active" }]);
+			await env.DB.exec("UPDATE registrations SET disabled=1 WHERE device_id='active'");
+			expect(await env.DB.prepare("SELECT id FROM registrations").first()).toBeNull();
+		} finally {
+			await env.DB.exec("DROP TRIGGER IF EXISTS registrations_erase_on_deactivation");
+		}
+	});
+
+	it("expires delivery diagnostics at the cutoff and catches up after a missed run", async () => {
+		const authorization = await issueInstallAuth("example-ha-install");
+		await registerDevice(authorization);
+		await env.DB.prepare(`UPDATE registrations SET last_success_at='2026-11-01 00:00:00',
+			last_error_code='BadTopic', updated_at='2026-11-01 00:00:01'`).run();
+		for (const [id, created] of [["boundary", "2026-11-01 00:00:00"], ["fresh", "2026-11-01 00:00:01"]]) {
+			await env.DB.prepare("INSERT INTO relay_events (id, ha_install_id, event_type, created_at) VALUES (?, 'example-ha-install', 'ask_dj_response', ?)")
+				.bind(id, created).run();
+			await env.DB.prepare("INSERT INTO push_delivery_failures (id, relay_event_id, apns_status, apns_reason, created_at) VALUES (?, ?, 400, 'BadTopic', '2026-11-01 00:00:01')")
+				.bind(id, id).run();
+		}
+		await purgePushDeliveryDiagnostics(env.DB, Date.parse("2026-11-08T00:00:00Z"));
+		expect((await env.DB.prepare("SELECT id FROM relay_events").all()).results).toEqual([{ id: "fresh" }]);
+		expect((await env.DB.prepare("SELECT id FROM push_delivery_failures").all()).results).toEqual([{ id: "fresh" }]);
+		expect(await env.DB.prepare("SELECT last_success_at, last_error_code FROM registrations").first())
+			.toEqual({ last_success_at: null, last_error_code: "BadTopic" });
+		await purgePushDeliveryDiagnostics(env.DB, Date.parse("2026-11-10T00:00:00Z"));
+		expect(await env.DB.prepare("SELECT id FROM relay_events").first()).toBeNull();
+		expect(await env.DB.prepare("SELECT id FROM push_delivery_failures").first()).toBeNull();
+		expect(await env.DB.prepare("SELECT last_error_code, disabled FROM registrations").first()).toEqual({ last_error_code: null, disabled: 0 });
+	});
+
+	it("skips a queued APNs send when its registration is erased during an earlier send", async () => {
+		const authorization = await issueInstallAuth("example-ha-install");
+		await registerDevice(authorization, { device_id: "first", apns_token: "example-apns-token-first" });
+		await registerDevice(authorization, { device_id: "second", apns_token: "example-apns-token-second" });
+		const provider = vi.spyOn(globalThis, "fetch").mockImplementation(async () => {
+			await dispatch("/v1/push/unregister", { ha_install_id: "example-ha-install", device_id: "first" }, authorization);
+			await dispatch("/v1/push/unregister", { ha_install_id: "example-ha-install", device_id: "second" }, authorization);
+			return new Response("{}", { status: 200 });
+		});
+		const event = await dispatch("/v1/push/event", { ha_install_id: "example-ha-install", event_type: "ask_dj_response" }, authorization);
+		expect(await event.json()).toEqual({ ok: true, matched: 1, delivered: 1, failed: 0 });
+		expect(provider).toHaveBeenCalledOnce();
+	});
+
+	it("erases a registration when APNs reports an invalid token", async () => {
 		const installAuth = await issueInstallAuth("example-ha-install");
 		await dispatch("/v1/push/register", registerPayload(), installAuth);
 		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
@@ -825,7 +901,18 @@ describe("DJConnect API worker", () => {
 		expect(fetchMock.mock.calls[0]?.[0]).toBe("https://api.sandbox.push.apple.com/3/device/example-apns-token");
 
 		const row = await env.DB.prepare("SELECT disabled, invalid, last_error_code FROM registrations WHERE device_id = ?").bind("example-device").first<{ disabled: number; invalid: number; last_error_code: string }>();
-		expect(row).toEqual({ disabled: 1, invalid: 1, last_error_code: "BadDeviceToken" });
+		expect(row).toBeNull();
+	});
+
+	it("preserves a refreshed registration when an earlier provider request reports an invalid token", async () => {
+		const authorization = await issueInstallAuth("example-ha-install");
+		await registerDevice(authorization);
+		vi.spyOn(globalThis, "fetch").mockImplementation(async () => {
+			await registerDevice(authorization);
+			return Response.json({ reason: "BadDeviceToken" }, { status: 400 });
+		});
+		await dispatch("/v1/push/event", { ha_install_id: "example-ha-install", event_type: "ask_dj_response" }, authorization);
+		expect(await env.DB.prepare("SELECT disabled, invalid FROM registrations").first()).toEqual({ disabled: 0, invalid: 0 });
 	});
 
 	it("filters push delivery by ha_user_hash", async () => {
@@ -1007,7 +1094,7 @@ describe("DJConnect API worker", () => {
 			FROM registrations
 			WHERE device_id = ?
 		`).bind("example-invalid-device").first<{ disabled: number; invalid: number; last_error_code: string }>();
-		expect(invalid).toEqual({ disabled: 1, invalid: 1, last_error_code: "Unregistered" });
+		expect(invalid).toBeNull();
 
 		const failure = await env.DB.prepare(`
 			SELECT apns_status, apns_reason, count
@@ -1132,8 +1219,8 @@ describe("DJConnect API worker", () => {
 		};
 
 		expect(body.ok).toBe(true);
-		expect(body.registrations).toMatchObject({ total: 1, invalid: 1 });
-		expect(body.registration_errors).toContainEqual({ code: "BadDeviceToken", count: 1 });
+		expect(body.registrations).toMatchObject({ total: 0, invalid: 0 });
+		expect(body.registration_errors).toEqual([]);
 		expect(body.relay.failed).toBe(1);
 		expect(body.apns_failures).toContainEqual({ reason: "BadDeviceToken", status: 400, client_type: "ios", count: 1 });
 		expect(body.api.by_error).toContainEqual({ error_code: "missing_apns_token", status: 400, count: 1 });

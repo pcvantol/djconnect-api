@@ -188,8 +188,9 @@ export function createMomentTransport(ports: MomentPorts) {
 				if (result.status === 410 || result.reason === "BadDeviceToken" || result.reason === "Unregistered") {
 					p.guard(); const r = registration;
 					await ports.db.prepare(`UPDATE registrations SET disabled=1,invalid=1,last_error_code='InvalidWatchToken'
-					 WHERE id=? AND apns_token_hash=? AND ha_install_id=? AND ha_user_hash=? AND device_id=? AND topic=? AND apns_environment=?`)
-						.bind(r.id, r.apns_token_hash, r.ha_install_id, r.ha_user_hash, r.device_id, r.topic, r.apns_environment).run();
+					 WHERE id=? AND apns_token_hash=? AND ha_install_id=? AND ha_user_hash=? AND device_id=? AND topic=? AND apns_environment=?
+					 AND apns_token_nonce IS ?`)
+						.bind(r.id, r.apns_token_hash, r.ha_install_id, r.ha_user_hash, r.device_id, r.topic, r.apns_environment, r.apns_token_nonce).run();
 				}
 				p.guard(); const finished = await store.get(p.key); p.guard();
 				return finished ? receipt(p.event, finished) : { ...receipt(p.event, selected), state: "unknown", provider_status: null };

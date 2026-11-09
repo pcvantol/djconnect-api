@@ -2,7 +2,7 @@ import { HttpError } from "./http";
 import type { ApiMessageKey } from "./messages";
 import type { AdminDiagnosticsQuery, AdminRegistrationsQuery, AnnouncementHint, BootstrapProofRequest, InstallTokenRequest, PushEventRequest, RegisterRequest, RevokeInstallTokenRequest, RotateInstallTokenRequest, UnregisterRequest } from "./types";
 
-type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_install_id" | "pairing_session_id" | "token_id";
+type RequiredStringField = "apns_token" | "bootstrap_proof" | "device_id" | "ha_install_id" | "pairing_session_id" | "registration_id" | "token_id";
 type MissingStringKey = `missing_${RequiredStringField}`;
 
 const VALID_CLIENT_TYPES = new Set(["ios", "macos", "watchos"]);
@@ -128,6 +128,7 @@ export function validateRegister(input: RegisterRequest): void {
 export function validateUnregister(input: UnregisterRequest): void {
 	requireString(input.ha_install_id, "ha_install_id");
 	requireString(input.device_id, "device_id");
+	if (input.registration_id !== undefined) requireString(input.registration_id, "registration_id");
 	if (input.client_type && !VALID_CLIENT_TYPES.has(input.client_type)) {
 		throw new HttpError(400, "invalid_client_type");
 	}

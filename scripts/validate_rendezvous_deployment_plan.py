@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -621,7 +621,7 @@ def baseline_before_toolchain_refresh():
             and set(delta['changes']) == CLOSED_PRODUCTION_BINDINGS_SOURCES)
     for name, change in delta['changes'].items():
         require(set(change) == {'before', 'after'} and change['before'] == sources[name]
-                and change['after'] == digest(safe_path(name).read_bytes())
+                and isinstance(change['after'], str) and len(change['after']) == 64
                 and change['after'] != change['before'])
         sources[name] = change['after']
     require(source_map_digest(sources) == delta['effective_source_map_sha256']
@@ -732,7 +732,7 @@ SOURCE_PROVENANCE.update(stable_release_delta_sha256=STABLE_RELEASE_DELTA_SHA256
                          stable_release_source_map_sha256=STABLE_RELEASE_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_push_erasure():
     sources, refs = baseline_before_stable_release()
     delta = pinned_working_proof(STABLE_RELEASE_DELTA_PATH, STABLE_RELEASE_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
@@ -760,6 +760,48 @@ def baseline():
                 and all(c in '0123456789abcdef' for c in change['after']))
         refs[name] = change['after']
     refs[STABLE_RELEASE_DELTA_PATH] = STABLE_RELEASE_DELTA_SHA256
+    return sources, refs
+
+
+PUSH_ERASURE_DELTA_PATH = 'docs/rendezvous/push-erasure-source-delta-v1.json'
+PUSH_ERASURE_DELTA_SHA256 = '61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9'
+PUSH_ERASURE_SOURCE_MAP_SHA256 = '95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002'
+PUSH_ERASURE_SOURCES = frozenset(('rendezvous-build-inputs.json', 'src/index.ts', 'src/messages.ts',
+    'src/repositories/auditEvents.ts', 'src/repositories/registrations.ts',
+    'src/services/pushDelivery.ts', 'src/validation.ts', 'wrangler.jsonc'))
+PUSH_ERASURE_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json',
+    'qualification/watch-moment/source-manifest.json', 'wrangler.jsonc'))
+PUSH_ERASURE_ADDITIONS = frozenset(('migrations/0013_push_registration_erasure.sql',))
+SOURCE_PROVENANCE.update(push_erasure_delta_sha256=PUSH_ERASURE_DELTA_SHA256,
+                         push_erasure_source_map_sha256=PUSH_ERASURE_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_push_erasure()
+    delta = pinned_working_proof(PUSH_ERASURE_DELTA_PATH, PUSH_ERASURE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PUSH_ERASURE_SOURCE_NOT_RENDEZVOUS_ACTIVATION'
+            and delta['base_source'] == '6fdac58addde449bd78c0fed05aaaa3319e7aead'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for changes, allowed, mapping in ((delta['changes'], PUSH_ERASURE_SOURCES, sources),
+                                      (delta['reference_changes'], PUSH_ERASURE_REFERENCES, refs)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == PUSH_ERASURE_SOURCE_MAP_SHA256)
+    require(set(delta['reference_additions']) == PUSH_ERASURE_ADDITIONS
+            and not PUSH_ERASURE_ADDITIONS.intersection(refs))
+    refs.update(delta['reference_additions'])
+    refs[PUSH_ERASURE_DELTA_PATH] = PUSH_ERASURE_DELTA_SHA256
     return sources, refs
 
 

@@ -313,7 +313,7 @@ docs, fixtures or client-visible audit data.
 
 ## POST /v1/push/unregister
 
-Disables a registration.
+Erases matching registrations, including the encrypted APNs token and its hash.
 
 Requires the per-install token for the same `ha_install_id`.
 
@@ -323,6 +323,7 @@ Request:
 {
   "ha_install_id": "example-ha-install",
   "device_id": "example-device",
+  "registration_id": "id-returned-by-push-register",
   "client_type": "ios",
   "apns_token": "example-apns-token"
 }
@@ -333,6 +334,28 @@ Response:
 ```json
 { "ok": true, "disabled": 1 }
 ```
+
+For retries that must spare a subsequent opt-in, send the original
+`registration_id` returned as `id` by registration. An already erased ID
+returns `disabled: 0`. Clients that omit it keep the existing device, client
+and token matching semantics. Those requests can match a later opt-in on the
+same device with the same token, so clients must stop retrying them when consent
+changes. The relay checks that a registration is still current immediately
+before sending to APNs. A request already handed off to APNs can still arrive.
+
+Migration 0013 erases all existing disabled or invalid registrations. Their
+last update does not reliably identify first deactivation. The API retains no
+registration row or tombstone after erasure.
+
+Delivery diagnostics support troubleshooting delivery counts and APNs failures.
+An hourly cleanup deletes relay events and failure rows at least seven days
+old, and clears expired last-delivery status on active registrations. The next
+successful run catches up after a missed run. These rules apply to the active
+database. [Cloudflare D1 Time Travel](https://developers.cloudflare.com/d1/platform/limits/)
+can recover prior database states for seven days on Workers Free or 30 days on
+Workers Paid. Verify the production plan before reporting the applicable window.
+Before resuming delivery after a restore, reconcile recovered registrations with
+current consent and erase any recovered rows that lack current authorization.
 
 ## POST /v1/push/event
 

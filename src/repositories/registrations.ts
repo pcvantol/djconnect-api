@@ -68,8 +68,12 @@ export async function upsertRegistration(db: D1Database, env: { APNS_TOPIC_IOS: 
 }
 
 export async function unregister(db: D1Database, input: UnregisterRequest): Promise<number> {
-	let statement = "UPDATE registrations SET disabled = 1, updated_at = datetime('now') WHERE ha_install_id = ? AND device_id = ?";
+	let statement = "DELETE FROM registrations WHERE ha_install_id = ? AND device_id = ?";
 	const params: string[] = [input.ha_install_id, input.device_id];
+	if (input.registration_id !== undefined) {
+		statement += " AND id = ?";
+		params.push(input.registration_id);
+	}
 	if (input.client_type) {
 		statement += " AND client_type = ?";
 		params.push(input.client_type);
@@ -97,15 +101,27 @@ export async function findActiveRegistrations(db: D1Database, input: PushEventRe
 	return result.results ?? [];
 }
 
-export async function markRegistrationSuccess(db: D1Database, id: string): Promise<void> {
-	await db.prepare("UPDATE registrations SET last_success_at = datetime('now'), last_error_code = NULL, updated_at = datetime('now') WHERE id = ?").bind(id).run();
+export async function isRegistrationCurrent(db: D1Database, registration: Registration): Promise<boolean> {
+	const row = await db.prepare(`SELECT 1 FROM registrations
+		WHERE id = ? AND apns_token_nonce IS ? AND disabled = 0 AND invalid = 0`)
+		.bind(registration.id, registration.apns_token_nonce).first();
+	return row !== null;
 }
 
-export async function markRegistrationError(db: D1Database, id: string, code: string, disable: boolean): Promise<void> {
+export async function markRegistrationSuccess(db: D1Database, registration: Registration): Promise<void> {
+	await db.prepare(`UPDATE registrations SET last_success_at = datetime('now'), last_error_code = NULL, updated_at = datetime('now')
+		WHERE id = ? AND apns_token_nonce IS ? AND disabled = 0 AND invalid = 0`)
+		.bind(registration.id, registration.apns_token_nonce).run();
+}
+
+export async function markRegistrationError(db: D1Database, registration: Registration, code: string, disable: boolean): Promise<void> {
+	if (disable) {
+		await db.prepare("DELETE FROM registrations WHERE id = ? AND apns_token_nonce IS ?")
+			.bind(registration.id, registration.apns_token_nonce).run();
+		return;
+	}
 	await db.prepare(`
-		UPDATE registrations
-		SET last_error_code = ?, disabled = CASE WHEN ? THEN 1 ELSE disabled END,
-			invalid = CASE WHEN ? THEN 1 ELSE invalid END, updated_at = datetime('now')
-		WHERE id = ?
-	`).bind(code, disable ? 1 : 0, disable ? 1 : 0, id).run();
+		UPDATE registrations SET last_error_code = ?, updated_at = datetime('now')
+		WHERE id = ? AND apns_token_nonce IS ? AND disabled = 0 AND invalid = 0
+	`).bind(code, registration.id, registration.apns_token_nonce).run();
 }
