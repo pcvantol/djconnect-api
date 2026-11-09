@@ -62,6 +62,11 @@ jobs:
           smoke_contract: api-worker-post-deployment-health-v1
         env:
           READINESS_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Checkout migration guard from the workflow revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
       - name: Require approved central operational manifest source
         shell: bash
         env:
@@ -73,8 +78,7 @@ jobs:
           RELEASE_PROFILE: ${{ inputs.release_profile }}
         run: |
           set -euo pipefail
-          manifest="$(mktemp)"
-          trap 'rm -f "$manifest"' EXIT
+          manifest="$RUNNER_TEMP/api-operational-manifest.json"
           curl --fail --silent --show-error --location \
             https://raw.githubusercontent.com/pcvantol/djconnect/main/docs/release/PLATFORM_4_0_RC2_API_OPERATIONAL_MANIFEST.json \
             --output "$manifest"
@@ -129,7 +133,35 @@ jobs:
           test -f wrangler.jsonc
           test -d migrations
           npm ci --ignore-scripts
-          ./node_modules/.bin/wrangler d1 migrations apply djconnect_api --remote --config wrangler.jsonc
+          node --input-type=module <<'JS'
+          import { unstable_readConfig } from "wrangler";
+          const { d1_databases } = unstable_readConfig({ config: "wrangler.jsonc" });
+          const databases = d1_databases.filter(({ binding, database_name }) =>
+            binding === "djconnect_api" || database_name === "djconnect_api");
+          const [database] = databases;
+          if (databases.length !== 1 || database.database_name !== "djconnect_api" ||
+              database.migrations_dir !== "migrations" ||
+              (database.migrations_table ?? "d1_migrations") !== "d1_migrations" ||
+              database.migrations_pattern !== undefined) {
+            throw new Error("Unexpected production D1 migration configuration");
+          }
+          JS
+          read_migration_ledger() {
+            ./node_modules/.bin/wrangler d1 execute djconnect_api --remote --config wrangler.jsonc \
+              --json --command 'SELECT name FROM d1_migrations ORDER BY id' > "$RUNNER_TEMP/api-d1-ledger.json"
+          }
+          migration_guard() {
+            python3 "$GITHUB_WORKSPACE/scripts/check_production_d1_migrations.py" \
+              "$RUNNER_TEMP/api-operational-manifest.json" migrations "$RUNNER_TEMP/api-d1-ledger.json" "$@"
+          }
+          read_migration_ledger
+          pending="$(migration_guard)"
+          if [[ -n "$pending" ]]; then
+            printf 'Applying manifest-approved D1 migrations:\n%s\n' "$pending"
+            ./node_modules/.bin/wrangler d1 migrations apply djconnect_api --remote --config wrangler.jsonc
+            read_migration_ledger
+            migration_guard --after-apply
+          fi
           ./node_modules/.bin/wrangler deploy bundle/index.js --no-bundle --config wrangler.jsonc
       - name: Publish redacted deployment evidence
         env:

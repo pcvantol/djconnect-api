@@ -66,7 +66,8 @@ class PreparationTests(unittest.TestCase):
                          *v.STABLE_RELEASE_SOURCES, v.STABLE_RELEASE_DELTA_PATH,
                          *v.STABLE_RELEASE_REFERENCES, *v.PUSH_ERASURE_SOURCES,
                          *v.PUSH_ERASURE_REFERENCES, *v.PUSH_ERASURE_ADDITIONS,
-                         v.PUSH_ERASURE_DELTA_PATH)
+                         v.PUSH_ERASURE_DELTA_PATH, v.PRODUCTION_D1_GUARD_REFERENCE,
+                         *v.PRODUCTION_D1_GUARD_ADDITIONS, v.PRODUCTION_D1_GUARD_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],

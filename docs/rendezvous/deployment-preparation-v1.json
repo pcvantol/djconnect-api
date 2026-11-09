@@ -65,7 +65,7 @@
   "public_entrypoint": null,
   "reference_hashes": {
     "wrangler.jsonc": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
-    ".github/workflows/deploy-api-worker.yml": "8fbfb0ec6d0291af560f353baa9e982c6059c87d948f1e5225201113ae1745db",
+    ".github/workflows/deploy-api-worker.yml": "d45cbffb150b955a8f6cd4220ae85413463192da42feb2fbadcb365714ae7876",
     ".github/workflows/api-release-artifact.yml": "b9e52f0c3ca882485fa6fc2c405ff11149d00736118a2a1126d9fb2448830955",
     "docs/rendezvous/implementation-contract-release-v1.json": "189e71aca07ac49cc6f7db225d3acb10a3a9fc357be02a9eaacb8f30a798c596",
     "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
@@ -103,7 +103,11 @@
     "docs/rendezvous/api-maintenance-source-delta-v1.json": "cd9128297a6aa9332e71bf3c2a3ce25dcd7cd4499cb68d79dd5d3905f63dc0be",
     "docs/rendezvous/stable-api-release-source-delta-v1.json": "accd67d7b485632be51264120fe63cb2c8fd889e26ca1be77ad45bcdd5140d41",
     "docs/rendezvous/push-erasure-source-delta-v1.json": "61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9",
-    "migrations/0013_push_registration_erasure.sql": "cc4bab55a2ad48a9335c06355713a5cbb088fbc891fbc2f61b1770c10d7a60a5"
+    "migrations/0013_push_registration_erasure.sql": "cc4bab55a2ad48a9335c06355713a5cbb088fbc891fbc2f61b1770c10d7a60a5",
+    ".github/workflows/reusable-workflow-guard.yml": "1d1dccc80cfd681bf505961b0b581cbdeb227b2de6634f517bb06a0eb1161acb",
+    "docs/rendezvous/production-d1-migration-guard-delta-v1.json": "3ecc560b779e3368d16826fe3d08383267d6eea78eb793c9423d007dc2edd877",
+    "scripts/check_production_d1_migrations.py": "1f574fef53a4ac24f0e2b8511bf207ae9ae3f5816e83e68e1037aee28a1268bb",
+    "scripts/test_production_d1_migrations.py": "c5387c7dd023997fecccc46e345e834961927e4cf803f295e223b0e7c4ba5254"
   },
   "schema_version": 1,
   "secret_names": [
@@ -292,7 +296,8 @@
     "stable_release_delta_sha256": "accd67d7b485632be51264120fe63cb2c8fd889e26ca1be77ad45bcdd5140d41",
     "stable_release_source_map_sha256": "6bd122979c515ed8baca9f9404f2599da49e96512d7178f3fe9f9eaa5df72e70",
     "push_erasure_delta_sha256": "61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9",
-    "push_erasure_source_map_sha256": "95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002"
+    "push_erasure_source_map_sha256": "95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002",
+    "production_d1_guard_delta_sha256": "3ecc560b779e3368d16826fe3d08383267d6eea78eb793c9423d007dc2edd877"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

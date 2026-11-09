@@ -776,7 +776,7 @@ SOURCE_PROVENANCE.update(push_erasure_delta_sha256=PUSH_ERASURE_DELTA_SHA256,
                          push_erasure_source_map_sha256=PUSH_ERASURE_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_production_d1_guard():
     sources, refs = baseline_before_push_erasure()
     delta = pinned_working_proof(PUSH_ERASURE_DELTA_PATH, PUSH_ERASURE_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
@@ -802,6 +802,35 @@ def baseline():
             and not PUSH_ERASURE_ADDITIONS.intersection(refs))
     refs.update(delta['reference_additions'])
     refs[PUSH_ERASURE_DELTA_PATH] = PUSH_ERASURE_DELTA_SHA256
+    return sources, refs
+
+
+PRODUCTION_D1_GUARD_PATH = 'docs/rendezvous/production-d1-migration-guard-delta-v1.json'
+PRODUCTION_D1_GUARD_SHA256 = '3ecc560b779e3368d16826fe3d08383267d6eea78eb793c9423d007dc2edd877'
+PRODUCTION_D1_GUARD_REFERENCE = '.github/workflows/deploy-api-worker.yml'
+PRODUCTION_D1_GUARD_ADDITIONS = frozenset((
+    '.github/workflows/reusable-workflow-guard.yml',
+    'scripts/check_production_d1_migrations.py', 'scripts/test_production_d1_migrations.py'))
+SOURCE_PROVENANCE['production_d1_guard_delta_sha256'] = PRODUCTION_D1_GUARD_SHA256
+
+
+def baseline():
+    sources, refs = baseline_before_production_d1_guard()
+    delta = pinned_working_proof(PRODUCTION_D1_GUARD_PATH, PRODUCTION_D1_GUARD_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PRODUCTION_D1_MIGRATION_GUARD_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False)
+    require(set(delta['reference_changes']) == {PRODUCTION_D1_GUARD_REFERENCE})
+    change = delta['reference_changes'][PRODUCTION_D1_GUARD_REFERENCE]
+    require(set(change) == {'before', 'after'} and change['before'] == refs[PRODUCTION_D1_GUARD_REFERENCE]
+            and change['after'] != change['before'])
+    require(set(delta['reference_additions']) == PRODUCTION_D1_GUARD_ADDITIONS
+            and not PRODUCTION_D1_GUARD_ADDITIONS.intersection(refs))
+    refs[PRODUCTION_D1_GUARD_REFERENCE] = change['after']
+    refs.update(delta['reference_additions'])
+    refs[PRODUCTION_D1_GUARD_PATH] = PRODUCTION_D1_GUARD_SHA256
     return sources, refs
 
 
