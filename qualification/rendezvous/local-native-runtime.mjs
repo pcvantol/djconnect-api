@@ -69,6 +69,12 @@ export async function sourceSnapshot(){
  need(plan.reference_hashes[releaseRetentionPath]===sha(releaseRetentionRaw)&&sha(releaseRetentionRaw)===provenance.release_ci_retention_delta_sha256);
  const releaseRetention=JSON.parse(releaseRetentionRaw);need(releaseRetention.scope==='EXACT_RELEASE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'&&releaseRetention.public_activation_allowed===false);
  need(releaseRetention.baseline_source_map_sha256===receipt.effective_source_map_sha256&&releaseRetention.effective_source_map_sha256===provenance.release_ci_retention_source_map_sha256);
+ const bindingsPath='docs/rendezvous/closed-production-bindings-source-delta-v1.json';
+ const bindingsRaw=await readFile(join(repo,bindingsPath));
+ need(plan.reference_hashes[bindingsPath]===sha(bindingsRaw)&&sha(bindingsRaw)===provenance.closed_production_bindings_delta_sha256);
+ const bindings=JSON.parse(bindingsRaw);
+ need(bindings.scope==='EXACT_CLOSED_PRODUCTION_BINDINGS_SOURCE_ONLY'&&bindings.public_activation_allowed===false&&bindings.production_effect_authorized===false);
+ need(bindings.baseline_source_map_sha256===releaseRetention.effective_source_map_sha256&&bindings.effective_source_map_sha256===provenance.closed_production_bindings_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -80,6 +86,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(watch.source_changes,name)){need(watch.source_changes[name].before===expected);expected=watch.source_changes[name].after;}
   if(Object.hasOwn(receipt.source_changes,name)){need(receipt.source_changes[name].before===expected);expected=receipt.source_changes[name].after;}
   if(Object.hasOwn(releaseRetention.changes,name)){need(releaseRetention.changes[name].before===expected);expected=releaseRetention.changes[name].after;}
+  if(Object.hasOwn(bindings.changes,name)){need(bindings.changes[name].before===expected);expected=bindings.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
