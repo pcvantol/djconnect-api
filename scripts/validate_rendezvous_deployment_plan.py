@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | API_MAINTENANCE_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -573,7 +573,7 @@ SOURCE_PROVENANCE.update(release_ci_retention_delta_sha256=RELEASE_RETENTION_DEL
                          release_ci_retention_source_map_sha256=RELEASE_RETENTION_SOURCE_MAP_SHA256)
 
 
-def baseline_before_api_maintenance():
+def baseline():
     sources, refs = baseline_before_release_retention()
     delta = pinned_working_proof(RELEASE_RETENTION_DELTA_PATH, RELEASE_RETENTION_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source',
@@ -594,44 +594,6 @@ def baseline_before_api_maintenance():
     require(source_map_digest(sources) == delta['effective_source_map_sha256']
             == RELEASE_RETENTION_SOURCE_MAP_SHA256)
     refs[RELEASE_RETENTION_DELTA_PATH] = RELEASE_RETENTION_DELTA_SHA256
-    return sources, refs
-
-
-API_MAINTENANCE_DELTA_PATH = 'docs/rendezvous/api-maintenance-source-delta-v1.json'
-API_MAINTENANCE_DELTA_SHA256 = '95d063005b7e61d58cf14396bc1cd7872c07b492dcecddbd5613f5b2cf801f69'
-API_MAINTENANCE_SOURCE_MAP_SHA256 = 'e1beb00c88f3fcd5f9002f8759098fe4b481b3563ef4f29a986818321c9c8390'
-API_MAINTENANCE_REFERENCE = 'qualification/rendezvous/maintenance-dependency-provenance-v1.json'
-API_MAINTENANCE_SOURCES = frozenset((
-    'package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs',
-    'src/auth.ts', 'src/handlers/install.ts', 'src/messages.ts',
-    'src/repositories/installTokens.ts', 'src/repositories/registrations.ts',
-))
-SOURCE_PROVENANCE.update(api_maintenance_delta_sha256=API_MAINTENANCE_DELTA_SHA256,
-                         api_maintenance_source_map_sha256=API_MAINTENANCE_SOURCE_MAP_SHA256)
-
-
-def baseline():
-    sources, refs = baseline_before_api_maintenance()
-    delta = pinned_working_proof(API_MAINTENANCE_DELTA_PATH, API_MAINTENANCE_DELTA_SHA256)
-    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
-                           'effective_source_map_sha256', 'changes', 'reference_sha256',
-                           'public_activation_allowed'})
-    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
-            and delta['scope'] == 'EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION'
-            and delta['base_source'] == '2274d2875c2ea5c324427c8014ade0c05b0fbead'
-            and delta['public_activation_allowed'] is False
-            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
-            and set(delta['changes']) == API_MAINTENANCE_SOURCES)
-    for name, change in delta['changes'].items():
-        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
-                and change['after'] != change['before']
-                and isinstance(change['after'], str) and len(change['after']) == 64
-                and all(c in '0123456789abcdef' for c in change['after']))
-        sources[name] = change['after']
-    require(source_map_digest(sources) == delta['effective_source_map_sha256']
-            == API_MAINTENANCE_SOURCE_MAP_SHA256)
-    refs[API_MAINTENANCE_DELTA_PATH] = API_MAINTENANCE_DELTA_SHA256
-    refs[API_MAINTENANCE_REFERENCE] = delta['reference_sha256']
     return sources, refs
 
 
