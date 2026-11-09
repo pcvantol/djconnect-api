@@ -1,3 +1,7 @@
+## 4.0.0 - 2026-11-09
+
+- Promote the API release metadata to the stable platform version.
+
 ## Unreleased — enrollment server-policy availability
 
 - Distinguish unusable server enrollment policy from invalid sender proof with the existing service-unavailable response; preserve original deadlines, budgets and uncertain postcommit outcomes.

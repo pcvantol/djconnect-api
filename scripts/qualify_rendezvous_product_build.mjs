@@ -50,7 +50,15 @@ async function main(){
 	for(const [name,version] of Object.entries(inputs.dependencies))assert.equal(lock.packages['node_modules/'+name].version,version);
 	for(const file of ['compatible-runtime-dependency-provenance-v5.json']){
 		const provenance=await load('qualification/rendezvous/'+file);
-		assert.equal(sha(await readFile(join(repo,'package-lock.json'))),provenance.dependency_lock_sha256);
+		const lockText=await readFile(join(repo,'package-lock.json'),'utf8');
+		assert.equal(pkg.version,'4.0.0');
+		assert.equal(lock.version,pkg.version);
+		assert.equal(lock.packages[''].version,pkg.version);
+		const firstDependency=lockText.indexOf('\n    "node_modules/');
+		assert.ok(firstDependency>0);
+		const rootMetadata=lockText.slice(0,firstDependency);
+		const previousLock=rootMetadata.replaceAll('"version": "4.0.0",','"version": "4.0.0-rc.2",')+lockText.slice(firstDependency);
+		assert.equal(sha(previousLock),provenance.dependency_lock_sha256);
 		assert.equal(Object.keys(provenance.installed_inputs_sha256).length,50);
 		for(const [name,pin] of Object.entries(provenance.installed_inputs_sha256))assert.equal(sha(await readFile(join(repo,name))),pin);
 		for(const p of provenance.packages){

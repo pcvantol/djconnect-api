@@ -91,6 +91,14 @@ export async function sourceSnapshot(){
  need(maintenance.baseline_source_map_sha256===toolchain.effective_source_map_sha256&&maintenance.effective_source_map_sha256===provenance.api_maintenance_source_map_sha256);
  const maintenanceFiles=["src/auth.ts","src/handlers/install.ts","src/messages.ts","src/repositories/installTokens.ts","src/repositories/registrations.ts"];
  need(Object.keys(maintenance.changes).length===maintenanceFiles.length&&maintenanceFiles.every(name=>Object.hasOwn(maintenance.changes,name)&&Object.hasOwn(root.source_hashes,name)));
+ const stablePath='docs/rendezvous/stable-api-release-source-delta-v1.json';
+ const stableRaw=await readFile(join(repo,stablePath));
+ need(plan.reference_hashes[stablePath]===sha(stableRaw)&&sha(stableRaw)===provenance.stable_release_delta_sha256);
+ const stable=JSON.parse(stableRaw);
+ need(stable.scope==='EXACT_STABLE_API_RELEASE_METADATA_NOT_ACTIVATION'&&stable.public_activation_allowed===false);
+ need(stable.baseline_source_map_sha256===maintenance.effective_source_map_sha256&&stable.effective_source_map_sha256===provenance.stable_release_source_map_sha256);
+ const stableFiles=["src/auth.ts","src/handlers/install.ts","src/messages.ts","src/repositories/installTokens.ts","src/repositories/registrations.ts"];
+ need(Object.keys(stable.changes).length===stableFiles.length&&stableFiles.every(name=>Object.hasOwn(stable.changes,name)&&Object.hasOwn(root.source_hashes,name)));
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -105,6 +113,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(bindings.changes,name)){need(bindings.changes[name].before===expected);expected=bindings.changes[name].after;}
   if(Object.hasOwn(toolchain.changes,name)){need(toolchain.changes[name].before===expected);expected=toolchain.changes[name].after;}
  need(Object.keys(maintenance.changes).length===maintenanceFiles.length&&maintenanceFiles.every(name=>Object.hasOwn(maintenance.changes,name)&&Object.hasOwn(root.source_hashes,name)));
+ need(Object.keys(stable.changes).length===stableFiles.length&&stableFiles.every(name=>Object.hasOwn(stable.changes,name)&&Object.hasOwn(root.source_hashes,name)));
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

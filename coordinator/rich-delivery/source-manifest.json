@@ -17,7 +17,7 @@
     "coordinator/rich-session/profile-data.ts": "d5c6c4755bff698e25aa5a58af5d1c19592d20815792b162f3a499678c985d96",
     "coordinator/rich-session/qualification/apple-fixtures/attributes_original_uuid.json": "f3a40f9865cc311e0dbb7009c8d460b68192e6e7e85e1ad8f402db10b065b132",
     "coordinator/rich-session/qualification/apple-fixtures/state_rich_both.json": "ca6a3ce305d5777226108dd5cf469ecedf9d116afcb4348b01725f6c0e110974",
-    "package-lock.json": "0e756477e6ae46368a1bba97fbb5010360faaffc6b6004becb1542bb5374657e",
-    "package.json": "5946dbd9f69b22d4a2ddccb5a62a243e017dcfe486a83adfe1f797fc414e2650"
+    "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
+    "package.json": "b684c815c993c080483dc9d9be50f5546d07a39ee18408ea46535f39a75f143e"
   }
 }
