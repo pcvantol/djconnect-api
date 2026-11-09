@@ -1,4 +1,6 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
+import { createWidgetFirstKeyHandler, isWidgetFirstKeyRoute,
+	type CoreCurrentnessAuthority, type WidgetFirstKeyPolicy } from "../native-push/first-key-service";
 import type { AppEnv } from "../types";
 import { createSurfaceEnrollment } from "./enrollment";
 import { ENROLLMENT_PREFIX } from "./enrollment-wire";
@@ -97,11 +99,20 @@ export class WidgetEnrollmentOperator extends WorkerEntrypoint<WidgetPilotBindin
 	}
 }
 
-export default {
-	async fetch(request: Request, env: WidgetPilotBindings, ctx: ExecutionContext): Promise<Response> {
-		if (new URL(request.url).pathname === relayEvent) return closed(404);
-		const pilot = transportPilot(env);
-		if (!pilot) return closed(503);
-		return pilot.ingress(request, ctx);
-	},
-} satisfies ExportedHandler<WidgetPilotBindings>;
+export function createWidgetHaDevWorker(firstKeyPolicy?: WidgetFirstKeyPolicy, authorizeCore?: CoreCurrentnessAuthority) {
+	return {
+		async fetch(request: Request, env: WidgetPilotBindings, ctx: ExecutionContext): Promise<Response> {
+			const { pathname } = new URL(request.url);
+			if (pathname === relayEvent) return closed(404);
+			const pilot = transportPilot(env);
+			if (!pilot) return closed(503);
+			if (isWidgetFirstKeyRoute(pathname)) {
+				return createWidgetFirstKeyHandler(env.WIDGET_HA_DEV_DB!, env.WIDGET_PILOT_ORIGIN!,
+					() => pilot.current(env), firstKeyPolicy, authorizeCore)(request);
+			}
+			return pilot.ingress(request, ctx);
+		},
+	} satisfies ExportedHandler<WidgetPilotBindings>;
+}
+
+export default createWidgetHaDevWorker();
