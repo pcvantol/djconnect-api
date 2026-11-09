@@ -75,6 +75,14 @@ export async function sourceSnapshot(){
  const bindings=JSON.parse(bindingsRaw);
  need(bindings.scope==='EXACT_CLOSED_PRODUCTION_BINDINGS_SOURCE_ONLY'&&bindings.public_activation_allowed===false&&bindings.production_effect_authorized===false);
  need(bindings.baseline_source_map_sha256===releaseRetention.effective_source_map_sha256&&bindings.effective_source_map_sha256===provenance.closed_production_bindings_source_map_sha256);
+ const toolchainPath='docs/rendezvous/toolchain-development-dependency-refresh-v1.json';
+ const toolchainRaw=await readFile(join(repo,toolchainPath));
+ need(plan.reference_hashes[toolchainPath]===sha(toolchainRaw)&&sha(toolchainRaw)===provenance.toolchain_refresh_delta_sha256);
+ const toolchain=JSON.parse(toolchainRaw);
+ need(toolchain.scope==='EXACT_TOOLCHAIN_AND_DEVELOPMENT_DEPENDENCY_REFRESH_NOT_ACTIVATION'&&toolchain.public_activation_allowed===false);
+ need(toolchain.baseline_source_map_sha256===bindings.effective_source_map_sha256&&toolchain.effective_source_map_sha256===provenance.toolchain_refresh_source_map_sha256);
+ const toolchainFiles=["package-lock.json","package.json","scripts/qualify_rendezvous_product_build.mjs"];
+ need(Object.keys(toolchain.changes).length===toolchainFiles.length&&toolchainFiles.every(name=>Object.hasOwn(toolchain.changes,name)&&Object.hasOwn(root.source_hashes,name)));
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -87,6 +95,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(receipt.source_changes,name)){need(receipt.source_changes[name].before===expected);expected=receipt.source_changes[name].after;}
   if(Object.hasOwn(releaseRetention.changes,name)){need(releaseRetention.changes[name].before===expected);expected=releaseRetention.changes[name].after;}
   if(Object.hasOwn(bindings.changes,name)){need(bindings.changes[name].before===expected);expected=bindings.changes[name].after;}
+  if(Object.hasOwn(toolchain.changes,name)){need(toolchain.changes[name].before===expected);expected=toolchain.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
