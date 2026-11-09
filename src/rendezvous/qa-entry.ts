@@ -40,7 +40,13 @@ export default {
   const json = (value: unknown, status: number) => new Response(JSON.stringify(value), {status, headers});
   if (url.origin !== SERVICE || url.username || url.password) return json({error:'not_found'},404);
   const startedAt = Date.now();
-  const window = selectWindow(QA_WINDOW, startedAt);
+  const reviewedWindow = selectWindow(QA_WINDOW, startedAt);
+  const configuration = env as ProductRendezvousEnv | undefined;
+  // The enrollment coordinator uses this same deadline at its SQLite commit.
+  const window = reviewedWindow
+   && configuration?.ASSERTION_POLICY_EXPIRES_AT === String(reviewedWindow.endsAt)
+   && configuration.RENDEZVOUS_CAPACITY_POLICY === 'private-household/1'
+   ? reviewedWindow : null;
   if (request.method === 'GET' && url.href === SERVICE+'/health') return json({ok:true,service:'djconnect-api-vibecast-qa',release_sha:__DJC_QA_SOURCE_SHA__,activation_allowed:window!==null},200);
   if (url.pathname !== '/v1/rendezvous' && !url.pathname.startsWith('/v1/rendezvous/')) return json({error:'not_found'},404);
   if (request.headers.get('Origin') === BROWSER) headers.set('Access-Control-Allow-Origin',BROWSER);
