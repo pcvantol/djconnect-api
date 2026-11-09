@@ -10,8 +10,9 @@ export function createWatchAccessKeyResolver(issuer: string, fetcher: typeof fet
 	return async (kid: string, signal: AbortSignal): Promise<CryptoKey | null> => {
 		if (!endpoint || !keyId.test(kid)) return null;
 		signal.throwIfAborted();
+		// Workers fetch supports manual redirects. The status check below rejects them.
 		const response = await fetcher(endpoint, {
-			redirect: "error", cache: "no-store", headers: { accept: "application/json" }, signal,
+			redirect: "manual", cache: "no-store", headers: { accept: "application/json" }, signal,
 		});
 		if (response.status !== 200 || response.redirected || (response.url && response.url !== endpoint)) {
 			void response.body?.cancel().catch(() => undefined);
