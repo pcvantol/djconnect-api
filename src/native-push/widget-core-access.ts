@@ -23,10 +23,13 @@ export async function verifyWidgetCoreAccess(
 	request: Request, ctx: ExecutionContext, issuer: string, audience: string, clientId: string,
 	expiresAt: number, configurationCurrent: () => boolean, resolveKeys = createWatchAccessKeyResolver,
 ) {
-	if (!ctx.access || request.headers.has("cookie") || request.headers.has("origin") ||
+	if (!ctx.access || request.headers.has("origin") ||
 		request.headers.has("content-encoding")) return null;
 	const token = request.headers.get("cf-access-jwt-assertion");
 	if (!token || token.length > 8192) return null;
+	// Access can forward its own cookie on a service-token request.
+	const cookie = request.headers.get("cookie");
+	if (cookie !== null && cookie !== "CF_Authorization=" + token) return null;
 	const parts = token.split(".");
 	if (parts.length !== 3) return null;
 	const [header, payload, signature] = parts;

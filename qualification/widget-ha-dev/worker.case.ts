@@ -144,9 +144,10 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	};
 	const jwt = await makeJwt();
 	const ctx = { access: {} } as ExecutionContext;
-	const send = (path: string, body: unknown, options: { jwt?: string; bearer?: string; decision?: string;
+	const send = (path: string, body: unknown, options: { jwt?: string; cookie?: string; bearer?: string; decision?: string;
 		ctx?: ExecutionContext; config?: typeof config } = {}) => selected.fetch(new Request(origin + path, {
 		method: "POST", headers: { "content-type": "application/json", "cf-access-jwt-assertion": options.jwt ?? jwt,
+			...(options.cookie ? { cookie: options.cookie } : {}),
 			...(options.bearer ? { authorization: "Bearer " + options.bearer } : {}),
 			...(options.decision ? { "x-djc-first-key-currentness": options.decision } : {}) },
 		body: canonical(body),
@@ -217,7 +218,16 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	expect(await db.prepare("SELECT 1 FROM widget_core_machines WHERE access_client_id = ?").bind(clientId).first()).toBeNull();
 	expect((await publisher(publication("bind", { ...binding, scope_id: "caller-scope" }))).status).toBe(400);
 	const publisherStringJwt = await makeJwt({ ...publisherClaims, aud: publisherConfig.WIDGET_PUBLISHER_ACCESS_AUDIENCE });
-	expect((await publisher(publication("bind", binding, publisherStringJwt))).status).toBe(200);
+	const serviceCookie = "CF_Authorization=" + publisherStringJwt;
+	const publisherWithCookie = publication("bind", binding, publisherStringJwt);
+	publisherWithCookie.headers.set("cookie", serviceCookie);
+	const cookieOnly = publisherWithCookie.clone();
+	cookieOnly.headers.delete("cf-access-jwt-assertion");
+	expect((await publisher(cookieOnly)).status).toBe(403);
+	const extraCookie = publisherWithCookie.clone();
+	extraCookie.headers.append("cookie", "session=fixture");
+	expect((await publisher(extraCookie)).status).toBe(403);
+	expect((await publisher(publisherWithCookie)).status).toBe(200);
 	expect((await publisher(publication("bind", binding))).status).toBe(200);
 	expect((await publisher(publication("bind", { ...binding, device_id: "foreign" }))).status).toBe(409);
 	expect((await send(bootstrap, { ...install, device_id: "foreign-device" })).status).toBe(403);
@@ -225,7 +235,8 @@ it("closes the dedicated Core Worker and binds signed Access, issuer, first key 
 	const coreStringJwt = await makeJwt({ aud: config.WIDGET_CORE_ACCESS_AUDIENCE });
 	expect((await publisher(publication("bind", binding, coreStringJwt))).status).toBe(403);
 	expect((await send(bootstrap, install, { jwt: publisherStringJwt })).status).toBe(403);
-	const issued = await send(bootstrap, install, { jwt: coreStringJwt });
+	expect((await send(bootstrap, install, { jwt: coreStringJwt, cookie: serviceCookie })).status).toBe(403);
+	const issued = await send(bootstrap, install, { jwt: coreStringJwt, cookie: "CF_Authorization=" + coreStringJwt });
 	expect(issued.status).toBe(200);
 	const { bootstrap_proof } = await issued.json<{ bootstrap_proof: string }>();
 	const exchanged = await send(exchange, { ...install, bootstrap_proof });
