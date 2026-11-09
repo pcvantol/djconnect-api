@@ -28,7 +28,7 @@
     "src/apns.ts": "8a6d3c3fa5400dc16b8b81e95e4536b2e2acdfe75829061c61741d791ae45948",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
     "src/http.ts": "3828f75c474dd5dcab4d5804cbcb48b129bfda684a32ff5261123e50914cbc5f",
-    "src/messages.ts": "980ab421315143a27ca1e3605310fd043779fe0e175ef0e0d9f7844f5eeadb79",
+    "src/messages.ts": "b9d1c33651d56182156913ca5b1e5bc5d8dc6dfff705186f4e2ad320f47eb675",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "src/types.ts": "d1200cffd65c9d026563cfa7688f7351b6d58d27ee79bb145d29d4006f2e7bd9",
     "src/validation.ts": "2fad4e70fb69b073f838b5233497efca4774f718ae930b9d29a1e270367d275b",
