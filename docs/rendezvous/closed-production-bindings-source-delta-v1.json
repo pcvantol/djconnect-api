@@ -1,0 +1,19 @@
+{
+  "base_source": "d0827f5f84d765d87f6d29f61add7a4d9570c9e2",
+  "baseline_source_map_sha256": "95ed9d508a33a905d807bc422c525a3b8a6fc5ee3920e8e0020f174c6a23cfc5",
+  "changes": {
+    "rendezvous-build-inputs.json": {
+      "after": "a27c7f0ff055d68d4c1ec939bcec76e0812582db393bd7554958cd6b114d541c",
+      "before": "79ef2e847c72d96114355c3b9468a4e7434836401c5f6621d41f1c5ac51521cd"
+    },
+    "wrangler.jsonc": {
+      "after": "e42eead0bab919b9d78d0922cfab7bf5ab837666bda8a6a488e225604185ea81",
+      "before": "5c0a0a382d9144271b754397baf3e0def47dcc83acb3a610dc4abbc28ff3b54f"
+    }
+  },
+  "effective_source_map_sha256": "2ea924a5e904eb1e675f328be9a24ed5453cd62c2b040b7a5f90a31a3f10b950",
+  "production_effect_authorized": false,
+  "public_activation_allowed": false,
+  "schema_version": 1,
+  "scope": "EXACT_CLOSED_PRODUCTION_BINDINGS_SOURCE_ONLY"
+}
