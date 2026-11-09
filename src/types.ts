@@ -76,6 +76,7 @@ export interface RegisterRequest {
 export interface UnregisterRequest {
 	ha_install_id: string;
 	device_id: string;
+	registration_id?: string;
 	client_type?: ClientType;
 	apns_token?: string;
 }

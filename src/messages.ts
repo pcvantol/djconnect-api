@@ -36,6 +36,7 @@ export type ApiMessageKey =
 	| "missing_ha_install_id"
 	| "missing_pairing_session_id"
 	| "missing_token_id"
+	| "missing_registration_id"
 	| "not_found"
 	| "relay_secret_not_configured"
 	| "unsafe_payload"
@@ -81,6 +82,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_ha_install_id: "The install ID is required.",
 		missing_pairing_session_id: "The pairing session ID is required.",
 		missing_token_id: "The token ID is required.",
+		missing_registration_id: "The registration ID is required.",
 		not_found: "The requested endpoint was not found.",
 		relay_secret_not_configured: "The relay secret is not configured.",
 		unsafe_payload: "The request contains unsupported sensitive fields.",
@@ -121,6 +123,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_ha_install_id: "De installatie-ID is vereist.",
 		missing_pairing_session_id: "De pairing session-ID is vereist.",
 		missing_token_id: "De token-ID is vereist.",
+		missing_registration_id: "De registratie-ID is vereist.",
 		not_found: "Het gevraagde endpoint is niet gevonden.",
 		relay_secret_not_configured: "Het relaygeheim is niet geconfigureerd.",
 		unsafe_payload: "Het verzoek bevat niet-ondersteunde gevoelige velden.",
@@ -161,6 +164,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_ha_install_id: "Die Installations-ID ist erforderlich.",
 		missing_pairing_session_id: "Die Pairing-Session-ID ist erforderlich.",
 		missing_token_id: "Die Token-ID ist erforderlich.",
+		missing_registration_id: "Die Registrierungs-ID ist erforderlich.",
 		not_found: "Der angeforderte Endpunkt wurde nicht gefunden.",
 		relay_secret_not_configured: "Das Relay-Geheimnis ist nicht konfiguriert.",
 		unsafe_payload: "Die Anfrage enthält nicht unterstützte sensible Felder.",
@@ -201,6 +205,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_ha_install_id: "L'ID d'installation est requis.",
 		missing_pairing_session_id: "L'ID de session de jumelage est requis.",
 		missing_token_id: "L'ID du jeton est requis.",
+		missing_registration_id: "L’identifiant de l’enregistrement est requis.",
 		not_found: "Le point de terminaison demandé est introuvable.",
 		relay_secret_not_configured: "Le secret du relais n'est pas configuré.",
 		unsafe_payload: "La requête contient des champs sensibles non pris en charge.",
@@ -241,6 +246,7 @@ export const MESSAGES: Record<SupportedLanguage, Record<MessageKey, string>> = {
 		missing_ha_install_id: "Se requiere el ID de instalación.",
 		missing_pairing_session_id: "Se requiere el ID de sesión de emparejamiento.",
 		missing_token_id: "Se requiere el ID del token.",
+		missing_registration_id: "Se requiere el ID del registro.",
 		not_found: "No se encontró el endpoint solicitado.",
 		relay_secret_not_configured: "El secreto del relay no está configurado.",
 		unsafe_payload: "La solicitud contiene campos sensibles no admitidos.",

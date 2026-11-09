@@ -3,7 +3,7 @@ import { diagnostics, listRegistrations, revokeToken } from "./handlers/admin";
 import { issueBootstrapProofHandler, issueInstallTokenHandler, issuePairingBootstrapProofHandler, rotateInstallTokenHandler } from "./handlers/install";
 import { registerDevice, sendPushEvent, unregisterDevice } from "./handlers/push";
 import { errorJson, HttpError, json } from "./http";
-import { recordApiDiagnostic } from "./repository";
+import { purgePushDeliveryDiagnostics, recordApiDiagnostic } from "./repository";
 import { RELEASE_SOURCE_SHA, RELEASE_VERSION } from "./releaseMetadata";
 import type { AppEnv } from "./types";
 import { dispatchRendezvousRequest } from "./rendezvous/dispatch";
@@ -66,6 +66,9 @@ const routes: Array<{ method: string; path: string; handler: RouteHandler }> = [
 ];
 
 export default {
+	async scheduled(_controller, env): Promise<void> {
+		await purgePushDeliveryDiagnostics(env.DB);
+	},
 	async fetch(request, env, ctx): Promise<Response> {
 		const privateReceiving = dispatchPrivateReceivingRequest(request, env, Date.now, fetch);
 		if (privateReceiving) return await privateReceiving;
@@ -73,7 +76,7 @@ export default {
 		if (issuerUnavailable) return issuerUnavailable;
 		const rendezvousUnavailable = await dispatchRendezvousRequest(request, env);
 		if (rendezvousUnavailable) return rendezvousUnavailable;
-		const appEnv = env as AppEnv;
+		const appEnv = env as Env & AppEnv;
 		const url = new URL(request.url);
 		let routePath = url.pathname;
 		try {

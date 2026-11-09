@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_PUSH_ERASURE_SOURCE_NOT_RENDEZVOUS_ACTIVATION",
+  "base_source": "6fdac58addde449bd78c0fed05aaaa3319e7aead",
+  "baseline_source_map_sha256": "6bd122979c515ed8baca9f9404f2599da49e96512d7178f3fe9f9eaa5df72e70",
+  "effective_source_map_sha256": "73d20a644cd871a58a45fbd894dc9c710dc85a54064c0ffc9e27b53e290cbb86",
+  "changes": {
+    "rendezvous-build-inputs.json": {
+      "before": "a27c7f0ff055d68d4c1ec939bcec76e0812582db393bd7554958cd6b114d541c",
+      "after": "2b96897393242c9b66def0350f73c6cc91b9e2059757d731b3b8b448c6def8ef"
+    },
+    "src/index.ts": {
+      "before": "82d971c8ad989cbe00a8406673c99838d72eb9de9451d6ce39dc40e3f1df41c2",
+      "after": "1a75cb7dee8a9b9c5e2bf59adc6647e8ab95f173660779f7a315c91d16d49246"
+    },
+    "src/messages.ts": {
+      "before": "b9d1c33651d56182156913ca5b1e5bc5d8dc6dfff705186f4e2ad320f47eb675",
+      "after": "1c8598d6fe40bd237de33a31ee8df15fb129267a58addbd83887f16ccd7fe57f"
+    },
+    "src/repositories/auditEvents.ts": {
+      "before": "6e06cf7849c44a60fd23bdf3b3188f398cd9142a236f56b8e9a436101d8e0493",
+      "after": "a129d52db2e0d73069d3877e619c75ba671dedc1e610984791884569de71facf"
+    },
+    "src/repositories/registrations.ts": {
+      "before": "e102137ae2b8a376058da013a87d45f7668a54909aa716ee67f9ca409399bb65",
+      "after": "7df082998bb64c1f71fc708e389290c9917966b030f298851bdddae979f55a56"
+    },
+    "src/services/pushDelivery.ts": {
+      "before": "d83fd7a13494fbd899a50b1f221ff6adda395ccd18fc29f3577678280a54fe53",
+      "after": "e7126dfcc73778bdf3964402659a894af313aafc8a88b0c9c92f7e9728592a63"
+    },
+    "src/validation.ts": {
+      "before": "2fad4e70fb69b073f838b5233497efca4774f718ae930b9d29a1e270367d275b",
+      "after": "d74d32e61e6f2a0531f352fd565c8b71602494173c5e364fbea1df4805d1c60e"
+    },
+    "wrangler.jsonc": {
+      "before": "e42eead0bab919b9d78d0922cfab7bf5ab837666bda8a6a488e225604185ea81",
+      "after": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1"
+    }
+  },
+  "reference_changes": {
+    "coordinator/host-app-wake-receiving/runtime/source-inputs.json": {
+      "before": "3ab74601fcf087f59ea43747987e98420d114f8026523ce64ed1d5780b51eab5",
+      "after": "1c9126cffe9eb586c82e686e044d07f4ce31e120c4dbaf669c62a3da7404cd47"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "7fefa4add8ced8f01bec5ad0defc4c88065cfb90b8c6696fbfa3ac18d8dea967",
+      "after": "75dd8ae204b2b6614d49afb7a65cd8dc1cfac5e68ae06f2eb625ff7386018b9a"
+    },
+    "wrangler.jsonc": {
+      "before": "e42eead0bab919b9d78d0922cfab7bf5ab837666bda8a6a488e225604185ea81",
+      "after": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1"
+    }
+  },
+  "reference_additions": {
+    "migrations/0013_push_registration_erasure.sql": "cc4bab55a2ad48a9335c06355713a5cbb088fbc891fbc2f61b1770c10d7a60a5"
+  },
+  "public_activation_allowed": false
+}
