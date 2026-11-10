@@ -70,7 +70,9 @@ class PreparationTests(unittest.TestCase):
                          *v.PRODUCTION_D1_GUARD_ADDITIONS, v.PRODUCTION_D1_GUARD_PATH,
                          v.REPOSITORY_NAMESPACE_SMOKE_REFERENCE, v.REPOSITORY_NAMESPACE_DELTA_PATH,
                          *v.SHARED_KEY_ADDRESS_SOURCES, v.SHARED_KEY_ADDRESS_ADDITION,
-                         v.SHARED_KEY_ADDRESS_PATH)
+                         v.SHARED_KEY_ADDRESS_PATH, *v.TESTFLIGHT_PROFILE_SOURCES,
+                         *v.TESTFLIGHT_PROFILE_ADDITIONS, *v.TESTFLIGHT_PROFILE_REFERENCES,
+                         *v.TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS, v.TESTFLIGHT_PROFILE_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],

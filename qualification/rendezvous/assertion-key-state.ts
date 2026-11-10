@@ -3,6 +3,7 @@ import {ReceiptKeyStore,StoreRejected,type StoreEnv,type StoreMaterial} from './
 import {qualifyAssertionCore} from 'djc-qualified-assertion';
 import {base64Decode,base64Url} from 'djc-existing-crypto';
 import { rendezvousKeyAddress } from './key-address';
+import { TESTFLIGHT_POLICY } from './testflight-40521.mjs';
 export interface CoordinatorEnv extends StoreEnv { ASSERTION_POLICY_ENABLED?:string; ASSERTION_POLICY_EXPIRES_AT?:string }
 type Action='recover-key'|'delete-key'|'submit';
 export interface SubmitBinding {transactionId:string;generation:number;browserThumbprint:string;envelopeDigest:string;expiresAt:number}
@@ -31,8 +32,10 @@ export class AssertionKeyState extends ReceiptKeyStore {
  protected override removingKeyEvidence(){this.ctx.storage.sql.exec('DELETE FROM proof_operations');}
  protected override nextCleanupAt(){return this.ctx.storage.sql.exec<{at:number|null}>('SELECT MIN(expires_at) AS at FROM proof_operations').toArray()[0]?.at??undefined;}
  private cleanup(now:number){this.ctx.storage.sql.exec('DELETE FROM proof_operations WHERE expires_at<=?',now);return this.expire(now);}
- private policy(now:number){const e=this.env as CoordinatorEnv,until=Number(e.ASSERTION_POLICY_EXPIRES_AT);if(!(e.ASSERTION_POLICY_ENABLED===POLICY&&integer(until)&&now<until))throw new AssertionConfigUnavailable();return until;}
- private active(now:number){this.policy(now);const r=this.cleanup(now);need(r?.status==='active'&&r.objectId===this.ctx.id.toString()&&r.appPolicy===POLICY&&r.environment==='development'&&now>=r.createdAt&&now<r.expiresAt);return r;}
+ protected appPolicy():typeof POLICY|typeof TESTFLIGHT_POLICY{return (this.env as CoordinatorEnv).ASSERTION_POLICY_ENABLED===TESTFLIGHT_POLICY?TESTFLIGHT_POLICY:POLICY;}
+ protected appAttestEnvironment(){return this.appPolicy()===TESTFLIGHT_POLICY?'production' as const:'development' as const;}
+ private policy(now:number){const e=this.env as CoordinatorEnv,until=Number(e.ASSERTION_POLICY_EXPIRES_AT);if(!(e.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until))throw new AssertionConfigUnavailable();return until;}
+ private active(now:number){this.policy(now);const r=this.cleanup(now);need(r?.status==='active'&&r.objectId===this.ctx.id.toString()&&r.appPolicy===this.appPolicy()&&r.environment===this.appAttestEnvironment()&&now>=r.createdAt&&now<r.expiresAt);return r;}
  private operation(id:string){return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations WHERE id=?',id).toArray().map(r=>JSON.parse(r.value) as Operation)[0];}
  private saveOperation(op:Operation){this.ctx.storage.sql.exec('INSERT INTO proof_operations(id,expires_at,value) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',op.id,op.expiresAt,JSON.stringify(op));}
  private response(op:Operation){need(op.status==='challenge'&&op.clientData&&op.nonce);return {v:VERSION,challenge_id:op.id,challenge:op.nonce,expires_at:op.expiresAt,client_data:op.clientData};}
@@ -40,7 +43,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
   need(input&&typeof input==='object'&&!Array.isArray(input));if(input.binding!==undefined&&input.binding!==null)need(typeof input.binding==='object'&&!Array.isArray(input.binding));
   input={...input,...(input.binding?{binding:{...input.binding}}:{})};closed(input,input.action==='submit'?['action','keyId','binding']:['action','keyId']);need(['recover-key','delete-key','submit'].includes(input.action));
   need(typeof input.keyId==='string'&&input.keyId.length===44);let keyBytes:Uint8Array;try{keyBytes=base64Decode(input.keyId);}catch{throw new ProofRejected();}need(keyBytes.length===32&&btoa(String.fromCharCode(...keyBytes))===input.keyId);
-  const keyAddress=await rendezvousKeyAddress(input.keyId,'development',POLICY);let binding:SubmitBinding|undefined;
+  const appPolicy=this.appPolicy(),keyAddress=await rendezvousKeyAddress(input.keyId,this.appAttestEnvironment(),appPolicy);let binding:SubmitBinding|undefined;
   if(input.action==='submit'){
    need(input.binding);closed(input.binding,['transactionId','generation','browserThumbprint','envelopeDigest','expiresAt']);binding={...input.binding};
    need(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(binding.transactionId));need(Number.isInteger(binding.generation)&&binding.generation>=1&&binding.generation<=2147483647);opaque(binding.browserThumbprint);opaque(binding.envelopeDigest);
@@ -51,7 +54,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
   try{return await this.locked(async()=>{
    const alarm=await this.ctx.storage.getAlarm();await this.ctx.storage.setAlarm(Math.min(alarm??expiresAt,expiresAt));
    return this.ctx.storage.transactionSync(()=>{
-    const at=Date.now();this.policy(at);const row=this.cleanup(at);need(at>=now&&at<expiresAt);if(row)need(row.keyAddress===keyAddress);
+    const at=Date.now();this.policy(at);need(this.appPolicy()===appPolicy);const row=this.cleanup(at);need(at>=now&&at<expiresAt);if(row)need(row.keyAddress===keyAddress);
     const ops=this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations').toArray().map(r=>JSON.parse(r.value) as Operation);
     if(input.action!=='submit'){const existing=ops.find(v=>v.status==='challenge'&&v.action===input.action&&v.keyAddress===keyAddress);if(existing)return {ok:true as const,...this.response(existing)};}
     need(ops.length<32&&ops.filter(v=>v.action===input.action).length<(input.action==='submit'?28:2)&&!this.operation(op.id));this.saveOperation(op);return {ok:true as const,...this.response(op)};
@@ -70,11 +73,11 @@ export class AssertionKeyState extends ReceiptKeyStore {
   const requestDigest=await digest([input.action,input.operationId,snapshot.row.keyAddress,input.clientData,input.assertion]);
   if(snapshot.op.status==='authorized')return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now(),recordWindow);});
   need(snapshot.op.clientData===input.clientData);recordWindow([snapshot.op.createdAt,snapshot.op.expiresAt],[snapshot.row.createdAt,snapshot.row.expiresAt]);
-  const verified=await qualifyAssertionCore(proof,client,base64Decode(snapshot.row.publicPoint),snapshot.row.counter);need(verified);
+  const verified=await qualifyAssertionCore(proof,client,base64Decode(snapshot.row.publicPoint),snapshot.row.counter,snapshot.row.appPolicy);need(verified);
   let committedBounds:ReadonlyArray<readonly[number|undefined,number|undefined]>=[];
   const result=this.ctx.storage.transactionSync(()=>{
    const at=Date.now(),row=this.active(at),op=this.operation(input.operationId);need(op&&op.status==='challenge'&&op.action===input.action&&op.keyAddress===row.keyAddress&&op.clientData===input.clientData&&at>=op.createdAt&&at<op.expiresAt);
-   need(row.publicPoint===snapshot.row.publicPoint&&row.createdAt===snapshot.row.createdAt&&row.expiresAt===snapshot.row.expiresAt&&verified.counter>row.counter&&verified.counter<=0xffffffff);
+   need(row.appPolicy===snapshot.row.appPolicy&&row.environment===snapshot.row.environment&&row.publicPoint===snapshot.row.publicPoint&&row.createdAt===snapshot.row.createdAt&&row.expiresAt===snapshot.row.expiresAt&&verified.counter>row.counter&&verified.counter<=0xffffffff);
    if(input.action==='delete-key'){const tombstone=this.tombstone(row);this.save(tombstone);return {kind:'deleted' as const,purgeAt:tombstone.purgeAt};}
    row.counter=verified.counter;row.revision++;this.save(row);
    const receipt:Operation={id:op.id,action:op.action,keyAddress:op.keyAddress,createdAt:op.createdAt,expiresAt:Math.min(op.expiresAt,row.expiresAt),status:'authorized',requestDigest,counter:verified.counter,admittedAt:at,keyExpiresAt:row.expiresAt,...(op.binding?{binding:op.binding,authorizationExpiresAt:Math.min(at+5000,op.expiresAt,row.expiresAt,this.policy(at))}:{})};

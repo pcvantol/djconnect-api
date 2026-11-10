@@ -1,13 +1,14 @@
 // SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import { DurableObject } from 'cloudflare:workers';
 import { encryptSecret, decryptSecret, base64Decode, base64Url } from 'djc-existing-crypto';
+import { TESTFLIGHT_POLICY } from './testflight-40521.mjs';
 export interface StoreEnv { RECEIPT_ACTIVE_KEY?: string; RECEIPT_PREVIOUS_KEY?: string }
 export interface StoreMaterial {
-  keyAddress: string; appPolicy: string; environment: 'development'; publicPoint: string;
+  keyAddress: string; appPolicy: string; environment: 'development' | 'production'; publicPoint: string;
   receipt: string; receiptCreatedAt: number; challengeCreatedAt: number; challengeExpiresAt: number;
   operationId: string; requestDigest: string;
 }
-interface Context { objectId:string; keyAddress:string; appPolicy:string; environment:'development'; createdAt:number; expiresAt:number; receiptCreatedAt:number; keyVersion:string; publicPoint:string }
+interface Context { objectId:string; keyAddress:string; appPolicy:string; environment:'development'|'production'; createdAt:number; expiresAt:number; receiptCreatedAt:number; keyVersion:string; publicPoint:string }
 interface Active extends Context { status:'active'; version:1; revision:number; publicPoint:string; counter:number; ciphertext:string; nonce:string; operationId?:string; requestDigest?:string; challengeExpiresAt?:number }
 interface Tombstone { status:'revoked'; version:1; keyAddress:string; expiresAt:number; purgeAt:number }
 type RecordState=Active|Tombstone;
@@ -39,7 +40,7 @@ export class ReceiptKeyStore extends DurableObject<StoreEnv> {
   protected async arm(){await this.locked(async()=>{const r=this.load(),extra=this.nextCleanupAt();const at=Math.min(r?(r.status==='active'?Math.min(r.challengeExpiresAt??r.expiresAt,r.expiresAt):r.purgeAt):Infinity,extra??Infinity);if(Number.isFinite(at))await this.ctx.storage.setAlarm(at);else await this.ctx.storage.deleteAlarm();});}
   private material(m:StoreMaterial,now:number){
     need(m&&Object.keys(m).sort().join(',')==='appPolicy,challengeCreatedAt,challengeExpiresAt,environment,keyAddress,operationId,publicPoint,receipt,receiptCreatedAt,requestDigest');
-    need(/^[a-f0-9]{64}$/.test(m.keyAddress)&&m.appPolicy==='ios-dev-qualification/1'&&m.environment==='development');
+    need(/^[a-f0-9]{64}$/.test(m.keyAddress)&&(m.appPolicy==='ios-dev-qualification/1'&&m.environment==='development'||m.appPolicy===TESTFLIGHT_POLICY&&m.environment==='production'));
     need(/^[a-f0-9]{64}$/.test(m.requestDigest)&&/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(m.operationId));
     need(canonicalBase64(m.publicPoint,65,65)[0]===4);canonicalBase64(m.receipt,16384);
     need(integer(m.receiptCreatedAt)&&now>=m.receiptCreatedAt&&now-m.receiptCreatedAt<=300000);

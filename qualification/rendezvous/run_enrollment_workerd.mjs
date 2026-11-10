@@ -32,7 +32,7 @@ async function main(){
     }
   }
   await put('fixtures.mjs','export default '+JSON.stringify(fixture)+';\n');
-  const sources={};for(const name of ['enrollment-evidence-candidate.mjs','enrollment-evidence-candidate.d.mts','enrollment-evidence.check.mjs','app-attest-core-candidate.mjs','receipt-cms-candidate.mjs','worker-path-candidate.mjs','receipt-status-candidate.mjs','receipt-status-client.mjs','run_enrollment_workerd.mjs']){const data=await readFile(new URL('./'+name,import.meta.url));sources[name]=hash(data);await put(name,data);}
+  const sources={};for(const name of ['enrollment-evidence-candidate.mjs','testflight-40521.mjs','testflight-40521.d.mts','enrollment-evidence-candidate.d.mts','enrollment-evidence.check.mjs','app-attest-core-candidate.mjs','receipt-cms-candidate.mjs','worker-path-candidate.mjs','receipt-status-candidate.mjs','receipt-status-client.mjs','run_enrollment_workerd.mjs']){const data=await readFile(new URL('./'+name,import.meta.url));sources[name]=hash(data);await put(name,data);}
   await put('worker.mjs',"export default {fetch(){return new Response('qualification only',{status:503,headers:{'cache-control':'no-store'}})}};\n");
   await put('wrangler.jsonc',JSON.stringify({name:'djc-local-enrollment-evidence-qualification',main:'worker.mjs',workers_dev:false,compatibility_date:'2026-06-20',compatibility_flags:['nodejs_compat'],send_metrics:false,observability:{enabled:false}}));
   const aliases={'djc-enrollment-trust':join(output,'trust.mjs'),'djc-enrollment-fixtures':join(output,'fixtures.mjs'),cbor:rd.resolve('cbor'),pkijs:join(deps,'node_modules/pkijs/build/index.es.js'),asn1js:join(deps,'node_modules/asn1js/build/index.es.js')};

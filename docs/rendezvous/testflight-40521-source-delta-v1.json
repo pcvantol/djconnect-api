@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_TESTFLIGHT_40521_PROFILE_NOT_ACTIVATION",
+  "baseline_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
+  "effective_source_map_sha256": "4a7b413bdb7dc59fdd66c729deca7768dcb8f56d66f7f6cd8303ea34d3ac7150",
+  "changes": {
+    "qualification/rendezvous/app-attest-core-candidate.mjs": {
+      "before": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
+      "after": "0e0fd572c2341328c710a871d0b7fe6255c96b6573fb22c3185a4875451d698c"
+    },
+    "qualification/rendezvous/assertion-key-state.check.mjs": {
+      "before": "9f730fc3981bb45681f24f57b22df0021ade9c10ba75c55826548bd1ce66fa78",
+      "after": "9396f21cf741510f546ddbd75587be479e3436b68847de5b887bc7829a5015e7"
+    },
+    "qualification/rendezvous/assertion-key-state.ts": {
+      "before": "d65abe4ec101f52372340f47a159efa2f725c3ea0e4aa03fca8efeb5143b1917",
+      "after": "cb9a3d8f3102d043644ae5329ebe9be93ace2a5135f44f959d5add46c5da846f"
+    },
+    "qualification/rendezvous/assertion-verifier.d.ts": {
+      "before": "53fe57a62d1f00c2ea44c6801b24e79acaaa47d46177629bbf7d81401ba166f1",
+      "after": "20dcbeb07121837ca37617093b5a86300da90f4b314192f2c82f80a5c53bb0b2"
+    },
+    "qualification/rendezvous/composed-http.ts": {
+      "before": "21fad11bb8c0317084950f68bb3462fb737d31fdcbfbd82e054ab3a74eebde02",
+      "after": "e30844d651ecce08a21bd6cd1bb90f35bbbc7a2f32c3e3edf5ef3ba04b8250a1"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.d.mts": {
+      "before": "176ad10c9ee9b9ea92846576b8db115271e33ff09eaf485edf1285020b543209",
+      "after": "25943719d970e3ef2ba1a059ec48808b07244168ae1e6a4acc8d7eb537c4a292"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.mjs": {
+      "before": "55f99c8073f10f29c834b459ac84cb4f9c9290476fa51c8741dc5db8b1781644",
+      "after": "adf7036542a3e3cd37eec30088de9cde06263c03ae12c7e6caed7da5f3115dd8"
+    },
+    "qualification/rendezvous/enrollment-key-state.ts": {
+      "before": "2e713fb51bb8e775ecd070c20984136ac32ed42b318454d72d9394b7b7630de5",
+      "after": "4f277e05244513fae99acb6fa48c989498c052b5677118b2423948860205081f"
+    },
+    "qualification/rendezvous/key-routing.ts": {
+      "before": "56d05029e953617b078680c8e31a79d15e81ab90abe941d5895d0d94025885c4",
+      "after": "1e40dec638c7530665592768525872e711adca5b04853f482ca645e12ef9d77d"
+    },
+    "qualification/rendezvous/receipt-cms-candidate.mjs": {
+      "before": "0dadf10ef3055862ef952dd551907d15f6aedc66f19400d8ed268e3c9daf5dd0",
+      "after": "4897e2fc10b2bbb6e9dd24f35b95e49845917cf27b2e04490314cfb4b18617f1"
+    },
+    "qualification/rendezvous/receipt-key-store.ts": {
+      "before": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
+      "after": "21c94a8649e354e44bba2babadf3c285ad9a0f2543dce9fd22438bbebe7eb257"
+    },
+    "qualification/rendezvous/run_challenge_budget_workerd.mjs": {
+      "before": "7f92e95b3d090d8900e67704ef300065648c7671cb298ee389a33ae834cb2e88",
+      "after": "1c9f67e29b1419c510724b790022f1db3c4d608ca6852e8ce395a4db4984f37e"
+    },
+    "qualification/rendezvous/run_composed_http_workerd.mjs": {
+      "before": "39937feef03cd2bbae0ee60504b31a7bb52ae03b4d495017189446171eb9634b",
+      "after": "5e51d570d1c8208c857fa82b0c8d651acdaf98305c31a269ad5e18448891f7c2"
+    },
+    "qualification/rendezvous/run_index_workerd.mjs": {
+      "before": "d3d886a3a976727637c2c317fea1cb8bbd13079bca6632d2d86c4f1178e23804",
+      "after": "fd031b46123e9dcacc52c5c8bc83783cabdaf49857a882226f56b1b619ac2827"
+    },
+    "qualification/rendezvous/run_key_routing_workerd.mjs": {
+      "before": "9795d2a211813cc98de3cd17786df716be0e76b394fc5842fc77942824c7451e",
+      "after": "f1b86523b288a5bfe44f3cfea943c70efb2cdfd0b3c0065042bee7be188c8ac4"
+    },
+    "qualification/rendezvous/run_provider_unavailable_workerd.mjs": {
+      "before": "2b1161ed65db3a30ccffb3a541e4de6d72b23a0dc8029b83a93bdcc2135bf98a",
+      "after": "dece013f1b01f519d3cd6d46b8c238d6dfb78443cf6b51de25932c61cc110041"
+    },
+    "qualification/rendezvous/run_registration_workerd.mjs": {
+      "before": "bd9af9a5a63e3682a9a58303df1f6d81a2b3f190b421d1aeda4f93af7f423bc7",
+      "after": "36f22548309f5ab1ee66f6901fd9a8e609f7de429e0e24daa9d0a7edc505ac2d"
+    },
+    "qualification/rendezvous/run_request_admission_workerd.mjs": {
+      "before": "7a7ec0b7acc7b08b398f87f7cad1e2a4d171fa45e5876b37479758c554aaaf7c",
+      "after": "061bc4bc24bc788bfbc13b855e1061f56c419ef6a38dc040a13ef542d4138b5d"
+    },
+    "qualification/rendezvous/run_retry_hint_workerd.mjs": {
+      "before": "197e0b5a062983123378ff4d7ed2d5b4b0a672345db51b825847eaacbaa90c54",
+      "after": "0dbf735b828560cbebcacdbf513ed242a072a12b550df02c6a953532a9cd420d"
+    },
+    "qualification/rendezvous/run_shared_key_workerd.mjs": {
+      "before": "91514965bb1207e273891488423d256ac29cb6a510887d78667c0bebcc996f37",
+      "after": "ba13dfa5fc918af137e88c2f3fd47e20e068224054ee0f2b15e992b34d65f398"
+    },
+    "qualification/rendezvous/run_transaction_workerd.mjs": {
+      "before": "3f7c7455169284886932038e56b50367db13f85e0a247bdc6b20d073845bb36e",
+      "after": "1f93c07e89ce27f023f88f3ce23d752fa17fd0da0e9a3fe6661bd17071f2f83e"
+    },
+    "qualification/rendezvous/transaction-state.ts": {
+      "before": "fc6342c2265a1c53f78fbefd8800b6819c1e1d8c3b612fa7b21c23a5a7410e0e",
+      "after": "eb4bf7b91d26a0868e6e4582a37f14d2f452b12d9d657e4dc2ce0ecb904fc8ae"
+    },
+    "src/rendezvous/composition.ts": {
+      "before": "79e8fe0dc4c04d872e3edc9bf7753bc05c1bae305b2e4b3ddbf3d6701c0b5a44",
+      "after": "4fc05fbafd2c8e0500b2b36adc703ba82118eed572ead465c7666966bdc70620"
+    }
+  },
+  "source_additions": {
+    "qualification/rendezvous/testflight-40521.mjs": "482b36e3cfcf2726bd3c014cf9a302a71b96cea6666efd19a4f8130d76a6bf46",
+    "qualification/rendezvous/testflight-40521.d.mts": "0279f687a8aba3b4b6dbf349464751eb0996561499ddcfa6e1d90d15a868ff3d"
+  },
+  "reference_changes": {},
+  "reference_additions": {
+    "qualification/rendezvous/qa-build-profile.json": "2b7b97eb2bd4cd2902759165d9d411370c018ba50d5c4dda84ea7b8588af75a4",
+    "qualification/rendezvous/run_assertion_state_workerd.mjs": "c1914b694ce574dc884ec0671670850c1f56db54b95efd0765c576cbef7fbb54",
+    "qualification/rendezvous/run_capacity_workerd.mjs": "fd61923a66a273ba8065a3d9b6496759fd3f27b260d0960c12e59a5bfdc32533",
+    "qualification/rendezvous/run_create_recovery_workerd.mjs": "09c017998915e14c895e5023646a4ef29d6c23432f693cdf7d24505cc022da8d",
+    "qualification/rendezvous/run_enrollment_workerd.mjs": "8f8d883f58ed16432ac5862bbe030791c3e4f30ea2303cad22a7375410eeb50b",
+    "qualification/rendezvous/run_partition_capacity_workerd.mjs": "61dcc14e64172c53a90cb073335c938d7d9b2c7b8869f17df47173e6ff7d7c61",
+    "qualification/rendezvous/run_receipt_workerd.mjs": "7cdecdbb2068c0b8bd0ab0a7ab830f2d771ed58bd8fc83a50c674e64e70b8f79",
+    "qualification/rendezvous/run_store_workerd.mjs": "6d597802ba33d5d464d69b79497d228a2bc00bd1ed71b10761f8886644f13e73",
+    "scripts/build_rendezvous_qa.mjs": "874d397f26f253c839e3c2cee2e973f6fba06e5213f08e7e7e7234bb029870f0",
+    "src/rendezvous/qa-entry.ts": "c08c0da27890d0f88086cd604ddff28fac02eab268357f035b409a0cf8c57b61"
+  },
+  "public_activation_allowed": false
+}

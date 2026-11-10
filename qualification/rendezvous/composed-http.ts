@@ -31,7 +31,7 @@ const fromUrl=(value:string)=>Uint8Array.from(atob(value.replaceAll('-','+').rep
 export class BudgetedTransactionCoordinator extends TransactionCoordinator {
   constructor(ctx:DurableObjectState,env:ComposedEnv,namespace=env.COMPOSED_TRANSACTIONS,keys=env.ENROLLMENT_COORDINATOR){
     const budget=env.ADMISSION_STATE.get(env.ADMISSION_STATE.idFromName(BUDGET_NAME));
-    const router=new KeyRpcRouter(budget,keys,()=>env.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY);
+    const router=new KeyRpcRouter(budget,keys,()=>env.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY,()=>env.ASSERTION_POLICY_ENABLED);
     super(ctx,env,namespace,keys,keyRoutedAuthorizer(router));
   }
 }
@@ -48,7 +48,7 @@ export function createComposedHandler(env?:ComposedEnv,resolveIdentity?:TrustedI
       dispatch:async(route:IngressRoute,b:WireObject)=>{
         try{
           need(enabled());const e=env!,budget=e.ADMISSION_STATE.get(e.ADMISSION_STATE.idFromName(BUDGET_NAME)),index=e.ALLOCATION_INDEX.get(e.ALLOCATION_INDEX.idFromName(INDEX_NAME));
-          const tx=new IndexedTransactionRouter(index,e.COMPOSED_TRANSACTIONS,enabled),keys=new KeyRpcRouter(budget,e.ENROLLMENT_COORDINATOR,enabled);
+          const tx=new IndexedTransactionRouter(index,e.COMPOSED_TRANSACTIONS,enabled),keys=new KeyRpcRouter(budget,e.ENROLLMENT_COORDINATOR,enabled,()=>e.ASSERTION_POLICY_ENABLED);
           const scan=()=>({transactionId:b.transaction_id as string,generation:b.generation as number,qrCapability:b.qr_capability as string});
           const browser=()=>({transactionId:b.transaction_id as string,generation:b.generation as number,claimSecret:b.claim_secret as string});
           let result:WireObject,body:unknown,code=200;

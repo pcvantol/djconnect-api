@@ -11,12 +11,12 @@
   "origin_disposition": "RECEIVER_DESIGN_GO_API_SOURCE_VARIANT_APPLE_CORE_ACK_PENDING",
   "transforms": {
     "src/rendezvous/composition.ts": {
-      "source_sha256": "79e8fe0dc4c04d872e3edc9bf7753bc05c1bae305b2e4b3ddbf3d6701c0b5a44",
+      "source_sha256": "4fc05fbafd2c8e0500b2b36adc703ba82118eed572ead465c7666966bdc70620",
       "counts": {
         "https://api.djconnect.dev": 1,
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "b63d2d4ccf5dba78b5f8ce46e1ca580034e8be70614d60823a2658facba37175"
+      "derived_sha256": "2f2e4de72a86482357b4819020e446db133c6dfb5ff63829ed87579cffb3a970"
     },
     "qualification/rendezvous/http-ingress.ts": {
       "source_sha256": "d01adf7731975bbb846aec3d4980d88d7b7f3c2f7e59b801b3124ed4cd068554",
@@ -27,20 +27,20 @@
       "derived_sha256": "95e53c82c2822ccae6222514791489e940fd24df7a0d999906ba72adca6ccddd"
     },
     "qualification/rendezvous/assertion-key-state.ts": {
-      "source_sha256": "d65abe4ec101f52372340f47a159efa2f725c3ea0e4aa03fca8efeb5143b1917",
+      "source_sha256": "cb9a3d8f3102d043644ae5329ebe9be93ace2a5135f44f959d5add46c5da846f",
       "counts": {
         "https://api.djconnect.dev": 1,
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "11cff643559e320a2a9665f05b2da4163bc3b695eb9e3b000e9798164af02e07"
+      "derived_sha256": "2ec8c0b0520e22e7cb73cdcfd221ea911c3b9bcdb6883c8575ea89482d347509"
     },
     "qualification/rendezvous/transaction-state.ts": {
-      "source_sha256": "fc6342c2265a1c53f78fbefd8800b6819c1e1d8c3b612fa7b21c23a5a7410e0e",
+      "source_sha256": "eb4bf7b91d26a0868e6e4582a37f14d2f452b12d9d657e4dc2ce0ecb904fc8ae",
       "counts": {
         "https://api.djconnect.dev": 1,
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "1819a4a2b1c14719f571c70635bcb24470a0a516165e063b15964db076e24608"
+      "derived_sha256": "5e0432617bc9673304c512779e0a2c254d4d4b78aa74adbd1ffa0b58919c972b"
     },
     "docs/rendezvous/wire-request-schemas-v1.json": {
       "source_sha256": "c00d495222a5bc719e5ef22280e4bbacbb7496f03740cb9c6ccf8b464f4d8a0d",
@@ -51,54 +51,47 @@
       "derived_sha256": "24ab72719195f7971e070e56c52ceea7e67e02ee1bd7c6946eca99883194505f"
     },
     "qualification/rendezvous/key-routing.ts": {
-      "source_sha256": "56d05029e953617b078680c8e31a79d15e81ab90abe941d5895d0d94025885c4",
+      "source_sha256": "1e40dec638c7530665592768525872e711adca5b04853f482ca645e12ef9d77d",
       "counts": {
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "5b684039b97a2593149dd80a0b5be5793a076f98cecaf33e9c2aabdf5f288eb3"
+      "derived_sha256": "678dabcb71f4f23a121a7e5a77287b319d91aac459bb6acaa474283c960166f2"
     },
     "qualification/rendezvous/receipt-key-store.ts": {
-      "source_sha256": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
+      "source_sha256": "21c94a8649e354e44bba2babadf3c285ad9a0f2543dce9fd22438bbebe7eb257",
       "counts": {
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "c8a048c438aa653714e4efa66893f2961ebe8234cfc92a69eaf62651c0952206"
+      "derived_sha256": "3f5a927c9a01f7631af06bb886b84114e3c3e992be9df54099cc546e361aefc6"
     },
     "qualification/rendezvous/app-attest-core-candidate.mjs": {
-      "source_sha256": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
+      "source_sha256": "0e0fd572c2341328c710a871d0b7fe6255c96b6573fb22c3185a4875451d698c",
       "counts": {
         "ZEML4LPXH4.dev.djconnect.ios": 1,
         "const BUILDS = new Set(['40227', '40228', '40230']);": 1
       },
-      "derived_sha256": "5bd36e83941554785adf362eb3240e6ce9039fdf360fb83ac0204b660c4361a1"
+      "derived_sha256": "925fff40983a9ccfee939153143a96cf37ba60ce37ffb1be439053ca4f38f1fb"
     },
     "qualification/rendezvous/receipt-cms-candidate.mjs": {
-      "source_sha256": "0dadf10ef3055862ef952dd551907d15f6aedc66f19400d8ed268e3c9daf5dd0",
+      "source_sha256": "4897e2fc10b2bbb6e9dd24f35b95e49845917cf27b2e04490314cfb4b18617f1",
       "counts": {
         "ZEML4LPXH4.dev.djconnect.ios": 1
       },
-      "derived_sha256": "5dd60d52d33fe12c732f3d9c3a58ad4c7258c9b9ca5f8f3c31cd2b69e2ccec2b"
+      "derived_sha256": "b033cfa0786356d2c24bdb62e76b0c5d4b1ccbb1a37b5021925d4ceb609d601e"
     },
     "qualification/rendezvous/enrollment-evidence-candidate.mjs": {
-      "source_sha256": "55f99c8073f10f29c834b459ac84cb4f9c9290476fa51c8741dc5db8b1781644",
+      "source_sha256": "adf7036542a3e3cd37eec30088de9cde06263c03ae12c7e6caed7da5f3115dd8",
       "counts": {
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "a7c147c1dbe91ae9393e32bdda36d7f4a598fee38491222d095ce8c1505b8b8c"
-    },
-    "qualification/rendezvous/enrollment-key-state.ts": {
-      "source_sha256": "2e713fb51bb8e775ecd070c20984136ac32ed42b318454d72d9394b7b7630de5",
-      "counts": {
-        "ios-dev-qualification/1": 1
-      },
-      "derived_sha256": "03c401dfb5fb90a1cf638e6a755b366252f1d8ac65b441d8c95690f5fce0c627"
+      "derived_sha256": "a1c94984a6f29d652f0b24339983dc776fb081711c7a704a045e3b4aff3bb2e9"
     },
     "qualification/rendezvous/enrollment-evidence-candidate.d.mts": {
-      "source_sha256": "176ad10c9ee9b9ea92846576b8db115271e33ff09eaf485edf1285020b543209",
+      "source_sha256": "25943719d970e3ef2ba1a059ec48808b07244168ae1e6a4acc8d7eb537c4a292",
       "counts": {
         "ios-dev-qualification/1": 2
       },
-      "derived_sha256": "5fadf27a2b32efa3cfb9611f93c7fe95a039218252031a24179ff05c657b25d8"
+      "derived_sha256": "89135b698d7cdf9e3c2431b56fb2ebf6298db0b634b963d81cb3f4ca563a4cd2"
     }
   },
   "qa_verifier_identity": {

@@ -45,6 +45,7 @@ export default {
   // The enrollment coordinator uses this same deadline at its SQLite commit.
   const window = reviewedWindow
    && configuration?.ASSERTION_POLICY_EXPIRES_AT === String(reviewedWindow.endsAt)
+   && configuration.ASSERTION_POLICY_ENABLED === 'ios-vibecast-qa-development/1'
    && configuration.RENDEZVOUS_CAPACITY_POLICY === 'private-household/1'
    ? reviewedWindow : null;
   if (request.method === 'GET' && url.href === SERVICE+'/health') return json({ok:true,service:'djconnect-api-vibecast-qa',release_sha:__DJC_QA_SOURCE_SHA__,activation_allowed:window!==null},200);

@@ -2,6 +2,7 @@
 import * as asn from 'asn1js';
 import * as pki from 'pkijs';
 const ROOT = '63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179';
+import { TESTFLIGHT_POLICY, TESTFLIGHT_APP } from './testflight-40521.mjs';
 const APP = new TextEncoder().encode('ZEML4LPXH4.dev.djconnect.ios');
 const OID = { bc:'2.5.29.19', ku:'2.5.29.15', ski:'2.5.29.14', aki:'2.5.29.35',
   leaf:'1.2.840.113635.100.12.15', inter:'1.2.840.113635.100.6.2.3',
@@ -88,7 +89,7 @@ function instant(bytes){
   need(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(text));
   const n=Date.parse(text);need(Number.isSafeInteger(n)&&new Date(n).toISOString()===text);return n;
 }
-async function evaluate(encoded,attestedCert,clientData,anchor,pin,now){
+async function evaluate(encoded,attestedCert,clientData,anchor,pin,now,policy){
   bounded(attestedCert,1,8192);bounded(clientData,1,2048);bounded(anchor,1,8192);need(Number.isSafeInteger(now));
   need([...await hash(anchor)].map(v=>v.toString(16).padStart(2,'0')).join('')===pin);
   const outer=parse(encoded,16384,true),[contentType,wrapped]=seq(outer,2);
@@ -124,18 +125,19 @@ async function evaluate(encoded,attestedCert,clientData,anchor,pin,now){
   const verified=await sd.verify({signer:0,checkChain:false,extendedMode:true},engine);
   need(verified.signatureVerified===true&&verified.signerCertificate&&same(raw(verified.signerCertificate),raw(leaf)));
   const fields=payloadFields(body);
+  need(policy!==TESTFLIGHT_POLICY||same(APP,new TextEncoder().encode(TESTFLIGHT_APP)));
   need(same(fields.get(2),APP)&&same(fields.get(3),attestedCert)&&same(fields.get(4),await hash(clientData)));
-  need(same(fields.get(6),new TextEncoder().encode('ATTEST'))&&same(fields.get(7),new TextEncoder().encode('sandbox')));
+  need(same(fields.get(6),new TextEncoder().encode('ATTEST'))&&same(fields.get(7),new TextEncoder().encode(policy===TESTFLIGHT_POLICY?'production':'sandbox')));
   bounded(fields.get(5),1,1024);const created=instant(fields.get(12)),expires=instant(fields.get(21));need(expires>created);
   // Internal authenticated common-cert tuple, never the device leaf from receipt field3.
   return {scope:'CMS_SIGNATURE_PATH_FIELDS_ONLY_REVOCATION_UNCHECKED_NO_ENROLLMENT',created,expires,fresh:now>=created&&now-created<=300000&&now<expires,
     signer:raw(leaf).slice(),issuer:raw(inter).slice(),root:raw(root).slice(),certificateExpiresAt:Math.min(...[leaf,inter,root].map(c=>c.notAfter.value.getTime()))};
 }
-export async function qualifyReceiptEvidence(encoded,attestedCert,clientData,anchor){
-  try{return await evaluate(encoded,attestedCert,clientData,anchor,ROOT,Date.now());}catch{return null;}
+export async function qualifyReceiptEvidence(encoded,attestedCert,clientData,anchor,policy){
+  try{return await evaluate(encoded,attestedCert,clientData,anchor,ROOT,Date.now(),policy);}catch{return null;}
 }
-export async function qualifyFreshReceiptEvidence(encoded,attestedCert,clientData,anchor){
-  const result=await qualifyReceiptEvidence(encoded,attestedCert,clientData,anchor);return result?.fresh?result:null;
+export async function qualifyFreshReceiptEvidence(encoded,attestedCert,clientData,anchor,policy){
+  const result=await qualifyReceiptEvidence(encoded,attestedCert,clientData,anchor,policy);return result?.fresh?result:null;
 }
 // Fake root/clock only for synthetic tests; no scope string establishes trust.
 export async function qualifySyntheticReceipt(f){

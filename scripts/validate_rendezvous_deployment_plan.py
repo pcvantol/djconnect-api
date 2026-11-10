@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES | SHARED_KEY_ADDRESS_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES | SHARED_KEY_ADDRESS_SOURCES | TESTFLIGHT_PROFILE_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -875,7 +875,7 @@ SOURCE_PROVENANCE.update(shared_key_address_delta_sha256=SHARED_KEY_ADDRESS_SHA2
                          shared_key_address_source_map_sha256=SHARED_KEY_ADDRESS_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_testflight_profile():
     sources, refs = baseline_before_shared_key_address()
     delta = pinned_working_proof(SHARED_KEY_ADDRESS_PATH, SHARED_KEY_ADDRESS_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
@@ -896,6 +896,82 @@ def baseline():
     require(source_map_digest(sources) == delta['effective_source_map_sha256']
             == SHARED_KEY_ADDRESS_SOURCE_MAP_SHA256)
     refs[SHARED_KEY_ADDRESS_PATH] = SHARED_KEY_ADDRESS_SHA256
+    return sources, refs
+
+
+TESTFLIGHT_PROFILE_PATH = 'docs/rendezvous/testflight-40521-source-delta-v1.json'
+TESTFLIGHT_PROFILE_SHA256 = '2fa8becf81eac71d2a6e118d6a3f0e9bef58fde48a45a1dc833b806aa52436a7'
+TESTFLIGHT_PROFILE_MAP_SHA256 = '4a7b413bdb7dc59fdd66c729deca7768dcb8f56d66f7f6cd8303ea34d3ac7150'
+TESTFLIGHT_PROFILE_SOURCES = frozenset((
+    'qualification/rendezvous/app-attest-core-candidate.mjs',
+    'qualification/rendezvous/assertion-key-state.check.mjs',
+    'qualification/rendezvous/assertion-key-state.ts',
+    'qualification/rendezvous/assertion-verifier.d.ts',
+    'qualification/rendezvous/composed-http.ts',
+    'qualification/rendezvous/enrollment-evidence-candidate.d.mts',
+    'qualification/rendezvous/enrollment-evidence-candidate.mjs',
+    'qualification/rendezvous/enrollment-key-state.ts',
+    'qualification/rendezvous/key-routing.ts',
+    'qualification/rendezvous/receipt-cms-candidate.mjs',
+    'qualification/rendezvous/receipt-key-store.ts',
+    'qualification/rendezvous/run_challenge_budget_workerd.mjs',
+    'qualification/rendezvous/run_composed_http_workerd.mjs',
+    'qualification/rendezvous/run_index_workerd.mjs',
+    'qualification/rendezvous/run_key_routing_workerd.mjs',
+    'qualification/rendezvous/run_provider_unavailable_workerd.mjs',
+    'qualification/rendezvous/run_registration_workerd.mjs',
+    'qualification/rendezvous/run_request_admission_workerd.mjs',
+    'qualification/rendezvous/run_retry_hint_workerd.mjs',
+    'qualification/rendezvous/run_shared_key_workerd.mjs',
+    'qualification/rendezvous/run_transaction_workerd.mjs',
+    'qualification/rendezvous/transaction-state.ts',
+    'src/rendezvous/composition.ts',
+))
+TESTFLIGHT_PROFILE_ADDITIONS = frozenset((
+    'qualification/rendezvous/testflight-40521.mjs',
+    'qualification/rendezvous/testflight-40521.d.mts',
+))
+TESTFLIGHT_PROFILE_REFERENCES = frozenset()
+TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS = frozenset((
+    'qualification/rendezvous/qa-build-profile.json',
+    'qualification/rendezvous/run_assertion_state_workerd.mjs',
+    'qualification/rendezvous/run_capacity_workerd.mjs',
+    'qualification/rendezvous/run_create_recovery_workerd.mjs',
+    'qualification/rendezvous/run_enrollment_workerd.mjs',
+    'qualification/rendezvous/run_partition_capacity_workerd.mjs',
+    'qualification/rendezvous/run_receipt_workerd.mjs',
+    'qualification/rendezvous/run_store_workerd.mjs',
+    'scripts/build_rendezvous_qa.mjs',
+    'src/rendezvous/qa-entry.ts',
+))
+SOURCE_PROVENANCE.update(testflight_profile_delta_sha256=TESTFLIGHT_PROFILE_SHA256,
+                         testflight_profile_source_map_sha256=TESTFLIGHT_PROFILE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_testflight_profile()
+    delta = pinned_working_proof(TESTFLIGHT_PROFILE_PATH, TESTFLIGHT_PROFILE_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'source_additions',
+                           'reference_changes', 'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_TESTFLIGHT_40521_PROFILE_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in ((sources, delta['changes'], TESTFLIGHT_PROFILE_SOURCES),
+                                      (refs, delta['reference_changes'], TESTFLIGHT_PROFILE_REFERENCES)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['before'] != change['after'])
+            mapping[name] = change['after']
+    for mapping, additions, allowed in ((sources, delta['source_additions'], TESTFLIGHT_PROFILE_ADDITIONS),
+                                         (refs, delta['reference_additions'], TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS)):
+        require(set(additions) == allowed and not allowed.intersection(mapping))
+        mapping.update(additions)
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == TESTFLIGHT_PROFILE_MAP_SHA256)
+    refs[TESTFLIGHT_PROFILE_PATH] = TESTFLIGHT_PROFILE_SHA256
     return sources, refs
 
 
