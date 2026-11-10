@@ -4,7 +4,7 @@ import {AssertionKeyState,type CoordinatorEnv,type IssueInput,type ProofInput} f
 import {StoreRejected,validReceiptActiveKey,type StoreMaterial} from './receipt-key-store';
 import {createEnrollmentEvidenceVerifier,type EnrollmentVerifier,type EnrollmentEvidence,type SavedEnrollmentState} from './enrollment-evidence-candidate.mjs';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
-import { TESTFLIGHT_POLICY, testflightReleaseRevision } from './testflight-release.mjs';
+import { assertionPolicyDeadline, TESTFLIGHT_POLICY, testflightReleaseRevision } from './testflight-release.mjs';
 import { rendezvousKeyAddress } from './key-address';
 
 export interface EnrollmentEnv extends CoordinatorEnv {ENROLLMENT_POLICY_REVISION?:string}
@@ -34,7 +34,7 @@ export class EnrollmentKeyState extends AssertionKeyState {
   }
   #configuration(){if(!validReceiptActiveKey(this.env))throw new EnrollmentConfigUnavailable();}
   protected enrollmentPolicy(now:number){
-    const env=this.env as EnrollmentEnv,until=Number(env.ASSERTION_POLICY_EXPIRES_AT),configuredRevision=env.ENROLLMENT_POLICY_REVISION,releaseRevision=testflightReleaseRevision(this.release());
+    const env=this.env as EnrollmentEnv,until=assertionPolicyDeadline(env),configuredRevision=env.ENROLLMENT_POLICY_REVISION,releaseRevision=testflightReleaseRevision(this.release());
     const revision=typeof configuredRevision==='string'&&configuredRevision.length>0
       ? (releaseRevision===undefined?configuredRevision:JSON.stringify([configuredRevision,releaseRevision])) : undefined;
     if(!(env.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until&&(this.appPolicy()!==TESTFLIGHT_POLICY||releaseRevision!==undefined)&&typeof revision==='string'&&revision.length>0&&revision.length<=128))throw new EnrollmentConfigUnavailable();

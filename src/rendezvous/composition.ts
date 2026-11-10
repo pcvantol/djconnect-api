@@ -4,7 +4,7 @@ import {COMPOSED_POLICY,type ComposedEnv} from '../../qualification/rendezvous/c
 import {deriveBudgetIdentity,normalizeBudgetIp,BUDGET_POLICY} from '../../qualification/rendezvous/allocation-budget';
 import {INDEX_POLICY} from '../../qualification/rendezvous/allocation-index';
 import {validReceiptActiveKey} from '../../qualification/rendezvous/receipt-key-store';
-import {TESTFLIGHT_POLICY,publicTrialRequestOpen,testflightRelease,type PublicTrialWindow} from '../../qualification/rendezvous/testflight-release.mjs';
+import {assertionPolicyDeadline,TESTFLIGHT_POLICY,publicTrialRequestOpen,testflightRelease,type PublicTrialWindow} from '../../qualification/rendezvous/testflight-release.mjs';
 import type {EnrollmentEnv} from '../../qualification/rendezvous/enrollment-key-state';
 
 export type ProductRendezvousEnv=ComposedEnv&RequestEnv&EnrollmentEnv&PublicTrialWindow&{
@@ -21,7 +21,7 @@ function snapshot(env:ProductRendezvousEnv){
 	need(env.RENDEZVOUS_CAPACITY_POLICY===undefined||env.RENDEZVOUS_CAPACITY_POLICY==='private-household/1');
 	need(env.RENDEZVOUS_EDGE_POLICY==='djc-direct-edge-identity/1-candidate');
 	need(env.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY&&env.REQUEST_POLICY_ENABLED===REQUEST_POLICY&&env.ALLOCATION_POLICY_ENABLED===BUDGET_POLICY&&env.INDEX_POLICY_ENABLED===INDEX_POLICY);
-	const until=Number(env.ASSERTION_POLICY_EXPIRES_AT);
+	const until=assertionPolicyDeadline(env);
 	need((env.ASSERTION_POLICY_ENABLED==='ios-dev-qualification/1'||(env.ASSERTION_POLICY_ENABLED===TESTFLIGHT_POLICY&&testflightRelease(env)))&&Number.isSafeInteger(until)&&Date.now()<until);
 	need(typeof env.ENROLLMENT_POLICY_REVISION==='string'&&env.ENROLLMENT_POLICY_REVISION.length>0&&env.ENROLLMENT_POLICY_REVISION.length<=128);
 	need(validReceiptActiveKey(env));

@@ -19,4 +19,6 @@ export interface PublicTrialWindow {
   RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT?: string;
   ASSERTION_POLICY_EXPIRES_AT?: string;
 }
+export function alwaysOnTestflight(env: PublicTrialWindow): boolean;
+export function assertionPolicyDeadline(env: PublicTrialWindow): number;
 export function publicTrialRequestOpen(env: PublicTrialWindow, now: number, creating: boolean): boolean;
