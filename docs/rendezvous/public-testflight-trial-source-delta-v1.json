@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "scope": "PUBLIC_TESTFLIGHT_TRIAL_SOURCE_NO_ACTIVE_CONFIGURATION",
+  "scope": "PUBLIC_TESTFLIGHT_TRIAL_CONFIGURED_NOT_DEPLOYED",
   "baseline_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
-  "effective_source_map_sha256": "e627ff1e1ecdfe6d2ad300247662531106507b761b4cea224544ae1fb2a84239",
+  "effective_source_map_sha256": "4b2db849f8454ff702e75801dd7c546ccf62a19d7132ec9867026c2741bdbae2",
   "source_changes": {
     "src/rendezvous/dispatch.ts": {
       "before": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
@@ -10,7 +10,7 @@
     },
     "src/rendezvous/composition.ts": {
       "before": "b1a04b3f35b27c4597105f5bbb4e68315d16010eb336a3492be82954d52cacd0",
-      "after": "539d7087f588fa98b4a1725e8c5d18144536ee2561ba54b8cb47d30c063b7649"
+      "after": "b57ba14b066882cb7c3e3467b3e54225dfae42b697c9166fd08c888f1c1c452b"
     },
     "qualification/rendezvous/product-composition.check.ts": {
       "before": "8223295b4684bc1d665e43c26541cb9c64922fcd46c9e6333dd60ce49b2f71e8",
@@ -30,20 +30,28 @@
     },
     "qualification/rendezvous/testflight-release.mjs": {
       "before": "c44979c2fc4329037f8a464934a22ce7fdfb1943db641e6a85f6f1e23cfd8d69",
-      "after": "4d2f3feccb752b17771d52101411a9926d2189ea934b1bb4f3f32e62483ceb64"
+      "after": "5cf90a1df302169ba6e7bcc388236db87cfa6e27c727bb2163463864fcdc23c1"
     },
     "qualification/rendezvous/testflight-release.d.mts": {
       "before": "6ed5cbc9c7dfd3619b701c199edf0618020d823b9ab4fe42a7c6e92b270d317d",
-      "after": "4c04d875f35f672677feae9b92db1e49e2bf73b6abeda7cbb55fa1d012c59dd0"
+      "after": "76d33a30ba96e9cd7606afba9f61c46cd798e8c4d74a2363bd5d0ac84bb4e3d2"
+    },
+    "wrangler.jsonc": {
+      "before": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
+      "after": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a"
     }
   },
   "reference_changes": {
     "qualification/rendezvous/qa-build-profile.json": {
       "before": "0aa52b27a4f9e9d57200a6abeeae8728c87fd0e99b623e220c034fc446a99d3b",
-      "after": "b28f0757ba9b040225b21e3945ce4804dfc78c68d8436852e8d743764cb1dcee"
+      "after": "00c8f784262ec3b54169453bade031e4587f54cc7b7dbf0a6361ad4760ea2ab4"
+    },
+    "wrangler.jsonc": {
+      "before": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
+      "after": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a"
     }
   },
   "reference_additions": {
-    "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "b300a3929d2922e8eb2ebfe2d540432a0b763f422fe775d58b70f50a41a9e9bb"
+    "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "2d8766f46a75a686735573ab91731caac9471f43c5d2b2d70a7e2f76e47d3043"
   }
 }

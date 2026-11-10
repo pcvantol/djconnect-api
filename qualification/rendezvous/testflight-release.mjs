@@ -27,7 +27,7 @@ export function testflightReleaseRevision(release) {
 }
 
 export function publicTrialRequestOpen(env, now, creating) {
-  if (env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT === undefined) return true;
+  if (env.ASSERTION_POLICY_ENABLED !== TESTFLIGHT_POLICY || env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT === undefined) return true;
   const start = Number(env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT);
   const end = Number(env.ASSERTION_POLICY_EXPIRES_AT);
   return Number.isSafeInteger(start) && Number.isSafeInteger(end)

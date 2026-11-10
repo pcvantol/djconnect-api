@@ -31,7 +31,20 @@
 		"APNS_TOPIC_IOS": "dev.djconnect.ios",
 		"APNS_TOPIC_MACOS": "dev.djconnect.mac",
 		"APNS_TOPIC_WATCHOS": "dev.djconnect.ios.watch",
-		"APNS_ENVIRONMENT": "sandbox"
+		"APNS_ENVIRONMENT": "sandbox",
+		"RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT": "1794313800000",
+		"ASSERTION_POLICY_EXPIRES_AT": "1794319200000",
+		"ASSERTION_POLICY_ENABLED": "ios-testflight/1",
+		"RENDEZVOUS_TESTFLIGHT_MIN_BUILD": "40522",
+		"RENDEZVOUS_TESTFLIGHT_MAX_BUILD": "40522",
+		"RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION": "1",
+		"RENDEZVOUS_CAPACITY_POLICY": "private-household/1",
+		"ENROLLMENT_POLICY_REVISION": "public-testflight-trial/1",
+		"ALLOCATION_POLICY_ENABLED": "djc-allocation-qualification/1",
+		"COMPOSED_POLICY_ENABLED": "djc-http-composition-qualification/1",
+		"INDEX_POLICY_ENABLED": "djc-index-qualification/1",
+		"REQUEST_POLICY_ENABLED": "djc-request-admission-qualification/2",
+		"RENDEZVOUS_EDGE_POLICY": "djc-direct-edge-identity/1-candidate"
 	},
 	"d1_databases": [
 		{

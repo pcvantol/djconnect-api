@@ -980,9 +980,9 @@ def baseline_before_public_trial():
 
 
 PUBLIC_TRIAL_DELTA_PATH = 'docs/rendezvous/public-testflight-trial-source-delta-v1.json'
-PUBLIC_TRIAL_DELTA_SHA256 = 'e330c62aa389e52a21bb77be46765fa4d95b0f2f7c4269675772eabb4198bd0f'
-PUBLIC_TRIAL_MAP_SHA256 = 'e627ff1e1ecdfe6d2ad300247662531106507b761b4cea224544ae1fb2a84239'
-PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/allocation-index.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'qualification/rendezvous/transaction-state.ts', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts'))
+PUBLIC_TRIAL_DELTA_SHA256 = 'be20f63a21c382e2b52c80e2226a53702753db0e9136a62203788b5199c56f64'
+PUBLIC_TRIAL_MAP_SHA256 = '4b2db849f8454ff702e75801dd7c546ccf62a19d7132ec9867026c2741bdbae2'
+PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/allocation-index.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'qualification/rendezvous/transaction-state.ts', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts', 'wrangler.jsonc'))
 SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
                          public_trial_source_map_sha256=PUBLIC_TRIAL_MAP_SHA256)
 
@@ -991,11 +991,11 @@ def baseline():
     sources, refs = baseline_before_public_trial()
     delta = pinned_working_proof(PUBLIC_TRIAL_DELTA_PATH, PUBLIC_TRIAL_DELTA_SHA256)
     require(delta['schema_version'] == 1
-            and delta['scope'] == 'PUBLIC_TESTFLIGHT_TRIAL_SOURCE_NO_ACTIVE_CONFIGURATION'
+            and delta['scope'] == 'PUBLIC_TESTFLIGHT_TRIAL_CONFIGURED_NOT_DEPLOYED'
             and delta['baseline_source_map_sha256'] == source_map_digest(sources))
     for mapping, changes, allowed in (
         (sources, delta['source_changes'], PUBLIC_TRIAL_SOURCES),
-        (refs, delta['reference_changes'], {'qualification/rendezvous/qa-build-profile.json'}),
+        (refs, delta['reference_changes'], {'qualification/rendezvous/qa-build-profile.json', 'wrangler.jsonc'}),
     ):
         require(set(changes) == allowed)
         for name, change in changes.items():

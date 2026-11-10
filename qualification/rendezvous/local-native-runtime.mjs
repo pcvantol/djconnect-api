@@ -121,7 +121,7 @@ export async function sourceSnapshot(){
  const publicTrialRaw=await readFile(join(repo,publicTrialPath));
  need(plan.reference_hashes[publicTrialPath]===sha(publicTrialRaw)&&sha(publicTrialRaw)===provenance.public_trial_delta_sha256);
  const publicTrial=JSON.parse(publicTrialRaw);
- need(publicTrial.scope==='PUBLIC_TESTFLIGHT_TRIAL_SOURCE_NO_ACTIVE_CONFIGURATION');
+ need(publicTrial.scope==='PUBLIC_TESTFLIGHT_TRIAL_CONFIGURED_NOT_DEPLOYED');
  need(publicTrial.baseline_source_map_sha256===testFlight.effective_source_map_sha256&&publicTrial.effective_source_map_sha256===provenance.public_trial_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;

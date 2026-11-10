@@ -64,7 +64,7 @@
   },
   "public_entrypoint": null,
   "reference_hashes": {
-    "wrangler.jsonc": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
+    "wrangler.jsonc": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a",
     ".github/workflows/api-worker-post-deployment-smoke.yml": "6ba44be153abdc24fe01ebe6a9a95acd39d101e2fb80341656434e6b2cf45f72",
     ".github/workflows/deploy-api-worker.yml": "2058d08c7b77af2c4a1147d60fd0a5726cbd18bc176d14a871001d27c28df310",
     ".github/workflows/api-release-artifact.yml": "b9e52f0c3ca882485fa6fc2c405ff11149d00736118a2a1126d9fb2448830955",
@@ -112,7 +112,7 @@
     "docs/rendezvous/repository-namespace-release-delta-v1.json": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504",
     "docs/rendezvous/shared-key-address-delta-v1.json": "4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824",
     "docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md": "283f2f3f023e4a09d00f75ce1d9c62de97f83478d2a3beb0c62acaeb3644193e",
-    "qualification/rendezvous/qa-build-profile.json": "b28f0757ba9b040225b21e3945ce4804dfc78c68d8436852e8d743764cb1dcee",
+    "qualification/rendezvous/qa-build-profile.json": "00c8f784262ec3b54169453bade031e4587f54cc7b7dbf0a6361ad4760ea2ab4",
     "qualification/rendezvous/run_assertion_state_workerd.mjs": "18e6d564da7c2632ec9828c3ef9416c018be8f05299636c1e23d5a17fd40bab1",
     "qualification/rendezvous/run_capacity_workerd.mjs": "c7496d731a538e56bf6b641b48308221291e90a04750df4979f4d638a397a4cc",
     "qualification/rendezvous/run_create_recovery_workerd.mjs": "8f87ee04c9edfe025f8fa90ce0bae2f1f481d31c5d1c92af52aa1ffd9bb3e069",
@@ -124,8 +124,8 @@
     "src/rendezvous/qa-entry.ts": "c08c0da27890d0f88086cd604ddff28fac02eab268357f035b409a0cf8c57b61",
     "docs/rendezvous/testflight-release-source-delta-v1.json": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad",
-    "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "b300a3929d2922e8eb2ebfe2d540432a0b763f422fe775d58b70f50a41a9e9bb",
-    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "e330c62aa389e52a21bb77be46765fa4d95b0f2f7c4269675772eabb4198bd0f"
+    "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "2d8766f46a75a686735573ab91731caac9471f43c5d2b2d70a7e2f76e47d3043",
+    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "be20f63a21c382e2b52c80e2226a53702753db0e9136a62203788b5199c56f64"
   },
   "schema_version": 1,
   "secret_names": [
@@ -201,7 +201,7 @@
     "docs/rendezvous/wire-schema-cases-v1.json": "3443cc6580997678d54d1f57ce0b30271134069cdd256d16ccea7446b9545e4a",
     "docs/rendezvous/capacity-browser-traces-v1.json": "1a1e26f68efc03860e2de29d42ddae216a93c30228a57000cdb63935815c9492",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
-    "src/rendezvous/composition.ts": "539d7087f588fa98b4a1725e8c5d18144536ee2561ba54b8cb47d30c063b7649",
+    "src/rendezvous/composition.ts": "b57ba14b066882cb7c3e3467b3e54225dfae42b697c9166fd08c888f1c1c452b",
     "qualification/rendezvous/product-composition.check.ts": "b00eb730ddff7b59887b3e5a84ce19835f27938a941c120c5d15e29d41e22a56",
     "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
     "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
@@ -209,7 +209,7 @@
     "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
     "rendezvous-build-inputs.json": "2b96897393242c9b66def0350f73c6cc91b9e2059757d731b3b8b448c6def8ef",
-    "wrangler.jsonc": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
+    "wrangler.jsonc": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a",
     "package.json": "b684c815c993c080483dc9d9be50f5546d07a39ee18408ea46535f39a75f143e",
     "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
     ".github/workflows/ci-cd.yml": "e1e90326dcb5d25c5f1e661d55cbd48f965700d171b0a3ad9b03fed185e2a60d",
@@ -281,8 +281,8 @@
     "scripts/test_cleanup_workflow_runs.py": "8c39ce1c90c64cb2c741240036a586d2acf5551a24b0ff9a17bb8a069441e096",
     "qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json": "1270c280cca0adadde67da371afeba936d404552a51f7c8929daa34126bf57b3",
     "qualification/rendezvous/key-address.ts": "1f26277b64c54123833f702f30a55149c7fdbcfdcd56fc168d7401a84ed2f277",
-    "qualification/rendezvous/testflight-release.mjs": "4d2f3feccb752b17771d52101411a9926d2189ea934b1bb4f3f32e62483ceb64",
-    "qualification/rendezvous/testflight-release.d.mts": "4c04d875f35f672677feae9b92db1e49e2bf73b6abeda7cbb55fa1d012c59dd0"
+    "qualification/rendezvous/testflight-release.mjs": "5cf90a1df302169ba6e7bcc388236db87cfa6e27c727bb2163463864fcdc23c1",
+    "qualification/rendezvous/testflight-release.d.mts": "76d33a30ba96e9cd7606afba9f61c46cd798e8c4d74a2363bd5d0ac84bb4e3d2"
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
@@ -324,8 +324,8 @@
     "shared_key_address_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
     "testflight_profile_delta_sha256": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "testflight_profile_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
-    "public_trial_delta_sha256": "e330c62aa389e52a21bb77be46765fa4d95b0f2f7c4269675772eabb4198bd0f",
-    "public_trial_source_map_sha256": "e627ff1e1ecdfe6d2ad300247662531106507b761b4cea224544ae1fb2a84239"
+    "public_trial_delta_sha256": "be20f63a21c382e2b52c80e2226a53702753db0e9136a62203788b5199c56f64",
+    "public_trial_source_map_sha256": "4b2db849f8454ff702e75801dd7c546ccf62a19d7132ec9867026c2741bdbae2"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

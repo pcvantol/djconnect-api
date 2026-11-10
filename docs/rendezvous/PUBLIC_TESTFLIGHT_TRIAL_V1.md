@@ -1,8 +1,8 @@
 # Public VibeCast TestFlight trial
 
 The central Worker can serve the existing VibeCast routes during an explicitly
-configured trial for one verified TestFlight build. The source defaults to a
-closed route. The release manifest binds the reviewed Worker configuration and
+configured trial for one verified TestFlight build. The route stays closed outside the configured interval. The 10 November
+2026 configuration admits build 40522 from 13:30 to 15:00 CET. The release manifest binds the reviewed Worker configuration and
 exact artifact.
 
 Use the production App Attest policy `ios-testflight/1`, a single build (equal

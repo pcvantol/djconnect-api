@@ -53,6 +53,7 @@ export function createProductRendezvousHandler(env:ProductRendezvousEnv){
 			need(validArity);
 			const before=snapshot(env);
 			const window={
+				ASSERTION_POLICY_ENABLED:env.ASSERTION_POLICY_ENABLED,
 				RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT:env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT,
 				ASSERTION_POLICY_EXPIRES_AT:env.ASSERTION_POLICY_EXPIRES_AT,
 			};

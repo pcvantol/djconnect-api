@@ -15,6 +15,7 @@ export function testflightBuildAllowed(value: unknown, release?: TestFlightRelea
 export function testflightReleaseRevision(release?: TestFlightRelease): string | undefined;
 
 export interface PublicTrialWindow {
+  ASSERTION_POLICY_ENABLED?: string;
   RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT?: string;
   ASSERTION_POLICY_EXPIRES_AT?: string;
 }

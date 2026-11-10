@@ -11,12 +11,12 @@
   "origin_disposition": "RECEIVER_DESIGN_GO_API_SOURCE_VARIANT_APPLE_CORE_ACK_PENDING",
   "transforms": {
     "src/rendezvous/composition.ts": {
-      "source_sha256": "539d7087f588fa98b4a1725e8c5d18144536ee2561ba54b8cb47d30c063b7649",
+      "source_sha256": "b57ba14b066882cb7c3e3467b3e54225dfae42b697c9166fd08c888f1c1c452b",
       "counts": {
         "https://api.djconnect.dev": 1,
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "21eac81a7fbdd23898dc848b528581e8452d13fdfdb8bca726f84492cc54652c"
+      "derived_sha256": "4d7b9240e0bf03e457efc8392f12336dce29809ac32046c490353c20c8d4e072"
     },
     "qualification/rendezvous/http-ingress.ts": {
       "source_sha256": "d01adf7731975bbb846aec3d4980d88d7b7f3c2f7e59b801b3124ed4cd068554",
