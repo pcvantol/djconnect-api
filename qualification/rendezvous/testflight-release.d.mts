@@ -13,3 +13,10 @@ export interface TestFlightRelease {
 export function testflightRelease(env: TestFlightReleaseEnv): TestFlightRelease | undefined;
 export function testflightBuildAllowed(value: unknown, release?: TestFlightRelease): boolean;
 export function testflightReleaseRevision(release?: TestFlightRelease): string | undefined;
+
+export interface PublicTrialWindow {
+  ASSERTION_POLICY_ENABLED?: string;
+  RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT?: string;
+  ASSERTION_POLICY_EXPIRES_AT?: string;
+}
+export function publicTrialRequestOpen(env: PublicTrialWindow, now: number, creating: boolean): boolean;

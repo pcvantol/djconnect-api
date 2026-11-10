@@ -6,7 +6,7 @@ import {qualifyBrowserPublicJwk,qualifyCompactJwe,type BrowserPublicJwk} from '.
 import {type ProofInput,type SubmitBinding} from './assertion-key-state';
 import {type EnrollmentCoordinator} from './enrollment-key-state';
 import { rendezvousKeyAddress } from './key-address';
-import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
+import { TESTFLIGHT_POLICY, publicTrialRequestOpen, type PublicTrialWindow } from './testflight-release.mjs';
 const V='djc-rendezvous/1',POLICY='ios-dev-qualification/1';
 type ErrorCode='invalid_request'|'invalid_capability'|'expired'|'cancelled'|'already_consumed'|'already_submitted'|'not_ready'|'operation_conflict'|'invalid_sender_proof'|'service_unavailable'|'rate_limited';
 const fail=(code:ErrorCode):never=>{throw new Failure(code);};
@@ -29,7 +29,7 @@ export interface CreateTransaction {descriptor:Descriptor;generation:number;brow
 export interface BrowserInput {transactionId:string;generation:number;claimSecret:string}
 export interface ScanInput {transactionId:string;generation:number;qrCapability:string}
 export interface SubmitInput extends ScanInput {keyId:string;challengeId:string;clientData:string;assertion:string;destinationEnvelope:string}
-export interface TransactionDependencies {ASSERTION_POLICY_ENABLED?:string;ENROLLMENT_COORDINATOR:DurableObjectNamespace<EnrollmentCoordinator>}
+export interface TransactionDependencies extends PublicTrialWindow {ASSERTION_POLICY_ENABLED?:string;ENROLLMENT_COORDINATOR:DurableObjectNamespace<EnrollmentCoordinator>}
 export interface TransactionEnv extends TransactionDependencies {TRANSACTION_STATE:DurableObjectNamespace}
 export type Authorizer=(key:string,proof:ProofInput)=>Promise<unknown>;
 function transactionKeyAddress(key: string, policy?: string) {
@@ -42,8 +42,8 @@ export function coordinatorAuthorizer(namespace:DurableObjectNamespace<Enrollmen
 interface Row extends Descriptor {generation:number;thumbprint:string;claimCommitment:string;qrCommitment:string;state:'pending'|'ready'|'consumed'|'cancelled';browserPublicKey?:BrowserPublicJwk;envelope?:string;operationId?:string;requestDigest?:string;polls:number;submitChallengeAttempts:number;lastPoll?:number}
 interface Authorization {ok:true;kind:'submit-authorization';operationId:string;requestDigest:string;admittedAt:number;keyExpiresAt:number;authorizationExpiresAt:number;counter:number;binding:SubmitBinding}
 export class TransactionState {
-  #ctx:DurableObjectState;#namespace:DurableObjectNamespace;#authorize:Authorizer;#policy:string|undefined;#busy=false;#creating=false;
-  constructor(ctx:DurableObjectState,namespace:DurableObjectNamespace,authorize:Authorizer,policy?:string){this.#ctx=ctx;this.#namespace=namespace;this.#authorize=authorize;this.#policy=policy;ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS rendezvous_state (id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, value TEXT NOT NULL)');}
+  #ctx:DurableObjectState;#namespace:DurableObjectNamespace;#authorize:Authorizer;#policy:string|undefined;#window:PublicTrialWindow;#busy=false;#creating=false;
+  constructor(ctx:DurableObjectState,namespace:DurableObjectNamespace,authorize:Authorizer,policy?:string,window:PublicTrialWindow={}){this.#window=window;this.#ctx=ctx;this.#namespace=namespace;this.#authorize=authorize;this.#policy=policy;ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS rendezvous_state (id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, value TEXT NOT NULL)');}
   #load(){return this.#ctx.storage.sql.exec<{value:string}>('SELECT value FROM rendezvous_state WHERE id=1').toArray().map(r=>JSON.parse(r.value) as Row)[0];}
   #save(r:Row){this.#ctx.storage.sql.exec('INSERT INTO rendezvous_state(id,expires_at,value) VALUES(1,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',r.expiresAt,JSON.stringify(r));}
   #route(id:string){uuid(id);need(this.#namespace.idFromName(id).equals(this.#ctx.id),'invalid_capability');}
@@ -56,12 +56,12 @@ export class TransactionState {
     if(this.#creating)return this.#result(new Failure('service_unavailable'));this.#creating=true;
     try{
       closed(input,['descriptor','generation','browserPublicKey','claimCommitment']);closed(input.descriptor,['id','createdAt','expiresAt']);
-      input={...input,descriptor:{...input.descriptor},browserPublicKey:{...input.browserPublicKey}};const d=input.descriptor;this.#route(d.id);
+      input={...input,descriptor:{...input.descriptor},browserPublicKey:{...input.browserPublicKey}};const d=input.descriptor;this.#route(d.id);need(publicTrialRequestOpen(this.#window,Date.now(),true),'service_unavailable');
       need(integer(d.createdAt)&&integer(d.expiresAt)&&d.expiresAt===d.createdAt+120000&&Date.now()>=d.createdAt&&Date.now()<d.expiresAt);need(Number.isInteger(input.generation)&&input.generation>=1&&input.generation<=2147483647);opaque(input.claimCommitment);
       const pub=await qualifyBrowserPublicJwk(input.browserPublicKey);need(pub.ok);const qr=base64Url(crypto.getRandomValues(new Uint8Array(32)).buffer),qrCommitment=base64Url((await sha(opaque(qr))).buffer);
       const alarm=await this.#ctx.storage.getAlarm();await this.#ctx.storage.setAlarm(Math.min(alarm??d.expiresAt,d.expiresAt));
       return this.#ctx.storage.transactionSync(()=>{
-        this.#route(d.id);need(Date.now()>=d.createdAt&&Date.now()<d.expiresAt,'expired');need(!this.#load(),'operation_conflict');
+        this.#route(d.id);need(publicTrialRequestOpen(this.#window,Date.now(),true),'service_unavailable');need(Date.now()>=d.createdAt&&Date.now()<d.expiresAt,'expired');need(!this.#load(),'operation_conflict');
         const r:Row={...d,generation:input.generation,thumbprint:pub.thumbprint,browserPublicKey:pub.jwk,claimCommitment:input.claimCommitment,qrCommitment,state:'pending',polls:0,submitChallengeAttempts:0};this.#save(r);
         return {ok:true as const,v:V,transaction_id:r.id,generation:r.generation,created_at:r.createdAt,expires_at:r.expiresAt,qr_payload:JSON.stringify({type:'djc-rendezvous-qr',v:V,service_origin:'https://api.djconnect.dev',transaction_id:r.id,generation:r.generation,expires_at:r.expiresAt,browser_key_thumbprint:r.thumbprint,qr_capability:qr})};
       });
@@ -115,7 +115,7 @@ export class TransactionCoordinator extends DurableObject<TransactionDependencie
   // Namespace choices are trusted constructor-only seams, never RPC input selectors.
   constructor(ctx:DurableObjectState,env:TransactionEnv,namespace?:DurableObjectNamespace,keys?:TransactionDependencies['ENROLLMENT_COORDINATOR'],authorize?:Authorizer);
   constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace:DurableObjectNamespace,keys?:TransactionDependencies['ENROLLMENT_COORDINATOR'],authorize?:Authorizer);
-  constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace=(env as TransactionEnv).TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys,env.ASSERTION_POLICY_ENABLED)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize,env.ASSERTION_POLICY_ENABLED);}
+  constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace=(env as TransactionEnv).TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys,env.ASSERTION_POLICY_ENABLED)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize,env.ASSERTION_POLICY_ENABLED,env);}
   create(input:CreateTransaction){return this.#state.create(input);}
   inspect(input:ScanInput){return this.#state.inspect(input);}
   reserveSubmitChallenge(input:ScanInput){return this.#state.reserveSubmitChallenge(input);}

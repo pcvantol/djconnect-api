@@ -4,14 +4,14 @@ import {COMPOSED_POLICY,type ComposedEnv} from '../../qualification/rendezvous/c
 import {deriveBudgetIdentity,normalizeBudgetIp,BUDGET_POLICY} from '../../qualification/rendezvous/allocation-budget';
 import {INDEX_POLICY} from '../../qualification/rendezvous/allocation-index';
 import {validReceiptActiveKey} from '../../qualification/rendezvous/receipt-key-store';
-import {TESTFLIGHT_POLICY,testflightRelease} from '../../qualification/rendezvous/testflight-release.mjs';
+import {TESTFLIGHT_POLICY,publicTrialRequestOpen,testflightRelease,type PublicTrialWindow} from '../../qualification/rendezvous/testflight-release.mjs';
 import type {EnrollmentEnv} from '../../qualification/rendezvous/enrollment-key-state';
 
-export type ProductRendezvousEnv=ComposedEnv&RequestEnv&EnrollmentEnv&{
+export type ProductRendezvousEnv=ComposedEnv&RequestEnv&EnrollmentEnv&PublicTrialWindow&{
 	ALLOCATION_POLICY_ENABLED?:string;INDEX_POLICY_ENABLED?:string;
 	RENDEZVOUS_EDGE_POLICY?:string;RENDEZVOUS_IP_HASH_KEY?:string;
 };
-const fields=['COMPOSED_POLICY_ENABLED','REQUEST_POLICY_ENABLED','RENDEZVOUS_CAPACITY_POLICY','ALLOCATION_POLICY_ENABLED','INDEX_POLICY_ENABLED','ASSERTION_POLICY_ENABLED','ASSERTION_POLICY_EXPIRES_AT','RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION','RENDEZVOUS_TESTFLIGHT_MIN_BUILD','RENDEZVOUS_TESTFLIGHT_MAX_BUILD','ENROLLMENT_POLICY_REVISION','RECEIPT_ACTIVE_KEY','RECEIPT_PREVIOUS_KEY','RENDEZVOUS_EDGE_POLICY','RENDEZVOUS_IP_HASH_KEY','REQUEST_ADMISSION','ADMISSION_STATE','ALLOCATION_INDEX','ENROLLMENT_COORDINATOR','COMPOSED_TRANSACTIONS'] as const;
+const fields=['COMPOSED_POLICY_ENABLED','REQUEST_POLICY_ENABLED','RENDEZVOUS_CAPACITY_POLICY','ALLOCATION_POLICY_ENABLED','INDEX_POLICY_ENABLED','ASSERTION_POLICY_ENABLED','ASSERTION_POLICY_EXPIRES_AT','RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT','RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION','RENDEZVOUS_TESTFLIGHT_MIN_BUILD','RENDEZVOUS_TESTFLIGHT_MAX_BUILD','ENROLLMENT_POLICY_REVISION','RECEIPT_ACTIVE_KEY','RECEIPT_PREVIOUS_KEY','RENDEZVOUS_EDGE_POLICY','RENDEZVOUS_IP_HASH_KEY','REQUEST_ADMISSION','ADMISSION_STATE','ALLOCATION_INDEX','ENROLLMENT_COORDINATOR','COMPOSED_TRANSACTIONS'] as const;
 const namespaces=['REQUEST_ADMISSION','ADMISSION_STATE','ALLOCATION_INDEX','ENROLLMENT_COORDINATOR','COMPOSED_TRANSACTIONS'] as const;
 const closedHandler=createRequestBudgetedHandler();
 const need:(value:unknown)=>asserts value=value=>{if(!value)throw new Error('service_unavailable');};
@@ -32,7 +32,7 @@ function snapshot(env:ProductRendezvousEnv){
 	return fields.map(name=>env[name]);
 }
 
-function directEdgeIp(request:Request):string{
+export function directEdgeIp(request:Request):string{
 	const url=new URL(request.url),path=url.pathname.slice('/v1/rendezvous'.length);
 	need(Object.hasOwn(REQUEST_LANES,path)&&url.href==='https://api.djconnect.dev/v1/rendezvous'+path);
 	need(request.cf&&typeof request.cf==='object'&&!Array.isArray(request.cf));
@@ -52,6 +52,13 @@ export function createProductRendezvousHandler(env:ProductRendezvousEnv){
 		try{
 			need(validArity);
 			const before=snapshot(env);
+			const window={
+				ASSERTION_POLICY_ENABLED:env.ASSERTION_POLICY_ENABLED,
+				RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT:env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT,
+				ASSERTION_POLICY_EXPIRES_AT:env.ASSERTION_POLICY_EXPIRES_AT,
+			};
+			const creating=new URL(request.url).pathname==='/v1/rendezvous/create';
+			const windowOpen=()=>publicTrialRequestOpen(window,Date.now(),creating);
 			return await createRequestBudgetedHandler(env,async incoming=>{
 				const startedAt=Date.now(),ip=directEdgeIp(incoming);
 				const identity=await deriveBudgetIdentity(ip,env.RENDEZVOUS_IP_HASH_KEY!);
@@ -59,7 +66,7 @@ export function createProductRendezvousHandler(env:ProductRendezvousEnv){
 				need(before.every((value,index)=>value===after[index]));
 				need(Date.now()>=startedAt&&identity.minute===Math.floor(startedAt/60000)&&identity.minute===Math.floor(Date.now()/60000));
 				return identity;
-			})(request);
+			},windowOpen)(request);
 		}catch{return closedHandler(request);}
 	};
 }

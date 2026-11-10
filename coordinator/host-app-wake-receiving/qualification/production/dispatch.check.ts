@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:test';
+import {env as workerEnv} from 'cloudflare:test';
 import {describe,it,expect,beforeAll,beforeEach,vi} from 'vitest';
 import type {AppEnv} from '../../../../src/types';
 import worker from '../../../../src/index';
@@ -11,6 +11,8 @@ import {sha256Hex} from '../../../../src/crypto';
 import sourceSchema from '../../../host-app-wake/schema.sql?raw';
 import schema from '../../schema.sql?raw';
 import installSchema from '../../../../migrations/0002_install_tokens.sql?raw';
+// These fixtures only depend on the database binding and supply credentials per case.
+const env: Pick<AppEnv, 'DB'> = workerEnv;
 const paths=['','/issuer/issue','/issuer/status','/issuer/withdraw','/native/challenge','/native/complete','/native/status','/authorization/resolve','/operator/authorize','/operator/withdraw','/operator/native-policy','/operator/native-policy/withdraw','/register','/wake','/status','/revoke'];
 describe('actual private production caller: authentication and original pre-await anchor; no native admission',()=>{
  beforeAll(async()=>{for(const text of [installSchema,sourceSchema,schema])for(const sql of text.replace(/--[^\n]*/g,'').split(';').filter(v=>v.trim()))await env.DB.prepare(sql).run();});

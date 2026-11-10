@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:test';
+import {env as workerEnv} from 'cloudflare:test';
 import {beforeAll,beforeEach,describe,it,expect} from 'vitest';
 import cbor from 'cbor';
 import type {AppEnv} from '../../../src/types';
@@ -15,6 +15,8 @@ import {RequestWindow} from '../request-window';
 import vectors from './native-transcript-vectors.json';
 import schema from '../schema.sql?raw';import hostSchema from '../../host-app-wake/schema.sql?raw';import installSchema from '../../../migrations/0002_install_tokens.sql?raw';
 import eligibility from '../eligibility-view.sql?raw';import registration from '../registration-guard.sql?raw';import dispatch from '../dispatch-guard.sql?raw';import issuer from '../issuer-guard.sql?raw';import firstJob from '../native-first-job-guard.sql?raw';import keyInsert from '../native-key-insert-guard.sql?raw';import firstProof from '../native-first-proof-guard.sql?raw';
+// These fixtures only depend on the database binding and supply credentials per case.
+const env: Pick<AppEnv, 'DB'> = workerEnv;
 const secret='synthetic-operator-enrollment-only-not-a-real-secret',token='djci_'+'A'.repeat(43),keyId=btoa(String.fromCharCode(...new Uint8Array(32))),challenge='88888888-8888-4888-8888-888888888888';
 let at:number,config:AppEnv,o:ReturnType<typeof decodeNativeOriginal>,policy:ReturnType<typeof decodeNativePolicy>,store:ReceivingStore,fetches:number;
 function service(capacity=16){return createReceivingService({env:config,capacity,now:()=>Date.now(),fetcher:async()=>{fetches++;throw Error('NO ACTUAL APPLE/SDK/PROVIDER NETWORK IN NEGATIVE QUALIFICATION');}});}

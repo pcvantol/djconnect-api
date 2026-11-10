@@ -69,17 +69,17 @@ export class RequestAdmission extends DurableObject<RequestEnv>{
   alarm(){return this.#state.alarm();}
 }
 export const REQUEST_LANES:Readonly<Record<IngressRoute,RequestLane>>=Object.freeze({'/create':'create','/poll':'poll','/consume':'terminal','/cancel':'terminal','/inspect':'native','/attestation/challenge':'native','/attestation/register':'native','/submit-challenge':'native','/submit':'native','/attestation/delete':'native','/attestation/recover':'native'});
-export function createRequestBudgetedHandler(env?:ComposedEnv&RequestEnv,resolveIdentity?:TrustedIdentityResolver){
+export function createRequestBudgetedHandler(env?:ComposedEnv&RequestEnv,resolveIdentity?:TrustedIdentityResolver,windowOpen:()=>boolean=()=>true){
   const originalCapacity=env?.RENDEZVOUS_CAPACITY_POLICY;
   const enabled=()=>env?.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY&&env.REQUEST_POLICY_ENABLED===REQUEST_POLICY&&typeof resolveIdentity==='function'&&env.RENDEZVOUS_CAPACITY_POLICY===originalCapacity&&(originalCapacity===undefined||originalCapacity==='private-household/1');
   return async(request:Request)=>{
     let identity:BudgetIdentity|undefined;const startedAt=Date.now();
-    const requestEnabled=()=>enabled()&&Date.now()>=startedAt&&(!identity||identity.minute===Math.floor(Date.now()/60000));
+    const requestEnabled=()=>enabled()&&windowOpen()&&Date.now()>=startedAt&&(!identity||identity.minute===Math.floor(Date.now()/60000));
     return createComposedHandler(env,async()=>{need(enabled()&&identity);return {...identity};},async route=>{
       try{
-        need(enabled());identity=copyIdentity(await resolveIdentity!(request));need(enabled()&&identity.minute===Math.floor(Date.now()/60000));const original=Date.now();
+        need(requestEnabled());identity=copyIdentity(await resolveIdentity!(request));need(requestEnabled());const original=Date.now();
         const result=await env!.REQUEST_ADMISSION.get(env!.REQUEST_ADMISSION.idFromName(REQUEST_NAME)).admit({identity:{...identity},lane:REQUEST_LANES[route]});
-        need(enabled()&&Date.now()>=original&&identity.minute===Math.floor(Date.now()/60000));
+        need(requestEnabled()&&Date.now()>=original);
         closed(result,result?.ok===true?['ok']:['ok','error',...(result&&Object.hasOwn(result,'retry_after_ms')?['retry_after_ms']:[])]);
         if(result.ok===false){need(result.error==='rate_limited'||result.error==='service_unavailable');if(result.retry_after_ms!==undefined)need(Number.isSafeInteger(result.retry_after_ms)&&result.retry_after_ms>=1&&result.retry_after_ms<=60000);return result;}
         need(result.ok===true);return {ok:true};
