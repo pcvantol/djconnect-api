@@ -3,6 +3,7 @@ import {beforeAll,beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
 import {env} from 'cloudflare:workers';
 import {runInDurableObject} from 'cloudflare:test';
 import {createProductRendezvousHandler,type ProductRendezvousEnv} from '../../src/rendezvous/composition';
+import { dispatchRendezvousRequest } from '../../src/rendezvous/dispatch';
 import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
 import { rendezvousKeyAddress } from './key-address';
 import {deriveBudgetIdentity} from './allocation-budget';
@@ -44,6 +45,65 @@ async function rejectsBeforeBody(bindings:ProductRendezvousEnv,req:Request){
 	const result=await createProductRendezvousHandler(bindings)(req);
 	expect(result.status).toBe(503);expect(await result.json()).toEqual({v:V,error:'service_unavailable'});expect(read).not.toHaveBeenCalled();
 }
+
+describe('public TestFlight dispatch', () => {
+	const window = (now: number) => ({
+		RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT: String(now - 1_000),
+		ASSERTION_POLICY_EXPIRES_AT: String(now + 180_000),
+		RENDEZVOUS_CAPACITY_POLICY: 'private-household/1',
+		ASSERTION_POLICY_ENABLED: TESTFLIGHT_POLICY,
+		RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION: '1',
+		RENDEZVOUS_TESTFLIGHT_MIN_BUILD: '40521',
+		RENDEZVOUS_TESTFLIGHT_MAX_BUILD: '40521',
+	});
+	const preflight = (headers?: Record<string, string>, ip?: string) => request('/create', undefined, {
+		method: 'OPTIONS', ip,
+		headers: { 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type', ...headers },
+	});
+
+	it('answers a browser preflight only on direct edge during the configured trial', async () => {
+		const now = Date.now();
+		const { bindings, calls } = blockedNamespaces();
+		const accepted = await dispatchRendezvousRequest(preflight(), { ...good(), ...window(now) });
+		const active = { ...bindings, ...window(now) };
+		expect(accepted?.status).toBe(204);
+		expect(accepted?.headers.get('Access-Control-Allow-Origin')).toBe(ORIGIN);
+		expect((await dispatchRendezvousRequest(preflight({ 'CF-Worker': 'djconnect.dev' }), active))?.status).toBe(503);
+		expect((await dispatchRendezvousRequest(preflight(undefined, '2a06:98c0:3600::103'), active))?.status).toBe(503);
+		expect(calls).not.toHaveBeenCalled();
+	});
+
+	it('issues a 120-second browser descriptor through public dispatch', async () => {
+		const claim = crypto.getRandomValues(new Uint8Array(32));
+		const commitment = base64Url(await crypto.subtle.digest('SHA-256', claim));
+		const response = await dispatchRendezvousRequest(
+			request('/create', { v: V, generation: 1, browser_public_key: jwk, claim_commitment: commitment }),
+			{ ...good(), ...window(Date.now()) },
+		);
+		expect(response?.status).toBe(201);
+		const descriptor = await response!.json<{ expires_at: number; created_at: number }>();
+		expect(descriptor.expires_at - descriptor.created_at).toBe(120_000);
+	});
+
+	it('keeps absent, expired, future, oversized and unrestricted trials closed', async () => {
+		const now = Date.now();
+		vi.spyOn(Date, 'now').mockReturnValue(now);
+		const { bindings, calls } = blockedNamespaces();
+		for (const override of [
+			{ RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT: undefined },
+			{ ASSERTION_POLICY_EXPIRES_AT: String(now) },
+			{ RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT: String(now + 1) },
+			{ ASSERTION_POLICY_EXPIRES_AT: String(now + 7_200_000) },
+			{ RENDEZVOUS_TESTFLIGHT_MAX_BUILD: undefined },
+			{ ASSERTION_POLICY_ENABLED: 'ios-dev-qualification/1' },
+			{ RENDEZVOUS_CAPACITY_POLICY: undefined },
+			{ ASSERTION_POLICY_EXPIRES_AT: String(now + 120_000) },
+		]) {
+			expect((await dispatchRendezvousRequest(preflight(), { ...bindings, ...window(now), ...override }))?.status).toBe(503);
+		}
+		expect(calls).not.toHaveBeenCalled();
+	});
+});
 
 describe('internal product configuration and fixed identity',()=>{
 	it.each([

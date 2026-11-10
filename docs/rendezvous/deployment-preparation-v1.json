@@ -112,7 +112,7 @@
     "docs/rendezvous/repository-namespace-release-delta-v1.json": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504",
     "docs/rendezvous/shared-key-address-delta-v1.json": "4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824",
     "docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md": "283f2f3f023e4a09d00f75ce1d9c62de97f83478d2a3beb0c62acaeb3644193e",
-    "qualification/rendezvous/qa-build-profile.json": "0aa52b27a4f9e9d57200a6abeeae8728c87fd0e99b623e220c034fc446a99d3b",
+    "qualification/rendezvous/qa-build-profile.json": "0f9fd943176cf7521eebdffbc6e2bf6386112414b2e6d1c2a891e5ee2ffa4cc7",
     "qualification/rendezvous/run_assertion_state_workerd.mjs": "18e6d564da7c2632ec9828c3ef9416c018be8f05299636c1e23d5a17fd40bab1",
     "qualification/rendezvous/run_capacity_workerd.mjs": "c7496d731a538e56bf6b641b48308221291e90a04750df4979f4d638a397a4cc",
     "qualification/rendezvous/run_create_recovery_workerd.mjs": "8f87ee04c9edfe025f8fa90ce0bae2f1f481d31c5d1c92af52aa1ffd9bb3e069",
@@ -123,7 +123,9 @@
     "scripts/build_rendezvous_qa.mjs": "874d397f26f253c839e3c2cee2e973f6fba06e5213f08e7e7e7234bb029870f0",
     "src/rendezvous/qa-entry.ts": "c08c0da27890d0f88086cd604ddff28fac02eab268357f035b409a0cf8c57b61",
     "docs/rendezvous/testflight-release-source-delta-v1.json": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
-    "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad"
+    "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad",
+    "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "b300a3929d2922e8eb2ebfe2d540432a0b763f422fe775d58b70f50a41a9e9bb",
+    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "065d359328121f2cc1749639ee201d4842321cd601771241ec7205f0aeab85c0"
   },
   "schema_version": 1,
   "secret_names": [
@@ -199,8 +201,8 @@
     "docs/rendezvous/wire-schema-cases-v1.json": "3443cc6580997678d54d1f57ce0b30271134069cdd256d16ccea7446b9545e4a",
     "docs/rendezvous/capacity-browser-traces-v1.json": "1a1e26f68efc03860e2de29d42ddae216a93c30228a57000cdb63935815c9492",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
-    "src/rendezvous/composition.ts": "b1a04b3f35b27c4597105f5bbb4e68315d16010eb336a3492be82954d52cacd0",
-    "qualification/rendezvous/product-composition.check.ts": "8223295b4684bc1d665e43c26541cb9c64922fcd46c9e6333dd60ce49b2f71e8",
+    "src/rendezvous/composition.ts": "df938e767fa3d8639682e2264b3096d37b9ce7e67e56da8f633d5a63cca5ae08",
+    "qualification/rendezvous/product-composition.check.ts": "8ec2f62012effdee11d7b41d1f94efaa9adfcb0256d85ee0e6cd419ed8dbe44e",
     "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
     "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
     "src/index.ts": "3bf44422f5f13cedeaa92b32fd4cdae1cbfad373202d4c374ee1a04f853b95f5",
@@ -211,7 +213,7 @@
     "package.json": "b684c815c993c080483dc9d9be50f5546d07a39ee18408ea46535f39a75f143e",
     "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
     ".github/workflows/ci-cd.yml": "e1e90326dcb5d25c5f1e661d55cbd48f965700d171b0a3ad9b03fed185e2a60d",
-    "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
+    "src/rendezvous/dispatch.ts": "c78502dab3b091acf4b0c90630499599a73551a3fc1c27daa7106fd561efb8f6",
     "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
     "qualification/rendezvous/root-integration.check.mjs": "b30be29743d836a3a4d0d3c006369c5ca9c1b2c5d3a25be05ef221c1727d193e",
     "qualification/rendezvous/root-integration-derivation.check.mjs": "e78eeedda2c1830bafc91ad20fdc3147f0047b8f6301445ff5ef1be257c69c76",
@@ -321,7 +323,9 @@
     "shared_key_address_delta_sha256": "4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824",
     "shared_key_address_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
     "testflight_profile_delta_sha256": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
-    "testflight_profile_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f"
+    "testflight_profile_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
+    "public_trial_delta_sha256": "065d359328121f2cc1749639ee201d4842321cd601771241ec7205f0aeab85c0",
+    "public_trial_source_map_sha256": "1ca1670618ea2df03eeae0b242eff74ca77b9ce0640ec64138cc75588b262478"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES | SHARED_KEY_ADDRESS_SOURCES | TESTFLIGHT_PROFILE_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES | SHARED_KEY_ADDRESS_SOURCES | TESTFLIGHT_PROFILE_SOURCES | PUBLIC_TRIAL_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -951,7 +951,7 @@ SOURCE_PROVENANCE.update(testflight_profile_delta_sha256=TESTFLIGHT_PROFILE_SHA2
                          testflight_profile_source_map_sha256=TESTFLIGHT_PROFILE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_public_trial():
     sources, refs = baseline_before_testflight_profile()
     delta = pinned_working_proof(TESTFLIGHT_PROFILE_PATH, TESTFLIGHT_PROFILE_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
@@ -975,6 +975,36 @@ def baseline():
     require(source_map_digest(sources) == delta['effective_source_map_sha256']
             == TESTFLIGHT_PROFILE_MAP_SHA256)
     refs[TESTFLIGHT_PROFILE_PATH] = TESTFLIGHT_PROFILE_SHA256
+    return sources, refs
+
+
+
+PUBLIC_TRIAL_DELTA_PATH = 'docs/rendezvous/public-testflight-trial-source-delta-v1.json'
+PUBLIC_TRIAL_DELTA_SHA256 = '065d359328121f2cc1749639ee201d4842321cd601771241ec7205f0aeab85c0'
+PUBLIC_TRIAL_MAP_SHA256 = '1ca1670618ea2df03eeae0b242eff74ca77b9ce0640ec64138cc75588b262478'
+PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/product-composition.check.ts', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts'))
+SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
+                         public_trial_source_map_sha256=PUBLIC_TRIAL_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_public_trial()
+    delta = pinned_working_proof(PUBLIC_TRIAL_DELTA_PATH, PUBLIC_TRIAL_DELTA_SHA256)
+    require(delta['schema_version'] == 1
+            and delta['scope'] == 'PUBLIC_TESTFLIGHT_TRIAL_SOURCE_NO_ACTIVE_CONFIGURATION'
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in (
+        (sources, delta['source_changes'], PUBLIC_TRIAL_SOURCES),
+        (refs, delta['reference_changes'], {'qualification/rendezvous/qa-build-profile.json'}),
+    ):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(change['before'] == mapping[name] and change['before'] != change['after'])
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == PUBLIC_TRIAL_MAP_SHA256)
+    require(set(delta['reference_additions']) == {'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md'})
+    refs.update(delta['reference_additions'])
+    refs[PUBLIC_TRIAL_DELTA_PATH] = PUBLIC_TRIAL_DELTA_SHA256
     return sources, refs
 
 

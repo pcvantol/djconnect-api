@@ -32,7 +32,7 @@ function snapshot(env:ProductRendezvousEnv){
 	return fields.map(name=>env[name]);
 }
 
-function directEdgeIp(request:Request):string{
+export function directEdgeIp(request:Request):string{
 	const url=new URL(request.url),path=url.pathname.slice('/v1/rendezvous'.length);
 	need(Object.hasOwn(REQUEST_LANES,path)&&url.href==='https://api.djconnect.dev/v1/rendezvous'+path);
 	need(request.cf&&typeof request.cf==='object'&&!Array.isArray(request.cf));

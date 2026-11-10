@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "scope": "PUBLIC_TESTFLIGHT_TRIAL_SOURCE_NO_ACTIVE_CONFIGURATION",
+  "baseline_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
+  "effective_source_map_sha256": "1ca1670618ea2df03eeae0b242eff74ca77b9ce0640ec64138cc75588b262478",
+  "source_changes": {
+    "src/rendezvous/dispatch.ts": {
+      "before": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
+      "after": "c78502dab3b091acf4b0c90630499599a73551a3fc1c27daa7106fd561efb8f6"
+    },
+    "src/rendezvous/composition.ts": {
+      "before": "b1a04b3f35b27c4597105f5bbb4e68315d16010eb336a3492be82954d52cacd0",
+      "after": "df938e767fa3d8639682e2264b3096d37b9ce7e67e56da8f633d5a63cca5ae08"
+    },
+    "qualification/rendezvous/product-composition.check.ts": {
+      "before": "8223295b4684bc1d665e43c26541cb9c64922fcd46c9e6333dd60ce49b2f71e8",
+      "after": "8ec2f62012effdee11d7b41d1f94efaa9adfcb0256d85ee0e6cd419ed8dbe44e"
+    }
+  },
+  "reference_changes": {
+    "qualification/rendezvous/qa-build-profile.json": {
+      "before": "0aa52b27a4f9e9d57200a6abeeae8728c87fd0e99b623e220c034fc446a99d3b",
+      "after": "0f9fd943176cf7521eebdffbc6e2bf6386112414b2e6d1c2a891e5ee2ffa4cc7"
+    }
+  },
+  "reference_additions": {
+    "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "b300a3929d2922e8eb2ebfe2d540432a0b763f422fe775d58b70f50a41a9e9bb"
+  }
+}
