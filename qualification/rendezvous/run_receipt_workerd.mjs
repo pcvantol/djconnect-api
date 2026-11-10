@@ -38,7 +38,7 @@ async function main() {
   fixture.synthetic=JSON.parse(await readFile(new URL('./synthetic-receipts-v1.json',import.meta.url),'utf8')).cases;
   await put('fixtures.mjs','export default '+JSON.stringify(fixture)+';\n');
   const sources={};
-  for(const name of ['receipt-cms-candidate.mjs','receipt-cms.check.mjs','run_receipt_workerd.mjs','build_synthetic_receipts.py']) {
+  for(const name of ['receipt-cms-candidate.mjs','testflight-release.mjs','testflight-release.d.mts','receipt-cms.check.mjs','run_receipt_workerd.mjs','build_synthetic_receipts.py']) {
     const source=await readFile(new URL('./'+name,import.meta.url)); sources[name]=hash(source); await put(name,source);
   }
   await put('worker.mjs',"export default {fetch(){return new Response('qualification only',{status:503})}};\n");

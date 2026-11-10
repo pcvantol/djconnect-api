@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_TESTFLIGHT_RELEASE_PROFILE_NOT_ACTIVATION",
+  "baseline_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
+  "effective_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
+  "changes": {
+    "qualification/rendezvous/app-attest-core-candidate.mjs": {
+      "before": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
+      "after": "1a10b9878b51a87570c03902f1115fb333de39173220b1f557227ac868c9708a"
+    },
+    "qualification/rendezvous/assertion-key-state.check.mjs": {
+      "before": "9f730fc3981bb45681f24f57b22df0021ade9c10ba75c55826548bd1ce66fa78",
+      "after": "caa07495f4d24dc6edac64d3fee11f23c4369aa1d39244ad1a139899840b128a"
+    },
+    "qualification/rendezvous/assertion-key-state.ts": {
+      "before": "d65abe4ec101f52372340f47a159efa2f725c3ea0e4aa03fca8efeb5143b1917",
+      "after": "c02bf757570e9fb5a850ff8178b2e37154a333f350474b4a81a2e9f3174fbf6d"
+    },
+    "qualification/rendezvous/assertion-verifier.d.ts": {
+      "before": "53fe57a62d1f00c2ea44c6801b24e79acaaa47d46177629bbf7d81401ba166f1",
+      "after": "8c39ff80d0a2b23f1743142e785be088008ea9c026a527e1a2950d6d64a9dd67"
+    },
+    "qualification/rendezvous/composed-http.ts": {
+      "before": "21fad11bb8c0317084950f68bb3462fb737d31fdcbfbd82e054ab3a74eebde02",
+      "after": "e30844d651ecce08a21bd6cd1bb90f35bbbc7a2f32c3e3edf5ef3ba04b8250a1"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.d.mts": {
+      "before": "176ad10c9ee9b9ea92846576b8db115271e33ff09eaf485edf1285020b543209",
+      "after": "0fb78c00df375e0b91056abc47e09b5be65e99560ab437e3e2369970f7f9f550"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.mjs": {
+      "before": "55f99c8073f10f29c834b459ac84cb4f9c9290476fa51c8741dc5db8b1781644",
+      "after": "65217c6c549d743419233523838df1a63f39b526d5db1443d7773c363b0c06b7"
+    },
+    "qualification/rendezvous/enrollment-key-state.ts": {
+      "before": "2e713fb51bb8e775ecd070c20984136ac32ed42b318454d72d9394b7b7630de5",
+      "after": "03d59071647072fc74fcdbb487a6fbf01392f93e7556d3a5a189a88a24aab1e4"
+    },
+    "qualification/rendezvous/key-routing.ts": {
+      "before": "56d05029e953617b078680c8e31a79d15e81ab90abe941d5895d0d94025885c4",
+      "after": "a9b53463a358b29c2a7026423f5f9d55ad732dea1cc3ab0dabd75704e175f493"
+    },
+    "qualification/rendezvous/product-composition.check.ts": {
+      "before": "515f985f368f5c07712eec2034bef8c45757b60efc2021e3a719c3033cb6df44",
+      "after": "8223295b4684bc1d665e43c26541cb9c64922fcd46c9e6333dd60ce49b2f71e8"
+    },
+    "qualification/rendezvous/receipt-cms-candidate.mjs": {
+      "before": "0dadf10ef3055862ef952dd551907d15f6aedc66f19400d8ed268e3c9daf5dd0",
+      "after": "1e58d4305041688fbed77b83bfd7fe14e200a7b0dd49371afe8e7671919ed28e"
+    },
+    "qualification/rendezvous/receipt-key-store.ts": {
+      "before": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
+      "after": "57a92075e488e111f605bc6478e76b6b554357a805324eb1983a9a415ec1fc71"
+    },
+    "qualification/rendezvous/run_challenge_budget_workerd.mjs": {
+      "before": "7f92e95b3d090d8900e67704ef300065648c7671cb298ee389a33ae834cb2e88",
+      "after": "2f07d30358092e802407859bb372fc7de5275644c99c74fb1dc5c0e7217dd549"
+    },
+    "qualification/rendezvous/run_composed_http_workerd.mjs": {
+      "before": "39937feef03cd2bbae0ee60504b31a7bb52ae03b4d495017189446171eb9634b",
+      "after": "40399fba5c6a97fc67b6a26e2c681987b39815c8f91393fd33aed0ea9015b487"
+    },
+    "qualification/rendezvous/run_index_workerd.mjs": {
+      "before": "d3d886a3a976727637c2c317fea1cb8bbd13079bca6632d2d86c4f1178e23804",
+      "after": "9513059014793e40a3f389599eee1328d2032fcb0b76cb83fabbc19f4093e92f"
+    },
+    "qualification/rendezvous/run_key_routing_workerd.mjs": {
+      "before": "9795d2a211813cc98de3cd17786df716be0e76b394fc5842fc77942824c7451e",
+      "after": "f50cf69aaf6e5fb1c05a821cc233372ab4f78587cc664e474fb3a45308747bb6"
+    },
+    "qualification/rendezvous/run_provider_unavailable_workerd.mjs": {
+      "before": "2b1161ed65db3a30ccffb3a541e4de6d72b23a0dc8029b83a93bdcc2135bf98a",
+      "after": "1dc0ee8e627da166a62558d2bc07303f12151a5d90d27aa675aeb2346b24861d"
+    },
+    "qualification/rendezvous/run_registration_workerd.mjs": {
+      "before": "bd9af9a5a63e3682a9a58303df1f6d81a2b3f190b421d1aeda4f93af7f423bc7",
+      "after": "ed638eeb0bc51ab73bd06e7dab591962cd288099bdac045bd60e851260b616f2"
+    },
+    "qualification/rendezvous/run_request_admission_workerd.mjs": {
+      "before": "7a7ec0b7acc7b08b398f87f7cad1e2a4d171fa45e5876b37479758c554aaaf7c",
+      "after": "2f61f2204e7948ae40df654a2610389c1bb5f85769bf91898b71fc4c35da03c2"
+    },
+    "qualification/rendezvous/run_retry_hint_workerd.mjs": {
+      "before": "197e0b5a062983123378ff4d7ed2d5b4b0a672345db51b825847eaacbaa90c54",
+      "after": "9e3226c601b867db35458088f6e166dd7dc33a6e7b3c2965fa43c61e4c999aef"
+    },
+    "qualification/rendezvous/run_shared_key_workerd.mjs": {
+      "before": "91514965bb1207e273891488423d256ac29cb6a510887d78667c0bebcc996f37",
+      "after": "b146889e51f97ed932946515064f222c3cca56d2ba5c2ba8b5f8f9123dc38bf4"
+    },
+    "qualification/rendezvous/run_transaction_workerd.mjs": {
+      "before": "3f7c7455169284886932038e56b50367db13f85e0a247bdc6b20d073845bb36e",
+      "after": "a63bb2592c751d7a3f7ba9243572396f0d0ec8d1284e968a1b31e75278d4ce62"
+    },
+    "qualification/rendezvous/transaction-state.ts": {
+      "before": "fc6342c2265a1c53f78fbefd8800b6819c1e1d8c3b612fa7b21c23a5a7410e0e",
+      "after": "bcd9b0a0e4b91fe9fa2506de0d1cdc44172716911ec5f027c7b78fda9eb96999"
+    },
+    "src/rendezvous/composition.ts": {
+      "before": "79e8fe0dc4c04d872e3edc9bf7753bc05c1bae305b2e4b3ddbf3d6701c0b5a44",
+      "after": "b1a04b3f35b27c4597105f5bbb4e68315d16010eb336a3492be82954d52cacd0"
+    }
+  },
+  "source_additions": {
+    "qualification/rendezvous/testflight-release.mjs": "c44979c2fc4329037f8a464934a22ce7fdfb1943db641e6a85f6f1e23cfd8d69",
+    "qualification/rendezvous/testflight-release.d.mts": "6ed5cbc9c7dfd3619b701c199edf0618020d823b9ab4fe42a7c6e92b270d317d"
+  },
+  "reference_changes": {},
+  "reference_additions": {
+    "docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md": "283f2f3f023e4a09d00f75ce1d9c62de97f83478d2a3beb0c62acaeb3644193e",
+    "qualification/rendezvous/qa-build-profile.json": "0aa52b27a4f9e9d57200a6abeeae8728c87fd0e99b623e220c034fc446a99d3b",
+    "qualification/rendezvous/run_assertion_state_workerd.mjs": "18e6d564da7c2632ec9828c3ef9416c018be8f05299636c1e23d5a17fd40bab1",
+    "qualification/rendezvous/run_capacity_workerd.mjs": "c7496d731a538e56bf6b641b48308221291e90a04750df4979f4d638a397a4cc",
+    "qualification/rendezvous/run_create_recovery_workerd.mjs": "8f87ee04c9edfe025f8fa90ce0bae2f1f481d31c5d1c92af52aa1ffd9bb3e069",
+    "qualification/rendezvous/run_enrollment_workerd.mjs": "6c2591b2b87d3b30fd663c4558ec3aa2f872e422bd9c1d52b33a76c82ea7a2c7",
+    "qualification/rendezvous/run_partition_capacity_workerd.mjs": "4213c113114af093ab24b95b375da253746c9493129bc04b8da7703348275274",
+    "qualification/rendezvous/run_receipt_workerd.mjs": "7babc4937ff78e706f51cae9f9ceb0063be5111f5385d75b2ff52e5acf818d03",
+    "qualification/rendezvous/run_store_workerd.mjs": "f185cbf957364148380100b7860b38ad480af93eec04f6395256c449f9cb027f",
+    "scripts/build_rendezvous_qa.mjs": "874d397f26f253c839e3c2cee2e973f6fba06e5213f08e7e7e7234bb029870f0",
+    "src/rendezvous/qa-entry.ts": "c08c0da27890d0f88086cd604ddff28fac02eab268357f035b409a0cf8c57b61",
+    "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad"
+  },
+  "public_activation_allowed": false
+}

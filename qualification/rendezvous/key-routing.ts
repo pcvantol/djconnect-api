@@ -5,6 +5,8 @@ import {type BudgetResult,type BudgetIdentity} from './allocation-budget';
 import {type EnrollmentCoordinator,type RegisterInput} from './enrollment-key-state';
 import {type IssueInput,type ProofInput,type SubmitBinding} from './assertion-key-state';
 import {type Authorizer} from './transaction-state';
+import { rendezvousKeyAddress } from './key-address';
+import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
 export interface KeyCallBudget {admitKeyCall():Promise<BudgetResult>;admit(input:{kind:'key';identity:BudgetIdentity}):Promise<BudgetResult>}
 type FailureCode='invalid_request'|'service_unavailable'|'rate_limited';
 class Failure extends Error {constructor(readonly code:FailureCode,readonly retryAfter?:number){super('key_route_rejected');}}
@@ -26,8 +28,8 @@ export type KeyRequest=
  |{operation:'issueAction';keyId:string;action:IssueInput['action'];binding?:SubmitBinding}
  |({operation:'authorize';keyId:string}&ProofInput);
 export class KeyRpcRouter {
-  #budget:KeyCallBudget;#namespace:DurableObjectNamespace<EnrollmentCoordinator>;#enabled:()=>boolean;
-  constructor(budget:KeyCallBudget,namespace:DurableObjectNamespace<EnrollmentCoordinator>,enabled:()=>boolean){this.#budget=budget;this.#namespace=namespace;this.#enabled=enabled;}
+  #budget:KeyCallBudget;#namespace:DurableObjectNamespace<EnrollmentCoordinator>;#enabled:()=>boolean;#policy:()=>string|undefined;
+  constructor(budget:KeyCallBudget,namespace:DurableObjectNamespace<EnrollmentCoordinator>,enabled:()=>boolean,policy:()=>string|undefined=()=>undefined){this.#budget=budget;this.#namespace=namespace;this.#enabled=enabled;this.#policy=policy;}
   #ready(){need(this.#enabled(),'service_unavailable');}
   async route(input:KeyRequest){try{
     this.#ready();need(input&&typeof input==='object');keyId(input.keyId);
@@ -40,13 +42,14 @@ export class KeyRpcRouter {
     }else{
       need(input.operation==='authorize');closed(input,['operation','keyId','operationId','action','clientData','assertion']);need(['recover-key','delete-key','submit'].includes(input.action));opaque(input.operationId);encoded(input.clientData,2048);encoded(input.assertion,4096);input={...input};
     }
-    const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(['development','ios-dev-qualification/1',input.keyId]))),address=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');this.#ready();
+    const selected=this.#policy(),testFlight=selected===TESTFLIGHT_POLICY;
+    const address=await rendezvousKeyAddress(input.keyId,testFlight?'production':'development',testFlight?TESTFLIGHT_POLICY:'ios-dev-qualification/1');this.#ready();
     const day=Math.floor(Date.now()/86400000);admitted(await this.#budget.admitKeyCall());this.#ready();need(Math.floor(Date.now()/86400000)===day,'service_unavailable');
     if(input.operation==='enroll'){admitted(await this.#budget.admit({kind:'key',identity:{...input.identity}}));this.#ready();need(input.identity.minute===Math.floor(Date.now()/60000),'service_unavailable');}
-    need(Math.floor(Date.now()/86400000)===day,'service_unavailable');
+    need(Math.floor(Date.now()/86400000)===day&&this.#policy()===selected,'service_unavailable');
     const child=this.#namespace.get(this.#namespace.idFromName('djc-rendezvous-key/1/'+address));
     const reply=input.operation==='issueEnrollment'?await child.issueEnrollment({keyId:input.keyId}):input.operation==='enroll'?await child.enroll({keyId:input.keyId,challengeId:input.challengeId,attestation:input.attestation} satisfies RegisterInput):input.operation==='issueAction'?await child.issueAction({action:input.action,keyId:input.keyId,...(input.binding?{binding:input.binding}:{})}):await child.authorize({operationId:input.operationId,action:input.action,clientData:input.clientData,assertion:input.assertion});
-    this.#ready();return reply;
+    this.#ready();need(this.#policy()===selected,'service_unavailable');return reply;
   }catch(error){return {ok:false as const,error:error instanceof Failure?error.code:'service_unavailable' as FailureCode,...hintFields(error instanceof Failure?error.retryAfter:undefined)};}}
 }
 // Constructor-only server adapter: never accept a caller-provided grant or budget selector.

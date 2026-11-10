@@ -68,7 +68,11 @@ class PreparationTests(unittest.TestCase):
                          *v.PUSH_ERASURE_REFERENCES, *v.PUSH_ERASURE_ADDITIONS,
                          v.PUSH_ERASURE_DELTA_PATH, v.PRODUCTION_D1_GUARD_REFERENCE,
                          *v.PRODUCTION_D1_GUARD_ADDITIONS, v.PRODUCTION_D1_GUARD_PATH,
-                         v.REPOSITORY_NAMESPACE_SMOKE_REFERENCE, v.REPOSITORY_NAMESPACE_DELTA_PATH)
+                         v.REPOSITORY_NAMESPACE_SMOKE_REFERENCE, v.REPOSITORY_NAMESPACE_DELTA_PATH,
+                         *v.SHARED_KEY_ADDRESS_SOURCES, v.SHARED_KEY_ADDRESS_ADDITION,
+                         v.SHARED_KEY_ADDRESS_PATH, *v.TESTFLIGHT_PROFILE_SOURCES,
+                         *v.TESTFLIGHT_PROFILE_ADDITIONS, *v.TESTFLIGHT_PROFILE_REFERENCES,
+                         *v.TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS, v.TESTFLIGHT_PROFILE_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],
@@ -161,7 +165,7 @@ class PreparationTests(unittest.TestCase):
         self.assertFalse(proof['public_activation_allowed'])
         self.assertFalse(proof['production_effect_authorized'])
         self.assertEqual(len(v.baseline_before_dependency_refresh()[0]), 144)
-        self.assertEqual(len(v.baseline()[0]), 145)
+        self.assertEqual(len(v.baseline()[0]), 148)
 
     def test_dependency_refresh_rejects_scope_history_and_source_forgery(self):
         original = v.pinned_working_proof(v.DEPENDENCY_DELTA_PATH, v.DEPENDENCY_DELTA_SHA256)
@@ -347,7 +351,7 @@ class PreparationTests(unittest.TestCase):
         self.assertEqual(len(v.baseline_before_receiving_root()[0]), 119)
         self.assertEqual(len(v.baseline_before_ci_retention()[0]), 142)
         self.assertEqual(len(v.baseline_before_dependency_refresh()[0]), 144)
-        self.assertEqual(len(self.plan['source_hashes']), 145)
+        self.assertEqual(len(self.plan['source_hashes']), 148)
         for name in v.DELTA_SOURCES:
             changed = copy.deepcopy(delta)
             changed['changes'][name]['before'] = None

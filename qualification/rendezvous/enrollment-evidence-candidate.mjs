@@ -4,6 +4,8 @@ import {qualifyFreshReceiptEvidence} from './receipt-cms-candidate.mjs';
 import {CommonStatusClient} from './receipt-status-client.mjs';
 import {attestationRoot,receiptRoot} from 'djc-enrollment-trust';
 
+import {TESTFLIGHT_POLICY} from './testflight-release.mjs';
+
 const POLICY='ios-dev-qualification/1';
 class StatusUnavailable extends Error {}
 // Preserve the owning coordinator's typed context/config/internal classification.
@@ -21,19 +23,19 @@ const same=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
 const closed=(v,keys)=>need(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===keys.sort().join(','));
 function opaque(v){need(typeof v==='string'&&/^[A-Za-z0-9_-]{43}$/.test(v));const b=atob(v.replaceAll('-','+').replaceAll('_','/'));need(b.length===32&&btoa(b).replaceAll('+','-').replaceAll('/','_').replaceAll('=','')===v);}
 function keyId(v){need(typeof v==='string'&&/^[A-Za-z0-9+/]{43}=$/.test(v));const b=atob(v);need(b.length===32&&btoa(b)===v);}
-function snapshot(readState,nonceOnly=false){
+function snapshot(readState,nonceOnly,policyId){
   let state;try{state=readState();}catch(cause){throw new StateReadFailure(cause);}closed(state,['policy','challenge']);
   closed(state.policy,['id','revision','enabled','expiresAt']);
   closed(state.challenge,['id','keyId','action','createdAt','expiresAt','clientData']);
   const policy={...state.policy},challenge={...state.challenge,clientData:copy(state.challenge.clientData,2048)};
   // Existing registration wire hashes the decoded 32-byte server nonce, never JSON clientData.
   need(!nonceOnly||challenge.clientData.length===32);
-  need(policy.id===POLICY&&policy.enabled===true&&typeof policy.revision==='string'&&policy.revision.length>0&&policy.revision.length<=128&&integer(policy.expiresAt));
+  need(policy.id===policyId&&policy.enabled===true&&typeof policy.revision==='string'&&policy.revision.length>0&&policy.revision.length<=128&&integer(policy.expiresAt));
   opaque(challenge.id);keyId(challenge.keyId);need(challenge.action==='register'&&integer(challenge.createdAt)&&integer(challenge.expiresAt)&&challenge.expiresAt>challenge.createdAt&&challenge.expiresAt-challenge.createdAt<=120000);
   return {policy,challenge};
 }
-function current(readState,initial,nonceOnly){
-  const state=snapshot(readState,nonceOnly),now=Date.now();need(integer(now)&&now>=initial.challenge.createdAt&&now<initial.challenge.expiresAt&&now<state.policy.expiresAt);
+function current(readState,initial,nonceOnly,policyId){
+  const state=snapshot(readState,nonceOnly,policyId),now=Date.now();need(integer(now)&&now>=initial.challenge.createdAt&&now<initial.challenge.expiresAt&&now<state.policy.expiresAt);
   for(const name of ['id','revision','enabled','expiresAt'])need(state.policy[name]===initial.policy[name]);
   for(const name of ['id','keyId','action','createdAt','expiresAt'])need(state.challenge[name]===initial.challenge[name]);
   need(same(state.challenge.clientData,initial.challenge.clientData));return now;
@@ -48,7 +50,7 @@ const savedStatus=value=>{
   if(value?.ok===false&&value.error==='status_unavailable'){closed(value,['ok','error']);throw new StatusUnavailable();}
   return value&&Object.fromEntries(['ok','scope','checkedAt','cacheUntil','thisUpdate','nextUpdate'].map(k=>[k,value[k]]));
 };
-function engine(readState,components,scope,nonceOnly){
+function engine(readState,components,scope,nonceOnly,policyId=POLICY){
   // Private closure; one active call per instance. Not an aggregate ingress or CPU budget.
   let busy=false;
   const roots={attestation:copy(attestationRoot,8192),receipt:copy(receiptRoot,8192)};
@@ -57,8 +59,8 @@ function engine(readState,components,scope,nonceOnly){
     try{
       closed(request,['challengeId','keyId','attestation']);
       const proof=copy(request.attestation,32768),id=request.challengeId,key=request.keyId;
-      opaque(id);keyId(key);const initial=snapshot(readState,nonceOnly);let cryptoDeadline=Infinity;
-      const check=()=>{const now=current(readState,initial,nonceOnly);need(now<cryptoDeadline);return now;};check();
+      opaque(id);keyId(key);const initial=snapshot(readState,nonceOnly,policyId);let cryptoDeadline=Infinity;
+      const check=()=>{const now=current(readState,initial,nonceOnly,policyId);need(now<cryptoDeadline);return now;};check();
       need(id===initial.challenge.id&&key===initial.challenge.keyId);
       const core=await components.core(proof,initial.challenge.clientData.slice(),key,roots.attestation.slice());let now=check();
       need(core?.scope==='ATTESTATION_CORE_ONLY_RECEIPT_UNVERIFIED_NO_ENROLLMENT');
@@ -74,13 +76,16 @@ function engine(readState,components,scope,nonceOnly){
       const signerResult=await components.status.check('ocsp',certs.signer.slice(),certs.issuer.slice(),certs.root.slice());now=check();
       receiptTime(cms,now);statusTime(issuer,'crl',now);const signer=savedStatus(signerResult);statusTime(signer,'ocsp',now);need(now<attestationExpiresAt&&now<cms.certificateExpiresAt);
       return {ok:true,evidence:{scope,keyId:key,challengeId:id,challengeCreatedAt:initial.challenge.createdAt,challengeExpiresAt:initial.challenge.expiresAt,
-        policy:POLICY,policyRevision:initial.policy.revision,verifiedAt:now,validUntil:Math.min(initial.challenge.expiresAt,initial.policy.expiresAt,cms.created+300001,cms.expires,attestationExpiresAt,cms.certificateExpiresAt,issuer.cacheUntil,signer.cacheUntil),
+        policy:policyId,policyRevision:initial.policy.revision,verifiedAt:now,validUntil:Math.min(initial.challenge.expiresAt,initial.policy.expiresAt,cms.created+300001,cms.expires,attestationExpiresAt,cms.certificateExpiresAt,issuer.cacheUntil,signer.cacheUntil),
         publicPoint:point,initialReceipt:receipt,receiptCreatedAt:cms.created}};
     }catch(error){if(error instanceof StateReadFailure||error instanceof PointDigestFailure)throw error.cause;return {ok:false,error:error instanceof StatusUnavailable?'attestation_unavailable':'enrollment_rejected'};}finally{busy=false;}
   }});
 }
-export function createEnrollmentEvidenceVerifier(readState){
-  return engine(readState,{core:qualifyAttestationCore,cms:qualifyFreshReceiptEvidence,status:new CommonStatusClient()},'COMPOSED_PRIVATE_EVIDENCE_ONLY_NO_ATOMIC_REGISTRATION',true);
+export function createEnrollmentEvidenceVerifier(readState,policyId=POLICY,release){
+  need(policyId===POLICY||policyId===TESTFLIGHT_POLICY);
+  const core=(proof,clientData,keyId,root)=>qualifyAttestationCore(proof,clientData,keyId,root,policyId,release);
+  const cms=(receipt,leaf,clientData,root)=>qualifyFreshReceiptEvidence(receipt,leaf,clientData,root,policyId);
+  return engine(readState,{core,cms,status:new CommonStatusClient()},'COMPOSED_PRIVATE_EVIDENCE_ONLY_NO_ATOMIC_REGISTRATION',true,policyId);
 }
 // Explicit orchestration-only fixture path. It is never selected by the default factory or a request.
 export function createSoftwareStubEnrollmentVerifier(readState,components){

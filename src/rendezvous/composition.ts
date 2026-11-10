@@ -4,13 +4,14 @@ import {COMPOSED_POLICY,type ComposedEnv} from '../../qualification/rendezvous/c
 import {deriveBudgetIdentity,normalizeBudgetIp,BUDGET_POLICY} from '../../qualification/rendezvous/allocation-budget';
 import {INDEX_POLICY} from '../../qualification/rendezvous/allocation-index';
 import {validReceiptActiveKey} from '../../qualification/rendezvous/receipt-key-store';
+import {TESTFLIGHT_POLICY,testflightRelease} from '../../qualification/rendezvous/testflight-release.mjs';
 import type {EnrollmentEnv} from '../../qualification/rendezvous/enrollment-key-state';
 
 export type ProductRendezvousEnv=ComposedEnv&RequestEnv&EnrollmentEnv&{
 	ALLOCATION_POLICY_ENABLED?:string;INDEX_POLICY_ENABLED?:string;
 	RENDEZVOUS_EDGE_POLICY?:string;RENDEZVOUS_IP_HASH_KEY?:string;
 };
-const fields=['COMPOSED_POLICY_ENABLED','REQUEST_POLICY_ENABLED','RENDEZVOUS_CAPACITY_POLICY','ALLOCATION_POLICY_ENABLED','INDEX_POLICY_ENABLED','ASSERTION_POLICY_ENABLED','ASSERTION_POLICY_EXPIRES_AT','ENROLLMENT_POLICY_REVISION','RECEIPT_ACTIVE_KEY','RECEIPT_PREVIOUS_KEY','RENDEZVOUS_EDGE_POLICY','RENDEZVOUS_IP_HASH_KEY','REQUEST_ADMISSION','ADMISSION_STATE','ALLOCATION_INDEX','ENROLLMENT_COORDINATOR','COMPOSED_TRANSACTIONS'] as const;
+const fields=['COMPOSED_POLICY_ENABLED','REQUEST_POLICY_ENABLED','RENDEZVOUS_CAPACITY_POLICY','ALLOCATION_POLICY_ENABLED','INDEX_POLICY_ENABLED','ASSERTION_POLICY_ENABLED','ASSERTION_POLICY_EXPIRES_AT','RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION','RENDEZVOUS_TESTFLIGHT_MIN_BUILD','RENDEZVOUS_TESTFLIGHT_MAX_BUILD','ENROLLMENT_POLICY_REVISION','RECEIPT_ACTIVE_KEY','RECEIPT_PREVIOUS_KEY','RENDEZVOUS_EDGE_POLICY','RENDEZVOUS_IP_HASH_KEY','REQUEST_ADMISSION','ADMISSION_STATE','ALLOCATION_INDEX','ENROLLMENT_COORDINATOR','COMPOSED_TRANSACTIONS'] as const;
 const namespaces=['REQUEST_ADMISSION','ADMISSION_STATE','ALLOCATION_INDEX','ENROLLMENT_COORDINATOR','COMPOSED_TRANSACTIONS'] as const;
 const closedHandler=createRequestBudgetedHandler();
 const need:(value:unknown)=>asserts value=value=>{if(!value)throw new Error('service_unavailable');};
@@ -21,7 +22,7 @@ function snapshot(env:ProductRendezvousEnv){
 	need(env.RENDEZVOUS_EDGE_POLICY==='djc-direct-edge-identity/1-candidate');
 	need(env.COMPOSED_POLICY_ENABLED===COMPOSED_POLICY&&env.REQUEST_POLICY_ENABLED===REQUEST_POLICY&&env.ALLOCATION_POLICY_ENABLED===BUDGET_POLICY&&env.INDEX_POLICY_ENABLED===INDEX_POLICY);
 	const until=Number(env.ASSERTION_POLICY_EXPIRES_AT);
-	need(env.ASSERTION_POLICY_ENABLED==='ios-dev-qualification/1'&&Number.isSafeInteger(until)&&Date.now()<until);
+	need((env.ASSERTION_POLICY_ENABLED==='ios-dev-qualification/1'||(env.ASSERTION_POLICY_ENABLED===TESTFLIGHT_POLICY&&testflightRelease(env)))&&Number.isSafeInteger(until)&&Date.now()<until);
 	need(typeof env.ENROLLMENT_POLICY_REVISION==='string'&&env.ENROLLMENT_POLICY_REVISION.length>0&&env.ENROLLMENT_POLICY_REVISION.length<=128);
 	need(validReceiptActiveKey(env));
 	const secret=env.RENDEZVOUS_IP_HASH_KEY;

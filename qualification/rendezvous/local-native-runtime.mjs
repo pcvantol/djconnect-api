@@ -105,6 +105,18 @@ export async function sourceSnapshot(){
  const erasure=JSON.parse(erasureRaw);
  need(erasure.scope==='EXACT_PUSH_ERASURE_SOURCE_NOT_RENDEZVOUS_ACTIVATION'&&erasure.public_activation_allowed===false);
  need(erasure.baseline_source_map_sha256===stable.effective_source_map_sha256&&erasure.effective_source_map_sha256===provenance.push_erasure_source_map_sha256);
+ const keyAddressPath='docs/rendezvous/shared-key-address-delta-v1.json';
+ const keyAddressRaw=await readFile(join(repo,keyAddressPath));
+ need(plan.reference_hashes[keyAddressPath]===sha(keyAddressRaw)&&sha(keyAddressRaw)===provenance.shared_key_address_delta_sha256);
+ const keyAddress=JSON.parse(keyAddressRaw);
+ need(keyAddress.scope==='EXACT_SHARED_KEY_ADDRESS_DERIVATION_NOT_ACTIVATION'&&keyAddress.public_activation_allowed===false);
+ need(keyAddress.baseline_source_map_sha256===erasure.effective_source_map_sha256&&keyAddress.effective_source_map_sha256===provenance.shared_key_address_source_map_sha256);
+ const testFlightPath='docs/rendezvous/testflight-release-source-delta-v1.json';
+ const testFlightRaw=await readFile(join(repo,testFlightPath));
+ need(plan.reference_hashes[testFlightPath]===sha(testFlightRaw)&&sha(testFlightRaw)===provenance.testflight_profile_delta_sha256);
+ const testFlight=JSON.parse(testFlightRaw);
+ need(testFlight.scope==='EXACT_TESTFLIGHT_RELEASE_PROFILE_NOT_ACTIVATION'&&testFlight.public_activation_allowed===false);
+ need(testFlight.baseline_source_map_sha256===keyAddress.effective_source_map_sha256&&testFlight.effective_source_map_sha256===provenance.testflight_profile_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -121,6 +133,8 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(maintenance.changes,name)){need(maintenance.changes[name].before===expected);expected=maintenance.changes[name].after;}
   if(Object.hasOwn(stable.changes,name)){need(stable.changes[name].before===expected);expected=stable.changes[name].after;}
   if(Object.hasOwn(erasure.changes,name)){need(erasure.changes[name].before===expected);expected=erasure.changes[name].after;}
+  if(Object.hasOwn(keyAddress.changes,name)){need(keyAddress.changes[name].before===expected);expected=keyAddress.changes[name].after;}
+  if(Object.hasOwn(testFlight.changes,name)){need(testFlight.changes[name].before===expected);expected=testFlight.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

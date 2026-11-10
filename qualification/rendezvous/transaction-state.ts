@@ -5,6 +5,8 @@ import {base64Url,base64Decode} from 'djc-existing-crypto';
 import {qualifyBrowserPublicJwk,qualifyCompactJwe,type BrowserPublicJwk} from './jwe-framing';
 import {type ProofInput,type SubmitBinding} from './assertion-key-state';
 import {type EnrollmentCoordinator} from './enrollment-key-state';
+import { rendezvousKeyAddress } from './key-address';
+import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
 const V='djc-rendezvous/1',POLICY='ios-dev-qualification/1';
 type ErrorCode='invalid_request'|'invalid_capability'|'expired'|'cancelled'|'already_consumed'|'already_submitted'|'not_ready'|'operation_conflict'|'invalid_sender_proof'|'service_unavailable'|'rate_limited';
 const fail=(code:ErrorCode):never=>{throw new Failure(code);};
@@ -27,17 +29,21 @@ export interface CreateTransaction {descriptor:Descriptor;generation:number;brow
 export interface BrowserInput {transactionId:string;generation:number;claimSecret:string}
 export interface ScanInput {transactionId:string;generation:number;qrCapability:string}
 export interface SubmitInput extends ScanInput {keyId:string;challengeId:string;clientData:string;assertion:string;destinationEnvelope:string}
-export interface TransactionDependencies {ENROLLMENT_COORDINATOR:DurableObjectNamespace<EnrollmentCoordinator>}
+export interface TransactionDependencies {ASSERTION_POLICY_ENABLED?:string;ENROLLMENT_COORDINATOR:DurableObjectNamespace<EnrollmentCoordinator>}
 export interface TransactionEnv extends TransactionDependencies {TRANSACTION_STATE:DurableObjectNamespace}
 export type Authorizer=(key:string,proof:ProofInput)=>Promise<unknown>;
-export function coordinatorAuthorizer(namespace:DurableObjectNamespace<EnrollmentCoordinator>):Authorizer {
-  return async(key,proof)=>{keyId(key);const address=hex(await jsonHash(['development',POLICY,key]));return namespace.get(namespace.idFromName('djc-rendezvous-key/1/'+address)).authorize(proof);};
+function transactionKeyAddress(key: string, policy?: string) {
+  const testFlight = policy === TESTFLIGHT_POLICY;
+  return rendezvousKeyAddress(key, testFlight ? 'production' : 'development', testFlight ? TESTFLIGHT_POLICY : POLICY);
+}
+export function coordinatorAuthorizer(namespace:DurableObjectNamespace<EnrollmentCoordinator>,policy?:string):Authorizer {
+  return async(key,proof)=>{keyId(key);const address=await transactionKeyAddress(key,policy);return namespace.get(namespace.idFromName('djc-rendezvous-key/1/'+address)).authorize(proof);};
 }
 interface Row extends Descriptor {generation:number;thumbprint:string;claimCommitment:string;qrCommitment:string;state:'pending'|'ready'|'consumed'|'cancelled';browserPublicKey?:BrowserPublicJwk;envelope?:string;operationId?:string;requestDigest?:string;polls:number;submitChallengeAttempts:number;lastPoll?:number}
 interface Authorization {ok:true;kind:'submit-authorization';operationId:string;requestDigest:string;admittedAt:number;keyExpiresAt:number;authorizationExpiresAt:number;counter:number;binding:SubmitBinding}
 export class TransactionState {
-  #ctx:DurableObjectState;#namespace:DurableObjectNamespace;#authorize:Authorizer;#busy=false;#creating=false;
-  constructor(ctx:DurableObjectState,namespace:DurableObjectNamespace,authorize:Authorizer){this.#ctx=ctx;this.#namespace=namespace;this.#authorize=authorize;ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS rendezvous_state (id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, value TEXT NOT NULL)');}
+  #ctx:DurableObjectState;#namespace:DurableObjectNamespace;#authorize:Authorizer;#policy:string|undefined;#busy=false;#creating=false;
+  constructor(ctx:DurableObjectState,namespace:DurableObjectNamespace,authorize:Authorizer,policy?:string){this.#ctx=ctx;this.#namespace=namespace;this.#authorize=authorize;this.#policy=policy;ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS rendezvous_state (id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, value TEXT NOT NULL)');}
   #load(){return this.#ctx.storage.sql.exec<{value:string}>('SELECT value FROM rendezvous_state WHERE id=1').toArray().map(r=>JSON.parse(r.value) as Row)[0];}
   #save(r:Row){this.#ctx.storage.sql.exec('INSERT INTO rendezvous_state(id,expires_at,value) VALUES(1,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',r.expiresAt,JSON.stringify(r));}
   #route(id:string){uuid(id);need(this.#namespace.idFromName(id).equals(this.#ctx.id),'invalid_capability');}
@@ -86,7 +92,7 @@ export class TransactionState {
       if(snapshot.operationId){need(snapshot.operationId===input.challengeId&&snapshot.requestDigest===requestDigest,'already_submitted');return this.#accepted(snapshot);}
       need(snapshot.state==='pending',snapshot.state==='cancelled'?'cancelled':'already_submitted');
       const envelope=await qualifyCompactJwe(input.destinationEnvelope,snapshot.thumbprint);need(envelope.ok);
-      const address=hex(await jsonHash(['development',POLICY,input.keyId])),proofDigest=hex(await jsonHash(['submit',input.challengeId,address,input.clientData,input.assertion]));
+      const address=await transactionKeyAddress(input.keyId,this.#policy),proofDigest=hex(await jsonHash(['submit',input.challengeId,address,input.clientData,input.assertion]));
       const result=await this.#authorize(input.keyId,{operationId:input.challengeId,action:'submit',clientData:input.clientData,assertion:input.assertion}) as Authorization|{ok:false;error:string;retry_after_ms?:unknown};
       if(result?.ok===false&&(result.error==='rate_limited'||result.error==='service_unavailable')){let hint:number|undefined;try{hint=readRetryHint(result);}catch{fail('service_unavailable');}throw new Failure(result.error,hint);}
       need(result?.ok&&result.kind==='submit-authorization','invalid_sender_proof');const auth=structuredClone(result);
@@ -109,7 +115,7 @@ export class TransactionCoordinator extends DurableObject<TransactionDependencie
   // Namespace choices are trusted constructor-only seams, never RPC input selectors.
   constructor(ctx:DurableObjectState,env:TransactionEnv,namespace?:DurableObjectNamespace,keys?:TransactionDependencies['ENROLLMENT_COORDINATOR'],authorize?:Authorizer);
   constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace:DurableObjectNamespace,keys?:TransactionDependencies['ENROLLMENT_COORDINATOR'],authorize?:Authorizer);
-  constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace=(env as TransactionEnv).TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize);}
+  constructor(ctx:DurableObjectState,env:TransactionDependencies,namespace=(env as TransactionEnv).TRANSACTION_STATE,keys=env.ENROLLMENT_COORDINATOR,authorize:Authorizer=coordinatorAuthorizer(keys,env.ASSERTION_POLICY_ENABLED)){super(ctx,env);this.#state=new TransactionState(ctx,namespace,authorize,env.ASSERTION_POLICY_ENABLED);}
   create(input:CreateTransaction){return this.#state.create(input);}
   inspect(input:ScanInput){return this.#state.inspect(input);}
   reserveSubmitChallenge(input:ScanInput){return this.#state.reserveSubmitChallenge(input);}

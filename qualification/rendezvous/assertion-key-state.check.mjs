@@ -4,6 +4,7 @@ import cbor from 'cbor';
 import * as pki from 'pkijs';
 import fixtures from 'djc-assertion-state-fixtures';
 import {ReceiptKeyStore} from './receipt-key-store';
+import {TESTFLIGHT_POLICY,TESTFLIGHT_APP} from './testflight-release.mjs';
 const namespace=env.ASSERTION_KEY_STATE,decode=v=>Uint8Array.from(atob(v),c=>c.charCodeAt(0)),u=v=>Buffer.from(v).toString('base64url'),text=v=>new TextEncoder().encode(v);
 const hash=async v=>new Uint8Array(await crypto.subtle.digest('SHA-256',v)),hex=v=>Buffer.from(v).toString('hex');
 const join=(a,b)=>Uint8Array.from([...a,...b]);
@@ -13,10 +14,11 @@ const row=s=>runInDurableObject(s,(_i,state)=>state.storage.sql.exec('SELECT val
 const ops=s=>runInDurableObject(s,(_i,state)=>state.storage.sql.exec('SELECT value FROM proof_operations').toArray().map(v=>JSON.parse(v.value)));
 const denied=async p=>expect(await p).toMatchObject({ok:false});
 async function software(){const keys=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},false,['sign','verify']),point=new Uint8Array(await crypto.subtle.exportKey('raw',keys.publicKey));return {keys,point,keyId:btoa(String.fromCharCode(...await hash(point)))};}
-async function setup(f,install=true){
- const s=stub();await runInDurableObject(s,i=>{i.env.RECEIPT_ACTIVE_KEY=btoa(String.fromCharCode(...new Uint8Array(32).fill(11)));i.env.ASSERTION_POLICY_ENABLED='ios-dev-qualification/1';i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now()+1e9);});
- const keyAddress=hex(await hash(text(JSON.stringify(['development','ios-dev-qualification/1',f.keyId])))),originalNow=Date.now();
- const m={keyAddress,appPolicy:'ios-dev-qualification/1',environment:'development',publicPoint:btoa(String.fromCharCode(...f.point)),receipt:btoa('PUBLIC_SYNTHETIC_TRUSTED_STORAGE_SEED_NOT_ENROLLMENT'),receiptCreatedAt:originalNow-1000,challengeCreatedAt:originalNow-1000,challengeExpiresAt:originalNow+119000,operationId:crypto.randomUUID(),requestDigest:'b'.repeat(64)};
+async function setup(f,install=true,testFlight=false,maxBuild='40521'){
+ const policy=testFlight?TESTFLIGHT_POLICY:'ios-dev-qualification/1',environment=testFlight?'production':'development';
+ const s=stub();await runInDurableObject(s,i=>{i.env.RECEIPT_ACTIVE_KEY=btoa(String.fromCharCode(...new Uint8Array(32).fill(11)));i.env.ASSERTION_POLICY_ENABLED=policy;i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now()+1e9);if(testFlight){i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='1';i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40521';if(maxBuild)i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD=maxBuild;else delete i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD;}});
+ const keyAddress=hex(await hash(text(JSON.stringify([environment,policy,f.keyId])))),originalNow=Date.now();
+ const m={keyAddress,appPolicy:policy,environment,publicPoint:btoa(String.fromCharCode(...f.point)),receipt:btoa('PUBLIC_SYNTHETIC_TRUSTED_STORAGE_SEED_NOT_ENROLLMENT'),receiptCreatedAt:originalNow-1000,challengeCreatedAt:originalNow-1000,challengeExpiresAt:originalNow+119000,operationId:crypto.randomUUID(),requestDigest:'b'.repeat(64)};
  if(install)expect((await runInDurableObject(s,i=>ReceiptKeyStore.prototype.install.call(i,m))).ok).toBe(true);return {s,m};
 }
 test('trusted storage fixture retains one original clock sample across a millisecond boundary',async()=>{
@@ -32,13 +34,61 @@ test('trusted storage fixture retains one original clock sample across a millise
 });
 const issue=(s,f,action='recover-key',binding)=>s.issue({action,keyId:f.keyId,...(binding?{binding}:{})});
 const binding=()=>({transactionId:crypto.randomUUID(),generation:1,browserThumbprint:u(new Uint8Array(32).fill(1)),envelopeDigest:u(new Uint8Array(32).fill(2)),expiresAt:Date.now()+120000});
-async function proof(f,ch,counter=1,action='recover-key'){
+async function proof(f,ch,counter=1,action='recover-key',build='40230',category=3){
  let auth=new Uint8Array(37);auth.set(await hash(text('ZEML4LPXH4.dev.djconnect.ios')));auth[32]=0xc0;new DataView(auth.buffer).setUint32(33,counter,false);
- auth=join(auth,new Uint8Array(cbor.encode(new Map([['apple_bundle_version_01','40230'],['apple_validation_category_01',Buffer.from([3,0,0,0])]]))));
+ auth=join(auth,new Uint8Array(cbor.encode(new Map([['apple_bundle_version_01',build],['apple_validation_category_01',Buffer.from([category,0,0,0])]]))));
  const nonce=await hash(join(auth,await hash(Buffer.from(ch.client_data,'base64url'))));
  const signature=pki.createCMSECDSASignature(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},f.keys.privateKey,nonce));
  return {operationId:ch.challenge_id,action,clientData:ch.client_data,assertion:u(cbor.encode(new Map([['signature',Buffer.from(signature)],['authenticatorData',Buffer.from(auth)]])))};
 }
+test('software assertion under a seeded production key requires exact TestFlight build and category',async()=>{
+ const f=await software(),{s}=await setup(f,true,true),ch=await issue(s,f);
+ expect(ch.ok).toBe(true);
+ for(const [build,category] of [['40520',2],['40522',2],['40521',3],['40521',4],['40230',3]]){
+  await denied(s.authorize(await proof(f,ch,1,'recover-key',build,category)));
+  expect((await row(s)).counter).toBe(0);
+ }
+ const request=await proof(f,ch,1,'recover-key','40521',2);
+ if('ZEML4LPXH4.dev.djconnect.ios'===TESTFLIGHT_APP){
+  expect(await s.authorize(request)).toMatchObject({ok:true,kind:'recovery-receipt',counter:1});
+ }else{
+  await denied(s.authorize(request));
+  expect((await row(s)).counter).toBe(0);
+ }
+});
+test('the same TestFlight key works for a successor build and respects a raised build floor',async()=>{
+ const f=await software(),{s}=await setup(f,true,true,null),ch=await issue(s,f);
+ const request=await proof(f,ch,1,'recover-key','40522',2);
+ if('ZEML4LPXH4.dev.djconnect.ios'!==TESTFLIGHT_APP){
+  await denied(s.authorize(request));
+  return;
+ }
+ expect(await s.authorize(request)).toMatchObject({ok:true,counter:1});
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40523';i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='2';});
+ await denied(s.authorize(request));
+ const next=await issue(s,f);
+ await denied(s.authorize(await proof(f,next,2,'recover-key','40522',2)));
+ expect(await s.authorize(await proof(f,next,2,'recover-key','40523',2))).toMatchObject({ok:true,counter:2});
+});
+test('an issued TestFlight challenge cannot cross a policy change or a return to the old bounds',async()=>{
+ const f=await software(),{s}=await setup(f,true,true),original=await issue(s,f);
+ expect(original.ok).toBe(true);
+ const originalProof=await proof(f,original,1,'recover-key','40521',2);
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD='40522';i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='2';});
+ await denied(s.authorize(await proof(f,original,1,'recover-key','40522',2)));
+ expect((await row(s)).counter).toBe(0);
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD='40521';i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='3';});
+ await denied(s.authorize(originalProof));
+ const fresh=await issue(s,f);
+ expect(fresh.ok).toBe(true);
+ expect(fresh.challenge_id).not.toBe(original.challenge_id);
+ if('ZEML4LPXH4.dev.djconnect.ios'!==TESTFLIGHT_APP)return;
+ const freshProof=await proof(f,fresh,1,'recover-key','40521',2);
+ expect(await s.authorize(freshProof)).toMatchObject({ok:true,counter:1});
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='4';});
+ await denied(s.authorize(freshProof));
+ expect((await row(s)).counter).toBe(1);
+});
 test('all public requests remain unavailable and unverified helper RPCs denied',async()=>{const f=await software(),{s,m}=await setup(f);expect((await SELF.fetch('https://example.test/v1/rendezvous/submit',{method:'POST'})).status).toBe(503);await denied(s.install(m));await denied(s.advance(999));await denied(s.evidence());});
 test('recover uses exact saved wire bytes then atomically removes nonce and commits counter/receipt',async()=>{
  const f=await software(),{s}=await setup(f),ch=await issue(s,f);expect(ch.ok).toBe(true);expect(Buffer.from(ch.challenge_id,'base64url').length).toBe(32);
