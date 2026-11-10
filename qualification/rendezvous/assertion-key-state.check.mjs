@@ -16,7 +16,7 @@ const denied=async p=>expect(await p).toMatchObject({ok:false});
 async function software(){const keys=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},false,['sign','verify']),point=new Uint8Array(await crypto.subtle.exportKey('raw',keys.publicKey));return {keys,point,keyId:btoa(String.fromCharCode(...await hash(point)))};}
 async function setup(f,install=true,testFlight=false,maxBuild='40521'){
  const policy=testFlight?TESTFLIGHT_POLICY:'ios-dev-qualification/1',environment=testFlight?'production':'development';
- const s=stub();await runInDurableObject(s,i=>{i.env.RECEIPT_ACTIVE_KEY=btoa(String.fromCharCode(...new Uint8Array(32).fill(11)));i.env.ASSERTION_POLICY_ENABLED=policy;i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now()+1e9);if(testFlight){i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40521';if(maxBuild)i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD=maxBuild;else delete i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD;}});
+ const s=stub();await runInDurableObject(s,i=>{i.env.RECEIPT_ACTIVE_KEY=btoa(String.fromCharCode(...new Uint8Array(32).fill(11)));i.env.ASSERTION_POLICY_ENABLED=policy;i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now()+1e9);if(testFlight){i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='1';i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40521';if(maxBuild)i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD=maxBuild;else delete i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD;}});
  const keyAddress=hex(await hash(text(JSON.stringify([environment,policy,f.keyId])))),originalNow=Date.now();
  const m={keyAddress,appPolicy:policy,environment,publicPoint:btoa(String.fromCharCode(...f.point)),receipt:btoa('PUBLIC_SYNTHETIC_TRUSTED_STORAGE_SEED_NOT_ENROLLMENT'),receiptCreatedAt:originalNow-1000,challengeCreatedAt:originalNow-1000,challengeExpiresAt:originalNow+119000,operationId:crypto.randomUUID(),requestDigest:'b'.repeat(64)};
  if(install)expect((await runInDurableObject(s,i=>ReceiptKeyStore.prototype.install.call(i,m))).ok).toBe(true);return {s,m};
@@ -64,11 +64,30 @@ test('the same TestFlight key works for a successor build and respects a raised 
   return;
  }
  expect(await s.authorize(request)).toMatchObject({ok:true,counter:1});
- await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40523';});
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40523';i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='2';});
  await denied(s.authorize(request));
  const next=await issue(s,f);
  await denied(s.authorize(await proof(f,next,2,'recover-key','40522',2)));
  expect(await s.authorize(await proof(f,next,2,'recover-key','40523',2))).toMatchObject({ok:true,counter:2});
+});
+test('an issued TestFlight challenge cannot cross a policy change or a return to the old bounds',async()=>{
+ const f=await software(),{s}=await setup(f,true,true),original=await issue(s,f);
+ expect(original.ok).toBe(true);
+ const originalProof=await proof(f,original,1,'recover-key','40521',2);
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD='40522';i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='2';});
+ await denied(s.authorize(await proof(f,original,1,'recover-key','40522',2)));
+ expect((await row(s)).counter).toBe(0);
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD='40521';i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='3';});
+ await denied(s.authorize(originalProof));
+ const fresh=await issue(s,f);
+ expect(fresh.ok).toBe(true);
+ expect(fresh.challenge_id).not.toBe(original.challenge_id);
+ if('ZEML4LPXH4.dev.djconnect.ios'!==TESTFLIGHT_APP)return;
+ const freshProof=await proof(f,fresh,1,'recover-key','40521',2);
+ expect(await s.authorize(freshProof)).toMatchObject({ok:true,counter:1});
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION='4';});
+ await denied(s.authorize(freshProof));
+ expect((await row(s)).counter).toBe(1);
 });
 test('all public requests remain unavailable and unverified helper RPCs denied',async()=>{const f=await software(),{s,m}=await setup(f);expect((await SELF.fetch('https://example.test/v1/rendezvous/submit',{method:'POST'})).status).toBe(503);await denied(s.install(m));await denied(s.advance(999));await denied(s.evidence());});
 test('recover uses exact saved wire bytes then atomically removes nonce and commits counter/receipt',async()=>{

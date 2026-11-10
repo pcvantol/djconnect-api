@@ -1,10 +1,12 @@
 export const TESTFLIGHT_POLICY: 'ios-testflight/1';
 export const TESTFLIGHT_APP: 'ZEML4LPXH4.dev.djconnect.ios';
 export interface TestFlightReleaseEnv {
+  RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION?: string;
   RENDEZVOUS_TESTFLIGHT_MIN_BUILD?: string;
   RENDEZVOUS_TESTFLIGHT_MAX_BUILD?: string;
 }
 export interface TestFlightRelease {
+  readonly revision: number;
   readonly min: number;
   readonly max?: number;
 }

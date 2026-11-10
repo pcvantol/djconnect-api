@@ -49,14 +49,18 @@ export class AssertionKeyState extends ReceiptKeyStore {
    need(input.binding);closed(input.binding,['transactionId','generation','browserThumbprint','envelopeDigest','expiresAt']);binding={...input.binding};
    need(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(binding.transactionId));need(Number.isInteger(binding.generation)&&binding.generation>=1&&binding.generation<=2147483647);opaque(binding.browserThumbprint);opaque(binding.envelopeDigest);
   }
-  const now=Date.now();this.policy(now);const expiresAt=binding?.expiresAt??now+120000;need(integer(expiresAt)&&expiresAt>now&&expiresAt-now<=120000);
+  const now=Date.now();this.policy(now);const releaseRevision=testflightReleaseRevision(this.release()),expiresAt=binding?.expiresAt??now+120000;need(integer(expiresAt)&&expiresAt>now&&expiresAt-now<=120000);
   const id=random(),nonce=random(),body=binding?{v:VERSION,action:input.action,service_origin:ORIGIN,transaction_id:binding.transactionId,generation:binding.generation,browser_key_thumbprint:binding.browserThumbprint,expires_at:expiresAt,key_id:input.keyId,challenge_id:id,challenge:nonce,envelope_digest:binding.envelopeDigest}:{v:VERSION,action:input.action,service_origin:ORIGIN,key_id:input.keyId,challenge_id:id,challenge:nonce,expires_at:expiresAt};
-  const op:Operation={id,nonce,action:input.action,keyAddress,createdAt:now,expiresAt,status:'challenge',clientData:base64Url(JSON.stringify(body)),...(binding?{binding}:{})};
+  const op:Operation={id,nonce,action:input.action,keyAddress,createdAt:now,expiresAt,status:'challenge',releaseRevision,clientData:base64Url(JSON.stringify(body)),...(binding?{binding}:{})};
   try{return await this.locked(async()=>{
    const alarm=await this.ctx.storage.getAlarm();await this.ctx.storage.setAlarm(Math.min(alarm??expiresAt,expiresAt));
    return this.ctx.storage.transactionSync(()=>{
-    const at=Date.now();this.policy(at);need(this.appPolicy()===appPolicy);const row=this.cleanup(at);need(at>=now&&at<expiresAt);if(row)need(row.keyAddress===keyAddress);
-    const ops=this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations').toArray().map(r=>JSON.parse(r.value) as Operation);
+    const at=Date.now();this.policy(at);need(this.appPolicy()===appPolicy&&testflightReleaseRevision(this.release())===releaseRevision);const row=this.cleanup(at);need(at>=now&&at<expiresAt);if(row)need(row.keyAddress===keyAddress);
+    const ops=this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations').toArray().map(r=>JSON.parse(r.value) as Operation).filter(previous=>{
+     if(previous.releaseRevision===releaseRevision)return true;
+     this.ctx.storage.sql.exec('DELETE FROM proof_operations WHERE id=?',previous.id);
+     return false;
+    });
     if(input.action!=='submit'){const existing=ops.find(v=>v.status==='challenge'&&v.action===input.action&&v.keyAddress===keyAddress);if(existing)return {ok:true as const,...this.response(existing)};}
     need(ops.length<32&&ops.filter(v=>v.action===input.action).length<(input.action==='submit'?28:2)&&!this.operation(op.id));this.saveOperation(op);return {ok:true as const,...this.response(op)};
    });
@@ -70,18 +74,18 @@ export class AssertionKeyState extends ReceiptKeyStore {
  private async authorizeInternal(input:ProofInput,recordWindow:RecordWindow){
   input={...input};closed(input,['operationId','action','clientData','assertion']);opaque(input.operationId);need(['recover-key','delete-key','submit'].includes(input.action));
   const client=b64url(input.clientData,2048),proof=b64url(input.assertion,4096),now=Date.now();
-  const snapshot=this.ctx.storage.transactionSync(()=>{const row=this.active(now),op=this.operation(input.operationId);need(op&&op.action===input.action&&op.keyAddress===row.keyAddress&&now>=op.createdAt&&now<op.expiresAt);return {row,op,release:this.release()};});
+  const snapshot=this.ctx.storage.transactionSync(()=>{const row=this.active(now),op=this.operation(input.operationId);need(op&&op.action===input.action&&op.keyAddress===row.keyAddress&&now>=op.createdAt&&now<op.expiresAt);const release=this.release();need(op.releaseRevision===testflightReleaseRevision(release));return {row,op,release};});
   const requestDigest=await digest([input.action,input.operationId,snapshot.row.keyAddress,input.clientData,input.assertion]);
   if(snapshot.op.status==='authorized')return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now(),recordWindow);});
   need(snapshot.op.clientData===input.clientData);recordWindow([snapshot.op.createdAt,snapshot.op.expiresAt],[snapshot.row.createdAt,snapshot.row.expiresAt]);
   const verified=await qualifyAssertionCore(proof,client,base64Decode(snapshot.row.publicPoint),snapshot.row.counter,snapshot.row.appPolicy,snapshot.release);need(verified);
   let committedBounds:ReadonlyArray<readonly[number|undefined,number|undefined]>=[];
   const result=this.ctx.storage.transactionSync(()=>{
-   const at=Date.now(),row=this.active(at),op=this.operation(input.operationId);need(op&&op.status==='challenge'&&op.action===input.action&&op.keyAddress===row.keyAddress&&op.clientData===input.clientData&&at>=op.createdAt&&at<op.expiresAt);
+   const at=Date.now(),row=this.active(at),op=this.operation(input.operationId);need(op&&op.status==='challenge'&&op.releaseRevision===snapshot.op.releaseRevision&&op.action===input.action&&op.keyAddress===row.keyAddress&&op.clientData===input.clientData&&at>=op.createdAt&&at<op.expiresAt);
    need(testflightReleaseRevision(this.release())===testflightReleaseRevision(snapshot.release)&&row.appPolicy===snapshot.row.appPolicy&&row.environment===snapshot.row.environment&&row.publicPoint===snapshot.row.publicPoint&&row.createdAt===snapshot.row.createdAt&&row.expiresAt===snapshot.row.expiresAt&&verified.counter>row.counter&&verified.counter<=0xffffffff);
    if(input.action==='delete-key'){const tombstone=this.tombstone(row);this.save(tombstone);return {kind:'deleted' as const,purgeAt:tombstone.purgeAt};}
    row.counter=verified.counter;row.revision++;this.save(row);
-   const receipt:Operation={id:op.id,action:op.action,keyAddress:op.keyAddress,createdAt:op.createdAt,expiresAt:Math.min(op.expiresAt,row.expiresAt),status:'authorized',requestDigest,releaseRevision:testflightReleaseRevision(snapshot.release),counter:verified.counter,admittedAt:at,keyExpiresAt:row.expiresAt,...(op.binding?{binding:op.binding,authorizationExpiresAt:Math.min(at+5000,op.expiresAt,row.expiresAt,this.policy(at))}:{})};
+   const receipt:Operation={id:op.id,action:op.action,keyAddress:op.keyAddress,createdAt:op.createdAt,expiresAt:Math.min(op.expiresAt,row.expiresAt),status:'authorized',requestDigest,releaseRevision:op.releaseRevision,counter:verified.counter,admittedAt:at,keyExpiresAt:row.expiresAt,...(op.binding?{binding:op.binding,authorizationExpiresAt:Math.min(at+5000,op.expiresAt,row.expiresAt,this.policy(at))}:{})};
    this.saveOperation(receipt);return this.disposition(receipt,requestDigest,at,(...bounds)=>{committedBounds=bounds;});
   });
   recordWindow(...committedBounds);

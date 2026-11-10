@@ -63,6 +63,7 @@ test('signed P256 assertion software fixtures distinguish both build policies an
  let code=await readFile(join(stage.root,CORE),'utf8');
  for(const name of ['cbor','asn1js','pkijs'])code=code.replace("from '"+name+"'","from "+JSON.stringify(pathToFileURL(require.resolve(name)).href));
  code=code.replace("from './worker-path-candidate.mjs'","from "+JSON.stringify(pathToFileURL(join(repo,'qualification/rendezvous/worker-path-candidate.mjs')).href));
+ code=code.replace("from './testflight-release.mjs'","from "+JSON.stringify(pathToFileURL(join(stage.root,'qualification/rendezvous/testflight-release.mjs')).href));
  const out=join(p,'node-fixture-core.mjs');await writeFile(out,code,{mode:0o600});
  const baseline=await import(pathToFileURL(join(repo,CORE)).href),variant=await import(pathToFileURL(out).href);
  const hash=async b=>new Uint8Array(await crypto.subtle.digest('SHA-256',b));

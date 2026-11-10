@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scope": "EXACT_TESTFLIGHT_RELEASE_PROFILE_NOT_ACTIVATION",
   "baseline_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
-  "effective_source_map_sha256": "e4a4fd4c30d474413e3e27e4af5950dd32e49c53ae88728623264abd35487796",
+  "effective_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
   "changes": {
     "qualification/rendezvous/app-attest-core-candidate.mjs": {
       "before": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
@@ -10,11 +10,11 @@
     },
     "qualification/rendezvous/assertion-key-state.check.mjs": {
       "before": "9f730fc3981bb45681f24f57b22df0021ade9c10ba75c55826548bd1ce66fa78",
-      "after": "5afa2e97d8a776c13a4eb17bf2d7b6afbee75a9d7fb665bcb877a718e1c6032f"
+      "after": "caa07495f4d24dc6edac64d3fee11f23c4369aa1d39244ad1a139899840b128a"
     },
     "qualification/rendezvous/assertion-key-state.ts": {
       "before": "d65abe4ec101f52372340f47a159efa2f725c3ea0e4aa03fca8efeb5143b1917",
-      "after": "2ac0e1ec86fec944f38d2c8a6d5dc6ae13d53188864b9d60fb9c735136f86368"
+      "after": "c02bf757570e9fb5a850ff8178b2e37154a333f350474b4a81a2e9f3174fbf6d"
     },
     "qualification/rendezvous/assertion-verifier.d.ts": {
       "before": "53fe57a62d1f00c2ea44c6801b24e79acaaa47d46177629bbf7d81401ba166f1",
@@ -42,7 +42,7 @@
     },
     "qualification/rendezvous/product-composition.check.ts": {
       "before": "515f985f368f5c07712eec2034bef8c45757b60efc2021e3a719c3033cb6df44",
-      "after": "b141a210517cae07b82f47c29e3fc71dd040fafe60a4b0f213e7b7194d4b42cf"
+      "after": "8223295b4684bc1d665e43c26541cb9c64922fcd46c9e6333dd60ce49b2f71e8"
     },
     "qualification/rendezvous/receipt-cms-candidate.mjs": {
       "before": "0dadf10ef3055862ef952dd551907d15f6aedc66f19400d8ed268e3c9daf5dd0",
@@ -98,17 +98,17 @@
     },
     "src/rendezvous/composition.ts": {
       "before": "79e8fe0dc4c04d872e3edc9bf7753bc05c1bae305b2e4b3ddbf3d6701c0b5a44",
-      "after": "28f25db5d080b303d894e7c58f8825882e84504ea47ec05ea386ebff3c3735dd"
+      "after": "b1a04b3f35b27c4597105f5bbb4e68315d16010eb336a3492be82954d52cacd0"
     }
   },
   "source_additions": {
-    "qualification/rendezvous/testflight-release.mjs": "94aa0ec19f69a8e6130fbb50f1c2d1a7f15980ca4c397dbc8bcc29de92b248ee",
-    "qualification/rendezvous/testflight-release.d.mts": "7453ab8ddfe81136d6802f1d551e368f2239fe30d53064c1cf6373af4378ac0c"
+    "qualification/rendezvous/testflight-release.mjs": "c44979c2fc4329037f8a464934a22ce7fdfb1943db641e6a85f6f1e23cfd8d69",
+    "qualification/rendezvous/testflight-release.d.mts": "6ed5cbc9c7dfd3619b701c199edf0618020d823b9ab4fe42a7c6e92b270d317d"
   },
   "reference_changes": {},
   "reference_additions": {
-    "docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md": "76625905bffb1584496b23039cdcdebf44d3ef0dd658dba7b892d5522305adb4",
-    "qualification/rendezvous/qa-build-profile.json": "a0eca1def555806bae72f92f7e217d1eab87b8d965fe952ba928f4c3ed9cc35f",
+    "docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md": "283f2f3f023e4a09d00f75ce1d9c62de97f83478d2a3beb0c62acaeb3644193e",
+    "qualification/rendezvous/qa-build-profile.json": "0aa52b27a4f9e9d57200a6abeeae8728c87fd0e99b623e220c034fc446a99d3b",
     "qualification/rendezvous/run_assertion_state_workerd.mjs": "18e6d564da7c2632ec9828c3ef9416c018be8f05299636c1e23d5a17fd40bab1",
     "qualification/rendezvous/run_capacity_workerd.mjs": "c7496d731a538e56bf6b641b48308221291e90a04750df4979f4d638a397a4cc",
     "qualification/rendezvous/run_create_recovery_workerd.mjs": "8f87ee04c9edfe025f8fa90ce0bae2f1f481d31c5d1c92af52aa1ffd9bb3e069",
@@ -117,7 +117,8 @@
     "qualification/rendezvous/run_receipt_workerd.mjs": "7babc4937ff78e706f51cae9f9ceb0063be5111f5385d75b2ff52e5acf818d03",
     "qualification/rendezvous/run_store_workerd.mjs": "f185cbf957364148380100b7860b38ad480af93eec04f6395256c449f9cb027f",
     "scripts/build_rendezvous_qa.mjs": "874d397f26f253c839e3c2cee2e973f6fba06e5213f08e7e7e7234bb029870f0",
-    "src/rendezvous/qa-entry.ts": "c08c0da27890d0f88086cd604ddff28fac02eab268357f035b409a0cf8c57b61"
+    "src/rendezvous/qa-entry.ts": "c08c0da27890d0f88086cd604ddff28fac02eab268357f035b409a0cf8c57b61",
+    "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad"
   },
   "public_activation_allowed": false
 }

@@ -900,8 +900,8 @@ def baseline_before_testflight_profile():
 
 
 TESTFLIGHT_PROFILE_PATH = 'docs/rendezvous/testflight-release-source-delta-v1.json'
-TESTFLIGHT_PROFILE_SHA256 = '48467de493a40c64ae676e697495420d1e031c0e71a772664ea51c827cb34a9f'
-TESTFLIGHT_PROFILE_MAP_SHA256 = 'e4a4fd4c30d474413e3e27e4af5950dd32e49c53ae88728623264abd35487796'
+TESTFLIGHT_PROFILE_SHA256 = 'c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80'
+TESTFLIGHT_PROFILE_MAP_SHA256 = '89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f'
 TESTFLIGHT_PROFILE_SOURCES = frozenset((
     'qualification/rendezvous/app-attest-core-candidate.mjs',
     'qualification/rendezvous/assertion-key-state.check.mjs',
@@ -934,6 +934,7 @@ TESTFLIGHT_PROFILE_ADDITIONS = frozenset((
 ))
 TESTFLIGHT_PROFILE_REFERENCES = frozenset()
 TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS = frozenset((
+    'qualification/rendezvous/private-profile-40381.check.mjs',
     'docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md',
     'qualification/rendezvous/qa-build-profile.json',
     'qualification/rendezvous/run_assertion_state_workerd.mjs',

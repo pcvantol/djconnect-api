@@ -47,13 +47,16 @@ async function rejectsBeforeBody(bindings:ProductRendezvousEnv,req:Request){
 
 describe('internal product configuration and fixed identity',()=>{
 	it.each([
-		[undefined, undefined],
-		['040521', undefined],
-		['40521', ''],
-		['40521', '40520'],
-	])('invalid TestFlight release range rejects before body or storage (%s, %s)', async (min, max) => {
+		[undefined, undefined, '1'],
+		['040521', undefined, '1'],
+		['40521', '', '1'],
+		['40521', '40520', '1'],
+		['40521', '40521', undefined],
+		['40521', '40521', '01'],
+	])('invalid TestFlight release range rejects before body or storage (%s, %s, %s)', async (min, max, revision) => {
 		const {bindings,calls}=blockedNamespaces();
 		bindings.ASSERTION_POLICY_ENABLED=TESTFLIGHT_POLICY;
+		bindings.RENDEZVOUS_TESTFLIGHT_RELEASE_REVISION=revision;
 		bindings.RENDEZVOUS_TESTFLIGHT_MIN_BUILD=min;
 		bindings.RENDEZVOUS_TESTFLIGHT_MAX_BUILD=max;
 		await rejectsBeforeBody(bindings,request('/create'));
