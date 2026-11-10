@@ -3,6 +3,7 @@ import {beforeAll,beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
 import {env} from 'cloudflare:workers';
 import {runInDurableObject} from 'cloudflare:test';
 import {createProductRendezvousHandler,type ProductRendezvousEnv} from '../../src/rendezvous/composition';
+import { rendezvousKeyAddress } from './key-address';
 import {deriveBudgetIdentity} from './allocation-budget';
 import {base64Url} from '../../src/crypto';
 
@@ -44,6 +45,15 @@ async function rejectsBeforeBody(bindings:ProductRendezvousEnv,req:Request){
 }
 
 describe('internal product configuration and fixed identity',()=>{
+	it('preserves the existing key address and separates attestation environments and policies', async () => {
+		expect(await rendezvousKeyAddress(keyId, 'development', 'ios-dev-qualification/1'))
+			.toBe('2a449a9894f60998c7455ddac55b8ffc523c86560675335556334370b6b7c3a6');
+		expect(await rendezvousKeyAddress(keyId, 'development', 'ios-vibecast-qa-development/1'))
+			.toBe('d727033d79ac203e9d719e411b1e54b1570b377b4e45c190d0bce1d85b17dde9');
+		expect(await rendezvousKeyAddress(keyId, 'production', 'ios-dev-qualification/1'))
+			.toBe('8a3f8467aaa6774f42c6a8c3c383c4ee1e543514d1708523016783e3dae11a7e');
+	});
+
 	it('local egress guard intercepts an explicit QA-only positive control',async()=>{
 		await expect(fetch('https://egress-denied.example.invalid/qualification')).rejects.toThrow('local_product_module_egress_denied');expect(egress).toHaveBeenCalledTimes(1);egress.mockClear();
 	});

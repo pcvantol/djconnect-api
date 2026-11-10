@@ -2,6 +2,7 @@
 import {ReceiptKeyStore,StoreRejected,type StoreEnv,type StoreMaterial} from './receipt-key-store';
 import {qualifyAssertionCore} from 'djc-qualified-assertion';
 import {base64Decode,base64Url} from 'djc-existing-crypto';
+import { rendezvousKeyAddress } from './key-address';
 export interface CoordinatorEnv extends StoreEnv { ASSERTION_POLICY_ENABLED?:string; ASSERTION_POLICY_EXPIRES_AT?:string }
 type Action='recover-key'|'delete-key'|'submit';
 export interface SubmitBinding {transactionId:string;generation:number;browserThumbprint:string;envelopeDigest:string;expiresAt:number}
@@ -39,7 +40,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
   need(input&&typeof input==='object'&&!Array.isArray(input));if(input.binding!==undefined&&input.binding!==null)need(typeof input.binding==='object'&&!Array.isArray(input.binding));
   input={...input,...(input.binding?{binding:{...input.binding}}:{})};closed(input,input.action==='submit'?['action','keyId','binding']:['action','keyId']);need(['recover-key','delete-key','submit'].includes(input.action));
   need(typeof input.keyId==='string'&&input.keyId.length===44);let keyBytes:Uint8Array;try{keyBytes=base64Decode(input.keyId);}catch{throw new ProofRejected();}need(keyBytes.length===32&&btoa(String.fromCharCode(...keyBytes))===input.keyId);
-  const keyAddress=await digest(['development',POLICY,input.keyId]);let binding:SubmitBinding|undefined;
+  const keyAddress=await rendezvousKeyAddress(input.keyId,'development',POLICY);let binding:SubmitBinding|undefined;
   if(input.action==='submit'){
    need(input.binding);closed(input.binding,['transactionId','generation','browserThumbprint','envelopeDigest','expiresAt']);binding={...input.binding};
    need(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(binding.transactionId));need(Number.isInteger(binding.generation)&&binding.generation>=1&&binding.generation<=2147483647);opaque(binding.browserThumbprint);opaque(binding.envelopeDigest);

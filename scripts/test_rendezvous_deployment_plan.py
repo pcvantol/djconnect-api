@@ -68,7 +68,9 @@ class PreparationTests(unittest.TestCase):
                          *v.PUSH_ERASURE_REFERENCES, *v.PUSH_ERASURE_ADDITIONS,
                          v.PUSH_ERASURE_DELTA_PATH, v.PRODUCTION_D1_GUARD_REFERENCE,
                          *v.PRODUCTION_D1_GUARD_ADDITIONS, v.PRODUCTION_D1_GUARD_PATH,
-                         v.REPOSITORY_NAMESPACE_SMOKE_REFERENCE, v.REPOSITORY_NAMESPACE_DELTA_PATH)
+                         v.REPOSITORY_NAMESPACE_SMOKE_REFERENCE, v.REPOSITORY_NAMESPACE_DELTA_PATH,
+                         *v.SHARED_KEY_ADDRESS_SOURCES, v.SHARED_KEY_ADDRESS_ADDITION,
+                         v.SHARED_KEY_ADDRESS_PATH)
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = {**self.plan['source_hashes'],

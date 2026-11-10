@@ -109,7 +109,8 @@
     "docs/rendezvous/production-d1-migration-guard-delta-v1.json": "3ecc560b779e3368d16826fe3d08383267d6eea78eb793c9423d007dc2edd877",
     "scripts/check_production_d1_migrations.py": "1f574fef53a4ac24f0e2b8511bf207ae9ae3f5816e83e68e1037aee28a1268bb",
     "scripts/test_production_d1_migrations.py": "c5387c7dd023997fecccc46e345e834961927e4cf803f295e223b0e7c4ba5254",
-    "docs/rendezvous/repository-namespace-release-delta-v1.json": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504"
+    "docs/rendezvous/repository-namespace-release-delta-v1.json": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504",
+    "docs/rendezvous/shared-key-address-delta-v1.json": "4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824"
   },
   "schema_version": 1,
   "secret_names": [
@@ -122,13 +123,13 @@
     "qualification/rendezvous/retry-hint.ts": "422b97fb81c63c52129f36d6d6c5948e8987e3f7797d3cdda35b2992a8f13f33",
     "qualification/rendezvous/receipt-key-store.ts": "07c502f8741031055134e3f8dbd9d0db87c70532a0129ba3758cab070bc7ab33",
     "qualification/rendezvous/receipt-key-store.check.ts": "6a2acc17becb471b35ca200b93a5ad064bdb91d43fb300944b8dbf85670bec82",
-    "qualification/rendezvous/assertion-key-state.ts": "fa7b29c185c2163e1ec652f6fe2808f9f2d687dfe70ae48572ec4f44ba7dc2e6",
+    "qualification/rendezvous/assertion-key-state.ts": "d65abe4ec101f52372340f47a159efa2f725c3ea0e4aa03fca8efeb5143b1917",
     "qualification/rendezvous/assertion-verifier.d.ts": "53fe57a62d1f00c2ea44c6801b24e79acaaa47d46177629bbf7d81401ba166f1",
     "qualification/rendezvous/assertion-key-state.check.mjs": "9f730fc3981bb45681f24f57b22df0021ade9c10ba75c55826548bd1ce66fa78",
     "qualification/rendezvous/assertion-state-harness.ts": "bc257394b71a4367e72b99359e44ecb2fc6987a87c05441ce52f8f4f00816c34",
     "qualification/rendezvous/app-attest-core-candidate.mjs": "8b6c11a4318142cf0a2cf3ac359900f2ee095a60f86cc7fad874f9d1881800b8",
     "qualification/rendezvous/worker-path-candidate.mjs": "2ea6e9e1048e81304948b2189dee250269d30c7a18bc35738dfab7a6f8375773",
-    "qualification/rendezvous/enrollment-key-state.ts": "a6782474798f90f0d338bbcfd518cda6ee9338c5ce40205b1020258897c448b0",
+    "qualification/rendezvous/enrollment-key-state.ts": "2e713fb51bb8e775ecd070c20984136ac32ed42b318454d72d9394b7b7630de5",
     "qualification/rendezvous/enrollment-key-state.check.mjs": "2d6f2a651c96e0be4e4fdc57e9577117d6b0d9eb5749390399a51e31112cd358",
     "qualification/rendezvous/enrollment-state-harness.ts": "c475ff92969df368707662a702a272721775ddae7ed0dfd73e5d3874c1253eba",
     "qualification/rendezvous/enrollment-trust.d.ts": "505ef994aea65472bdf5d5353d7f98c2482742e6bbdd3ddd75671d0aa3978595",
@@ -138,7 +139,7 @@
     "qualification/rendezvous/receipt-status-candidate.mjs": "7f2b1aa7d4307e36a8edddea7d89a1ada327ead8c9350e82866c6eee9449d434",
     "qualification/rendezvous/receipt-status-client.mjs": "df34ffdfba387a0715e67e4977addf9e9fd1ee0cd452b750fc643f3269b6cc95",
     "qualification/rendezvous/run_registration_workerd.mjs": "bd9af9a5a63e3682a9a58303df1f6d81a2b3f190b421d1aeda4f93af7f423bc7",
-    "qualification/rendezvous/transaction-state.ts": "40d84abd12043f00da12b50a14bd178e85228662815b894aea6618227ea4423b",
+    "qualification/rendezvous/transaction-state.ts": "fc6342c2265a1c53f78fbefd8800b6819c1e1d8c3b612fa7b21c23a5a7410e0e",
     "qualification/rendezvous/transaction-state-harness.ts": "4d95bee46b85e2b04a84f38c8ea1b94185625b32c241f5f2f2b31aa9dd34475f",
     "qualification/rendezvous/transaction-state.check.mjs": "6f1d94581ace10094dc183fd0506a1027021f9d454212c632a769607b7901088",
     "qualification/rendezvous/jwe-framing.ts": "8dd212cbc1dedc48d9b5333e46ff2a3b24f95f3ff2e8ce5c6f9504298a16d6d8",
@@ -152,7 +153,7 @@
     "qualification/rendezvous/allocation-index.check.mjs": "b8a40b33d614ae28f2d0a82d777354fdbfbda4aede3090a39af7f6f8a628e109",
     "qualification/rendezvous/index-state-harness.ts": "eeb34b3530d8c054dd23a5ef9114b359239e264731d40378fac3180079c479f6",
     "qualification/rendezvous/run_index_workerd.mjs": "d3d886a3a976727637c2c317fea1cb8bbd13079bca6632d2d86c4f1178e23804",
-    "qualification/rendezvous/key-routing.ts": "8ce1268598a5c12c448510f81691c185f0a0d5688ccc163e01d0bfd5fe3a97af",
+    "qualification/rendezvous/key-routing.ts": "56d05029e953617b078680c8e31a79d15e81ab90abe941d5895d0d94025885c4",
     "qualification/rendezvous/key-routing.check.mjs": "cec00414b00d260f1ffe15abab7bbb8ccb70d77bb3d6694cc68a8481c6b55c0a",
     "qualification/rendezvous/key-routing-harness.ts": "5522524e1bcec9a4c4350dd1ebf31e9ab7583cc314a0fe3d400cdf649887f6c2",
     "qualification/rendezvous/run_key_routing_workerd.mjs": "9795d2a211813cc98de3cd17786df716be0e76b394fc5842fc77942824c7451e",
@@ -186,7 +187,7 @@
     "docs/rendezvous/capacity-browser-traces-v1.json": "1a1e26f68efc03860e2de29d42ddae216a93c30228a57000cdb63935815c9492",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
     "src/rendezvous/composition.ts": "79e8fe0dc4c04d872e3edc9bf7753bc05c1bae305b2e4b3ddbf3d6701c0b5a44",
-    "qualification/rendezvous/product-composition.check.ts": "9f0459d1d825413936086974f63e22d8b164cc0ff9c8a194aa97872546f93b93",
+    "qualification/rendezvous/product-composition.check.ts": "515f985f368f5c07712eec2034bef8c45757b60efc2021e3a719c3033cb6df44",
     "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
     "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
     "src/index.ts": "3bf44422f5f13cedeaa92b32fd4cdae1cbfad373202d4c374ee1a04f853b95f5",
@@ -263,7 +264,8 @@
     "src/host-wake-receiving/dispatch.ts": "f5f0fc8ac40c58e60e78600564055a0c33dcfa4cac21dade34c8eb9f1d713fb9",
     "scripts/cleanup_workflow_runs.py": "546560243ab53a6503d01cbb72cf9911515c2dcbb38fff82ff9322f3d14bba86",
     "scripts/test_cleanup_workflow_runs.py": "8c39ce1c90c64cb2c741240036a586d2acf5551a24b0ff9a17bb8a069441e096",
-    "qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json": "1270c280cca0adadde67da371afeba936d404552a51f7c8929daa34126bf57b3"
+    "qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json": "1270c280cca0adadde67da371afeba936d404552a51f7c8929daa34126bf57b3",
+    "qualification/rendezvous/key-address.ts": "1f26277b64c54123833f702f30a55149c7fdbcfdcd56fc168d7401a84ed2f277"
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
@@ -300,7 +302,9 @@
     "push_erasure_delta_sha256": "61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9",
     "push_erasure_source_map_sha256": "95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002",
     "production_d1_guard_delta_sha256": "3ecc560b779e3368d16826fe3d08383267d6eea78eb793c9423d007dc2edd877",
-    "repository_namespace_delta_sha256": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504"
+    "repository_namespace_delta_sha256": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504",
+    "shared_key_address_delta_sha256": "4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824",
+    "shared_key_address_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

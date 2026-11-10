@@ -4,6 +4,7 @@ import {AssertionKeyState,type CoordinatorEnv,type IssueInput,type ProofInput} f
 import {StoreRejected,validReceiptActiveKey,type StoreMaterial} from './receipt-key-store';
 import {createEnrollmentEvidenceVerifier,type EnrollmentVerifier,type EnrollmentEvidence,type SavedEnrollmentState} from './enrollment-evidence-candidate.mjs';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
+import { rendezvousKeyAddress } from './key-address';
 
 export interface EnrollmentEnv extends CoordinatorEnv {ENROLLMENT_POLICY_REVISION?:string}
 export interface RegisterInput {challengeId:string;keyId:string;attestation:Uint8Array}
@@ -72,7 +73,7 @@ export class EnrollmentKeyState extends AssertionKeyState {
   async issueEnrollment(input:{keyId:string}){
     try{
       this.#configuration();input={...input};closed(input,['keyId']);keyId(input.keyId);
-      const address=hex(await hash(['development',POLICY,input.keyId])),now=Date.now(),policy=this.enrollmentPolicy(now);
+      const address=await rendezvousKeyAddress(input.keyId,'development',POLICY),now=Date.now(),policy=this.enrollmentPolicy(now);
       const op:EnrollmentOperation={id:random(),internalId:crypto.randomUUID(),nonce:random(),keyAddress:address,createdAt:now,expiresAt:Math.min(now+120000,policy.expiresAt),policyRevision:policy.revision,policyExpiresAt:policy.expiresAt,status:'challenge'};
       return await this.locked(async()=>{
         const alarm=await this.ctx.storage.getAlarm();await this.ctx.storage.setAlarm(Math.min(alarm??op.expiresAt,op.expiresAt));
@@ -90,7 +91,7 @@ export class EnrollmentKeyState extends AssertionKeyState {
     try{
       this.#configuration();closed(input,['keyId','challengeId','attestation']);keyId(input.keyId);opaque(input.challengeId);need(input.attestation instanceof Uint8Array&&input.attestation.length>0&&input.attestation.length<=32768);
       input={keyId:input.keyId,challengeId:input.challengeId,attestation:Uint8Array.from(input.attestation)};
-      const address=hex(await hash(['development',POLICY,input.keyId])),digest=hex(await hash([VERSION,'register',input.challengeId,input.keyId,b64(input.attestation)]));
+      const address=await rendezvousKeyAddress(input.keyId,'development',POLICY),digest=hex(await hash([VERSION,'register',input.challengeId,input.keyId,b64(input.attestation)]));
       const policy=this.enrollmentPolicy(Date.now()),op=this.enrollmentOperation();need(op&&op.id===input.challengeId&&op.keyAddress===address&&Date.now()>=op.createdAt&&Date.now()<op.expiresAt&&op.policyRevision===policy.revision&&op.policyExpiresAt===policy.expiresAt);
       original={createdAt:op.createdAt,expiresAt:op.expiresAt};
       if(op.status==='registered')return this.ctx.storage.transactionSync(()=>this.registered(op.id,address,digest));

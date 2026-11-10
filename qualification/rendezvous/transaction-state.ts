@@ -5,6 +5,7 @@ import {base64Url,base64Decode} from 'djc-existing-crypto';
 import {qualifyBrowserPublicJwk,qualifyCompactJwe,type BrowserPublicJwk} from './jwe-framing';
 import {type ProofInput,type SubmitBinding} from './assertion-key-state';
 import {type EnrollmentCoordinator} from './enrollment-key-state';
+import { rendezvousKeyAddress } from './key-address';
 const V='djc-rendezvous/1',POLICY='ios-dev-qualification/1';
 type ErrorCode='invalid_request'|'invalid_capability'|'expired'|'cancelled'|'already_consumed'|'already_submitted'|'not_ready'|'operation_conflict'|'invalid_sender_proof'|'service_unavailable'|'rate_limited';
 const fail=(code:ErrorCode):never=>{throw new Failure(code);};
@@ -31,7 +32,7 @@ export interface TransactionDependencies {ENROLLMENT_COORDINATOR:DurableObjectNa
 export interface TransactionEnv extends TransactionDependencies {TRANSACTION_STATE:DurableObjectNamespace}
 export type Authorizer=(key:string,proof:ProofInput)=>Promise<unknown>;
 export function coordinatorAuthorizer(namespace:DurableObjectNamespace<EnrollmentCoordinator>):Authorizer {
-  return async(key,proof)=>{keyId(key);const address=hex(await jsonHash(['development',POLICY,key]));return namespace.get(namespace.idFromName('djc-rendezvous-key/1/'+address)).authorize(proof);};
+  return async(key,proof)=>{keyId(key);const address=await rendezvousKeyAddress(key,'development',POLICY);return namespace.get(namespace.idFromName('djc-rendezvous-key/1/'+address)).authorize(proof);};
 }
 interface Row extends Descriptor {generation:number;thumbprint:string;claimCommitment:string;qrCommitment:string;state:'pending'|'ready'|'consumed'|'cancelled';browserPublicKey?:BrowserPublicJwk;envelope?:string;operationId?:string;requestDigest?:string;polls:number;submitChallengeAttempts:number;lastPoll?:number}
 interface Authorization {ok:true;kind:'submit-authorization';operationId:string;requestDigest:string;admittedAt:number;keyExpiresAt:number;authorizationExpiresAt:number;counter:number;binding:SubmitBinding}
@@ -86,7 +87,7 @@ export class TransactionState {
       if(snapshot.operationId){need(snapshot.operationId===input.challengeId&&snapshot.requestDigest===requestDigest,'already_submitted');return this.#accepted(snapshot);}
       need(snapshot.state==='pending',snapshot.state==='cancelled'?'cancelled':'already_submitted');
       const envelope=await qualifyCompactJwe(input.destinationEnvelope,snapshot.thumbprint);need(envelope.ok);
-      const address=hex(await jsonHash(['development',POLICY,input.keyId])),proofDigest=hex(await jsonHash(['submit',input.challengeId,address,input.clientData,input.assertion]));
+      const address=await rendezvousKeyAddress(input.keyId,'development',POLICY),proofDigest=hex(await jsonHash(['submit',input.challengeId,address,input.clientData,input.assertion]));
       const result=await this.#authorize(input.keyId,{operationId:input.challengeId,action:'submit',clientData:input.clientData,assertion:input.assertion}) as Authorization|{ok:false;error:string;retry_after_ms?:unknown};
       if(result?.ok===false&&(result.error==='rate_limited'||result.error==='service_unavailable')){let hint:number|undefined;try{hint=readRetryHint(result);}catch{fail('service_unavailable');}throw new Failure(result.error,hint);}
       need(result?.ok&&result.kind==='submit-authorization','invalid_sender_proof');const auth=structuredClone(result);

@@ -5,6 +5,7 @@ import {type BudgetResult,type BudgetIdentity} from './allocation-budget';
 import {type EnrollmentCoordinator,type RegisterInput} from './enrollment-key-state';
 import {type IssueInput,type ProofInput,type SubmitBinding} from './assertion-key-state';
 import {type Authorizer} from './transaction-state';
+import { rendezvousKeyAddress } from './key-address';
 export interface KeyCallBudget {admitKeyCall():Promise<BudgetResult>;admit(input:{kind:'key';identity:BudgetIdentity}):Promise<BudgetResult>}
 type FailureCode='invalid_request'|'service_unavailable'|'rate_limited';
 class Failure extends Error {constructor(readonly code:FailureCode,readonly retryAfter?:number){super('key_route_rejected');}}
@@ -40,7 +41,7 @@ export class KeyRpcRouter {
     }else{
       need(input.operation==='authorize');closed(input,['operation','keyId','operationId','action','clientData','assertion']);need(['recover-key','delete-key','submit'].includes(input.action));opaque(input.operationId);encoded(input.clientData,2048);encoded(input.assertion,4096);input={...input};
     }
-    const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(['development','ios-dev-qualification/1',input.keyId]))),address=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');this.#ready();
+    const address=await rendezvousKeyAddress(input.keyId,'development','ios-dev-qualification/1');this.#ready();
     const day=Math.floor(Date.now()/86400000);admitted(await this.#budget.admitKeyCall());this.#ready();need(Math.floor(Date.now()/86400000)===day,'service_unavailable');
     if(input.operation==='enroll'){admitted(await this.#budget.admit({kind:'key',identity:{...input.identity}}));this.#ready();need(input.identity.minute===Math.floor(Date.now()/60000),'service_unavailable');}
     need(Math.floor(Date.now()/86400000)===day,'service_unavailable');
