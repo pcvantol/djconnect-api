@@ -74,6 +74,7 @@ class PreparationTests(unittest.TestCase):
                          *v.TESTFLIGHT_PROFILE_ADDITIONS, *v.TESTFLIGHT_PROFILE_REFERENCES,
                          *v.TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS, v.TESTFLIGHT_PROFILE_PATH,
                          *v.PUBLIC_TRIAL_SOURCES, v.PUBLIC_TRIAL_DELTA_PATH,
+                         *v.ALWAYS_ON_SOURCES, *v.ALWAYS_ON_REFERENCES, v.ALWAYS_ON_DELTA_PATH,
                          'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
             for path in additions:
                 raw = (canonical / path).read_bytes()

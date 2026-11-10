@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "scope": "PUBLIC_TESTFLIGHT_ALWAYS_ON_SOURCE_NOT_DEPLOYED",
+  "baseline_source_map_sha256": "5701251f20432ea063643f0308dc41c8133dbb8f02db346bfc15fc36b8e47334",
+  "effective_source_map_sha256": "89e6c6cab440cbcbc709ee9093d2b6e0ac8f92496532e51b4d1ca942b41f9dc8",
+  "source_changes": {
+    "qualification/rendezvous/assertion-key-state.ts": {
+      "before": "c02bf757570e9fb5a850ff8178b2e37154a333f350474b4a81a2e9f3174fbf6d",
+      "after": "0b76dc31f6ddb1bf56452b4dd0a54e025416279ea3968fd8ea37b57af68fb014"
+    },
+    "qualification/rendezvous/enrollment-key-state.ts": {
+      "before": "03d59071647072fc74fcdbb487a6fbf01392f93e7556d3a5a189a88a24aab1e4",
+      "after": "f69e50ff80712ae520efc7f1699256cdb7a3101394c010d851137864984c6169"
+    },
+    "qualification/rendezvous/product-composition.check.ts": {
+      "before": "b00eb730ddff7b59887b3e5a84ce19835f27938a941c120c5d15e29d41e22a56",
+      "after": "6290b7dc15e08bf280fae495a1f06eeac5a561d66d35ec01f5bdafecc3984445"
+    },
+    "qualification/rendezvous/testflight-release.d.mts": {
+      "before": "76d33a30ba96e9cd7606afba9f61c46cd798e8c4d74a2363bd5d0ac84bb4e3d2",
+      "after": "63942fa0d8ac62b8a5778b98cfa3ba82b648e7282bc13506e9ca2edfabf3910d"
+    },
+    "qualification/rendezvous/testflight-release.mjs": {
+      "before": "5cf90a1df302169ba6e7bcc388236db87cfa6e27c727bb2163463864fcdc23c1",
+      "after": "4fb294a53484f4ade8eb11bfcbd0fad974392b8e0a4351abdd6550cd59f75f57"
+    },
+    "rendezvous-build-inputs.json": {
+      "before": "f28f25617c8628c7c842fcf7e6bd62a8d278defe9dbc8bc788920e9335bd4a8e",
+      "after": "789a90ad0d146d4f9779e98dc89f583ed5cff4d654d9c5c7e33e4cb97eb7a49d"
+    },
+    "src/rendezvous/composition.ts": {
+      "before": "b57ba14b066882cb7c3e3467b3e54225dfae42b697c9166fd08c888f1c1c452b",
+      "after": "8632eca7e668ed1bc17956d2801f257dac8ee6d105d3dd1f06fc865250d0eae5"
+    },
+    "src/rendezvous/dispatch.ts": {
+      "before": "c3e4c9e2b72eba18873c649ca2452f029c060339de829182fa94108a230541c1",
+      "after": "a9a89832a4d9027476b45a883ae87d8e87f2679dd9dfa7ea2c080990756a1bac"
+    },
+    "wrangler.jsonc": {
+      "before": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a",
+      "after": "e78d6760c1335121c471ce7f95c3f443c858400ddc4dce8faa479bc84507d5d8"
+    }
+  },
+  "reference_changes": {
+    "coordinator/host-app-wake/source-manifest.json": {
+      "before": "9327b772b48a76ab9eefe8fb11c5f6ca4131edc6107280505b2e729ac103ffaf",
+      "after": "0146de390fd9cd65dab816d3e30a703ce07784553787e631795e6a0e32e4cf95"
+    },
+    "coordinator/installation-principal/source-manifest.json": {
+      "before": "3ef5dc83caba58cbf2d9f222ab67b60c4b4cb286e8ff3311ee2023f46218db51",
+      "after": "e07ff79aacb554aa0b410d1f1dc468df9e8106e36939b5e4eae70886d95ffe66"
+    },
+    "coordinator/installation-registry/source-manifest.json": {
+      "before": "07b3a98e493c992761eab67157d007ea85388293a15e203cabaae23e19bf6f67",
+      "after": "3d0a353fd82324094acc9ac1bd8f815ec4963074bd21f6dca426e192cba18938"
+    },
+    "coordinator/principal-possession/source-manifest.json": {
+      "before": "0ceb43305045743fcf9c05e6ef2d996aabf61df6b8826d243ba6a1ecb7bc77a1",
+      "after": "5f13b0360a71e001eb3fb4e611c1a5250e4d1a9aa59c32a517086ead8f4d9402"
+    },
+    "coordinator/rich-session/source-manifest.json": {
+      "before": "89257dfeee965277839e4692447ca4da7b9152bed295567a807cade30bbd6e07",
+      "after": "e02dd62f3efaba6de7df14449b0bdc97a9fe2dac24cd47a6fc9bbc829c4522bc"
+    },
+    "qualification/rendezvous/qa-build-profile.json": {
+      "before": "00c8f784262ec3b54169453bade031e4587f54cc7b7dbf0a6361ad4760ea2ab4",
+      "after": "9e02d20d9c45ccc3337b0654cc60ba2625cad823e5000367df96bdaa3a40d2a8"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "d4b34bcd922188afd2d33497f88a375b7793e90b81165916992268fab765c924",
+      "after": "308c1eec31e2d09b093568b8c418d221cb317171d346c02baf758e08a16faa28"
+    },
+    "wrangler.jsonc": {
+      "before": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a",
+      "after": "e78d6760c1335121c471ce7f95c3f443c858400ddc4dce8faa479bc84507d5d8"
+    }
+  }
+}

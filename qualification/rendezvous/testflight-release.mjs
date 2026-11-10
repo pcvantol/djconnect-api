@@ -26,6 +26,17 @@ export function testflightReleaseRevision(release) {
   return release === undefined ? undefined : `${release.revision}:${release.min}:${release.max ?? ''}`;
 }
 
+// Only an explicit production TestFlight policy can omit the release deadline.
+export function alwaysOnTestflight(env) {
+  return env.ASSERTION_POLICY_ENABLED === TESTFLIGHT_POLICY
+    && env.ASSERTION_POLICY_EXPIRES_AT === 'always-on/1'
+    && env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT === undefined;
+}
+
+export function assertionPolicyDeadline(env) {
+  return alwaysOnTestflight(env) ? Number.MAX_SAFE_INTEGER : Number(env.ASSERTION_POLICY_EXPIRES_AT);
+}
+
 export function publicTrialRequestOpen(env, now, creating) {
   if (env.ASSERTION_POLICY_ENABLED !== TESTFLIGHT_POLICY || env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT === undefined) return true;
   const start = Number(env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT);

@@ -1,20 +1,21 @@
 import { createProductRendezvousHandler, directEdgeIp, type ProductRendezvousEnv } from "./composition";
 import { unavailableRendezvousResponse } from "./perimeter";
-import { TESTFLIGHT_POLICY, testflightRelease } from "../../qualification/rendezvous/testflight-release.mjs";
+import { alwaysOnTestflight, assertionPolicyDeadline, TESTFLIGHT_POLICY, testflightRelease } from "../../qualification/rendezvous/testflight-release.mjs";
 
 // The loopback qualifier replaces this exact literal. Production uses only the
-// separately configured, finite TestFlight trial below.
+// reviewed TestFlight release policy below.
 const PRODUCT_RENDEZVOUS_ENABLED = false as boolean;
 const QR_LIFETIME_MS = 120_000;
 const MAX_TRIAL_MS = 2 * 60 * 60 * 1000;
 
 type TrialEnv = ProductRendezvousEnv & { RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT?: string };
 
-function trialEnd(env: TrialEnv | undefined, now: number): number | undefined {
-	if (env?.ASSERTION_POLICY_ENABLED !== TESTFLIGHT_POLICY ||
-		env.RENDEZVOUS_CAPACITY_POLICY !== "private-household/1") return;
+function publicReleaseEnd(env: TrialEnv, now: number): number | undefined {
+	if (env.ASSERTION_POLICY_ENABLED !== TESTFLIGHT_POLICY) return;
 	const release = testflightRelease(env);
-	if (!release || release.min !== release.max) return;
+	if (!release) return;
+	if (alwaysOnTestflight(env)) return assertionPolicyDeadline(env);
+	if (env.RENDEZVOUS_CAPACITY_POLICY !== "private-household/1" || release.min !== release.max) return;
 
 	const startsAt = Number(env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT);
 	const endsAt = Number(env.ASSERTION_POLICY_EXPIRES_AT);
@@ -34,9 +35,9 @@ export async function dispatchRendezvousRequest(request: Request, env: unknown):
 	if (PRODUCT_RENDEZVOUS_ENABLED) return createProductRendezvousHandler(bindings!)(request);
 
 	try {
-		if (!bindings || !Object.hasOwn(bindings, "RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT")) return unavailable;
+		if (!bindings) return unavailable;
 		const startedAt = Date.now();
-		const endsAt = trialEnd(bindings, startedAt);
+		const endsAt = publicReleaseEnd(bindings, startedAt);
 		if (endsAt === undefined) return unavailable;
 		const create = new URL(request.url).pathname === "/v1/rendezvous/create";
 		if (create && startedAt >= endsAt - QR_LIFETIME_MS) return unavailable;

@@ -3,8 +3,8 @@ import {ReceiptKeyStore,StoreRejected,type StoreEnv,type StoreMaterial} from './
 import {qualifyAssertionCore} from 'djc-qualified-assertion';
 import {base64Decode,base64Url} from 'djc-existing-crypto';
 import { rendezvousKeyAddress } from './key-address';
-import { TESTFLIGHT_POLICY, testflightRelease, testflightReleaseRevision, type TestFlightReleaseEnv } from './testflight-release.mjs';
-export interface CoordinatorEnv extends StoreEnv, TestFlightReleaseEnv { ASSERTION_POLICY_ENABLED?:string; ASSERTION_POLICY_EXPIRES_AT?:string }
+import { assertionPolicyDeadline, TESTFLIGHT_POLICY, testflightRelease, testflightReleaseRevision, type PublicTrialWindow, type TestFlightReleaseEnv } from './testflight-release.mjs';
+export interface CoordinatorEnv extends StoreEnv, TestFlightReleaseEnv, PublicTrialWindow {}
 type Action='recover-key'|'delete-key'|'submit';
 export interface SubmitBinding {transactionId:string;generation:number;browserThumbprint:string;envelopeDigest:string;expiresAt:number}
 export interface IssueInput {action:Action;keyId:string;binding?:SubmitBinding}
@@ -35,7 +35,7 @@ export class AssertionKeyState extends ReceiptKeyStore {
  protected appPolicy():typeof POLICY|typeof TESTFLIGHT_POLICY{return (this.env as CoordinatorEnv).ASSERTION_POLICY_ENABLED===TESTFLIGHT_POLICY?TESTFLIGHT_POLICY:POLICY;}
  protected appAttestEnvironment(){return this.appPolicy()===TESTFLIGHT_POLICY?'production' as const:'development' as const;}
  protected release(){return this.appPolicy()===TESTFLIGHT_POLICY?testflightRelease(this.env as CoordinatorEnv):undefined;}
- private policy(now:number){const e=this.env as CoordinatorEnv,until=Number(e.ASSERTION_POLICY_EXPIRES_AT);if(!(e.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until&&(this.appPolicy()!==TESTFLIGHT_POLICY||this.release())))throw new AssertionConfigUnavailable();return until;}
+ private policy(now:number){const e=this.env as CoordinatorEnv,until=assertionPolicyDeadline(e);if(!(e.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until&&(this.appPolicy()!==TESTFLIGHT_POLICY||this.release())))throw new AssertionConfigUnavailable();return until;}
  private active(now:number){this.policy(now);const r=this.cleanup(now);need(r?.status==='active'&&r.objectId===this.ctx.id.toString()&&r.appPolicy===this.appPolicy()&&r.environment===this.appAttestEnvironment()&&now>=r.createdAt&&now<r.expiresAt);return r;}
  private operation(id:string){return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations WHERE id=?',id).toArray().map(r=>JSON.parse(r.value) as Operation)[0];}
  private saveOperation(op:Operation){this.ctx.storage.sql.exec('INSERT INTO proof_operations(id,expires_at,value) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',op.id,op.expiresAt,JSON.stringify(op));}

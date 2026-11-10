@@ -85,6 +85,28 @@ describe('public TestFlight dispatch', () => {
 		expect(descriptor.expires_at - descriptor.created_at).toBe(120_000);
 	});
 
+	it('issues a 120-second QR after the trial with explicit always-on TestFlight configuration', async () => {
+		const claim = crypto.getRandomValues(new Uint8Array(32));
+		const commitment = base64Url(await crypto.subtle.digest('SHA-256', claim));
+		const bindings = {
+			...good(), ...window(Date.now()),
+			RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT: undefined,
+			RENDEZVOUS_CAPACITY_POLICY: undefined,
+			ASSERTION_POLICY_EXPIRES_AT: 'always-on/1',
+			RENDEZVOUS_TESTFLIGHT_MAX_BUILD: undefined,
+		};
+		const response = await dispatchRendezvousRequest(
+			request('/create', { v: V, generation: 1, browser_public_key: jwk, claim_commitment: commitment }),
+			bindings,
+		);
+		expect(response?.status).toBe(201);
+		const descriptor = await response!.json<{ expires_at: number; created_at: number }>();
+		expect(descriptor.expires_at - descriptor.created_at).toBe(120_000);
+		expect((await dispatchRendezvousRequest(preflight(), { ...bindings, RENDEZVOUS_TESTFLIGHT_MIN_BUILD: undefined }))?.status).toBe(503);
+		expect((await dispatchRendezvousRequest(preflight(), { ...bindings, RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT: String(Date.now()) }))?.status).toBe(503);
+		expect((await dispatchRendezvousRequest(preflight(), { ...bindings, ASSERTION_POLICY_ENABLED: 'ios-dev-qualification/1' }))?.status).toBe(503);
+	});
+
 	it('rejects a QR request that reaches the creation cutoff while reading its body', async () => {
 		const now = Math.floor(Date.now() / 60_000) * 60_000 + 10_000;
 		const clock = vi.spyOn(Date, 'now').mockReturnValue(now);
