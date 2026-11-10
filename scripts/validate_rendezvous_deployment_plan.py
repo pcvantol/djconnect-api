@@ -980,9 +980,9 @@ def baseline_before_public_trial():
 
 
 PUBLIC_TRIAL_DELTA_PATH = 'docs/rendezvous/public-testflight-trial-source-delta-v1.json'
-PUBLIC_TRIAL_DELTA_SHA256 = '8261fbc19bf801fbb9eac3f621d57230fb8464a1d3293f1c365e50d3bef9557d'
-PUBLIC_TRIAL_MAP_SHA256 = '762abf35465e683b3d68bbd3287c61ad99ac03bdb9e9284b98b47ffa75b18af6'
-PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/product-composition.check.ts', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts'))
+PUBLIC_TRIAL_DELTA_SHA256 = 'e330c62aa389e52a21bb77be46765fa4d95b0f2f7c4269675772eabb4198bd0f'
+PUBLIC_TRIAL_MAP_SHA256 = 'e627ff1e1ecdfe6d2ad300247662531106507b761b4cea224544ae1fb2a84239'
+PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/allocation-index.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'qualification/rendezvous/transaction-state.ts', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts'))
 SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
                          public_trial_source_map_sha256=PUBLIC_TRIAL_MAP_SHA256)
 

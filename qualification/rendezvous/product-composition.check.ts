@@ -85,6 +85,29 @@ describe('public TestFlight dispatch', () => {
 		expect(descriptor.expires_at - descriptor.created_at).toBe(120_000);
 	});
 
+	it('rejects a QR request that reaches the creation cutoff while reading its body', async () => {
+		const now = Math.floor(Date.now() / 60_000) * 60_000 + 10_000;
+		const clock = vi.spyOn(Date, 'now').mockReturnValue(now);
+		const allocate = vi.fn(() => { throw new Error('late request reached allocation'); });
+		const input = request('/create', {
+			v: V, generation: 1, browser_public_key: jwk, claim_commitment: encoded(new Uint8Array(32)),
+		});
+		const body = input.body;
+		vi.spyOn(input, 'body', 'get').mockImplementation(() => {
+			clock.mockReturnValue(now + 1_000);
+			return body;
+		});
+		const bindings = {
+			...good(), ...window(now),
+			ASSERTION_POLICY_EXPIRES_AT: String(now + 121_000),
+			ALLOCATION_INDEX: { get: allocate, idFromName: allocate },
+		};
+		const result = await dispatchRendezvousRequest(input, bindings);
+		expect(result?.status).toBe(503);
+		expect(clock).toHaveReturnedWith(now + 1_000);
+		expect(allocate).not.toHaveBeenCalled();
+	});
+
 	it('keeps absent, expired, future, oversized and unrestricted trials closed', async () => {
 		const now = Date.now();
 		vi.spyOn(Date, 'now').mockReturnValue(now);

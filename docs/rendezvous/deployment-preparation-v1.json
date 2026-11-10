@@ -112,7 +112,7 @@
     "docs/rendezvous/repository-namespace-release-delta-v1.json": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504",
     "docs/rendezvous/shared-key-address-delta-v1.json": "4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824",
     "docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md": "283f2f3f023e4a09d00f75ce1d9c62de97f83478d2a3beb0c62acaeb3644193e",
-    "qualification/rendezvous/qa-build-profile.json": "0f9fd943176cf7521eebdffbc6e2bf6386112414b2e6d1c2a891e5ee2ffa4cc7",
+    "qualification/rendezvous/qa-build-profile.json": "b28f0757ba9b040225b21e3945ce4804dfc78c68d8436852e8d743764cb1dcee",
     "qualification/rendezvous/run_assertion_state_workerd.mjs": "18e6d564da7c2632ec9828c3ef9416c018be8f05299636c1e23d5a17fd40bab1",
     "qualification/rendezvous/run_capacity_workerd.mjs": "c7496d731a538e56bf6b641b48308221291e90a04750df4979f4d638a397a4cc",
     "qualification/rendezvous/run_create_recovery_workerd.mjs": "8f87ee04c9edfe025f8fa90ce0bae2f1f481d31c5d1c92af52aa1ffd9bb3e069",
@@ -125,7 +125,7 @@
     "docs/rendezvous/testflight-release-source-delta-v1.json": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad",
     "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "b300a3929d2922e8eb2ebfe2d540432a0b763f422fe775d58b70f50a41a9e9bb",
-    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "8261fbc19bf801fbb9eac3f621d57230fb8464a1d3293f1c365e50d3bef9557d"
+    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "e330c62aa389e52a21bb77be46765fa4d95b0f2f7c4269675772eabb4198bd0f"
   },
   "schema_version": 1,
   "secret_names": [
@@ -154,7 +154,7 @@
     "qualification/rendezvous/receipt-status-candidate.mjs": "7f2b1aa7d4307e36a8edddea7d89a1ada327ead8c9350e82866c6eee9449d434",
     "qualification/rendezvous/receipt-status-client.mjs": "df34ffdfba387a0715e67e4977addf9e9fd1ee0cd452b750fc643f3269b6cc95",
     "qualification/rendezvous/run_registration_workerd.mjs": "ed638eeb0bc51ab73bd06e7dab591962cd288099bdac045bd60e851260b616f2",
-    "qualification/rendezvous/transaction-state.ts": "bcd9b0a0e4b91fe9fa2506de0d1cdc44172716911ec5f027c7b78fda9eb96999",
+    "qualification/rendezvous/transaction-state.ts": "e194dbe0282aa9fc6e3f41ea20ffe6b053334b22f7daf1141f5e64694ee9485b",
     "qualification/rendezvous/transaction-state-harness.ts": "4d95bee46b85e2b04a84f38c8ea1b94185625b32c241f5f2f2b31aa9dd34475f",
     "qualification/rendezvous/transaction-state.check.mjs": "6f1d94581ace10094dc183fd0506a1027021f9d454212c632a769607b7901088",
     "qualification/rendezvous/jwe-framing.ts": "8dd212cbc1dedc48d9b5333e46ff2a3b24f95f3ff2e8ce5c6f9504298a16d6d8",
@@ -164,7 +164,7 @@
     "qualification/rendezvous/run_transaction_workerd.mjs": "a63bb2592c751d7a3f7ba9243572396f0d0ec8d1284e968a1b31e75278d4ce62",
     "qualification/rendezvous/allocation-budget.ts": "51a708467a13992896093a350c71c8ba08f9bcf5711f6542c92cc1e4bdb77f8e",
     "qualification/rendezvous/allocation-budget.check.mjs": "b6f9ccf4b94101ed12552d9525ce482cc83c4c5e04efc26180aff481aa74c921",
-    "qualification/rendezvous/allocation-index.ts": "980a2bf7ccc3a28c95794ca2a1148b26a36ef94ab384ba817e5bee9147e11557",
+    "qualification/rendezvous/allocation-index.ts": "bbd274d795ad7f6d8b902ca357fa103af592177310eab6eea62e141d4ed2f93a",
     "qualification/rendezvous/allocation-index.check.mjs": "b8a40b33d614ae28f2d0a82d777354fdbfbda4aede3090a39af7f6f8a628e109",
     "qualification/rendezvous/index-state-harness.ts": "eeb34b3530d8c054dd23a5ef9114b359239e264731d40378fac3180079c479f6",
     "qualification/rendezvous/run_index_workerd.mjs": "9513059014793e40a3f389599eee1328d2032fcb0b76cb83fabbc19f4093e92f",
@@ -179,7 +179,7 @@
     "qualification/rendezvous/composed-http.check.mjs": "44490d470c16bca8401d87b5634484abfb96bb00e4f9131f18a205944dfc6f3a",
     "qualification/rendezvous/composed-http-harness.ts": "230a41bbaf335fda0c0f7cb092337510231a4573ac06d549f958535243210a2f",
     "qualification/rendezvous/run_composed_http_workerd.mjs": "40399fba5c6a97fc67b6a26e2c681987b39815c8f91393fd33aed0ea9015b487",
-    "qualification/rendezvous/request-admission.ts": "d3604825e83218e44eeaa69aabea3dc4fe5820d7532ab3600bc101d2d032ce29",
+    "qualification/rendezvous/request-admission.ts": "564a8d37928fd96948e4826a1ab51bc12dadbef156a13b7bcd4809b1e6edab5a",
     "qualification/rendezvous/request-admission.check.mjs": "521c50d88178cb8324a4ffb2d3d87f1cb837126c40fbdd83f207cb76bb30009e",
     "qualification/rendezvous/request-admission-harness.ts": "6b0699fcd46c4d4a04e7f0fcdf64996df5e1765cf3d090a8d021a6f88fc2019f",
     "qualification/rendezvous/run_request_admission_workerd.mjs": "2f61f2204e7948ae40df654a2610389c1bb5f85769bf91898b71fc4c35da03c2",
@@ -201,8 +201,8 @@
     "docs/rendezvous/wire-schema-cases-v1.json": "3443cc6580997678d54d1f57ce0b30271134069cdd256d16ccea7446b9545e4a",
     "docs/rendezvous/capacity-browser-traces-v1.json": "1a1e26f68efc03860e2de29d42ddae216a93c30228a57000cdb63935815c9492",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
-    "src/rendezvous/composition.ts": "df938e767fa3d8639682e2264b3096d37b9ce7e67e56da8f633d5a63cca5ae08",
-    "qualification/rendezvous/product-composition.check.ts": "8ec2f62012effdee11d7b41d1f94efaa9adfcb0256d85ee0e6cd419ed8dbe44e",
+    "src/rendezvous/composition.ts": "539d7087f588fa98b4a1725e8c5d18144536ee2561ba54b8cb47d30c063b7649",
+    "qualification/rendezvous/product-composition.check.ts": "b00eb730ddff7b59887b3e5a84ce19835f27938a941c120c5d15e29d41e22a56",
     "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
     "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
     "src/index.ts": "3bf44422f5f13cedeaa92b32fd4cdae1cbfad373202d4c374ee1a04f853b95f5",
@@ -281,8 +281,8 @@
     "scripts/test_cleanup_workflow_runs.py": "8c39ce1c90c64cb2c741240036a586d2acf5551a24b0ff9a17bb8a069441e096",
     "qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json": "1270c280cca0adadde67da371afeba936d404552a51f7c8929daa34126bf57b3",
     "qualification/rendezvous/key-address.ts": "1f26277b64c54123833f702f30a55149c7fdbcfdcd56fc168d7401a84ed2f277",
-    "qualification/rendezvous/testflight-release.mjs": "c44979c2fc4329037f8a464934a22ce7fdfb1943db641e6a85f6f1e23cfd8d69",
-    "qualification/rendezvous/testflight-release.d.mts": "6ed5cbc9c7dfd3619b701c199edf0618020d823b9ab4fe42a7c6e92b270d317d"
+    "qualification/rendezvous/testflight-release.mjs": "4d2f3feccb752b17771d52101411a9926d2189ea934b1bb4f3f32e62483ceb64",
+    "qualification/rendezvous/testflight-release.d.mts": "4c04d875f35f672677feae9b92db1e49e2bf73b6abeda7cbb55fa1d012c59dd0"
   },
   "source_provenance": {
     "baseline_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
@@ -324,8 +324,8 @@
     "shared_key_address_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
     "testflight_profile_delta_sha256": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "testflight_profile_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
-    "public_trial_delta_sha256": "8261fbc19bf801fbb9eac3f621d57230fb8464a1d3293f1c365e50d3bef9557d",
-    "public_trial_source_map_sha256": "762abf35465e683b3d68bbd3287c61ad99ac03bdb9e9284b98b47ffa75b18af6"
+    "public_trial_delta_sha256": "e330c62aa389e52a21bb77be46765fa4d95b0f2f7c4269675772eabb4198bd0f",
+    "public_trial_source_map_sha256": "e627ff1e1ecdfe6d2ad300247662531106507b761b4cea224544ae1fb2a84239"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

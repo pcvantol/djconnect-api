@@ -4,11 +4,12 @@ import {base64Url} from 'djc-existing-crypto';
 import {BUDGET_NAME,type BudgetIdentity,type BudgetResult,type AllocationBudget} from './allocation-budget';
 import {newTransactionDescriptor,type Descriptor,type TransactionCoordinator,type BrowserInput,type ScanInput,type SubmitInput} from './transaction-state';
 import {qualifyBrowserPublicJwk,type BrowserPublicJwk} from './jwe-framing';
+import {publicTrialRequestOpen,type PublicTrialWindow} from './testflight-release.mjs';
 export const INDEX_NAME='djc-rendezvous-index/1',INDEX_POLICY='djc-index-qualification/1';
 type Code='invalid_request'|'invalid_capability'|'service_unavailable'|'rate_limited'|'expired';
 type Denial={ok:false;error:Code;retry_after_ms?:number};
 export type IndexResult={ok:true;descriptor:Descriptor}|Denial;
-export interface IndexEnv {ALLOCATION_INDEX:DurableObjectNamespace;ADMISSION_STATE:DurableObjectNamespace<AllocationBudget>;INDEX_POLICY_ENABLED?:string}
+export interface IndexEnv extends PublicTrialWindow {ALLOCATION_INDEX:DurableObjectNamespace;ADMISSION_STATE:DurableObjectNamespace<AllocationBudget>;INDEX_POLICY_ENABLED?:string}
 export interface IndexPort {allocate(input:{identity:BudgetIdentity}):Promise<IndexResult>;lookup(input:{transactionId:string}):Promise<IndexResult>}
 class Failure extends Error {constructor(readonly code:Code){super('index_rejected');}}
 const need:(v:unknown,code?:Code)=>asserts v=(v,code='invalid_request')=>{if(!v)throw new Failure(code);};
@@ -27,7 +28,7 @@ export class AllocationIndexState {
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS allocation_index (id TEXT PRIMARY KEY, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL)');
   }
   #policy(){need(this.#env.INDEX_POLICY_ENABLED===INDEX_POLICY&&this.#env.ALLOCATION_INDEX.idFromName(INDEX_NAME).equals(this.#ctx.id),'service_unavailable');}
-  #window(identity:BudgetIdentity){need(identity.minute===Math.floor(Date.now()/60000),'service_unavailable');}
+  #window(identity:BudgetIdentity){const now=Date.now();need(identity.minute===Math.floor(now/60000)&&publicTrialRequestOpen(this.#env,now,true),'service_unavailable');}
   async allocate(input:{identity:BudgetIdentity}):Promise<IndexResult>{
     if(this.#busy)return result(new Failure('service_unavailable'));this.#busy=true;
     try{

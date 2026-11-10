@@ -25,3 +25,11 @@ export function testflightBuildAllowed(value, release) {
 export function testflightReleaseRevision(release) {
   return release === undefined ? undefined : `${release.revision}:${release.min}:${release.max ?? ''}`;
 }
+
+export function publicTrialRequestOpen(env, now, creating) {
+  if (env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT === undefined) return true;
+  const start = Number(env.RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT);
+  const end = Number(env.ASSERTION_POLICY_EXPIRES_AT);
+  return Number.isSafeInteger(start) && Number.isSafeInteger(end)
+    && now >= start && now < end - (creating ? 120_000 : 0);
+}
