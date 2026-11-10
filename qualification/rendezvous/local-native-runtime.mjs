@@ -117,6 +117,12 @@ export async function sourceSnapshot(){
  const testFlight=JSON.parse(testFlightRaw);
  need(testFlight.scope==='EXACT_TESTFLIGHT_RELEASE_PROFILE_NOT_ACTIVATION'&&testFlight.public_activation_allowed===false);
  need(testFlight.baseline_source_map_sha256===keyAddress.effective_source_map_sha256&&testFlight.effective_source_map_sha256===provenance.testflight_profile_source_map_sha256);
+ const publicTrialPath='docs/rendezvous/public-testflight-trial-source-delta-v1.json';
+ const publicTrialRaw=await readFile(join(repo,publicTrialPath));
+ need(plan.reference_hashes[publicTrialPath]===sha(publicTrialRaw)&&sha(publicTrialRaw)===provenance.public_trial_delta_sha256);
+ const publicTrial=JSON.parse(publicTrialRaw);
+ need(publicTrial.scope==='PUBLIC_TESTFLIGHT_TRIAL_SOURCE_NO_ACTIVE_CONFIGURATION');
+ need(publicTrial.baseline_source_map_sha256===testFlight.effective_source_map_sha256&&publicTrial.effective_source_map_sha256===provenance.public_trial_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -135,6 +141,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(erasure.changes,name)){need(erasure.changes[name].before===expected);expected=erasure.changes[name].after;}
   if(Object.hasOwn(keyAddress.changes,name)){need(keyAddress.changes[name].before===expected);expected=keyAddress.changes[name].after;}
   if(Object.hasOwn(testFlight.changes,name)){need(testFlight.changes[name].before===expected);expected=testFlight.changes[name].after;}
+  if(Object.hasOwn(publicTrial.source_changes,name)){need(publicTrial.source_changes[name].before===expected);expected=publicTrial.source_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};
