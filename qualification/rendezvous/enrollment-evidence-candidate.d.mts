@@ -1,4 +1,4 @@
-import type { TESTFLIGHT_POLICY } from './testflight-40521.mjs';
+import type { TESTFLIGHT_POLICY, TestFlightRelease } from './testflight-release.mjs';
 
 /** LOCAL QA contract only. Evidence is sensitive and cannot authorize/persist a key by itself. */
 export interface SavedEnrollmentState {
@@ -16,7 +16,7 @@ export interface EnrollmentVerifier {
   verify(request:{challengeId:string;keyId:string;attestation:Uint8Array}):Promise<
     {ok:true;evidence:EnrollmentEvidence}|{ok:false;error:'enrollment_rejected'|'attestation_unavailable'}>;
 }
-export function createEnrollmentEvidenceVerifier(readState:()=>SavedEnrollmentState,policyId?:SavedEnrollmentState['policy']['id']):EnrollmentVerifier;
+export function createEnrollmentEvidenceVerifier(readState:()=>SavedEnrollmentState,policyId?:SavedEnrollmentState['policy']['id'],release?:TestFlightRelease):EnrollmentVerifier;
 /** Dependency injection is restricted to explicit software orchestration fixtures. Never a request parameter. */
 export function createSoftwareStubEnrollmentVerifier(readState:()=>SavedEnrollmentState,components:{
   core:(...args:unknown[])=>Promise<unknown>;cms:(...args:unknown[])=>Promise<unknown>;

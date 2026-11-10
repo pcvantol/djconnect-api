@@ -4,6 +4,7 @@ import {AssertionKeyState,type CoordinatorEnv,type IssueInput,type ProofInput} f
 import {StoreRejected,validReceiptActiveKey,type StoreMaterial} from './receipt-key-store';
 import {createEnrollmentEvidenceVerifier,type EnrollmentVerifier,type EnrollmentEvidence,type SavedEnrollmentState} from './enrollment-evidence-candidate.mjs';
 import {base64Url,base64Decode} from 'djc-existing-crypto';
+import { TESTFLIGHT_POLICY, testflightReleaseRevision } from './testflight-release.mjs';
 import { rendezvousKeyAddress } from './key-address';
 
 export interface EnrollmentEnv extends CoordinatorEnv {ENROLLMENT_POLICY_REVISION?:string}
@@ -26,15 +27,17 @@ const random=()=>base64Url(crypto.getRandomValues(new Uint8Array(32)).buffer);
 export class EnrollmentKeyState extends AssertionKeyState {
   #busy=false;
   #intent:Intent|undefined;
-  #verifier:EnrollmentVerifier|undefined;
+  #verifier:{profile:string;value:EnrollmentVerifier}|undefined;
   constructor(ctx:DurableObjectState,env:EnrollmentEnv){
     super(ctx,env);
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS enrollment_operation (id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, value TEXT NOT NULL)');
   }
   #configuration(){if(!validReceiptActiveKey(this.env))throw new EnrollmentConfigUnavailable();}
   protected enrollmentPolicy(now:number){
-    const env=this.env as EnrollmentEnv,until=Number(env.ASSERTION_POLICY_EXPIRES_AT),revision=env.ENROLLMENT_POLICY_REVISION;
-    if(!(env.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until&&typeof revision==='string'&&revision.length>0&&revision.length<=128))throw new EnrollmentConfigUnavailable();
+    const env=this.env as EnrollmentEnv,until=Number(env.ASSERTION_POLICY_EXPIRES_AT),configuredRevision=env.ENROLLMENT_POLICY_REVISION,releaseRevision=testflightReleaseRevision(this.release());
+    const revision=typeof configuredRevision==='string'&&configuredRevision.length>0
+      ? (releaseRevision===undefined?configuredRevision:JSON.stringify([configuredRevision,releaseRevision])) : undefined;
+    if(!(env.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until&&(this.appPolicy()!==TESTFLIGHT_POLICY||releaseRevision!==undefined)&&typeof revision==='string'&&revision.length>0&&revision.length<=128))throw new EnrollmentConfigUnavailable();
     return {id:this.appPolicy(),revision,enabled:true,expiresAt:until};
   }
   protected enrollmentOperation(){return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM enrollment_operation WHERE id=1').toArray().map(r=>JSON.parse(r.value) as EnrollmentOperation)[0];}
@@ -47,7 +50,14 @@ export class EnrollmentKeyState extends AssertionKeyState {
     need(intent&&op?.status==='challenge'&&op.id===intent.id&&op.keyAddress===intent.keyAddress&&op.nonce&&op.policyRevision===policy.revision&&op.policyExpiresAt===policy.expiresAt);
     return {policy,challenge:{id:op.id,keyId:intent.keyId,action:'register',createdAt:op.createdAt,expiresAt:op.expiresAt,clientData:Uint8Array.from(atob(op.nonce.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0))}};
   }
-  protected verifyEnrollment(request:RegisterInput){this.#verifier??=createEnrollmentEvidenceVerifier(()=>this.enrollmentSnapshot(),this.appPolicy());return this.#verifier.verify(request);}
+  protected verifyEnrollment(request:RegisterInput){
+    const policy=this.appPolicy(),release=this.release();
+    const profile=JSON.stringify([policy,testflightReleaseRevision(release)]);
+    if(this.#verifier?.profile!==profile){
+      this.#verifier={profile,value:createEnrollmentEvidenceVerifier(()=>this.enrollmentSnapshot(),policy,release)};
+    }
+    return this.#verifier.value.verify(request);
+  }
   protected allowedEvidenceScope():EnrollmentEvidence['scope']{return 'COMPOSED_PRIVATE_EVIDENCE_ONLY_NO_ATOMIC_REGISTRATION';}
   protected override beforeInstallCommit(m:StoreMaterial,now:number){
     const intent=this.#intent,op=this.enrollmentOperation(),policy=this.enrollmentPolicy(now),e=intent?.evidence;

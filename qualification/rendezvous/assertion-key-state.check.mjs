@@ -4,7 +4,7 @@ import cbor from 'cbor';
 import * as pki from 'pkijs';
 import fixtures from 'djc-assertion-state-fixtures';
 import {ReceiptKeyStore} from './receipt-key-store';
-import {TESTFLIGHT_POLICY,TESTFLIGHT_BUILD,TESTFLIGHT_APP} from './testflight-40521.mjs';
+import {TESTFLIGHT_POLICY,TESTFLIGHT_APP} from './testflight-release.mjs';
 const namespace=env.ASSERTION_KEY_STATE,decode=v=>Uint8Array.from(atob(v),c=>c.charCodeAt(0)),u=v=>Buffer.from(v).toString('base64url'),text=v=>new TextEncoder().encode(v);
 const hash=async v=>new Uint8Array(await crypto.subtle.digest('SHA-256',v)),hex=v=>Buffer.from(v).toString('hex');
 const join=(a,b)=>Uint8Array.from([...a,...b]);
@@ -14,9 +14,9 @@ const row=s=>runInDurableObject(s,(_i,state)=>state.storage.sql.exec('SELECT val
 const ops=s=>runInDurableObject(s,(_i,state)=>state.storage.sql.exec('SELECT value FROM proof_operations').toArray().map(v=>JSON.parse(v.value)));
 const denied=async p=>expect(await p).toMatchObject({ok:false});
 async function software(){const keys=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},false,['sign','verify']),point=new Uint8Array(await crypto.subtle.exportKey('raw',keys.publicKey));return {keys,point,keyId:btoa(String.fromCharCode(...await hash(point)))};}
-async function setup(f,install=true,testFlight=false){
+async function setup(f,install=true,testFlight=false,maxBuild='40521'){
  const policy=testFlight?TESTFLIGHT_POLICY:'ios-dev-qualification/1',environment=testFlight?'production':'development';
- const s=stub();await runInDurableObject(s,i=>{i.env.RECEIPT_ACTIVE_KEY=btoa(String.fromCharCode(...new Uint8Array(32).fill(11)));i.env.ASSERTION_POLICY_ENABLED=policy;i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now()+1e9);});
+ const s=stub();await runInDurableObject(s,i=>{i.env.RECEIPT_ACTIVE_KEY=btoa(String.fromCharCode(...new Uint8Array(32).fill(11)));i.env.ASSERTION_POLICY_ENABLED=policy;i.env.ASSERTION_POLICY_EXPIRES_AT=String(Date.now()+1e9);if(testFlight){i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40521';if(maxBuild)i.env.RENDEZVOUS_TESTFLIGHT_MAX_BUILD=maxBuild;}});
  const keyAddress=hex(await hash(text(JSON.stringify([environment,policy,f.keyId])))),originalNow=Date.now();
  const m={keyAddress,appPolicy:policy,environment,publicPoint:btoa(String.fromCharCode(...f.point)),receipt:btoa('PUBLIC_SYNTHETIC_TRUSTED_STORAGE_SEED_NOT_ENROLLMENT'),receiptCreatedAt:originalNow-1000,challengeCreatedAt:originalNow-1000,challengeExpiresAt:originalNow+119000,operationId:crypto.randomUUID(),requestDigest:'b'.repeat(64)};
  if(install)expect((await runInDurableObject(s,i=>ReceiptKeyStore.prototype.install.call(i,m))).ok).toBe(true);return {s,m};
@@ -44,17 +44,31 @@ async function proof(f,ch,counter=1,action='recover-key',build='40230',category=
 test('software assertion under a seeded production key requires exact TestFlight build and category',async()=>{
  const f=await software(),{s}=await setup(f,true,true),ch=await issue(s,f);
  expect(ch.ok).toBe(true);
- for(const [build,category] of [['40520',2],[TESTFLIGHT_BUILD,3],[TESTFLIGHT_BUILD,4],['40230',3]]){
+ for(const [build,category] of [['40520',2],['40522',2],['40521',3],['40521',4],['40230',3]]){
   await denied(s.authorize(await proof(f,ch,1,'recover-key',build,category)));
   expect((await row(s)).counter).toBe(0);
  }
- const request=await proof(f,ch,1,'recover-key',TESTFLIGHT_BUILD,2);
+ const request=await proof(f,ch,1,'recover-key','40521',2);
  if('ZEML4LPXH4.dev.djconnect.ios'===TESTFLIGHT_APP){
   expect(await s.authorize(request)).toMatchObject({ok:true,kind:'recovery-receipt',counter:1});
  }else{
   await denied(s.authorize(request));
   expect((await row(s)).counter).toBe(0);
  }
+});
+test('the same TestFlight key works for a successor build and respects a raised build floor',async()=>{
+ const f=await software(),{s}=await setup(f,true,true,null),ch=await issue(s,f);
+ const request=await proof(f,ch,1,'recover-key','40522',2);
+ if('ZEML4LPXH4.dev.djconnect.ios'!==TESTFLIGHT_APP){
+  await denied(s.authorize(request));
+  return;
+ }
+ expect(await s.authorize(request)).toMatchObject({ok:true,counter:1});
+ await runInDurableObject(s,i=>{i.env.RENDEZVOUS_TESTFLIGHT_MIN_BUILD='40523';});
+ await denied(s.authorize(request));
+ const next=await issue(s,f);
+ await denied(s.authorize(await proof(f,next,2,'recover-key','40522',2)));
+ expect(await s.authorize(await proof(f,next,2,'recover-key','40523',2))).toMatchObject({ok:true,counter:2});
 });
 test('all public requests remain unavailable and unverified helper RPCs denied',async()=>{const f=await software(),{s,m}=await setup(f);expect((await SELF.fetch('https://example.test/v1/rendezvous/submit',{method:'POST'})).status).toBe(503);await denied(s.install(m));await denied(s.advance(999));await denied(s.evidence());});
 test('recover uses exact saved wire bytes then atomically removes nonce and commits counter/receipt',async()=>{

@@ -2,7 +2,7 @@
 import * as asn from 'asn1js';
 import * as pki from 'pkijs';
 const ROOT = '63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179';
-import { TESTFLIGHT_POLICY, TESTFLIGHT_APP } from './testflight-40521.mjs';
+import { TESTFLIGHT_POLICY, TESTFLIGHT_APP } from './testflight-release.mjs';
 const APP = new TextEncoder().encode('ZEML4LPXH4.dev.djconnect.ios');
 const OID = { bc:'2.5.29.19', ku:'2.5.29.15', ski:'2.5.29.14', aki:'2.5.29.35',
   leaf:'1.2.840.113635.100.12.15', inter:'1.2.840.113635.100.6.2.3',

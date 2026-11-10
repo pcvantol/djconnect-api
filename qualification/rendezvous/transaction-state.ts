@@ -6,7 +6,7 @@ import {qualifyBrowserPublicJwk,qualifyCompactJwe,type BrowserPublicJwk} from '.
 import {type ProofInput,type SubmitBinding} from './assertion-key-state';
 import {type EnrollmentCoordinator} from './enrollment-key-state';
 import { rendezvousKeyAddress } from './key-address';
-import { TESTFLIGHT_POLICY } from './testflight-40521.mjs';
+import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
 const V='djc-rendezvous/1',POLICY='ios-dev-qualification/1';
 type ErrorCode='invalid_request'|'invalid_capability'|'expired'|'cancelled'|'already_consumed'|'already_submitted'|'not_ready'|'operation_conflict'|'invalid_sender_proof'|'service_unavailable'|'rate_limited';
 const fail=(code:ErrorCode):never=>{throw new Failure(code);};

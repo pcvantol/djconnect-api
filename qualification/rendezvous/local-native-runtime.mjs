@@ -111,11 +111,11 @@ export async function sourceSnapshot(){
  const keyAddress=JSON.parse(keyAddressRaw);
  need(keyAddress.scope==='EXACT_SHARED_KEY_ADDRESS_DERIVATION_NOT_ACTIVATION'&&keyAddress.public_activation_allowed===false);
  need(keyAddress.baseline_source_map_sha256===erasure.effective_source_map_sha256&&keyAddress.effective_source_map_sha256===provenance.shared_key_address_source_map_sha256);
- const testFlightPath='docs/rendezvous/testflight-40521-source-delta-v1.json';
+ const testFlightPath='docs/rendezvous/testflight-release-source-delta-v1.json';
  const testFlightRaw=await readFile(join(repo,testFlightPath));
  need(plan.reference_hashes[testFlightPath]===sha(testFlightRaw)&&sha(testFlightRaw)===provenance.testflight_profile_delta_sha256);
  const testFlight=JSON.parse(testFlightRaw);
- need(testFlight.scope==='EXACT_TESTFLIGHT_40521_PROFILE_NOT_ACTIVATION'&&testFlight.public_activation_allowed===false);
+ need(testFlight.scope==='EXACT_TESTFLIGHT_RELEASE_PROFILE_NOT_ACTIVATION'&&testFlight.public_activation_allowed===false);
  need(testFlight.baseline_source_map_sha256===keyAddress.effective_source_map_sha256&&testFlight.effective_source_map_sha256===provenance.testflight_profile_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;

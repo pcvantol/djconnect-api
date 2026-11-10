@@ -2,7 +2,7 @@
 import cbor from 'cbor';
 import * as asn1js from 'asn1js';
 import * as pki from 'pkijs';
-import { TESTFLIGHT_POLICY, TESTFLIGHT_BUILD, TESTFLIGHT_APP } from './testflight-40521.mjs';
+import { TESTFLIGHT_POLICY, TESTFLIGHT_APP, testflightBuildAllowed } from './testflight-release.mjs';
 import { qualifyApplePath } from './worker-path-candidate.mjs';
 const APP = 'ZEML4LPXH4.dev.djconnect.ios';
 const BUILDS = new Set(['40227', '40228', '40230']);
@@ -29,11 +29,11 @@ function der(bytes) {
   assert(value.offset === bytes.length && !value.result.error && equal(new Uint8Array(value.result.toBER(false)), bytes));
   return value.result;
 }
-function properties(bytes, testFlight) {
+function properties(bytes, testFlight, release) {
   const map = closed(decode(bytes, 1024), ['apple_bundle_version_01', 'apple_validation_category_01']);
   assert(!testFlight || APP === TESTFLIGHT_APP);
   const build = map.get('apple_bundle_version_01');
-  assert(testFlight ? build === TESTFLIGHT_BUILD : BUILDS.has(build));
+  assert(testFlight ? testflightBuildAllowed(build, release) : BUILDS.has(build));
   assert(equal(buffer(map.get('apple_validation_category_01'), 4, 4), new Uint8Array([testFlight ? 2 : 3, 0, 0, 0])));
 }
 async function prefix(auth, digest = hash) {
@@ -46,7 +46,7 @@ function keyId(text) {
   const bytes = Uint8Array.from(atob(text), char => char.charCodeAt(0));
   assert(bytes.length === 32 && btoa(String.fromCharCode(...bytes)) === text); return bytes;
 }
-export async function qualifyAttestationCore(encoded, savedClientData, canonicalKeyId, publicRoot, policy) {
+export async function qualifyAttestationCore(encoded, savedClientData, canonicalKeyId, publicRoot, policy, release) {
   try {
     signedInput(savedClientData);
     const object = closed(decode(encoded, 32768), ['fmt', 'attStmt', 'authData']);
@@ -71,7 +71,7 @@ export async function qualifyAttestationCore(encoded, savedClientData, canonical
     const cose = closed(decoded.value, [1, 3, -1, -2, -3]);
     assert(cose.get(1) === 2 && cose.get(3) === -7 && cose.get(-1) === 1);
     const point = concat(new Uint8Array([4]), concat(buffer(cose.get(-2), 32, 32), buffer(cose.get(-3), 32, 32)));
-    properties(buffer(decoded.unused, 1, 1024), testFlight);
+    properties(buffer(decoded.unused, 1, 1024), testFlight, release);
     const certificate = new pki.Certificate({ schema: der(leaf) });
     assert(equal(point, certificate.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHexView));
     assert(equal(await hash(point), credential));
@@ -111,13 +111,13 @@ function assertionSignature(encoded) {
   const raw = new Uint8Array(pki.createECDSASignatureFromCMS(sequence, 32));
   assert(raw.length === 64); return raw;
 }
-export async function qualifyAssertionCore(encoded, savedClientData, storedPoint, previousCounter, policy) {
+export async function qualifyAssertionCore(encoded, savedClientData, storedPoint, previousCounter, policy, release) {
   try {
     signedInput(savedClientData); buffer(storedPoint, 65, 65);
     assert(storedPoint[0] === 4 && Number.isInteger(previousCounter) && previousCounter >= 0 && previousCounter <= 0xffffffff);
     const object = closed(decode(encoded, 4096), ['signature', 'authenticatorData']);
     const auth = buffer(object.get('authenticatorData'), 38, 2048);
-    await prefix(auth, assertionHash); properties(auth.subarray(37), policy === TESTFLIGHT_POLICY);
+    await prefix(auth, assertionHash); properties(auth.subarray(37), policy === TESTFLIGHT_POLICY, release);
     const counter = uint32(auth, 33); assert(counter > previousCounter);
     const key = await assertionCrypto(() => crypto.subtle.importKey('raw', storedPoint, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']));
     const nonce = await assertionHash(concat(auth, await assertionHash(savedClientData)));

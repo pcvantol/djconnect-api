@@ -4,7 +4,7 @@ import {qualifyFreshReceiptEvidence} from './receipt-cms-candidate.mjs';
 import {CommonStatusClient} from './receipt-status-client.mjs';
 import {attestationRoot,receiptRoot} from 'djc-enrollment-trust';
 
-import {TESTFLIGHT_POLICY} from './testflight-40521.mjs';
+import {TESTFLIGHT_POLICY} from './testflight-release.mjs';
 
 const POLICY='ios-dev-qualification/1';
 class StatusUnavailable extends Error {}
@@ -81,9 +81,9 @@ function engine(readState,components,scope,nonceOnly,policyId=POLICY){
     }catch(error){if(error instanceof StateReadFailure||error instanceof PointDigestFailure)throw error.cause;return {ok:false,error:error instanceof StatusUnavailable?'attestation_unavailable':'enrollment_rejected'};}finally{busy=false;}
   }});
 }
-export function createEnrollmentEvidenceVerifier(readState,policyId=POLICY){
+export function createEnrollmentEvidenceVerifier(readState,policyId=POLICY,release){
   need(policyId===POLICY||policyId===TESTFLIGHT_POLICY);
-  const core=(proof,clientData,keyId,root)=>qualifyAttestationCore(proof,clientData,keyId,root,policyId);
+  const core=(proof,clientData,keyId,root)=>qualifyAttestationCore(proof,clientData,keyId,root,policyId,release);
   const cms=(receipt,leaf,clientData,root)=>qualifyFreshReceiptEvidence(receipt,leaf,clientData,root,policyId);
   return engine(readState,{core,cms,status:new CommonStatusClient()},'COMPOSED_PRIVATE_EVIDENCE_ONLY_NO_ATOMIC_REGISTRATION',true,policyId);
 }

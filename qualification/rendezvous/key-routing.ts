@@ -6,7 +6,7 @@ import {type EnrollmentCoordinator,type RegisterInput} from './enrollment-key-st
 import {type IssueInput,type ProofInput,type SubmitBinding} from './assertion-key-state';
 import {type Authorizer} from './transaction-state';
 import { rendezvousKeyAddress } from './key-address';
-import { TESTFLIGHT_POLICY } from './testflight-40521.mjs';
+import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
 export interface KeyCallBudget {admitKeyCall():Promise<BudgetResult>;admit(input:{kind:'key';identity:BudgetIdentity}):Promise<BudgetResult>}
 type FailureCode='invalid_request'|'service_unavailable'|'rate_limited';
 class Failure extends Error {constructor(readonly code:FailureCode,readonly retryAfter?:number){super('key_route_rejected');}}

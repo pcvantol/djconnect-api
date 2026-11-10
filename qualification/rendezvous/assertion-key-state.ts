@@ -3,13 +3,13 @@ import {ReceiptKeyStore,StoreRejected,type StoreEnv,type StoreMaterial} from './
 import {qualifyAssertionCore} from 'djc-qualified-assertion';
 import {base64Decode,base64Url} from 'djc-existing-crypto';
 import { rendezvousKeyAddress } from './key-address';
-import { TESTFLIGHT_POLICY } from './testflight-40521.mjs';
-export interface CoordinatorEnv extends StoreEnv { ASSERTION_POLICY_ENABLED?:string; ASSERTION_POLICY_EXPIRES_AT?:string }
+import { TESTFLIGHT_POLICY, testflightRelease, testflightReleaseRevision, type TestFlightReleaseEnv } from './testflight-release.mjs';
+export interface CoordinatorEnv extends StoreEnv, TestFlightReleaseEnv { ASSERTION_POLICY_ENABLED?:string; ASSERTION_POLICY_EXPIRES_AT?:string }
 type Action='recover-key'|'delete-key'|'submit';
 export interface SubmitBinding {transactionId:string;generation:number;browserThumbprint:string;envelopeDigest:string;expiresAt:number}
 export interface IssueInput {action:Action;keyId:string;binding?:SubmitBinding}
 export interface ProofInput {operationId:string;action:Action;clientData:string;assertion:string}
-interface Operation {id:string;action:Action;keyAddress:string;createdAt:number;expiresAt:number;status:'challenge'|'authorized';clientData?:string;nonce?:string;binding?:SubmitBinding;requestDigest?:string;counter?:number;admittedAt?:number;authorizationExpiresAt?:number;keyExpiresAt?:number}
+interface Operation {id:string;action:Action;keyAddress:string;createdAt:number;expiresAt:number;status:'challenge'|'authorized';clientData?:string;nonce?:string;binding?:SubmitBinding;requestDigest?:string;counter?:number;admittedAt?:number;authorizationExpiresAt?:number;releaseRevision?:string;keyExpiresAt?:number}
 class ProofRejected extends Error {}
 class AssertionConfigUnavailable extends Error {}
 type RecordWindow=(...bounds:ReadonlyArray<readonly[number|undefined,number|undefined]>)=>void;
@@ -34,7 +34,8 @@ export class AssertionKeyState extends ReceiptKeyStore {
  private cleanup(now:number){this.ctx.storage.sql.exec('DELETE FROM proof_operations WHERE expires_at<=?',now);return this.expire(now);}
  protected appPolicy():typeof POLICY|typeof TESTFLIGHT_POLICY{return (this.env as CoordinatorEnv).ASSERTION_POLICY_ENABLED===TESTFLIGHT_POLICY?TESTFLIGHT_POLICY:POLICY;}
  protected appAttestEnvironment(){return this.appPolicy()===TESTFLIGHT_POLICY?'production' as const:'development' as const;}
- private policy(now:number){const e=this.env as CoordinatorEnv,until=Number(e.ASSERTION_POLICY_EXPIRES_AT);if(!(e.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until))throw new AssertionConfigUnavailable();return until;}
+ protected release(){return this.appPolicy()===TESTFLIGHT_POLICY?testflightRelease(this.env as CoordinatorEnv):undefined;}
+ private policy(now:number){const e=this.env as CoordinatorEnv,until=Number(e.ASSERTION_POLICY_EXPIRES_AT);if(!(e.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until&&(this.appPolicy()!==TESTFLIGHT_POLICY||this.release())))throw new AssertionConfigUnavailable();return until;}
  private active(now:number){this.policy(now);const r=this.cleanup(now);need(r?.status==='active'&&r.objectId===this.ctx.id.toString()&&r.appPolicy===this.appPolicy()&&r.environment===this.appAttestEnvironment()&&now>=r.createdAt&&now<r.expiresAt);return r;}
  private operation(id:string){return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations WHERE id=?',id).toArray().map(r=>JSON.parse(r.value) as Operation)[0];}
  private saveOperation(op:Operation){this.ctx.storage.sql.exec('INSERT INTO proof_operations(id,expires_at,value) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',op.id,op.expiresAt,JSON.stringify(op));}
@@ -62,25 +63,25 @@ export class AssertionKeyState extends ReceiptKeyStore {
   });}catch(error){need(Date.now()>=now&&Date.now()<expiresAt);throw error;}
  }
  private disposition(op:Operation,requestDigest:string,now:number,recordWindow:RecordWindow){
-  const row=this.active(now),policyUntil=this.policy(now);need(op.status==='authorized'&&op.requestDigest===requestDigest&&op.keyAddress===row.keyAddress&&now>=op.admittedAt!&&now<op.expiresAt);
+  const row=this.active(now),policyUntil=this.policy(now);need(op.status==='authorized'&&op.releaseRevision===testflightReleaseRevision(this.release())&&op.requestDigest===requestDigest&&op.keyAddress===row.keyAddress&&now>=op.admittedAt!&&now<op.expiresAt);
   if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);recordWindow([op.createdAt,op.expiresAt],[row.createdAt,row.expiresAt],[op.admittedAt,op.authorizationExpiresAt]);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,admittedAt:op.admittedAt!,keyExpiresAt:op.keyExpiresAt!,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
   need(op.action==='recover-key');recordWindow([op.createdAt,op.expiresAt],[row.createdAt,row.expiresAt],[op.admittedAt,op.expiresAt]);return {kind:'recovery-receipt' as const,keyExpiresAt:op.keyExpiresAt!,counter:op.counter!};
  }
  private async authorizeInternal(input:ProofInput,recordWindow:RecordWindow){
   input={...input};closed(input,['operationId','action','clientData','assertion']);opaque(input.operationId);need(['recover-key','delete-key','submit'].includes(input.action));
   const client=b64url(input.clientData,2048),proof=b64url(input.assertion,4096),now=Date.now();
-  const snapshot=this.ctx.storage.transactionSync(()=>{const row=this.active(now),op=this.operation(input.operationId);need(op&&op.action===input.action&&op.keyAddress===row.keyAddress&&now>=op.createdAt&&now<op.expiresAt);return {row,op};});
+  const snapshot=this.ctx.storage.transactionSync(()=>{const row=this.active(now),op=this.operation(input.operationId);need(op&&op.action===input.action&&op.keyAddress===row.keyAddress&&now>=op.createdAt&&now<op.expiresAt);return {row,op,release:this.release()};});
   const requestDigest=await digest([input.action,input.operationId,snapshot.row.keyAddress,input.clientData,input.assertion]);
   if(snapshot.op.status==='authorized')return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now(),recordWindow);});
   need(snapshot.op.clientData===input.clientData);recordWindow([snapshot.op.createdAt,snapshot.op.expiresAt],[snapshot.row.createdAt,snapshot.row.expiresAt]);
-  const verified=await qualifyAssertionCore(proof,client,base64Decode(snapshot.row.publicPoint),snapshot.row.counter,snapshot.row.appPolicy);need(verified);
+  const verified=await qualifyAssertionCore(proof,client,base64Decode(snapshot.row.publicPoint),snapshot.row.counter,snapshot.row.appPolicy,snapshot.release);need(verified);
   let committedBounds:ReadonlyArray<readonly[number|undefined,number|undefined]>=[];
   const result=this.ctx.storage.transactionSync(()=>{
    const at=Date.now(),row=this.active(at),op=this.operation(input.operationId);need(op&&op.status==='challenge'&&op.action===input.action&&op.keyAddress===row.keyAddress&&op.clientData===input.clientData&&at>=op.createdAt&&at<op.expiresAt);
-   need(row.appPolicy===snapshot.row.appPolicy&&row.environment===snapshot.row.environment&&row.publicPoint===snapshot.row.publicPoint&&row.createdAt===snapshot.row.createdAt&&row.expiresAt===snapshot.row.expiresAt&&verified.counter>row.counter&&verified.counter<=0xffffffff);
+   need(testflightReleaseRevision(this.release())===testflightReleaseRevision(snapshot.release)&&row.appPolicy===snapshot.row.appPolicy&&row.environment===snapshot.row.environment&&row.publicPoint===snapshot.row.publicPoint&&row.createdAt===snapshot.row.createdAt&&row.expiresAt===snapshot.row.expiresAt&&verified.counter>row.counter&&verified.counter<=0xffffffff);
    if(input.action==='delete-key'){const tombstone=this.tombstone(row);this.save(tombstone);return {kind:'deleted' as const,purgeAt:tombstone.purgeAt};}
    row.counter=verified.counter;row.revision++;this.save(row);
-   const receipt:Operation={id:op.id,action:op.action,keyAddress:op.keyAddress,createdAt:op.createdAt,expiresAt:Math.min(op.expiresAt,row.expiresAt),status:'authorized',requestDigest,counter:verified.counter,admittedAt:at,keyExpiresAt:row.expiresAt,...(op.binding?{binding:op.binding,authorizationExpiresAt:Math.min(at+5000,op.expiresAt,row.expiresAt,this.policy(at))}:{})};
+   const receipt:Operation={id:op.id,action:op.action,keyAddress:op.keyAddress,createdAt:op.createdAt,expiresAt:Math.min(op.expiresAt,row.expiresAt),status:'authorized',requestDigest,releaseRevision:testflightReleaseRevision(snapshot.release),counter:verified.counter,admittedAt:at,keyExpiresAt:row.expiresAt,...(op.binding?{binding:op.binding,authorizationExpiresAt:Math.min(at+5000,op.expiresAt,row.expiresAt,this.policy(at))}:{})};
    this.saveOperation(receipt);return this.disposition(receipt,requestDigest,at,(...bounds)=>{committedBounds=bounds;});
   });
   recordWindow(...committedBounds);

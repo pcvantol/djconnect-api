@@ -3,6 +3,7 @@ import {beforeAll,beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
 import {env} from 'cloudflare:workers';
 import {runInDurableObject} from 'cloudflare:test';
 import {createProductRendezvousHandler,type ProductRendezvousEnv} from '../../src/rendezvous/composition';
+import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
 import { rendezvousKeyAddress } from './key-address';
 import {deriveBudgetIdentity} from './allocation-budget';
 import {base64Url} from '../../src/crypto';
@@ -45,6 +46,20 @@ async function rejectsBeforeBody(bindings:ProductRendezvousEnv,req:Request){
 }
 
 describe('internal product configuration and fixed identity',()=>{
+	it.each([
+		[undefined, undefined],
+		['040521', undefined],
+		['40521', ''],
+		['40521', '40520'],
+	])('invalid TestFlight release range rejects before body or storage (%s, %s)', async (min, max) => {
+		const {bindings,calls}=blockedNamespaces();
+		bindings.ASSERTION_POLICY_ENABLED=TESTFLIGHT_POLICY;
+		bindings.RENDEZVOUS_TESTFLIGHT_MIN_BUILD=min;
+		bindings.RENDEZVOUS_TESTFLIGHT_MAX_BUILD=max;
+		await rejectsBeforeBody(bindings,request('/create'));
+		expect(calls).not.toHaveBeenCalled();
+	});
+
 	it('preserves the existing key address and separates attestation environments and policies', async () => {
 		expect(await rendezvousKeyAddress(keyId, 'development', 'ios-dev-qualification/1'))
 			.toBe('2a449a9894f60998c7455ddac55b8ffc523c86560675335556334370b6b7c3a6');

@@ -1,7 +1,7 @@
 // SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
 import { DurableObject } from 'cloudflare:workers';
 import { encryptSecret, decryptSecret, base64Decode, base64Url } from 'djc-existing-crypto';
-import { TESTFLIGHT_POLICY } from './testflight-40521.mjs';
+import { TESTFLIGHT_POLICY } from './testflight-release.mjs';
 export interface StoreEnv { RECEIPT_ACTIVE_KEY?: string; RECEIPT_PREVIOUS_KEY?: string }
 export interface StoreMaterial {
   keyAddress: string; appPolicy: string; environment: 'development' | 'production'; publicPoint: string;

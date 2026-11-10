@@ -899,9 +899,9 @@ def baseline_before_testflight_profile():
     return sources, refs
 
 
-TESTFLIGHT_PROFILE_PATH = 'docs/rendezvous/testflight-40521-source-delta-v1.json'
-TESTFLIGHT_PROFILE_SHA256 = '2fa8becf81eac71d2a6e118d6a3f0e9bef58fde48a45a1dc833b806aa52436a7'
-TESTFLIGHT_PROFILE_MAP_SHA256 = '4a7b413bdb7dc59fdd66c729deca7768dcb8f56d66f7f6cd8303ea34d3ac7150'
+TESTFLIGHT_PROFILE_PATH = 'docs/rendezvous/testflight-release-source-delta-v1.json'
+TESTFLIGHT_PROFILE_SHA256 = 'e85b008de5ea8cfc091a6a76e775a2b8abdd24dc95abd5f26b9aa32978475373'
+TESTFLIGHT_PROFILE_MAP_SHA256 = '400a0c6d7c7aee43f427006544ab19313895e5ff883c3cb03723dd8f621d0a87'
 TESTFLIGHT_PROFILE_SOURCES = frozenset((
     'qualification/rendezvous/app-attest-core-candidate.mjs',
     'qualification/rendezvous/assertion-key-state.check.mjs',
@@ -912,6 +912,7 @@ TESTFLIGHT_PROFILE_SOURCES = frozenset((
     'qualification/rendezvous/enrollment-evidence-candidate.mjs',
     'qualification/rendezvous/enrollment-key-state.ts',
     'qualification/rendezvous/key-routing.ts',
+    'qualification/rendezvous/product-composition.check.ts',
     'qualification/rendezvous/receipt-cms-candidate.mjs',
     'qualification/rendezvous/receipt-key-store.ts',
     'qualification/rendezvous/run_challenge_budget_workerd.mjs',
@@ -928,11 +929,12 @@ TESTFLIGHT_PROFILE_SOURCES = frozenset((
     'src/rendezvous/composition.ts',
 ))
 TESTFLIGHT_PROFILE_ADDITIONS = frozenset((
-    'qualification/rendezvous/testflight-40521.mjs',
-    'qualification/rendezvous/testflight-40521.d.mts',
+    'qualification/rendezvous/testflight-release.mjs',
+    'qualification/rendezvous/testflight-release.d.mts',
 ))
 TESTFLIGHT_PROFILE_REFERENCES = frozenset()
 TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS = frozenset((
+    'docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md',
     'qualification/rendezvous/qa-build-profile.json',
     'qualification/rendezvous/run_assertion_state_workerd.mjs',
     'qualification/rendezvous/run_capacity_workerd.mjs',
@@ -955,7 +957,7 @@ def baseline():
                            'effective_source_map_sha256', 'changes', 'source_additions',
                            'reference_changes', 'reference_additions', 'public_activation_allowed'})
     require(type(delta['schema_version']) is int and delta['schema_version'] == 1
-            and delta['scope'] == 'EXACT_TESTFLIGHT_40521_PROFILE_NOT_ACTIVATION'
+            and delta['scope'] == 'EXACT_TESTFLIGHT_RELEASE_PROFILE_NOT_ACTIVATION'
             and delta['public_activation_allowed'] is False
             and delta['baseline_source_map_sha256'] == source_map_digest(sources))
     for mapping, changes, allowed in ((sources, delta['changes'], TESTFLIGHT_PROFILE_SOURCES),
