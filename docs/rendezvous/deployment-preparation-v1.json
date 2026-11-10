@@ -122,7 +122,7 @@
     "qualification/rendezvous/run_store_workerd.mjs": "f185cbf957364148380100b7860b38ad480af93eec04f6395256c449f9cb027f",
     "scripts/build_rendezvous_qa.mjs": "874d397f26f253c839e3c2cee2e973f6fba06e5213f08e7e7e7234bb029870f0",
     "src/rendezvous/qa-entry.ts": "c08c0da27890d0f88086cd604ddff28fac02eab268357f035b409a0cf8c57b61",
-    "docs/rendezvous/testflight-release-source-delta-v1.json": "e85b008de5ea8cfc091a6a76e775a2b8abdd24dc95abd5f26b9aa32978475373"
+    "docs/rendezvous/testflight-release-source-delta-v1.json": "48467de493a40c64ae676e697495420d1e031c0e71a772664ea51c827cb34a9f"
   },
   "schema_version": 1,
   "secret_names": [
@@ -137,7 +137,7 @@
     "qualification/rendezvous/receipt-key-store.check.ts": "6a2acc17becb471b35ca200b93a5ad064bdb91d43fb300944b8dbf85670bec82",
     "qualification/rendezvous/assertion-key-state.ts": "2ac0e1ec86fec944f38d2c8a6d5dc6ae13d53188864b9d60fb9c735136f86368",
     "qualification/rendezvous/assertion-verifier.d.ts": "8c39ff80d0a2b23f1743142e785be088008ea9c026a527e1a2950d6d64a9dd67",
-    "qualification/rendezvous/assertion-key-state.check.mjs": "5e30d1797e7f5ea33fb1e2afbdf5cbd1661e2552a3d95194b27f936ebe030b79",
+    "qualification/rendezvous/assertion-key-state.check.mjs": "5afa2e97d8a776c13a4eb17bf2d7b6afbee75a9d7fb665bcb877a718e1c6032f",
     "qualification/rendezvous/assertion-state-harness.ts": "bc257394b71a4367e72b99359e44ecb2fc6987a87c05441ce52f8f4f00816c34",
     "qualification/rendezvous/app-attest-core-candidate.mjs": "1a10b9878b51a87570c03902f1115fb333de39173220b1f557227ac868c9708a",
     "qualification/rendezvous/worker-path-candidate.mjs": "2ea6e9e1048e81304948b2189dee250269d30c7a18bc35738dfab7a6f8375773",
@@ -319,8 +319,8 @@
     "repository_namespace_delta_sha256": "263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504",
     "shared_key_address_delta_sha256": "4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824",
     "shared_key_address_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
-    "testflight_profile_delta_sha256": "e85b008de5ea8cfc091a6a76e775a2b8abdd24dc95abd5f26b9aa32978475373",
-    "testflight_profile_source_map_sha256": "400a0c6d7c7aee43f427006544ab19313895e5ff883c3cb03723dd8f621d0a87"
+    "testflight_profile_delta_sha256": "48467de493a40c64ae676e697495420d1e031c0e71a772664ea51c827cb34a9f",
+    "testflight_profile_source_map_sha256": "e4a4fd4c30d474413e3e27e4af5950dd32e49c53ae88728623264abd35487796"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
