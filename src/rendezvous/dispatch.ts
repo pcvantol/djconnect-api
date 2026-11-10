@@ -33,12 +33,13 @@ export async function dispatchRendezvousRequest(request: Request, env: unknown):
 	const bindings = env as TrialEnv | undefined;
 	if (PRODUCT_RENDEZVOUS_ENABLED) return createProductRendezvousHandler(bindings!)(request);
 
-	const startedAt = Date.now();
-	const endsAt = trialEnd(bindings, startedAt);
-	if (endsAt === undefined) return unavailable;
-	const create = new URL(request.url).pathname === "/v1/rendezvous/create";
-	if (create && startedAt >= endsAt - QR_LIFETIME_MS) return unavailable;
 	try {
+		if (!bindings || !Object.hasOwn(bindings, "RENDEZVOUS_PUBLIC_TRIAL_STARTS_AT")) return unavailable;
+		const startedAt = Date.now();
+		const endsAt = trialEnd(bindings, startedAt);
+		if (endsAt === undefined) return unavailable;
+		const create = new URL(request.url).pathname === "/v1/rendezvous/create";
+		if (create && startedAt >= endsAt - QR_LIFETIME_MS) return unavailable;
 		// Check even OPTIONS before handing the request to the route handler.
 		directEdgeIp(request);
 		const response = await createProductRendezvousHandler(bindings!)(request);

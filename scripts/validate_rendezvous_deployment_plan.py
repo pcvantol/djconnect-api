@@ -980,8 +980,8 @@ def baseline_before_public_trial():
 
 
 PUBLIC_TRIAL_DELTA_PATH = 'docs/rendezvous/public-testflight-trial-source-delta-v1.json'
-PUBLIC_TRIAL_DELTA_SHA256 = '065d359328121f2cc1749639ee201d4842321cd601771241ec7205f0aeab85c0'
-PUBLIC_TRIAL_MAP_SHA256 = '1ca1670618ea2df03eeae0b242eff74ca77b9ce0640ec64138cc75588b262478'
+PUBLIC_TRIAL_DELTA_SHA256 = '8261fbc19bf801fbb9eac3f621d57230fb8464a1d3293f1c365e50d3bef9557d'
+PUBLIC_TRIAL_MAP_SHA256 = '762abf35465e683b3d68bbd3287c61ad99ac03bdb9e9284b98b47ffa75b18af6'
 PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/product-composition.check.ts', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts'))
 SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
                          public_trial_source_map_sha256=PUBLIC_TRIAL_MAP_SHA256)

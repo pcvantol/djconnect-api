@@ -125,7 +125,7 @@
     "docs/rendezvous/testflight-release-source-delta-v1.json": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad",
     "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "b300a3929d2922e8eb2ebfe2d540432a0b763f422fe775d58b70f50a41a9e9bb",
-    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "065d359328121f2cc1749639ee201d4842321cd601771241ec7205f0aeab85c0"
+    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "8261fbc19bf801fbb9eac3f621d57230fb8464a1d3293f1c365e50d3bef9557d"
   },
   "schema_version": 1,
   "secret_names": [
@@ -213,7 +213,7 @@
     "package.json": "b684c815c993c080483dc9d9be50f5546d07a39ee18408ea46535f39a75f143e",
     "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
     ".github/workflows/ci-cd.yml": "e1e90326dcb5d25c5f1e661d55cbd48f965700d171b0a3ad9b03fed185e2a60d",
-    "src/rendezvous/dispatch.ts": "c78502dab3b091acf4b0c90630499599a73551a3fc1c27daa7106fd561efb8f6",
+    "src/rendezvous/dispatch.ts": "c3e4c9e2b72eba18873c649ca2452f029c060339de829182fa94108a230541c1",
     "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
     "qualification/rendezvous/root-integration.check.mjs": "b30be29743d836a3a4d0d3c006369c5ca9c1b2c5d3a25be05ef221c1727d193e",
     "qualification/rendezvous/root-integration-derivation.check.mjs": "e78eeedda2c1830bafc91ad20fdc3147f0047b8f6301445ff5ef1be257c69c76",
@@ -324,8 +324,8 @@
     "shared_key_address_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
     "testflight_profile_delta_sha256": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "testflight_profile_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
-    "public_trial_delta_sha256": "065d359328121f2cc1749639ee201d4842321cd601771241ec7205f0aeab85c0",
-    "public_trial_source_map_sha256": "1ca1670618ea2df03eeae0b242eff74ca77b9ce0640ec64138cc75588b262478"
+    "public_trial_delta_sha256": "8261fbc19bf801fbb9eac3f621d57230fb8464a1d3293f1c365e50d3bef9557d",
+    "public_trial_source_map_sha256": "762abf35465e683b3d68bbd3287c61ad99ac03bdb9e9284b98b47ffa75b18af6"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
