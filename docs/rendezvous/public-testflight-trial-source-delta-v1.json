@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scope": "PUBLIC_TESTFLIGHT_TRIAL_CONFIGURED_NOT_DEPLOYED",
   "baseline_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
-  "effective_source_map_sha256": "4b2db849f8454ff702e75801dd7c546ccf62a19d7132ec9867026c2741bdbae2",
+  "effective_source_map_sha256": "5701251f20432ea063643f0308dc41c8133dbb8f02db346bfc15fc36b8e47334",
   "source_changes": {
     "src/rendezvous/dispatch.ts": {
       "before": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
@@ -39,6 +39,10 @@
     "wrangler.jsonc": {
       "before": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
       "after": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a"
+    },
+    "rendezvous-build-inputs.json": {
+      "before": "2b96897393242c9b66def0350f73c6cc91b9e2059757d731b3b8b448c6def8ef",
+      "after": "f28f25617c8628c7c842fcf7e6bd62a8d278defe9dbc8bc788920e9335bd4a8e"
     }
   },
   "reference_changes": {

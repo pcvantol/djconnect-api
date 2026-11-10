@@ -125,7 +125,7 @@
     "docs/rendezvous/testflight-release-source-delta-v1.json": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "qualification/rendezvous/private-profile-40381.check.mjs": "19aa415febf47e53ea1d950ac4c604e59cf8fcdbfaaef9f74ea9ad5d9f5b43ad",
     "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "2d8766f46a75a686735573ab91731caac9471f43c5d2b2d70a7e2f76e47d3043",
-    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "be20f63a21c382e2b52c80e2226a53702753db0e9136a62203788b5199c56f64"
+    "docs/rendezvous/public-testflight-trial-source-delta-v1.json": "b3da5bb3eb4958f5b66c8cdc886144d3e479bd8647b545c445806632b129fcde"
   },
   "schema_version": 1,
   "secret_names": [
@@ -208,7 +208,7 @@
     "src/index.ts": "3bf44422f5f13cedeaa92b32fd4cdae1cbfad373202d4c374ee1a04f853b95f5",
     "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
     "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
-    "rendezvous-build-inputs.json": "2b96897393242c9b66def0350f73c6cc91b9e2059757d731b3b8b448c6def8ef",
+    "rendezvous-build-inputs.json": "f28f25617c8628c7c842fcf7e6bd62a8d278defe9dbc8bc788920e9335bd4a8e",
     "wrangler.jsonc": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a",
     "package.json": "b684c815c993c080483dc9d9be50f5546d07a39ee18408ea46535f39a75f143e",
     "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
@@ -324,8 +324,8 @@
     "shared_key_address_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
     "testflight_profile_delta_sha256": "c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80",
     "testflight_profile_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
-    "public_trial_delta_sha256": "be20f63a21c382e2b52c80e2226a53702753db0e9136a62203788b5199c56f64",
-    "public_trial_source_map_sha256": "4b2db849f8454ff702e75801dd7c546ccf62a19d7132ec9867026c2741bdbae2"
+    "public_trial_delta_sha256": "b3da5bb3eb4958f5b66c8cdc886144d3e479bd8647b545c445806632b129fcde",
+    "public_trial_source_map_sha256": "5701251f20432ea063643f0308dc41c8133dbb8f02db346bfc15fc36b8e47334"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

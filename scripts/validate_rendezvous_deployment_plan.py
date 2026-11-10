@@ -980,9 +980,9 @@ def baseline_before_public_trial():
 
 
 PUBLIC_TRIAL_DELTA_PATH = 'docs/rendezvous/public-testflight-trial-source-delta-v1.json'
-PUBLIC_TRIAL_DELTA_SHA256 = 'be20f63a21c382e2b52c80e2226a53702753db0e9136a62203788b5199c56f64'
-PUBLIC_TRIAL_MAP_SHA256 = '4b2db849f8454ff702e75801dd7c546ccf62a19d7132ec9867026c2741bdbae2'
-PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/allocation-index.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'qualification/rendezvous/transaction-state.ts', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts', 'wrangler.jsonc'))
+PUBLIC_TRIAL_DELTA_SHA256 = 'b3da5bb3eb4958f5b66c8cdc886144d3e479bd8647b545c445806632b129fcde'
+PUBLIC_TRIAL_MAP_SHA256 = '5701251f20432ea063643f0308dc41c8133dbb8f02db346bfc15fc36b8e47334'
+PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/allocation-index.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'qualification/rendezvous/transaction-state.ts', 'rendezvous-build-inputs.json', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts', 'wrangler.jsonc'))
 SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
                          public_trial_source_map_sha256=PUBLIC_TRIAL_MAP_SHA256)
 
