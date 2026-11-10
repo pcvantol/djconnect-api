@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:test';
+import {env as workerEnv} from 'cloudflare:test';
 import {beforeAll,beforeEach,describe,it,expect,vi} from 'vitest';
 import cbor from 'cbor';
 import type {AppEnv} from '../../../src/types';
@@ -17,6 +17,8 @@ import schema from '../schema.sql?raw';import hostSchema from '../../host-app-wa
 import eligibility from '../eligibility-view.sql?raw';import registration from '../registration-guard.sql?raw';import dispatch from '../dispatch-guard.sql?raw';import issuer from '../issuer-guard.sql?raw';import firstJob from '../native-first-job-guard.sql?raw';import keyInsert from '../native-key-insert-guard.sql?raw';import firstProof from '../native-first-proof-guard.sql?raw';
 // MODEL ONLY: no Apple certificate/signature/receipt/status is qualified here.
 // This loader mock is absent from the production module's import graph.
+// These fixtures only depend on the database binding and supply credentials per case.
+const env: Pick<AppEnv, 'DB'> = workerEnv;
 const modeled=vi.hoisted(()=>({spki:'',badSpki:'',badKey:false,statusExpires:0,category:btoa(String.fromCharCode(3,0,0,0))}));
 vi.mock('../native-apple-evidence.mjs',async original=>{const actual=await original<typeof import('../native-apple-evidence.mjs')>();return {...actual,verifyAppleAttestationEvidence:async()=>({scope:'APPLE_ATTESTATION_AND_RECEIPT_CRYPTO_STATUS_ONLY_NO_ENROLLMENT',launch_validation_category_b64:modeled.category,public_key_spki_b64:modeled.badKey?modeled.badSpki:modeled.spki,receipt:new TextEncoder().encode('SYNTHETIC MODELED RECEIPT; NOT APPLE EVIDENCE'),receiptCreated:Date.now()-1,expires:Date.now()+3600000,attestationPathScope:'MODELED_NOT_QUALIFIED',receiptScope:'MODELED_NOT_QUALIFIED',statusCheckedAt:Date.now()-1,statusExpiresAt:modeled.statusExpires||Date.now()+60000})};});
 const secret='synthetic-operator-enrollment-only-not-a-real-secret',token='djci_'+'A'.repeat(43),challenge='88888888-8888-4888-8888-888888888888';

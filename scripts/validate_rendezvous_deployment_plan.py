@@ -980,7 +980,7 @@ def baseline_before_public_trial():
 
 
 PUBLIC_TRIAL_DELTA_PATH = 'docs/rendezvous/public-testflight-trial-source-delta-v1.json'
-PUBLIC_TRIAL_DELTA_SHA256 = 'b3da5bb3eb4958f5b66c8cdc886144d3e479bd8647b545c445806632b129fcde'
+PUBLIC_TRIAL_DELTA_SHA256 = '08bc849f8c4f5463d4e23f2a50f76b24df07cf28708a9757a4b32acb7b6a8ada'
 PUBLIC_TRIAL_MAP_SHA256 = '5701251f20432ea063643f0308dc41c8133dbb8f02db346bfc15fc36b8e47334'
 PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/allocation-index.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'qualification/rendezvous/transaction-state.ts', 'rendezvous-build-inputs.json', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts', 'wrangler.jsonc'))
 SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
@@ -995,7 +995,16 @@ def baseline():
             and delta['baseline_source_map_sha256'] == source_map_digest(sources))
     for mapping, changes, allowed in (
         (sources, delta['source_changes'], PUBLIC_TRIAL_SOURCES),
-        (refs, delta['reference_changes'], {'qualification/rendezvous/qa-build-profile.json', 'wrangler.jsonc'}),
+        (refs, delta['reference_changes'], {
+            'coordinator/host-app-wake/source-manifest.json',
+            'coordinator/installation-principal/source-manifest.json',
+            'coordinator/installation-registry/source-manifest.json',
+            'coordinator/principal-possession/source-manifest.json',
+            'coordinator/rich-session/source-manifest.json',
+            'qualification/rendezvous/qa-build-profile.json',
+            'qualification/watch-moment/source-manifest.json',
+            'wrangler.jsonc',
+        }),
     ):
         require(set(changes) == allowed)
         for name, change in changes.items():

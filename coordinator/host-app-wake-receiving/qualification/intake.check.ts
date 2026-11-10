@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:test';
+import {env as workerEnv} from 'cloudflare:test';
 import {beforeAll,beforeEach,describe,it,expect,vi} from 'vitest';
 import schema from '../schema.sql?raw';
 import hostSchema from '../../host-app-wake/schema.sql?raw';
@@ -11,6 +11,8 @@ import {SERVER_PREFIX} from '../server-wire';
 import type {AppEnv} from '../../../src/types';
 import vectors from './native-transcript-vectors.json';
 let at:number,store:ReceivingStore;
+// These fixtures only depend on the database binding and supply credentials per case.
+const env: Pick<AppEnv, 'DB'> = workerEnv;
 const token='djci_'+'A'.repeat(43),scope={authorization_id:'authorization',core_purpose_id:vectors.original.core_purpose_id,issuer_operation_id:'issuer-operation'};
 const body={version:RECEIVING_VERSION,...scope,original:vectors.original};
 const names={authorization_id:'x-djconnect-host-wake-authorization-id',core_purpose_id:'x-djconnect-host-wake-core-purpose-id',issuer_operation_id:'x-djconnect-host-wake-issuer-operation-id'};

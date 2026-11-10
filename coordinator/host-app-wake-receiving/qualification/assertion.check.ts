@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:test';
+import {env as workerEnv} from 'cloudflare:test';
 import {beforeAll,beforeEach,describe,it,expect,vi} from 'vitest';
 import cbor from 'cbor';import * as pki from 'pkijs';
 import firstJobGuard from '../native-first-job-guard.sql?raw';
@@ -23,6 +23,8 @@ import vectors from './native-transcript-vectors.json';
 // All native key/policy/Apple issuer authority here is SYNTHETIC. Actual
 // WebCrypto ECDSA and D1 counter CAS are reached; NO genuine enrollment/device.
 let at:number,store:ReceivingStore,pair:CryptoKeyPair,sourceEnv:AppEnv,capabilities:Map<string,string>,o:ReturnType<typeof decodeNativeOriginal>,spki:string;
+// These fixtures only depend on the database binding and supply credentials per case.
+const env: Pick<AppEnv, 'DB'> = workerEnv;
 const app='ABCDEFGHIJ.example.fixture.host',claim='original-native-claim';
 const b64=(b:Uint8Array)=>btoa(String.fromCharCode(...b));
 const hash=async(b:Uint8Array)=>new Uint8Array(await crypto.subtle.digest('SHA-256',Uint8Array.from(b)));

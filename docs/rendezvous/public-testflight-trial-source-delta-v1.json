@@ -46,9 +46,33 @@
     }
   },
   "reference_changes": {
+    "coordinator/host-app-wake/source-manifest.json": {
+      "before": "3ea9d21af5f2534c875ceca48edda48cdaac0b3758f9dd72ceb74fc93c5e4ffd",
+      "after": "9327b772b48a76ab9eefe8fb11c5f6ca4131edc6107280505b2e729ac103ffaf"
+    },
+    "coordinator/installation-principal/source-manifest.json": {
+      "before": "061c4fe5991b243f4bdbbde2439f1ae99a286248009f908c69a3a10b112bbb3a",
+      "after": "3ef5dc83caba58cbf2d9f222ab67b60c4b4cb286e8ff3311ee2023f46218db51"
+    },
+    "coordinator/installation-registry/source-manifest.json": {
+      "before": "06d03531d4f08cb5110d7239c91c1b475631e4a8d970e1e573b5af74a290d07b",
+      "after": "07b3a98e493c992761eab67157d007ea85388293a15e203cabaae23e19bf6f67"
+    },
+    "coordinator/principal-possession/source-manifest.json": {
+      "before": "647f6ae3b398c9188fda44bda1384b91c840af83bdad500404b299fbdfbfafcd",
+      "after": "0ceb43305045743fcf9c05e6ef2d996aabf61df6b8826d243ba6a1ecb7bc77a1"
+    },
+    "coordinator/rich-session/source-manifest.json": {
+      "before": "3bd24a4a5d5aeaabafbdb9401c18581b9a386e1cd17a634fd99a958d569ff8d9",
+      "after": "89257dfeee965277839e4692447ca4da7b9152bed295567a807cade30bbd6e07"
+    },
     "qualification/rendezvous/qa-build-profile.json": {
       "before": "0aa52b27a4f9e9d57200a6abeeae8728c87fd0e99b623e220c034fc446a99d3b",
       "after": "00c8f784262ec3b54169453bade031e4587f54cc7b7dbf0a6361ad4760ea2ab4"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "67f8340015fdd1801e73335e6eac001e46ca1f647fe0ffb8facbfc16cfd04dcd",
+      "after": "d4b34bcd922188afd2d33497f88a375b7793e90b81165916992268fab765c924"
     },
     "wrangler.jsonc": {
       "before": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
