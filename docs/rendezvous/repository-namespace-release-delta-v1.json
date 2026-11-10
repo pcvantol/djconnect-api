@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_RELEASE_REPOSITORY_NAMESPACE_DELTA_NOT_ACTIVATION",
+  "reference_changes": {
+    ".github/workflows/deploy-api-worker.yml": {
+      "before": "d45cbffb150b955a8f6cd4220ae85413463192da42feb2fbadcb365714ae7876",
+      "after": "2058d08c7b77af2c4a1147d60fd0a5726cbd18bc176d14a871001d27c28df310"
+    }
+  },
+  "reference_additions": {
+    ".github/workflows/api-worker-post-deployment-smoke.yml": "6ba44be153abdc24fe01ebe6a9a95acd39d101e2fb80341656434e6b2cf45f72"
+  },
+  "public_activation_allowed": false
+}

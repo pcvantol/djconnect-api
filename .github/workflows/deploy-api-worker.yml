@@ -86,8 +86,9 @@ jobs:
           test "$(jq -r '.approval.state' "$manifest")" = APPROVED
           test "$(jq -r '.manifest_id' "$manifest")" = "$MANIFEST_ID"
           test "$(jq -r '.release_profile' "$manifest")" = "$RELEASE_PROFILE"
-          jq -e --arg sha "$CANDIDATE_SHA" \
-            '.repositories[] | select(.repository == "pcvantol/djconnect-api" and .source_sha == $sha)' \
+          test "$GITHUB_REPOSITORY_ID" = 1275206655
+          jq -e --arg repository "$GITHUB_REPOSITORY" --arg sha "$CANDIDATE_SHA" \
+            '.repositories[] | select(.repository == $repository and .source_sha == $sha)' \
             "$manifest" >/dev/null
           jq -e --arg target "$TARGET" --arg artifact "$ARTIFACT_ID" --arg sha "$ARTIFACT_SHA256" \
             '.artifact_bindings[] | select(.target == $target and (.artifact_id | tostring) == $artifact and .artifact_sha256 == $sha)' \

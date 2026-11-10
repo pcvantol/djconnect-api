@@ -111,6 +111,13 @@ The explicit production deployment workflow can deploy a qualified
 internal-release candidate with the GitHub Actions `CLOUDFLARE_API_TOKEN`
 secret. CI validation itself has no deployment step.
 
+Deployment and post-deployment smoke bind the approved Core manifest entry
+to GitHub repository ID `1275206655`, the executing repository name, and the
+exact source SHA. After transfer to `djconnect-music-dj/djconnect-api`, use a new
+approved manifest naming that repository. Keep historical manifests under
+their original identity. Before transfer, the reusable Core Owner
+Authorization workflow must also accept the destination name.
+
 Required secrets must be set through Cloudflare secrets/configuration:
 
 ```sh
