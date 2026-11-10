@@ -123,6 +123,12 @@ export async function sourceSnapshot(){
  const publicTrial=JSON.parse(publicTrialRaw);
  need(publicTrial.scope==='PUBLIC_TESTFLIGHT_TRIAL_CONFIGURED_NOT_DEPLOYED');
  need(publicTrial.baseline_source_map_sha256===testFlight.effective_source_map_sha256&&publicTrial.effective_source_map_sha256===provenance.public_trial_source_map_sha256);
+ const alwaysOnPath='docs/rendezvous/always-on-testflight-source-delta-v1.json';
+ const alwaysOnRaw=await readFile(join(repo,alwaysOnPath));
+ need(plan.reference_hashes[alwaysOnPath]===sha(alwaysOnRaw)&&sha(alwaysOnRaw)===provenance.always_on_testflight_delta_sha256);
+ const alwaysOn=JSON.parse(alwaysOnRaw);
+ need(alwaysOn.scope==='PUBLIC_TESTFLIGHT_ALWAYS_ON_SOURCE_NOT_DEPLOYED');
+ need(alwaysOn.baseline_source_map_sha256===publicTrial.effective_source_map_sha256&&alwaysOn.effective_source_map_sha256===provenance.always_on_testflight_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -142,6 +148,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(keyAddress.changes,name)){need(keyAddress.changes[name].before===expected);expected=keyAddress.changes[name].after;}
   if(Object.hasOwn(testFlight.changes,name)){need(testFlight.changes[name].before===expected);expected=testFlight.changes[name].after;}
   if(Object.hasOwn(publicTrial.source_changes,name)){need(publicTrial.source_changes[name].before===expected);expected=publicTrial.source_changes[name].after;}
+  if(Object.hasOwn(alwaysOn.source_changes,name)){need(alwaysOn.source_changes[name].before===expected);expected=alwaysOn.source_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

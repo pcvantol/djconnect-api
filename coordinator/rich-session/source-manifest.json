@@ -56,6 +56,6 @@
     "coordinator/rich-session/qualification/wrangler.jsonc": "3cf49517fd574002f1b88f73ba40d9dabe444e1a2a86a1665a9610be00edcbd5",
     "package-lock.json": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
-    "worker-configuration.d.ts": "c46fa2c12582fb48e31adced255ca9e4b014cd22436eff8b74abb9df7b04ad00"
+    "worker-configuration.d.ts": "1003bdb1be07ff380278e6713b08768d41be6c98ee21dcfaf799b9c2c4441738"
   }
 }

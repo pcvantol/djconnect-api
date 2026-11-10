@@ -255,7 +255,7 @@ def closed_receiving_root_delta(sources, references):
         require(effective.get(name) == expected)
         # Only exact pinned source-delta layers may supersede historical bytes.
         # validate() checks EVERY effective input after applying those layers.
-        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES | SHARED_KEY_ADDRESS_SOURCES | TESTFLIGHT_PROFILE_SOURCES | PUBLIC_TRIAL_SOURCES:
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES | SHARED_KEY_ADDRESS_SOURCES | TESTFLIGHT_PROFILE_SOURCES | PUBLIC_TRIAL_SOURCES | ALWAYS_ON_SOURCES:
             require(digest(safe_path(name).read_bytes()) == expected)
     refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
     refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
@@ -987,7 +987,7 @@ SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
                          public_trial_source_map_sha256=PUBLIC_TRIAL_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_always_on():
     sources, refs = baseline_before_public_trial()
     delta = pinned_working_proof(PUBLIC_TRIAL_DELTA_PATH, PUBLIC_TRIAL_DELTA_SHA256)
     require(delta['schema_version'] == 1
@@ -1014,6 +1014,36 @@ def baseline():
     require(set(delta['reference_additions']) == {'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md'})
     refs.update(delta['reference_additions'])
     refs[PUBLIC_TRIAL_DELTA_PATH] = PUBLIC_TRIAL_DELTA_SHA256
+    return sources, refs
+
+
+
+ALWAYS_ON_DELTA_PATH = 'docs/rendezvous/always-on-testflight-source-delta-v1.json'
+ALWAYS_ON_DELTA_SHA256 = '57e84804cc8d697eb6236fdfaa952a6319aae9892feb95ccbf6292698dd45532'
+ALWAYS_ON_MAP_SHA256 = '89e6c6cab440cbcbc709ee9093d2b6e0ac8f92496532e51b4d1ca942b41f9dc8'
+ALWAYS_ON_SOURCES = frozenset(('qualification/rendezvous/assertion-key-state.ts', 'qualification/rendezvous/enrollment-key-state.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'rendezvous-build-inputs.json', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts', 'wrangler.jsonc'))
+ALWAYS_ON_REFERENCES = frozenset(('coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'qualification/rendezvous/qa-build-profile.json', 'qualification/watch-moment/source-manifest.json', 'wrangler.jsonc'))
+SOURCE_PROVENANCE.update(always_on_testflight_delta_sha256=ALWAYS_ON_DELTA_SHA256,
+                         always_on_testflight_source_map_sha256=ALWAYS_ON_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_always_on()
+    delta = pinned_working_proof(ALWAYS_ON_DELTA_PATH, ALWAYS_ON_DELTA_SHA256)
+    require(delta['schema_version'] == 1
+            and delta['scope'] == 'PUBLIC_TESTFLIGHT_ALWAYS_ON_SOURCE_NOT_DEPLOYED'
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in (
+        (sources, delta['source_changes'], ALWAYS_ON_SOURCES),
+        (refs, delta['reference_changes'], ALWAYS_ON_REFERENCES),
+    ):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['before'] != change['after'])
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == ALWAYS_ON_MAP_SHA256)
+    refs[ALWAYS_ON_DELTA_PATH] = ALWAYS_ON_DELTA_SHA256
     return sources, refs
 
 

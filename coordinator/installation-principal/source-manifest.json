@@ -31,7 +31,7 @@
     "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
-    "worker-configuration.d.ts": "c46fa2c12582fb48e31adced255ca9e4b014cd22436eff8b74abb9df7b04ad00"
+    "worker-configuration.d.ts": "1003bdb1be07ff380278e6713b08768d41be6c98ee21dcfaf799b9c2c4441738"
   },
   "parent_source_PR": 168,
   "protected_parent_main": "bd746b0602926720a57b518907b60c66289fcc14",

@@ -11,12 +11,12 @@
   "origin_disposition": "RECEIVER_DESIGN_GO_API_SOURCE_VARIANT_APPLE_CORE_ACK_PENDING",
   "transforms": {
     "src/rendezvous/composition.ts": {
-      "source_sha256": "b57ba14b066882cb7c3e3467b3e54225dfae42b697c9166fd08c888f1c1c452b",
+      "source_sha256": "8632eca7e668ed1bc17956d2801f257dac8ee6d105d3dd1f06fc865250d0eae5",
       "counts": {
         "https://api.djconnect.dev": 1,
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "4d7b9240e0bf03e457efc8392f12336dce29809ac32046c490353c20c8d4e072"
+      "derived_sha256": "9a23f8220c2988fb1527ed9412fe45792e103c6fe3336f084c69014bbd05ad93"
     },
     "qualification/rendezvous/http-ingress.ts": {
       "source_sha256": "d01adf7731975bbb846aec3d4980d88d7b7f3c2f7e59b801b3124ed4cd068554",
@@ -27,12 +27,12 @@
       "derived_sha256": "95e53c82c2822ccae6222514791489e940fd24df7a0d999906ba72adca6ccddd"
     },
     "qualification/rendezvous/assertion-key-state.ts": {
-      "source_sha256": "c02bf757570e9fb5a850ff8178b2e37154a333f350474b4a81a2e9f3174fbf6d",
+      "source_sha256": "0b76dc31f6ddb1bf56452b4dd0a54e025416279ea3968fd8ea37b57af68fb014",
       "counts": {
         "https://api.djconnect.dev": 1,
         "ios-dev-qualification/1": 1
       },
-      "derived_sha256": "e5e3ed2498c09bd65fdadefd61bb4a68d7724cca7c0752d58617c4a3266d4769"
+      "derived_sha256": "3667d2b8f86a5c50ea5da2ed6f87eb1afa78d6886f94b899178e27d3dfcd90a1"
     },
     "qualification/rendezvous/transaction-state.ts": {
       "source_sha256": "e194dbe0282aa9fc6e3f41ea20ffe6b053334b22f7daf1141f5e64694ee9485b",
