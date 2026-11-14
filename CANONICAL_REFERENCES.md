@@ -2,7 +2,7 @@
 
 Status: repository-local canonical reference map
 
-Repository: `pcvantol/djconnect-api`
+Repository: `djconnect-music-dj/djconnect-api`
 
 This repository extends the DJConnect Platform Foundation. It does not redefine
 it.
@@ -74,7 +74,7 @@ Canonical foundation documents include:
 
 ## Local Technical Design Ownership
 
-- Canonical repository: `pcvantol/djconnect-api` for repository-specific technical
+- Canonical repository: `djconnect-music-dj/djconnect-api` for repository-specific technical
   design, implementation, build, release and test details.
 - Local responsibility: maintain implementation reality for central API implementation, Cloudflare Worker runtime, APNs relay, per-install token bootstrap and API-owned localized display-message mapping.
 - May this repository modify it: yes, within its ownership boundary.
