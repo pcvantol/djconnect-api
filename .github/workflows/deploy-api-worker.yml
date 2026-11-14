@@ -79,14 +79,19 @@ jobs:
         run: |
           set -euo pipefail
           manifest="$RUNNER_TEMP/api-operational-manifest.json"
+          test "$GITHUB_REPOSITORY_ID" = 1275206655
+          case "$GITHUB_REPOSITORY" in
+            pcvantol/djconnect-api) manifest_file=PLATFORM_4_0_RC2_API_OPERATIONAL_MANIFEST.json ;;
+            djconnect-music-dj/djconnect-api) manifest_file=PLATFORM_4_0_API_ORG_OPERATIONAL_MANIFEST.json ;;
+            *) echo "Unexpected API repository: $GITHUB_REPOSITORY" >&2; exit 1 ;;
+          esac
           curl --fail --silent --show-error --location \
-            https://raw.githubusercontent.com/pcvantol/djconnect/main/docs/release/PLATFORM_4_0_RC2_API_OPERATIONAL_MANIFEST.json \
+            "https://raw.githubusercontent.com/pcvantol/djconnect/main/docs/release/$manifest_file" \
             --output "$manifest"
           test "$(jq -r '.status' "$manifest")" = APPROVED_DEPLOYMENT_DISPATCH_PENDING
           test "$(jq -r '.approval.state' "$manifest")" = APPROVED
           test "$(jq -r '.manifest_id' "$manifest")" = "$MANIFEST_ID"
           test "$(jq -r '.release_profile' "$manifest")" = "$RELEASE_PROFILE"
-          test "$GITHUB_REPOSITORY_ID" = 1275206655
           jq -e --arg repository "$GITHUB_REPOSITORY" --arg sha "$CANDIDATE_SHA" \
             '.repositories[] | select(.repository == $repository and .source_sha == $sha)' \
             "$manifest" >/dev/null
