@@ -24,7 +24,7 @@
     "@vitest/coverage-istanbul": "~4.1.12",
     "typescript": "^7.0.2",
     "vitest": "~4.1.12",
-    "wrangler": "^4.157.0"
+    "wrangler": "^4.160.0"
   },
   "overrides": {
     "sharp": "0.35.5",
