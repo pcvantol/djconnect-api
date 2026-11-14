@@ -1,0 +1,15 @@
+{
+  "public_activation_allowed": false,
+  "reference_changes": {
+    ".github/workflows/api-worker-post-deployment-smoke.yml": {
+      "after": "f4489bfb18928d7456566e217e32d4da2d1f7fb00c0f15ed7eb44d6158b73a8b",
+      "before": "6ba44be153abdc24fe01ebe6a9a95acd39d101e2fb80341656434e6b2cf45f72"
+    },
+    ".github/workflows/deploy-api-worker.yml": {
+      "after": "24792c1624354447ef056ab1402471bf2bb5240f78ac298489f78a579fb4c4be",
+      "before": "2058d08c7b77af2c4a1147d60fd0a5726cbd18bc176d14a871001d27c28df310"
+    }
+  },
+  "schema_version": 1,
+  "scope": "EXACT_ORG_OPERATIONAL_MANIFEST_PATH_NOT_ACTIVATION"
+}

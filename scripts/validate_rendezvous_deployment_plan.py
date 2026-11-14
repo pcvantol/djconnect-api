@@ -1027,7 +1027,7 @@ SOURCE_PROVENANCE.update(always_on_testflight_delta_sha256=ALWAYS_ON_DELTA_SHA25
                          always_on_testflight_source_map_sha256=ALWAYS_ON_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_org_operational_manifest_path():
     sources, refs = baseline_before_always_on()
     delta = pinned_working_proof(ALWAYS_ON_DELTA_PATH, ALWAYS_ON_DELTA_SHA256)
     require(delta['schema_version'] == 1
@@ -1044,6 +1044,28 @@ def baseline():
             mapping[name] = change['after']
     require(source_map_digest(sources) == delta['effective_source_map_sha256'] == ALWAYS_ON_MAP_SHA256)
     refs[ALWAYS_ON_DELTA_PATH] = ALWAYS_ON_DELTA_SHA256
+    return sources, refs
+
+
+ORG_OPERATIONAL_MANIFEST_PATH_DELTA = 'docs/rendezvous/org-operational-manifest-path-delta-v1.json'
+ORG_OPERATIONAL_MANIFEST_PATH_SHA256 = '0005e3efafd7732f156ff53ef0eab53d7d7bf1145035ee8f9c9bdbe1b6547605'
+SOURCE_PROVENANCE['org_operational_manifest_path_delta_sha256'] = ORG_OPERATIONAL_MANIFEST_PATH_SHA256
+
+
+def baseline():
+    sources, refs = baseline_before_org_operational_manifest_path()
+    delta = pinned_working_proof(ORG_OPERATIONAL_MANIFEST_PATH_DELTA, ORG_OPERATIONAL_MANIFEST_PATH_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_ORG_OPERATIONAL_MANIFEST_PATH_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False)
+    changes = delta['reference_changes']
+    require(set(changes) == {PRODUCTION_D1_GUARD_REFERENCE, REPOSITORY_NAMESPACE_SMOKE_REFERENCE})
+    for name, change in changes.items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and change['after'] != change['before'])
+        refs[name] = change['after']
+    refs[ORG_OPERATIONAL_MANIFEST_PATH_DELTA] = ORG_OPERATIONAL_MANIFEST_PATH_SHA256
     return sources, refs
 
 
