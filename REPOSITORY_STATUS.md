@@ -4,7 +4,7 @@ Status: Active engineering repository
 
 ## Repository
 
-`pcvantol/djconnect-api`
+`djconnect-music-dj/djconnect-api`
 
 ## Role
 
