@@ -1052,7 +1052,7 @@ ORG_OPERATIONAL_MANIFEST_PATH_SHA256 = '0005e3efafd7732f156ff53ef0eab53d7d7bf114
 SOURCE_PROVENANCE['org_operational_manifest_path_delta_sha256'] = ORG_OPERATIONAL_MANIFEST_PATH_SHA256
 
 
-def baseline():
+def baseline_before_wrangler_4160():
     sources, refs = baseline_before_org_operational_manifest_path()
     delta = pinned_working_proof(ORG_OPERATIONAL_MANIFEST_PATH_DELTA, ORG_OPERATIONAL_MANIFEST_PATH_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed'})
@@ -1066,6 +1066,47 @@ def baseline():
                 and change['after'] != change['before'])
         refs[name] = change['after']
     refs[ORG_OPERATIONAL_MANIFEST_PATH_DELTA] = ORG_OPERATIONAL_MANIFEST_PATH_SHA256
+    return sources, refs
+
+
+WRANGLER_4160_DELTA_PATH = 'docs/rendezvous/wrangler-4160-toolchain-source-delta-v1.json'
+WRANGLER_4160_DELTA_SHA256 = 'abede1a68b5eb3336bc91ce838eed2a977e5a41ac915bcf82861ebeb3b0dd0be'
+WRANGLER_4160_SOURCE_MAP_SHA256 = '1a549cc6a6585cead234d4edac427fab3d7ab00538b88d12e90d527144a2dbcf'
+WRANGLER_4160_SOURCES = frozenset(('package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs'))
+WRANGLER_4160_REFERENCES = STABLE_RELEASE_REFERENCES
+WRANGLER_4160_PROVENANCE = 'qualification/rendezvous/compatible-runtime-dependency-provenance-v6.json'
+SOURCE_PROVENANCE.update(wrangler_4160_delta_sha256=WRANGLER_4160_DELTA_SHA256,
+                         wrangler_4160_source_map_sha256=WRANGLER_4160_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_wrangler_4160()
+    delta = pinned_working_proof(WRANGLER_4160_DELTA_PATH, WRANGLER_4160_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_WRANGLER_4160_TOOLCHAIN_REFRESH_NOT_ACTIVATION'
+            and delta['base_source'] == 'a6dfec8c67c8c8f05224bca9de984df30ab5bddb'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in (
+        (sources, delta['changes'], WRANGLER_4160_SOURCES),
+        (refs, delta['reference_changes'], WRANGLER_4160_REFERENCES),
+    ):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == WRANGLER_4160_SOURCE_MAP_SHA256)
+    require(set(delta['reference_additions']) == {WRANGLER_4160_PROVENANCE}
+            and WRANGLER_4160_PROVENANCE not in refs)
+    refs.update(delta['reference_additions'])
+    refs[WRANGLER_4160_DELTA_PATH] = WRANGLER_4160_DELTA_SHA256
     return sources, refs
 
 

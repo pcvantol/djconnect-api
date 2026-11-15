@@ -3,8 +3,8 @@
   "parent": "13cb4f3ef82e16e6f4998f68cd5d867fdf8fc1c5",
   "design_sha256": "7b44758c5f7bba76dd3f61b042a776330ee25697523d3bd05248a5697f76db4b",
   "esbuild_version": "0.28.1",
-  "wrangler_version": "4.157.0",
-  "wrangler_schema_sha256": "57b91625cbaa059d39c30033c8f06df7a334348ccf019267e32ff3defd835d57",
+  "wrangler_version": "4.160.0",
+  "wrangler_schema_sha256": "fdf17b1ee9a637182af0678cd3725ad2845e63394fec9cb324765b4ec9ae46d0",
   "inputs_sha256": {
     ".github/workflows/installation-registry-transactions.yml": "ec1bd686c7b8c2787faea46db81743220e00fd102f2279bba745000a1a95c46b",
     "coordinator/installation-principal/codec-data.ts": "e97325cd2e36a2c9c0e06fbc1f3891dd9b38542b84c5f6214cc10182c468e158",
