@@ -33,9 +33,11 @@
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
+    "esbuild@0.28.2": true,
     "sharp@0.35.5": true,
     "workerd@1.20260815.1": true,
     "workerd@1.20260921.1": true,
+    "workerd@1.20261110.1": true,
     "fsevents": false
   },
   "dependencies": {
