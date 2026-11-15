@@ -18,7 +18,7 @@ jobs:
     uses: pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875
     with:
       execution_profile: balanced
-      owner: pcvantol/djconnect-api
+      owner: djconnect-music-dj/djconnect-api
 
   semgrep:
     uses: pcvantol/djconnect/.github/workflows/djconnect-semgrep-ci.yml@733ecc2836d40611b2b7472308a7175a6130c91a # Reachable canonical main commit
