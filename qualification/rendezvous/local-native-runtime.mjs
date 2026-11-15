@@ -129,6 +129,12 @@ export async function sourceSnapshot(){
  const alwaysOn=JSON.parse(alwaysOnRaw);
  need(alwaysOn.scope==='PUBLIC_TESTFLIGHT_ALWAYS_ON_SOURCE_NOT_DEPLOYED');
  need(alwaysOn.baseline_source_map_sha256===publicTrial.effective_source_map_sha256&&alwaysOn.effective_source_map_sha256===provenance.always_on_testflight_source_map_sha256);
+ const wranglerPath='docs/rendezvous/wrangler-4160-toolchain-source-delta-v1.json';
+ const wranglerRaw=await readFile(join(repo,wranglerPath));
+ need(plan.reference_hashes[wranglerPath]===sha(wranglerRaw)&&sha(wranglerRaw)===provenance.wrangler_4160_delta_sha256);
+ const wrangler=JSON.parse(wranglerRaw);
+ need(wrangler.scope==='EXACT_WRANGLER_4160_TOOLCHAIN_REFRESH_NOT_ACTIVATION'&&wrangler.public_activation_allowed===false);
+ need(wrangler.baseline_source_map_sha256===alwaysOn.effective_source_map_sha256&&wrangler.effective_source_map_sha256===provenance.wrangler_4160_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -149,6 +155,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(testFlight.changes,name)){need(testFlight.changes[name].before===expected);expected=testFlight.changes[name].after;}
   if(Object.hasOwn(publicTrial.source_changes,name)){need(publicTrial.source_changes[name].before===expected);expected=publicTrial.source_changes[name].after;}
   if(Object.hasOwn(alwaysOn.source_changes,name)){need(alwaysOn.source_changes[name].before===expected);expected=alwaysOn.source_changes[name].after;}
+  if(Object.hasOwn(wrangler.changes,name)){need(wrangler.changes[name].before===expected);expected=wrangler.changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

@@ -76,6 +76,8 @@ class PreparationTests(unittest.TestCase):
                          *v.PUBLIC_TRIAL_SOURCES, v.PUBLIC_TRIAL_DELTA_PATH,
                          *v.ALWAYS_ON_SOURCES, *v.ALWAYS_ON_REFERENCES, v.ALWAYS_ON_DELTA_PATH,
                          v.ORG_OPERATIONAL_MANIFEST_PATH_DELTA,
+                         *v.WRANGLER_4160_SOURCES, *v.WRANGLER_4160_REFERENCES,
+                         v.WRANGLER_4160_PROVENANCE, v.WRANGLER_4160_DELTA_PATH,
                          'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
             for path in additions:
                 raw = (canonical / path).read_bytes()
