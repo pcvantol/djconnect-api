@@ -10,7 +10,7 @@ async function main(){
  const dir=await privateDirectory(process.argv[2],repo);await emptyDirectory(dir);
  for(const [path,{leaf,sha256}]of Object.entries(manifest.receiver_sources)){
   need(['bootstrap/src/rendezvous.mjs','bootstrap/src/wire.mjs','bootstrap/src/wire-schema.mjs'].includes(path));
-  const url='https://raw.githubusercontent.com/pcvantol/djconnect-vibecast-receiver/'+manifest.receiver_sha+'/'+path;
+  const url='https://raw.githubusercontent.com/djconnect-music-dj/djconnect-vibecast-receiver/'+manifest.receiver_sha+'/'+path;
   const response=await fetch(url,{redirect:'manual',credentials:'omit',signal:AbortSignal.timeout(5000)});
   need(response.status===200&&!response.redirected&&response.body);
   const reader=response.body.getReader(),chunks=[];let size=0;
