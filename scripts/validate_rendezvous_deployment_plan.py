@@ -1079,7 +1079,7 @@ SOURCE_PROVENANCE.update(wrangler_4160_delta_sha256=WRANGLER_4160_DELTA_SHA256,
                          wrangler_4160_source_map_sha256=WRANGLER_4160_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_org_governance():
     sources, refs = baseline_before_wrangler_4160()
     delta = pinned_working_proof(WRANGLER_4160_DELTA_PATH, WRANGLER_4160_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
@@ -1107,6 +1107,38 @@ def baseline():
             and WRANGLER_4160_PROVENANCE not in refs)
     refs.update(delta['reference_additions'])
     refs[WRANGLER_4160_DELTA_PATH] = WRANGLER_4160_DELTA_SHA256
+    return sources, refs
+
+
+ORG_GOVERNANCE_DELTA_PATH = 'docs/rendezvous/org-governance-source-delta-v1.json'
+ORG_GOVERNANCE_DELTA_SHA256 = 'e5c736b6f5bf3d1e7528504d8fc791fa29bc103c88faf5a490f24ed1ba1fbb85'
+ORG_GOVERNANCE_SOURCE_MAP_SHA256 = '74558e3841d3fe579079a5af7c58b66bd6ff58982bedd99ee03346eaf291ad57'
+ORG_GOVERNANCE_SOURCES = frozenset(('.github/workflows/ci-cd.yml',))
+ORG_GOVERNANCE_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'qualification/watch-moment/source-manifest.json', '.github/workflows/reusable-workflow-guard.yml'))
+SOURCE_PROVENANCE.update(org_governance_delta_sha256=ORG_GOVERNANCE_DELTA_SHA256,
+                         org_governance_source_map_sha256=ORG_GOVERNANCE_SOURCE_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_org_governance()
+    delta = pinned_working_proof(ORG_GOVERNANCE_DELTA_PATH, ORG_GOVERNANCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'source_changes', 'reference_changes',
+                           'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_ORGANIZATION_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in ((sources, delta['source_changes'], ORG_GOVERNANCE_SOURCES),
+                                      (refs, delta['reference_changes'], ORG_GOVERNANCE_REFERENCES)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before'] and isinstance(change['after'], str)
+                    and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == ORG_GOVERNANCE_SOURCE_MAP_SHA256)
+    refs[ORG_GOVERNANCE_DELTA_PATH] = ORG_GOVERNANCE_DELTA_SHA256
     return sources, refs
 
 

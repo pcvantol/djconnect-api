@@ -78,6 +78,8 @@ class PreparationTests(unittest.TestCase):
                          v.ORG_OPERATIONAL_MANIFEST_PATH_DELTA,
                          *v.WRANGLER_4160_SOURCES, *v.WRANGLER_4160_REFERENCES,
                          v.WRANGLER_4160_PROVENANCE, v.WRANGLER_4160_DELTA_PATH,
+                         *v.ORG_GOVERNANCE_SOURCES, *v.ORG_GOVERNANCE_REFERENCES,
+                         v.ORG_GOVERNANCE_DELTA_PATH,
                          'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
             for path in additions:
                 raw = (canonical / path).read_bytes()
@@ -330,6 +332,16 @@ class PreparationTests(unittest.TestCase):
                     new = 'node_modules/other.js' if mutation == 'path' else 'node_modules/../escape'
                     proof[field][new] = proof[field].pop(key)
                 self.rejects_changed_proof(name, proof)
+
+    def test_org_governance_proof_and_each_input_are_pinned(self):
+        original = Path.read_bytes
+        for name in (v.ORG_GOVERNANCE_DELTA_PATH, *v.ORG_GOVERNANCE_SOURCES,
+                     *v.ORG_GOVERNANCE_REFERENCES):
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
 
     def test_each_current_delta_source_byte_is_verified(self):
         original = Path.read_bytes

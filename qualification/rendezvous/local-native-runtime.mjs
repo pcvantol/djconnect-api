@@ -135,6 +135,12 @@ export async function sourceSnapshot(){
  const wrangler=JSON.parse(wranglerRaw);
  need(wrangler.scope==='EXACT_WRANGLER_4160_TOOLCHAIN_REFRESH_NOT_ACTIVATION'&&wrangler.public_activation_allowed===false);
  need(wrangler.baseline_source_map_sha256===alwaysOn.effective_source_map_sha256&&wrangler.effective_source_map_sha256===provenance.wrangler_4160_source_map_sha256);
+ const governancePath='docs/rendezvous/org-governance-source-delta-v1.json';
+ const governanceRaw=await readFile(join(repo,governancePath));
+ need(plan.reference_hashes[governancePath]===sha(governanceRaw)&&sha(governanceRaw)===provenance.org_governance_delta_sha256);
+ const governance=JSON.parse(governanceRaw);
+ need(governance.scope==='EXACT_ORGANIZATION_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'&&governance.public_activation_allowed===false&&governance.production_effect_authorized===false);
+ need(governance.baseline_source_map_sha256===wrangler.effective_source_map_sha256&&governance.effective_source_map_sha256===provenance.org_governance_source_map_sha256);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -156,6 +162,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(publicTrial.source_changes,name)){need(publicTrial.source_changes[name].before===expected);expected=publicTrial.source_changes[name].after;}
   if(Object.hasOwn(alwaysOn.source_changes,name)){need(alwaysOn.source_changes[name].before===expected);expected=alwaysOn.source_changes[name].after;}
   if(Object.hasOwn(wrangler.changes,name)){need(wrangler.changes[name].before===expected);expected=wrangler.changes[name].after;}
+  if(Object.hasOwn(governance.source_changes,name)){need(governance.source_changes[name].before===expected);expected=governance.source_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

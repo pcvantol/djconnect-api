@@ -16,7 +16,7 @@
     "coordinator/worker-do/qualification/wrangler.jsonc": "136fd9b2cdac6e5fafcff91109844d49adacd1ece79db6f857c758d51ee577a6",
     "coordinator/worker-do/registry.ts": "de457d315db7746be016a202c35a5eb3e4de4064d7a37d688dd68c29968a187b",
     "coordinator/worker-do/worker.ts": "8a007aca2501c7a9f685a10b59db2117d4fa8563a484729bc6703aa261d6a4ca",
-    ".github/workflows/worker-do-registry-source.yml": "a03dfa56e4cf2f5e12c0450b561a398309173c618872a1d36deb17c98a512b1f",
+    ".github/workflows/worker-do-registry-source.yml": "44393482bda4585fa128c1047771a879dd8312d8cce9e6d1e85784967519ef74",
     "package-lock.json": "568caf0f455eab642abc58c036ea11f3b331b63ecf5ffbf865cf6df9a8525915",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
