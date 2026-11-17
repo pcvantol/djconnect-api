@@ -5,7 +5,7 @@ Status: repository-local prompt navigation
 Repository: `djconnect-music-dj/djconnect-api`
 
 This file tracks only this repository's local phase state. It must not copy the
-canonical platform roadmap from `pcvantol/djconnect/PROMPT_INDEX.md`.
+canonical platform roadmap from `djconnect-music-dj/djconnect/PROMPT_INDEX.md`.
 
 ## Current Repository Phase
 
@@ -17,9 +17,9 @@ LOCAL_IN_PROGRESS
 
 ## Depends On
 
-- Canonical Platform Foundation in `pcvantol/djconnect`
-- `pcvantol/djconnect/REPOSITORY_OWNERSHIP.md`
-- `pcvantol/djconnect/docs/meta/PHASE_COMPLETION_PROTOCOL.md`
+- Canonical Platform Foundation in `djconnect-music-dj/djconnect`
+- `djconnect-music-dj/djconnect/REPOSITORY_OWNERSHIP.md`
+- `djconnect-music-dj/djconnect/docs/meta/PHASE_COMPLETION_PROTOCOL.md`
 
 ## Current Prompt
 
