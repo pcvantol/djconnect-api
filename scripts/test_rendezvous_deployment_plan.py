@@ -80,11 +80,16 @@ class PreparationTests(unittest.TestCase):
                          v.WRANGLER_4160_PROVENANCE, v.WRANGLER_4160_DELTA_PATH,
                          *v.ORG_GOVERNANCE_SOURCES, *v.ORG_GOVERNANCE_REFERENCES,
                          v.ORG_GOVERNANCE_DELTA_PATH,
+                         v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
+                         *v.CORE_GOVERNANCE_AUXILIARY,
                          'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
+            transition = json.loads((canonical / v.CORE_GOVERNANCE_TRANSITION_PATH).read_bytes())
+            pinned = {**self.plan['source_hashes'], **self.plan['reference_hashes'],
+                      **{name: change['after'] for name, change in transition['workflow_changes'].items()},
+                      **{name: change['after'] for name, change in transition['auxiliary_changes'].items()}}
             for path in additions:
                 raw = (canonical / path).read_bytes()
-                expected = {**self.plan['source_hashes'],
-                            **self.plan['reference_hashes']}[path]
+                expected = pinned[path]
                 self.assertEqual(v.digest(raw), expected)
                 destination = checkout / path
                 destination.parent.mkdir(parents=True, exist_ok=True)
@@ -342,6 +347,22 @@ class PreparationTests(unittest.TestCase):
                     return b'changed' if path == v.ROOT / name else original(path)
                 with patch.object(Path, 'read_bytes', changed):
                     self.rejects(self.plan)
+
+    def test_core_governance_transition_proof_and_each_input_are_pinned(self):
+        original = Path.read_bytes
+        names = (v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
+                 *v.CORE_GOVERNANCE_REFERENCES, *v.CORE_GOVERNANCE_AUXILIARY)
+        for name in names:
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
+
+    def test_core_governance_transition_is_not_activation_authority(self):
+        plan = copy.deepcopy(self.plan)
+        plan['activation_allowed'] = True
+        self.rejects(plan)
 
     def test_each_current_delta_source_byte_is_verified(self):
         original = Path.read_bytes

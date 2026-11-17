@@ -4,7 +4,7 @@
   "rich_contract_sha256": "2a4a4a4f49e0f6d5a1015169ff63b27091f80d6d857423940a0381d955bbb499",
   "esbuild_version": "0.28.1",
   "inputs_sha256": {
-    ".github/workflows/rich-delivery-adapter.yml": "c03152933257785b001f1783049a7426a07531fd9bc17d879c3c5e0944390015",
+    ".github/workflows/rich-delivery-adapter.yml": "38af0ca245d26d0df54957bc08c8cf5ba98537d89347618a06649e65de70177d",
     "coordinator/rich-delivery/README.md": "41fb9c3d8e7b7f01d3b6fa79b514673f93e00cf104520fb754d39a29c08c18ff",
     "coordinator/rich-delivery/adapter.ts": "5330d1527ba717bbccf098bbcde4ae809f6f3554a748538b28742a6944801573",
     "coordinator/rich-delivery/build-source.mjs": "6795bcefcf1a40a69aa75b5bc577e0152cfede237af0ea7e910d59a1367241fb",
