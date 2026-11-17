@@ -6,7 +6,7 @@
   "Core_API_reference_receipt_sha256": "7930f243933bc0efa846878ac2d0d3fdc45b93bb8df4a1dd551065d9d7ed98cb",
   "esbuild_version": "0.28.1",
   "inputs_sha256": {
-    ".github/workflows/installation-principal-data.yml": "8149b54f50e82a3a87b1a514d4bbc09a82cd2f7fc196d9d4b6b816e064b07f2b",
+    ".github/workflows/installation-principal-data.yml": "2b3d8688d92d6e501e917852080b53823b3459b492bbfedf4d039e6379ebcfcc",
     "coordinator/installation-principal/README.md": "63e6e971917a712e940bb64731c7ff872dffe9a885de653479b2504853f79446",
     "coordinator/installation-principal/build-source.mjs": "06d44609015ef3ab6a5ef13cba6d5de2d6eebb1e696a61ba17ead068253fe206",
     "coordinator/installation-principal/codec-data.ts": "e97325cd2e36a2c9c0e06fbc1f3891dd9b38542b84c5f6214cc10182c468e158",

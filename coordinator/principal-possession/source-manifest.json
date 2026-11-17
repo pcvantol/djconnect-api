@@ -13,7 +13,7 @@
     "coordinator/principal-possession/qualification/possession.check.ts": "d83bf9e371c7235233bf56cb416048a29a03ecb0cf8ef5188cfa96be5831e4ac",
     "coordinator/principal-possession/qualification/tsconfig.json": "b965eac3f62f191625e54245773ae34842cdced00c0c76d0a9ff73a6380f354f",
     "coordinator/principal-possession/qualification/vitest.config.mts": "3a4efe06081f28f80d255c4e59d806373de5f5e0f8737f907c97e6d8f515f252",
-    ".github/workflows/principal-possession-data.yml": "6c773c53599b5d3cc8cba2fdfd8d271815d0fc70a09c29b45a2d6f46487a556a",
+    ".github/workflows/principal-possession-data.yml": "30000ba55f52bff97b5181e3f9d9e896f7ea6c0454ac89764180c3c7d365df7c",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
     "package-lock.json": "568caf0f455eab642abc58c036ea11f3b331b63ecf5ffbf865cf6df9a8525915",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",

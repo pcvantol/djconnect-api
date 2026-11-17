@@ -147,16 +147,48 @@ export async function sourceSnapshot(){
  const transition=JSON.parse(transitionRaw);
  need(transition.scope==='EXACT_CORE_GOVERNANCE_WORKFLOW_TRANSITION_NOT_ACTIVATION'&&transition.public_activation_allowed===false&&transition.production_effect_authorized===false);
  need(transition.baseline_source_map_sha256===governance.effective_source_map_sha256&&transition.effective_source_map_sha256===provenance.core_governance_transition_source_map_sha256);
+ const sharedPath='docs/rendezvous/api-shared-governance-source-delta-v1.json';
+ const sharedRaw=await readFile(join(repo,sharedPath));
+ need(sha(sharedRaw)==='b9e44f138b5824cc29ca5fd99c3d822491486f2a720bb675303e65dc50a65376'&&plan.reference_hashes[sharedPath]===sha(sharedRaw)&&provenance.api_shared_governance_delta_sha256===sha(sharedRaw));
+ const shared=JSON.parse(sharedRaw);
+ need(shared.schema_version===1&&shared.scope==='EXACT_API_SHARED_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'&&shared.public_activation_allowed===false&&shared.production_effect_authorized===false);
+ const sharedFiles=[".github/workflows/ci-cd.yml",".github/workflows/codeql.yml",".github/workflows/host-app-wake-receiving.yml",".github/workflows/host-app-wake-source.yml",".github/workflows/installation-principal-data.yml",".github/workflows/installation-registry-transactions.yml",".github/workflows/native-proof-data-journal.yml",".github/workflows/native-proof-transcript.yml",".github/workflows/principal-possession-data.yml",".github/workflows/push-coordinator-source.yml",".github/workflows/reusable-workflow-guard.yml",".github/workflows/rich-delivery-adapter.yml",".github/workflows/rich-session-data-profile.yml",".github/workflows/semgrep.yml",".github/workflows/surface-enrollment-source.yml",".github/workflows/watch-moment-alert-source.yml",".github/workflows/widget-first-key-source.yml",".github/workflows/worker-do-registry-source.yml"];
+ need(JSON.stringify(Object.keys(shared.workflow_changes).sort())===JSON.stringify(sharedFiles));
+ const sharedOld='pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508';
+ const sharedNew='djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@b4e6470be61fee895af0e13ca1a63f101f03d647';
+ const sharedPrevious={};
+ for(const name of sharedFiles){
+  const text=await readFile(join(repo,name),'utf8'),change=shared.workflow_changes[name];
+  need(Object.keys(change).sort().join(',')==='after,before'&&text.split(sharedNew).length===2&&sha(Buffer.from(text))===change.after);
+  sharedPrevious[name]=text.replace(sharedNew,sharedOld);
+  need(sha(Buffer.from(sharedPrevious[name]))===change.before);
+ }
+ const sharedManifests=["coordinator/host-app-wake-receiving/runtime/source-inputs.json","coordinator/host-app-wake/source-manifest.json","coordinator/installation-principal/source-manifest.json","coordinator/installation-registry/source-manifest.json","coordinator/principal-possession/source-manifest.json","coordinator/rich-delivery/source-manifest.json","coordinator/rich-session/source-manifest.json","coordinator/source-manifest.json","coordinator/worker-do/source-manifest.json","qualification/watch-moment/source-manifest.json"];
+ need(JSON.stringify(Object.keys(shared.manifest_changes).sort())===JSON.stringify(sharedManifests));
+ for(const name of sharedManifests){
+  const text=await readFile(join(repo,name),'utf8'),change=shared.manifest_changes[name],workflow=shared.workflow_changes[change.workflow];
+  need(Object.keys(change).sort().join(',')==='after,before,workflow'&&workflow&&text.split(workflow.after).length===2&&sha(Buffer.from(text))===change.after);
+  sharedPrevious[name]=text.replace(workflow.after,workflow.before);
+  need(sha(Buffer.from(sharedPrevious[name]))===change.before);
+ }
+ need(JSON.stringify(Object.keys(shared.source_changes))===JSON.stringify(['.github/workflows/ci-cd.yml']));
+ const sharedReferenceFiles=['.github/workflows/reusable-workflow-guard.yml',...sharedManifests.filter(name=>name!=='coordinator/source-manifest.json')].sort();
+ need(JSON.stringify(Object.keys(shared.reference_changes).sort())===JSON.stringify(sharedReferenceFiles));
+ for(const [name,change] of Object.entries({...shared.source_changes,...shared.reference_changes})){
+  const entry=shared.workflow_changes[name]||shared.manifest_changes[name];
+  need(entry&&change.before===entry.before&&change.after===entry.after&&Object.keys(change).sort().join(',')==='after,before');
+ }
+
  const transitionFiles=[".github/workflows/ci-cd.yml",".github/workflows/host-app-wake-receiving.yml",".github/workflows/host-app-wake-source.yml",".github/workflows/installation-principal-data.yml",".github/workflows/installation-registry-transactions.yml",".github/workflows/native-proof-data-journal.yml",".github/workflows/native-proof-transcript.yml",".github/workflows/principal-possession-data.yml",".github/workflows/push-coordinator-source.yml",".github/workflows/reusable-workflow-guard.yml",".github/workflows/rich-delivery-adapter.yml",".github/workflows/rich-session-data-profile.yml",".github/workflows/surface-enrollment-source.yml",".github/workflows/watch-moment-alert-source.yml",".github/workflows/worker-do-registry-source.yml"];
  need(Object.keys(transition.workflow_changes).length===transitionFiles.length&&transitionFiles.every(name=>Object.hasOwn(transition.workflow_changes,name)));
  const oldGovernance='software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875';
  const newGovernance='software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508';
  for(const name of transitionFiles){
-  const text=await readFile(join(repo,name),'utf8'),change=transition.workflow_changes[name];
+  const text=sharedPrevious[name],change=transition.workflow_changes[name];
   need(text.split(newGovernance).length===2&&sha(Buffer.from(text))===change.after&&sha(Buffer.from(text.replace(newGovernance,oldGovernance)))===change.before);
  }
  need(Object.keys(transition.auxiliary_changes).length===1&&Object.hasOwn(transition.auxiliary_changes,'coordinator/source-manifest.json'));
- need(sha(await readFile(join(repo,'coordinator/source-manifest.json')))===transition.auxiliary_changes['coordinator/source-manifest.json'].after);
+ need(sha(Buffer.from(sharedPrevious['coordinator/source-manifest.json']))===transition.auxiliary_changes['coordinator/source-manifest.json'].after);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -180,6 +212,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(wrangler.changes,name)){need(wrangler.changes[name].before===expected);expected=wrangler.changes[name].after;}
   if(Object.hasOwn(governance.source_changes,name)){need(governance.source_changes[name].before===expected);expected=governance.source_changes[name].after;}
   if(Object.hasOwn(transition.source_changes,name)){need(transition.source_changes[name].before===expected);expected=transition.source_changes[name].after;}
+  if(Object.hasOwn(shared.source_changes,name)){need(shared.source_changes[name].before===expected);expected=shared.source_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

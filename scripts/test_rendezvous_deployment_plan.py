@@ -81,13 +81,16 @@ class PreparationTests(unittest.TestCase):
                          *v.ORG_GOVERNANCE_SOURCES, *v.ORG_GOVERNANCE_REFERENCES,
                          v.ORG_GOVERNANCE_DELTA_PATH,
                          v.API_CORE_IDENTITY_DELTA_PATH,
+                         v.API_SHARED_GOVERNANCE_DELTA_PATH, *v.API_SHARED_GOVERNANCE_WORKFLOWS, *v.API_SHARED_GOVERNANCE_MANIFESTS,
                          v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
                          *v.CORE_GOVERNANCE_AUXILIARY,
                          'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
             transition = json.loads((canonical / v.CORE_GOVERNANCE_TRANSITION_PATH).read_bytes())
             pinned = {**self.plan['source_hashes'], **self.plan['reference_hashes'],
                       **{name: change['after'] for name, change in transition['workflow_changes'].items()},
-                      **{name: change['after'] for name, change in transition['auxiliary_changes'].items()}}
+                      **{name: change['after'] for name, change in transition['auxiliary_changes'].items()},
+                      **{name: change['after'] for name, change in json.loads((canonical / v.API_SHARED_GOVERNANCE_DELTA_PATH).read_bytes())['workflow_changes'].items()},
+                      **{name: change['after'] for name, change in json.loads((canonical / v.API_SHARED_GOVERNANCE_DELTA_PATH).read_bytes())['manifest_changes'].items()}}
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = pinned[path]
@@ -363,6 +366,15 @@ class PreparationTests(unittest.TestCase):
     def test_api_core_identity_delta_and_each_reference_are_pinned(self):
         original = Path.read_bytes
         for name in (v.API_CORE_IDENTITY_DELTA_PATH, *v.API_CORE_IDENTITY_REFERENCES):
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
+
+    def test_api_shared_governance_delta_and_each_source_are_pinned(self):
+        original = Path.read_bytes
+        for name in (v.API_SHARED_GOVERNANCE_DELTA_PATH, *v.API_SHARED_GOVERNANCE_WORKFLOWS, *v.API_SHARED_GOVERNANCE_MANIFESTS):
             with self.subTest(name=name):
                 def changed(path):
                     return b'changed' if path == v.ROOT / name else original(path)
