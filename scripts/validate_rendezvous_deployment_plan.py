@@ -1119,7 +1119,7 @@ SOURCE_PROVENANCE.update(org_governance_delta_sha256=ORG_GOVERNANCE_DELTA_SHA256
                          org_governance_source_map_sha256=ORG_GOVERNANCE_SOURCE_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_core_governance_transition():
     sources, refs = baseline_before_org_governance()
     delta = pinned_working_proof(ORG_GOVERNANCE_DELTA_PATH, ORG_GOVERNANCE_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
@@ -1139,6 +1139,52 @@ def baseline():
             mapping[name] = change['after']
     require(source_map_digest(sources) == delta['effective_source_map_sha256'] == ORG_GOVERNANCE_SOURCE_MAP_SHA256)
     refs[ORG_GOVERNANCE_DELTA_PATH] = ORG_GOVERNANCE_DELTA_SHA256
+    return sources, refs
+
+
+CORE_GOVERNANCE_TRANSITION_PATH = 'docs/rendezvous/core-governance-transition-source-delta-v1.json'
+CORE_GOVERNANCE_TRANSITION_SHA256 = 'aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23'
+CORE_GOVERNANCE_TRANSITION_MAP_SHA256 = '3cb7dabebff8c23d69772f17593fed2192da0aeceb1890e1a3d8a44b52410177'
+CORE_GOVERNANCE_WORKFLOWS = frozenset(('.github/workflows/ci-cd.yml', '.github/workflows/host-app-wake-receiving.yml', '.github/workflows/host-app-wake-source.yml', '.github/workflows/installation-principal-data.yml', '.github/workflows/installation-registry-transactions.yml', '.github/workflows/native-proof-data-journal.yml', '.github/workflows/native-proof-transcript.yml', '.github/workflows/principal-possession-data.yml', '.github/workflows/push-coordinator-source.yml', '.github/workflows/reusable-workflow-guard.yml', '.github/workflows/rich-delivery-adapter.yml', '.github/workflows/rich-session-data-profile.yml', '.github/workflows/surface-enrollment-source.yml', '.github/workflows/watch-moment-alert-source.yml', '.github/workflows/worker-do-registry-source.yml'))
+CORE_GOVERNANCE_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json', 'qualification/watch-moment/source-manifest.json', '.github/workflows/reusable-workflow-guard.yml'))
+CORE_GOVERNANCE_AUXILIARY = frozenset(('coordinator/source-manifest.json',))
+SOURCE_PROVENANCE.update(core_governance_transition_delta_sha256=CORE_GOVERNANCE_TRANSITION_SHA256,
+                         core_governance_transition_source_map_sha256=CORE_GOVERNANCE_TRANSITION_MAP_SHA256)
+
+
+def baseline():
+    sources, refs = baseline_before_core_governance_transition()
+    delta = pinned_working_proof(CORE_GOVERNANCE_TRANSITION_PATH, CORE_GOVERNANCE_TRANSITION_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'workflow_changes', 'source_changes',
+                           'reference_changes', 'auxiliary_changes', 'public_activation_allowed',
+                           'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_CORE_GOVERNANCE_WORKFLOW_TRANSITION_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    require(set(delta['workflow_changes']) == CORE_GOVERNANCE_WORKFLOWS)
+    old_pin = b'software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875'
+    new_pin = b'software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508'
+    for name, change in delta['workflow_changes'].items():
+        raw = safe_path(name).read_bytes()
+        require(set(change) == {'before', 'after'} and raw.count(new_pin) == 1
+                and digest(raw) == change['after']
+                and digest(raw.replace(new_pin, old_pin)) == change['before'])
+    for mapping, changes, allowed in ((sources, delta['source_changes'], frozenset(('.github/workflows/ci-cd.yml',))),
+                                      (refs, delta['reference_changes'], CORE_GOVERNANCE_REFERENCES)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before'] and isinstance(change['after'], str)
+                    and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(set(delta['auxiliary_changes']) == CORE_GOVERNANCE_AUXILIARY)
+    for name, change in delta['auxiliary_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] != change['after']
+                and digest(safe_path(name).read_bytes()) == change['after'])
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == CORE_GOVERNANCE_TRANSITION_MAP_SHA256)
+    refs[CORE_GOVERNANCE_TRANSITION_PATH] = CORE_GOVERNANCE_TRANSITION_SHA256
     return sources, refs
 
 

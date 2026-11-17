@@ -141,6 +141,22 @@ export async function sourceSnapshot(){
  const governance=JSON.parse(governanceRaw);
  need(governance.scope==='EXACT_ORGANIZATION_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'&&governance.public_activation_allowed===false&&governance.production_effect_authorized===false);
  need(governance.baseline_source_map_sha256===wrangler.effective_source_map_sha256&&governance.effective_source_map_sha256===provenance.org_governance_source_map_sha256);
+ const transitionPath='docs/rendezvous/core-governance-transition-source-delta-v1.json';
+ const transitionRaw=await readFile(join(repo,transitionPath));
+ need(plan.reference_hashes[transitionPath]===sha(transitionRaw)&&sha(transitionRaw)===provenance.core_governance_transition_delta_sha256);
+ const transition=JSON.parse(transitionRaw);
+ need(transition.scope==='EXACT_CORE_GOVERNANCE_WORKFLOW_TRANSITION_NOT_ACTIVATION'&&transition.public_activation_allowed===false&&transition.production_effect_authorized===false);
+ need(transition.baseline_source_map_sha256===governance.effective_source_map_sha256&&transition.effective_source_map_sha256===provenance.core_governance_transition_source_map_sha256);
+ const transitionFiles=[".github/workflows/ci-cd.yml",".github/workflows/host-app-wake-receiving.yml",".github/workflows/host-app-wake-source.yml",".github/workflows/installation-principal-data.yml",".github/workflows/installation-registry-transactions.yml",".github/workflows/native-proof-data-journal.yml",".github/workflows/native-proof-transcript.yml",".github/workflows/principal-possession-data.yml",".github/workflows/push-coordinator-source.yml",".github/workflows/reusable-workflow-guard.yml",".github/workflows/rich-delivery-adapter.yml",".github/workflows/rich-session-data-profile.yml",".github/workflows/surface-enrollment-source.yml",".github/workflows/watch-moment-alert-source.yml",".github/workflows/worker-do-registry-source.yml"];
+ need(Object.keys(transition.workflow_changes).length===transitionFiles.length&&transitionFiles.every(name=>Object.hasOwn(transition.workflow_changes,name)));
+ const oldGovernance='software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875';
+ const newGovernance='software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508';
+ for(const name of transitionFiles){
+  const text=await readFile(join(repo,name),'utf8'),change=transition.workflow_changes[name];
+  need(text.split(newGovernance).length===2&&sha(Buffer.from(text))===change.after&&sha(Buffer.from(text.replace(newGovernance,oldGovernance)))===change.before);
+ }
+ need(Object.keys(transition.auxiliary_changes).length===1&&Object.hasOwn(transition.auxiliary_changes,'coordinator/source-manifest.json'));
+ need(sha(await readFile(join(repo,'coordinator/source-manifest.json')))===transition.auxiliary_changes['coordinator/source-manifest.json'].after);
  for(const [name,pin] of Object.entries(root.source_hashes))if(!name.startsWith('node_modules/')){
   let expected=pin;
   if(Object.hasOwn(delta,name)){need(delta[name].before===expected);expected=delta[name].after;}
@@ -163,6 +179,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(alwaysOn.source_changes,name)){need(alwaysOn.source_changes[name].before===expected);expected=alwaysOn.source_changes[name].after;}
   if(Object.hasOwn(wrangler.changes,name)){need(wrangler.changes[name].before===expected);expected=wrangler.changes[name].after;}
   if(Object.hasOwn(governance.source_changes,name)){need(governance.source_changes[name].before===expected);expected=governance.source_changes[name].after;}
+  if(Object.hasOwn(transition.source_changes,name)){need(transition.source_changes[name].before===expected);expected=transition.source_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

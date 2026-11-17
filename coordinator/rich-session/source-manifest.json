@@ -7,7 +7,7 @@
   "handoff_sha256": "40e1c28a82799464d1ec8a03841490eaee31a4f488768f4d6429f86846895a12",
   "esbuild_version": "0.28.1",
   "inputs_sha256": {
-    ".github/workflows/rich-session-data-profile.yml": "ecba5449667f272dad5665821a56454dac55ffc1f692fbbbe54fbb8b0a08885e",
+    ".github/workflows/rich-session-data-profile.yml": "46120347160c055f393590db151ac9b94638ad4413aa797a4d5de4cca21bcf8d",
     "coordinator/rich-session/README.md": "a1609aac8b7bd3bb436f34ce55922c8fdd44a564af5684ab666ef4f7af25e6a2",
     "coordinator/rich-session/build-source.mjs": "5986717a09746370f93176f72b5bf71e99ab1cb6550b89425f93f910c8f4d8ae",
     "coordinator/rich-session/contract-v1.md": "2a4a4a4f49e0f6d5a1015169ff63b27091f80d6d857423940a0381d955bbb499",
