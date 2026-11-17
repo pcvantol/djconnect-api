@@ -21,4 +21,4 @@ jobs:
       owner: djconnect-music-dj/djconnect-api
 
   semgrep:
-    uses: pcvantol/djconnect/.github/workflows/djconnect-semgrep-ci.yml@733ecc2836d40611b2b7472308a7175a6130c91a # Reachable canonical main commit
+    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/djconnect-semgrep-733.yml@4bd9731a6fe7bb50c932e36635eb3ff5c5372687 # Reachable canonical main commit

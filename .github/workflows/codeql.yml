@@ -26,6 +26,6 @@ jobs:
       owner: djconnect-music-dj/djconnect-api
 
   codeql:
-    uses: pcvantol/djconnect/.github/workflows/djconnect-codeql-ci.yml@191b4561bdb659bd2e02905b5bce9643d4390a63 # Current canonical workflow closure
+    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/djconnect-codeql-191.yml@4bd9731a6fe7bb50c932e36635eb3ff5c5372687 # Current canonical workflow closure
     with:
       languages: javascript-typescript
