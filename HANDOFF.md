@@ -292,7 +292,7 @@ APNs/D1/operator runtime is unchanged; historical state below is retained.
 
 ## Current State
 
-- Repository: `pcvantol/djconnect-api`.
+- Repository: `djconnect-music-dj/djconnect-api`.
 - Runtime: Cloudflare Worker.
 - Current release: `1.0.14`.
 - Purpose: central APNs push relay for DJConnect Apple clients.
