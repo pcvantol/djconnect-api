@@ -65,8 +65,8 @@
   "public_entrypoint": null,
   "reference_hashes": {
     "wrangler.jsonc": "e78d6760c1335121c471ce7f95c3f443c858400ddc4dce8faa479bc84507d5d8",
-    ".github/workflows/api-worker-post-deployment-smoke.yml": "f4489bfb18928d7456566e217e32d4da2d1f7fb00c0f15ed7eb44d6158b73a8b",
-    ".github/workflows/deploy-api-worker.yml": "24792c1624354447ef056ab1402471bf2bb5240f78ac298489f78a579fb4c4be",
+    ".github/workflows/api-worker-post-deployment-smoke.yml": "0960471fdd231e070fe5e638ec25efe85c6932dad0a7d90ceb2411af73e6b32f",
+    ".github/workflows/deploy-api-worker.yml": "d208afa168b5dde7684d1d752a8ca3e1d8cf3f813d4d215be041ec4d18e98a45",
     ".github/workflows/api-release-artifact.yml": "b9e52f0c3ca882485fa6fc2c405ff11149d00736118a2a1126d9fb2448830955",
     "docs/rendezvous/implementation-contract-release-v1.json": "189e71aca07ac49cc6f7db225d3acb10a3a9fc357be02a9eaacb8f30a798c596",
     "LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
@@ -131,7 +131,8 @@
     "qualification/rendezvous/compatible-runtime-dependency-provenance-v6.json": "63dc62f098db2b915e086df819645632df663d9d84e4523f0fd44f75a60efb90",
     "docs/rendezvous/wrangler-4160-toolchain-source-delta-v1.json": "abede1a68b5eb3336bc91ce838eed2a977e5a41ac915bcf82861ebeb3b0dd0be",
     "docs/rendezvous/org-governance-source-delta-v1.json": "e5c736b6f5bf3d1e7528504d8fc791fa29bc103c88faf5a490f24ed1ba1fbb85",
-    "docs/rendezvous/core-governance-transition-source-delta-v1.json": "aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23"
+    "docs/rendezvous/core-governance-transition-source-delta-v1.json": "aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23",
+    "docs/rendezvous/api-core-identity-source-delta-v1.json": "dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab"
   },
   "schema_version": 1,
   "secret_names": [
@@ -340,7 +341,8 @@
     "org_governance_delta_sha256": "e5c736b6f5bf3d1e7528504d8fc791fa29bc103c88faf5a490f24ed1ba1fbb85",
     "org_governance_source_map_sha256": "74558e3841d3fe579079a5af7c58b66bd6ff58982bedd99ee03346eaf291ad57",
     "core_governance_transition_delta_sha256": "aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23",
-    "core_governance_transition_source_map_sha256": "3cb7dabebff8c23d69772f17593fed2192da0aeceb1890e1a3d8a44b52410177"
+    "core_governance_transition_source_map_sha256": "3cb7dabebff8c23d69772f17593fed2192da0aeceb1890e1a3d8a44b52410177",
+    "api_core_identity_delta_sha256": "dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

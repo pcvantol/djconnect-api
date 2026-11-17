@@ -48,8 +48,32 @@ jobs:
           printf '%s' "$ARTIFACT_ID" | grep -Eq '^[0-9]+$'
           printf '%s' "$ARTIFACT_SHA256" | grep -Eq '^[0-9a-f]{64}$'
           printf '%s' "$PLATFORM_VERSION" | grep -Eq '^[0-9]+\.[0-9]+$'
+      - name: Require unused preflight checkout path
+        run: |
+          set -euo pipefail
+          test ! -e .canonical-api-preflight && test ! -L .canonical-api-preflight
+      - id: canonical_source
+        name: Resolve canonical Core by immutable repository ID
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          script: |
+            const repo = (await github.request('GET /repositories/{repository_id}', {repository_id: 1258575431})).data;
+            if (repo.id !== 1258575431 || repo.private !== false || !['pcvantol/djconnect', 'djconnect-music-dj/djconnect'].includes(repo.full_name)) throw new Error('Canonical Core identity is not authorized');
+            core.setOutput('repository', repo.full_name);
+      - name: Checkout immutable canonical preflight
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ steps.canonical_source.outputs.repository }}
+          ref: 191b4561bdb659bd2e02905b5bce9643d4390a63
+          path: .canonical-api-preflight
+          persist-credentials: false
+      - name: Verify exact canonical preflight bytes
+        run: |
+          set -euo pipefail
+          test "$(git -C .canonical-api-preflight rev-parse HEAD)" = 191b4561bdb659bd2e02905b5bce9643d4390a63
+          printf '%s  %s\n' 8af709b8a6ddf29843562d4f1b09de0747204feb086eeebbb485d16f5423fd37 .canonical-api-preflight/.github/actions/deployment-readiness-preflight/action.yml | sha256sum --check
       - name: Verify target deployment readiness
-        uses: pcvantol/djconnect/.github/actions/deployment-readiness-preflight@191b4561bdb659bd2e02905b5bce9643d4390a63
+        uses: ./.canonical-api-preflight/.github/actions/deployment-readiness-preflight
         with:
           target: ${{ inputs.target }}
           manifest_id: ${{ inputs.manifest_id }}
@@ -70,6 +94,7 @@ jobs:
       - name: Require approved central operational manifest source
         shell: bash
         env:
+          CORE_REPOSITORY: ${{ steps.canonical_source.outputs.repository }}
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
           MANIFEST_ID: ${{ inputs.manifest_id }}
           ARTIFACT_ID: ${{ inputs.artifact_id }}
@@ -86,7 +111,7 @@ jobs:
             *) echo "Unexpected API repository: $GITHUB_REPOSITORY" >&2; exit 1 ;;
           esac
           curl --fail --silent --show-error --location \
-            "https://raw.githubusercontent.com/pcvantol/djconnect/main/docs/release/$manifest_file" \
+            "https://raw.githubusercontent.com/${CORE_REPOSITORY}/main/docs/release/$manifest_file" \
             --output "$manifest"
           test "$(jq -r '.status' "$manifest")" = APPROVED_DEPLOYMENT_DISPATCH_PENDING
           test "$(jq -r '.approval.state' "$manifest")" = APPROVED

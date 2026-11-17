@@ -80,6 +80,7 @@ class PreparationTests(unittest.TestCase):
                          v.WRANGLER_4160_PROVENANCE, v.WRANGLER_4160_DELTA_PATH,
                          *v.ORG_GOVERNANCE_SOURCES, *v.ORG_GOVERNANCE_REFERENCES,
                          v.ORG_GOVERNANCE_DELTA_PATH,
+                         v.API_CORE_IDENTITY_DELTA_PATH,
                          v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
                          *v.CORE_GOVERNANCE_AUXILIARY,
                          'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
@@ -353,6 +354,15 @@ class PreparationTests(unittest.TestCase):
         names = (v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
                  *v.CORE_GOVERNANCE_REFERENCES, *v.CORE_GOVERNANCE_AUXILIARY)
         for name in names:
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
+
+    def test_api_core_identity_delta_and_each_reference_are_pinned(self):
+        original = Path.read_bytes
+        for name in (v.API_CORE_IDENTITY_DELTA_PATH, *v.API_CORE_IDENTITY_REFERENCES):
             with self.subTest(name=name):
                 def changed(path):
                     return b'changed' if path == v.ROOT / name else original(path)
