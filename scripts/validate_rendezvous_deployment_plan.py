@@ -1228,8 +1228,39 @@ API_GUARD_MANIFESTS = frozenset(('coordinator/installation-principal/source-mani
 SOURCE_PROVENANCE['api_guard_reference_delta_sha256'] = API_GUARD_REFERENCE_DELTA_SHA256
 
 
-def guard_previous_bytes(name):
+API_GOVERNANCE_SUMMARY_DELTA_PATH = 'docs/rendezvous/api-governance-summary-pin-source-delta-v1.json'
+API_GOVERNANCE_SUMMARY_DELTA_SHA256 = '15a78327a997ada80926e8443715787951b2a18967a7ddaac90fa373cd6efd32'
+API_GOVERNANCE_SUMMARY_PIN = b'2a1c6fd2841b08630aee01402850f56840b50f70'
+SOURCE_PROVENANCE['api_governance_summary_pin_delta_sha256'] = API_GOVERNANCE_SUMMARY_DELTA_SHA256
+
+
+def summary_previous_bytes(name):
     raw = safe_path(name).read_bytes()
+    delta = pinned_working_proof(API_GOVERNANCE_SUMMARY_DELTA_PATH, API_GOVERNANCE_SUMMARY_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_GOVERNANCE_SUMMARY_PIN_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and set(delta['workflow_changes']) == API_SHARED_GOVERNANCE_WORKFLOWS
+            and set(delta['manifest_changes']) == API_SHARED_GOVERNANCE_MANIFESTS)
+    if name in API_SHARED_GOVERNANCE_WORKFLOWS:
+        change = delta['workflow_changes'][name]
+        require(set(change) == {'before', 'after'} and digest(raw) == change['after'] and raw.count(API_GOVERNANCE_SUMMARY_PIN) == 1)
+        previous = raw.replace(API_GOVERNANCE_SUMMARY_PIN, b'b4e6470be61fee895af0e13ca1a63f101f03d647')
+    elif name in API_SHARED_GOVERNANCE_MANIFESTS:
+        change = delta['manifest_changes'][name]
+        require(set(change) == {'before', 'after', 'workflow'} and change['workflow'] in API_SHARED_GOVERNANCE_WORKFLOWS)
+        workflow = delta['workflow_changes'][change['workflow']]
+        require(digest(raw) == change['after'] and raw.count(workflow['after'].encode()) == 1)
+        previous = raw.replace(workflow['after'].encode(), workflow['before'].encode())
+    else:
+        return raw
+    require(digest(previous) == change['before'])
+    return previous
+
+
+def guard_previous_bytes(name):
+    raw = summary_previous_bytes(name)
     if name not in API_GUARD_MANIFESTS:
         return raw
     delta = pinned_working_proof(API_GUARD_REFERENCE_DELTA_PATH, API_GUARD_REFERENCE_DELTA_SHA256)
@@ -1274,7 +1305,7 @@ def baseline():
             and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False)
     require(set(delta['workflow_changes']) == API_SHARED_GOVERNANCE_WORKFLOWS)
     for name, change in delta['workflow_changes'].items():
-        raw = safe_path(name).read_bytes()
+        raw = summary_previous_bytes(name)
         require(set(change) == {'before', 'after'} and raw.count(API_SHARED_GOVERNANCE_NEW_PIN) == 1
                 and digest(raw) == change['after']
                 and digest(shared_governance_previous_bytes(name)) == change['before'])
@@ -1298,6 +1329,15 @@ def baseline():
         require(name in API_GUARD_MANIFESTS and refs[name] == change['before'])
         refs[name] = change['after']
     refs[API_GUARD_REFERENCE_DELTA_PATH] = API_GUARD_REFERENCE_DELTA_SHA256
+    summary = pinned_working_proof(API_GOVERNANCE_SUMMARY_DELTA_PATH, API_GOVERNANCE_SUMMARY_DELTA_SHA256)
+    for name in API_SHARED_GOVERNANCE_WORKFLOWS | API_SHARED_GOVERNANCE_MANIFESTS:
+        summary_previous_bytes(name)
+        change = summary['workflow_changes'].get(name) or summary['manifest_changes'][name]
+        for target in (sources, refs):
+            if name in target:
+                require(target[name] == change['before'])
+                target[name] = change['after']
+    refs[API_GOVERNANCE_SUMMARY_DELTA_PATH] = API_GOVERNANCE_SUMMARY_DELTA_SHA256
     return sources, refs
 
 
