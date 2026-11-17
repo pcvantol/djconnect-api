@@ -1152,7 +1152,7 @@ SOURCE_PROVENANCE.update(core_governance_transition_delta_sha256=CORE_GOVERNANCE
                          core_governance_transition_source_map_sha256=CORE_GOVERNANCE_TRANSITION_MAP_SHA256)
 
 
-def baseline():
+def baseline_before_api_core_identity():
     sources, refs = baseline_before_core_governance_transition()
     delta = pinned_working_proof(CORE_GOVERNANCE_TRANSITION_PATH, CORE_GOVERNANCE_TRANSITION_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
@@ -1185,6 +1185,29 @@ def baseline():
                 and digest(safe_path(name).read_bytes()) == change['after'])
     require(source_map_digest(sources) == delta['effective_source_map_sha256'] == CORE_GOVERNANCE_TRANSITION_MAP_SHA256)
     refs[CORE_GOVERNANCE_TRANSITION_PATH] = CORE_GOVERNANCE_TRANSITION_SHA256
+    return sources, refs
+
+
+API_CORE_IDENTITY_DELTA_PATH = 'docs/rendezvous/api-core-identity-source-delta-v1.json'
+API_CORE_IDENTITY_DELTA_SHA256 = 'dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab'
+API_CORE_IDENTITY_REFERENCES = frozenset(('.github/workflows/deploy-api-worker.yml', '.github/workflows/api-worker-post-deployment-smoke.yml'))
+SOURCE_PROVENANCE['api_core_identity_delta_sha256'] = API_CORE_IDENTITY_DELTA_SHA256
+
+
+def baseline():
+    sources, refs = baseline_before_api_core_identity()
+    delta = pinned_working_proof(API_CORE_IDENTITY_DELTA_PATH, API_CORE_IDENTITY_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_CORE_IDENTITY_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False)
+    require(set(delta['reference_changes']) == API_CORE_IDENTITY_REFERENCES)
+    for name, change in delta['reference_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        refs[name] = change['after']
+    refs[API_CORE_IDENTITY_DELTA_PATH] = API_CORE_IDENTITY_DELTA_SHA256
     return sources, refs
 
 
