@@ -154,6 +154,11 @@ export async function sourceSnapshot(){
  need(Object.keys(guard).sort().join(',')==='guard,manifest_changes,production_effect_authorized,public_activation_allowed,schema_version,scope'&&guard.schema_version===1&&guard.scope==='EXACT_API_GUARD_REFERENCE_SOURCE_ONLY_NOT_ACTIVATION'&&guard.public_activation_allowed===false&&guard.production_effect_authorized===false);
  need(Object.keys(guard.manifest_changes).sort().join(',')===guardManifests.join(',')&&Object.keys(guard.guard).sort().join(',')==='after,before,path');
  need(guard.guard.path==='scripts/check_reusable_workflow_refs.sh'&&guard.guard.before==='dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5'&&guard.guard.after==='6b127d78cfdfbcc65669ab43d2ab1967371cb9e136c691d882bf102adf68149c'&&sha(await readFile(join(repo,guard.guard.path)))===guard.guard.after);
+ const summaryPath='docs/rendezvous/api-governance-summary-pin-source-delta-v1.json';
+ const summaryRaw=await readFile(join(repo,summaryPath));
+ need(sha(summaryRaw)==='15a78327a997ada80926e8443715787951b2a18967a7ddaac90fa373cd6efd32'&&plan.reference_hashes[summaryPath]===sha(summaryRaw)&&provenance.api_governance_summary_pin_delta_sha256===sha(summaryRaw));
+ const summary=JSON.parse(summaryRaw);
+ need(Object.keys(summary).sort().join(',')==='manifest_changes,production_effect_authorized,public_activation_allowed,schema_version,scope,workflow_changes'&&summary.schema_version===1&&summary.scope==='EXACT_API_GOVERNANCE_SUMMARY_PIN_SOURCE_ONLY_NOT_ACTIVATION'&&summary.public_activation_allowed===false&&summary.production_effect_authorized===false);
  const sharedPath='docs/rendezvous/api-shared-governance-source-delta-v1.json';
  const sharedRaw=await readFile(join(repo,sharedPath));
  need(sha(sharedRaw)==='b9e44f138b5824cc29ca5fd99c3d822491486f2a720bb675303e65dc50a65376'&&plan.reference_hashes[sharedPath]===sha(sharedRaw)&&provenance.api_shared_governance_delta_sha256===sha(sharedRaw));
@@ -161,23 +166,31 @@ export async function sourceSnapshot(){
  need(shared.schema_version===1&&shared.scope==='EXACT_API_SHARED_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'&&shared.public_activation_allowed===false&&shared.production_effect_authorized===false);
  const sharedFiles=[".github/workflows/ci-cd.yml",".github/workflows/codeql.yml",".github/workflows/host-app-wake-receiving.yml",".github/workflows/host-app-wake-source.yml",".github/workflows/installation-principal-data.yml",".github/workflows/installation-registry-transactions.yml",".github/workflows/native-proof-data-journal.yml",".github/workflows/native-proof-transcript.yml",".github/workflows/principal-possession-data.yml",".github/workflows/push-coordinator-source.yml",".github/workflows/reusable-workflow-guard.yml",".github/workflows/rich-delivery-adapter.yml",".github/workflows/rich-session-data-profile.yml",".github/workflows/semgrep.yml",".github/workflows/surface-enrollment-source.yml",".github/workflows/watch-moment-alert-source.yml",".github/workflows/widget-first-key-source.yml",".github/workflows/worker-do-registry-source.yml"];
  need(JSON.stringify(Object.keys(shared.workflow_changes).sort())===JSON.stringify(sharedFiles));
+ need(JSON.stringify(Object.keys(summary.workflow_changes).sort())===JSON.stringify(sharedFiles));
  const sharedOld='pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508';
  const sharedNew='djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@b4e6470be61fee895af0e13ca1a63f101f03d647';
  const sharedPrevious={};
  for(const name of sharedFiles){
-  const text=await readFile(join(repo,name),'utf8'),change=shared.workflow_changes[name];
+  const current=await readFile(join(repo,name),'utf8'),latest=summary.workflow_changes[name],change=shared.workflow_changes[name];
+  const newest='2a1c6fd2841b08630aee01402850f56840b50f70',previous='b4e6470be61fee895af0e13ca1a63f101f03d647';
+  need(Object.keys(latest).sort().join(',')==='after,before'&&current.split(newest).length===2&&sha(Buffer.from(current))===latest.after);
+  const text=current.replace(newest,previous);need(sha(Buffer.from(text))===latest.before);
   need(Object.keys(change).sort().join(',')==='after,before'&&text.split(sharedNew).length===2&&sha(Buffer.from(text))===change.after);
   sharedPrevious[name]=text.replace(sharedNew,sharedOld);
   need(sha(Buffer.from(sharedPrevious[name]))===change.before);
  }
  const sharedManifests=["coordinator/host-app-wake-receiving/runtime/source-inputs.json","coordinator/host-app-wake/source-manifest.json","coordinator/installation-principal/source-manifest.json","coordinator/installation-registry/source-manifest.json","coordinator/principal-possession/source-manifest.json","coordinator/rich-delivery/source-manifest.json","coordinator/rich-session/source-manifest.json","coordinator/source-manifest.json","coordinator/worker-do/source-manifest.json","qualification/watch-moment/source-manifest.json"];
  need(JSON.stringify(Object.keys(shared.manifest_changes).sort())===JSON.stringify(sharedManifests));
+ need(JSON.stringify(Object.keys(summary.manifest_changes).sort())===JSON.stringify(sharedManifests));
  for(const name of sharedManifests){
   let text=await readFile(join(repo,name),'utf8');
-  const change=shared.manifest_changes[name],workflow=shared.workflow_changes[change.workflow];
+  const latest=summary.manifest_changes[name],latestWorkflow=summary.workflow_changes[latest.workflow];
+  need(Object.keys(latest).sort().join(',')==='after,before,workflow'&&latestWorkflow&&sha(Buffer.from(text))===latest.after&&text.split(latestWorkflow.after).length===2);
+  text=text.replace(latestWorkflow.after,latestWorkflow.before);need(sha(Buffer.from(text))===latest.before);
+  const change=shared.manifest_changes[name],workflow=shared.workflow_changes[change.workflow];need(latest.workflow===change.workflow);
   if(guardManifests.includes(name)){
    const update=guard.manifest_changes[name];
-   need(Object.keys(update).sort().join(',')==='after,before'&&sha(Buffer.from(text))===update.after&&plan.reference_hashes[name]===update.after&&text.split(guard.guard.after).length===2);
+   need(Object.keys(update).sort().join(',')==='after,before'&&sha(Buffer.from(text))===update.after&&latest.before===update.after&&text.split(guard.guard.after).length===2);
    text=text.replace(guard.guard.after,guard.guard.before);
    need(sha(Buffer.from(text))===update.before&&update.before===change.after);
   }
@@ -227,6 +240,7 @@ export async function sourceSnapshot(){
   if(Object.hasOwn(governance.source_changes,name)){need(governance.source_changes[name].before===expected);expected=governance.source_changes[name].after;}
   if(Object.hasOwn(transition.source_changes,name)){need(transition.source_changes[name].before===expected);expected=transition.source_changes[name].after;}
   if(Object.hasOwn(shared.source_changes,name)){need(shared.source_changes[name].before===expected);expected=shared.source_changes[name].after;}
+  if(Object.hasOwn(summary.workflow_changes,name)){need(summary.workflow_changes[name].before===expected);expected=summary.workflow_changes[name].after;}
   need(plan.source_hashes[name]===expected);
  }
  const pins={...root.source_hashes,...plan.source_hashes,...plan.reference_hashes};

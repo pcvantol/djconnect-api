@@ -82,7 +82,7 @@ class PreparationTests(unittest.TestCase):
                          v.ORG_GOVERNANCE_DELTA_PATH,
                          v.API_CORE_IDENTITY_DELTA_PATH,
                          v.API_SHARED_GOVERNANCE_DELTA_PATH, *v.API_SHARED_GOVERNANCE_WORKFLOWS, *v.API_SHARED_GOVERNANCE_MANIFESTS,
-                         v.API_GUARD_REFERENCE_DELTA_PATH, 'scripts/check_reusable_workflow_refs.sh',
+                         v.API_GUARD_REFERENCE_DELTA_PATH, v.API_GOVERNANCE_SUMMARY_DELTA_PATH, 'scripts/check_reusable_workflow_refs.sh',
                          v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
                          *v.CORE_GOVERNANCE_AUXILIARY,
                          'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
@@ -93,7 +93,9 @@ class PreparationTests(unittest.TestCase):
                       **{name: change['after'] for name, change in json.loads((canonical / v.API_SHARED_GOVERNANCE_DELTA_PATH).read_bytes())['workflow_changes'].items()},
                       **{name: change['after'] for name, change in json.loads((canonical / v.API_SHARED_GOVERNANCE_DELTA_PATH).read_bytes())['manifest_changes'].items()},
                       **{name: change['after'] for name, change in json.loads((canonical / v.API_GUARD_REFERENCE_DELTA_PATH).read_bytes())['manifest_changes'].items()},
-                      'scripts/check_reusable_workflow_refs.sh': json.loads((canonical / v.API_GUARD_REFERENCE_DELTA_PATH).read_bytes())['guard']['after']}
+                      'scripts/check_reusable_workflow_refs.sh': json.loads((canonical / v.API_GUARD_REFERENCE_DELTA_PATH).read_bytes())['guard']['after'],
+                      **{name: change['after'] for name, change in json.loads((canonical / v.API_GOVERNANCE_SUMMARY_DELTA_PATH).read_bytes())['workflow_changes'].items()},
+                      **{name: change['after'] for name, change in json.loads((canonical / v.API_GOVERNANCE_SUMMARY_DELTA_PATH).read_bytes())['manifest_changes'].items()}}
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = pinned[path]
@@ -378,6 +380,15 @@ class PreparationTests(unittest.TestCase):
     def test_api_shared_governance_delta_and_each_source_are_pinned(self):
         original = Path.read_bytes
         for name in (v.API_SHARED_GOVERNANCE_DELTA_PATH, *v.API_SHARED_GOVERNANCE_WORKFLOWS, *v.API_SHARED_GOVERNANCE_MANIFESTS):
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
+
+    def test_api_governance_summary_delta_and_each_source_are_pinned(self):
+        original = Path.read_bytes
+        for name in (v.API_GOVERNANCE_SUMMARY_DELTA_PATH, *v.API_SHARED_GOVERNANCE_WORKFLOWS, *v.API_SHARED_GOVERNANCE_MANIFESTS):
             with self.subTest(name=name):
                 def changed(path):
                     return b'changed' if path == v.ROOT / name else original(path)

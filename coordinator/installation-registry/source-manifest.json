@@ -6,7 +6,7 @@
   "wrangler_version": "4.160.0",
   "wrangler_schema_sha256": "fdf17b1ee9a637182af0678cd3725ad2845e63394fec9cb324765b4ec9ae46d0",
   "inputs_sha256": {
-    ".github/workflows/installation-registry-transactions.yml": "3c627e9991ffaff97e26bf7ad7868d5d7cab6e1853ce241f47cdfedf907dbe9d",
+    ".github/workflows/installation-registry-transactions.yml": "b15769fe267c956da0f17ebb9a25bf392d226b280d37424cd6a6b3452dbdb332",
     "coordinator/installation-principal/codec-data.ts": "e97325cd2e36a2c9c0e06fbc1f3891dd9b38542b84c5f6214cc10182c468e158",
     "coordinator/installation-principal/design-r2.json": "7b44758c5f7bba76dd3f61b042a776330ee25697523d3bd05248a5697f76db4b",
     "coordinator/installation-principal/qualification/expired-synthetic-records.json": "5a5eb360c21aaf8da7f7883c4bd9c1e6b05f4d9e62d149eaec25b39045470153",
