@@ -1167,7 +1167,7 @@ def baseline_before_api_core_identity():
     old_pin = b'software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875'
     new_pin = b'software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508'
     for name, change in delta['workflow_changes'].items():
-        raw = safe_path(name).read_bytes()
+        raw = shared_governance_previous_bytes(name)
         require(set(change) == {'before', 'after'} and raw.count(new_pin) == 1
                 and digest(raw) == change['after']
                 and digest(raw.replace(new_pin, old_pin)) == change['before'])
@@ -1194,7 +1194,7 @@ API_CORE_IDENTITY_REFERENCES = frozenset(('.github/workflows/deploy-api-worker.y
 SOURCE_PROVENANCE['api_core_identity_delta_sha256'] = API_CORE_IDENTITY_DELTA_SHA256
 
 
-def baseline():
+def baseline_before_api_shared_governance():
     sources, refs = baseline_before_api_core_identity()
     delta = pinned_working_proof(API_CORE_IDENTITY_DELTA_PATH, API_CORE_IDENTITY_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'})
@@ -1208,6 +1208,47 @@ def baseline():
                 and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
         refs[name] = change['after']
     refs[API_CORE_IDENTITY_DELTA_PATH] = API_CORE_IDENTITY_DELTA_SHA256
+    return sources, refs
+
+
+API_SHARED_GOVERNANCE_DELTA_PATH = 'docs/rendezvous/api-shared-governance-source-delta-v1.json'
+API_SHARED_GOVERNANCE_DELTA_SHA256 = '3762bb7018e12cbb3f31de8a1a9136a5f3c12c5fbf9d28fe01e9d1e46eb832e5'
+API_SHARED_GOVERNANCE_WORKFLOWS = frozenset(('.github/workflows/ci-cd.yml', '.github/workflows/codeql.yml', '.github/workflows/host-app-wake-receiving.yml', '.github/workflows/host-app-wake-source.yml', '.github/workflows/installation-principal-data.yml', '.github/workflows/installation-registry-transactions.yml', '.github/workflows/native-proof-data-journal.yml', '.github/workflows/native-proof-transcript.yml', '.github/workflows/principal-possession-data.yml', '.github/workflows/push-coordinator-source.yml', '.github/workflows/reusable-workflow-guard.yml', '.github/workflows/rich-delivery-adapter.yml', '.github/workflows/rich-session-data-profile.yml', '.github/workflows/semgrep.yml', '.github/workflows/surface-enrollment-source.yml', '.github/workflows/watch-moment-alert-source.yml', '.github/workflows/widget-first-key-source.yml', '.github/workflows/worker-do-registry-source.yml'))
+API_SHARED_GOVERNANCE_SOURCES = frozenset(('.github/workflows/ci-cd.yml',))
+API_SHARED_GOVERNANCE_REFERENCES = frozenset(('.github/workflows/reusable-workflow-guard.yml',))
+API_SHARED_GOVERNANCE_OLD_PIN = b'pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508'
+API_SHARED_GOVERNANCE_NEW_PIN = b'djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@b4e6470be61fee895af0e13ca1a63f101f03d647'
+SOURCE_PROVENANCE['api_shared_governance_delta_sha256'] = API_SHARED_GOVERNANCE_DELTA_SHA256
+
+
+def shared_governance_previous_bytes(name):
+    raw = safe_path(name).read_bytes()
+    if name in API_SHARED_GOVERNANCE_WORKFLOWS:
+        require(raw.count(API_SHARED_GOVERNANCE_NEW_PIN) == 1)
+        raw = raw.replace(API_SHARED_GOVERNANCE_NEW_PIN, API_SHARED_GOVERNANCE_OLD_PIN)
+    return raw
+
+
+def baseline():
+    delta = pinned_working_proof(API_SHARED_GOVERNANCE_DELTA_PATH, API_SHARED_GOVERNANCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'source_changes', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_SHARED_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False)
+    require(set(delta['workflow_changes']) == API_SHARED_GOVERNANCE_WORKFLOWS)
+    for name, change in delta['workflow_changes'].items():
+        raw = safe_path(name).read_bytes()
+        require(set(change) == {'before', 'after'} and raw.count(API_SHARED_GOVERNANCE_NEW_PIN) == 1
+                and digest(raw) == change['after']
+                and digest(shared_governance_previous_bytes(name)) == change['before'])
+    sources, refs = baseline_before_api_shared_governance()
+    require(set(delta['source_changes']) == API_SHARED_GOVERNANCE_SOURCES)
+    require(set(delta['reference_changes']) == API_SHARED_GOVERNANCE_REFERENCES)
+    for target, changes in ((sources, delta['source_changes']), (refs, delta['reference_changes'])):
+        for name, change in changes.items():
+            require(change == delta['workflow_changes'][name] and change['before'] == target[name])
+            target[name] = change['after']
+    refs[API_SHARED_GOVERNANCE_DELTA_PATH] = API_SHARED_GOVERNANCE_DELTA_SHA256
     return sources, refs
 
 

@@ -1,0 +1,92 @@
+{
+  "production_effect_authorized": false,
+  "public_activation_allowed": false,
+  "reference_changes": {
+    ".github/workflows/reusable-workflow-guard.yml": {
+      "after": "4c10906521a90333e7ede39935341a80a701b3561ea91246bc066426b5c52e38",
+      "before": "4f20a8a6ffd0ced8ebb3b1c297ef490d0c866f6d8d50164db54154ff2fc88654"
+    }
+  },
+  "schema_version": 1,
+  "scope": "EXACT_API_SHARED_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION",
+  "source_changes": {
+    ".github/workflows/ci-cd.yml": {
+      "after": "73b3f9f56d8973374f93331ddc5a8363199f8e35db0bd7621ad233ba0f37b65b",
+      "before": "ee359ef939016ffc84896d2f8a847ba2a80bf6eb9b8066cc4ee1d48b2de73036"
+    }
+  },
+  "workflow_changes": {
+    ".github/workflows/ci-cd.yml": {
+      "after": "73b3f9f56d8973374f93331ddc5a8363199f8e35db0bd7621ad233ba0f37b65b",
+      "before": "ee359ef939016ffc84896d2f8a847ba2a80bf6eb9b8066cc4ee1d48b2de73036"
+    },
+    ".github/workflows/codeql.yml": {
+      "after": "a6e18e9037f2dbbd9d773508962a3cc58f897f42825daa7eacd7406b12763eaf",
+      "before": "ac74524c75963c2ebcabecd80f2a219843bf66c107e74a6f7bd0847aa90ef027"
+    },
+    ".github/workflows/host-app-wake-receiving.yml": {
+      "after": "480f1323f2c3c73075e7c507e29c085c766a4b9651f00a6c73ae26136d12afe5",
+      "before": "c3040db896752a9b5949a009eb93ef6ae34719b10fe68759e89872a29c14030a"
+    },
+    ".github/workflows/host-app-wake-source.yml": {
+      "after": "db9dc980b1eab18dfd194d39eb5a33424e995f72c7eef02aea98ba197ca039c9",
+      "before": "e1084e27ff0c6c24ea277bf2ff4f439a41c8f4127c774245223eb0061b50cb2c"
+    },
+    ".github/workflows/installation-principal-data.yml": {
+      "after": "2b3d8688d92d6e501e917852080b53823b3459b492bbfedf4d039e6379ebcfcc",
+      "before": "8149b54f50e82a3a87b1a514d4bbc09a82cd2f7fc196d9d4b6b816e064b07f2b"
+    },
+    ".github/workflows/installation-registry-transactions.yml": {
+      "after": "3c627e9991ffaff97e26bf7ad7868d5d7cab6e1853ce241f47cdfedf907dbe9d",
+      "before": "f0d70b52f00c06b0890fc9ff2e5185845923f8342548376b6bffe7f388081304"
+    },
+    ".github/workflows/native-proof-data-journal.yml": {
+      "after": "97ff4ac0b9dba1f9d6b66763a35a02d57c2291b9ba35cce3c1975c2b022f2d4a",
+      "before": "1ddac2c1fbe14265a485ff9eb0f660aab4384b37f56f1d778f0f6ca8cfe7ab7a"
+    },
+    ".github/workflows/native-proof-transcript.yml": {
+      "after": "6301b0768bf3dc379e099dded9955054228d5697791b3c312dea41072897ba3f",
+      "before": "3ff138d4346616ffa1272505f00018527e11f9d5f54283f09b7827ecaad5db13"
+    },
+    ".github/workflows/principal-possession-data.yml": {
+      "after": "30000ba55f52bff97b5181e3f9d9e896f7ea6c0454ac89764180c3c7d365df7c",
+      "before": "6c773c53599b5d3cc8cba2fdfd8d271815d0fc70a09c29b45a2d6f46487a556a"
+    },
+    ".github/workflows/push-coordinator-source.yml": {
+      "after": "c4f80d1b00d35a9394b546494123b210a8f55a018246171a33944c27ee7a39e4",
+      "before": "db106e6a910d2ab9554d78e12b3fc4a1c8c1c6c0b646b6b3d5e93c3ae007ecc1"
+    },
+    ".github/workflows/reusable-workflow-guard.yml": {
+      "after": "4c10906521a90333e7ede39935341a80a701b3561ea91246bc066426b5c52e38",
+      "before": "4f20a8a6ffd0ced8ebb3b1c297ef490d0c866f6d8d50164db54154ff2fc88654"
+    },
+    ".github/workflows/rich-delivery-adapter.yml": {
+      "after": "8f6100be00b1c90f963c08a92e74b954169ea30f7587f3faeeecda8de1f5bfd9",
+      "before": "38af0ca245d26d0df54957bc08c8cf5ba98537d89347618a06649e65de70177d"
+    },
+    ".github/workflows/rich-session-data-profile.yml": {
+      "after": "458f08a712dd78f77fc8ccfb57255762daf2c887159e37698f3c8722e8e381f8",
+      "before": "46120347160c055f393590db151ac9b94638ad4413aa797a4d5de4cca21bcf8d"
+    },
+    ".github/workflows/semgrep.yml": {
+      "after": "b3a2b78dbc6125e90a74341f8fdb32e40e15c3e885e635f364ae026838f509c0",
+      "before": "cf8909fe2e365fa4a909977a5b4fa964980576e61ebcf34afe040d73d2f5aa93"
+    },
+    ".github/workflows/surface-enrollment-source.yml": {
+      "after": "b7fabf6e542b4f6aee411b88b0dcec1aed71447c0bb3fdd08623405e45693b8b",
+      "before": "b5fe274e9401188e123f3e65ff5ed5741dd3cd598d32a1d7fecea94c49b34018"
+    },
+    ".github/workflows/watch-moment-alert-source.yml": {
+      "after": "b01afcebc7a024219b280c597e6a9e88a13c47e402dfaf89261da3db95f76dcf",
+      "before": "8000de7369dd85d675b29d09082d8e3a6e93ced787de145e546a8651b68695ee"
+    },
+    ".github/workflows/widget-first-key-source.yml": {
+      "after": "7910e1ab351dc2de30e16e55e6af453495e3cf0cabb0ee4b1073708f315e058e",
+      "before": "e4dfca3e77defae50aa43241c18557d6d28bc2a99e9053e97aede26e4cf657fd"
+    },
+    ".github/workflows/worker-do-registry-source.yml": {
+      "after": "4daac3c26c49ec1d8d7802a90ad11934f51de55ce2645c32d1242093feab9a45",
+      "before": "711a703ddf763f94f508e9b660adfd8158c750a14f19133f0e4053781e69e1d1"
+    }
+  }
+}

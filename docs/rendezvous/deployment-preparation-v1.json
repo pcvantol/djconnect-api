@@ -105,7 +105,7 @@
     "docs/rendezvous/stable-api-release-source-delta-v1.json": "accd67d7b485632be51264120fe63cb2c8fd889e26ca1be77ad45bcdd5140d41",
     "docs/rendezvous/push-erasure-source-delta-v1.json": "61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9",
     "migrations/0013_push_registration_erasure.sql": "cc4bab55a2ad48a9335c06355713a5cbb088fbc891fbc2f61b1770c10d7a60a5",
-    ".github/workflows/reusable-workflow-guard.yml": "4f20a8a6ffd0ced8ebb3b1c297ef490d0c866f6d8d50164db54154ff2fc88654",
+    ".github/workflows/reusable-workflow-guard.yml": "4c10906521a90333e7ede39935341a80a701b3561ea91246bc066426b5c52e38",
     "docs/rendezvous/org-operational-manifest-path-delta-v1.json": "0005e3efafd7732f156ff53ef0eab53d7d7bf1145035ee8f9c9bdbe1b6547605",
     "docs/rendezvous/production-d1-migration-guard-delta-v1.json": "3ecc560b779e3368d16826fe3d08383267d6eea78eb793c9423d007dc2edd877",
     "scripts/check_production_d1_migrations.py": "1f574fef53a4ac24f0e2b8511bf207ae9ae3f5816e83e68e1037aee28a1268bb",
@@ -132,7 +132,8 @@
     "docs/rendezvous/wrangler-4160-toolchain-source-delta-v1.json": "abede1a68b5eb3336bc91ce838eed2a977e5a41ac915bcf82861ebeb3b0dd0be",
     "docs/rendezvous/org-governance-source-delta-v1.json": "e5c736b6f5bf3d1e7528504d8fc791fa29bc103c88faf5a490f24ed1ba1fbb85",
     "docs/rendezvous/core-governance-transition-source-delta-v1.json": "aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23",
-    "docs/rendezvous/api-core-identity-source-delta-v1.json": "dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab"
+    "docs/rendezvous/api-core-identity-source-delta-v1.json": "dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab",
+    "docs/rendezvous/api-shared-governance-source-delta-v1.json": "3762bb7018e12cbb3f31de8a1a9136a5f3c12c5fbf9d28fe01e9d1e46eb832e5"
   },
   "schema_version": 1,
   "secret_names": [
@@ -219,7 +220,7 @@
     "wrangler.jsonc": "e78d6760c1335121c471ce7f95c3f443c858400ddc4dce8faa479bc84507d5d8",
     "package.json": "ca276a728f63e8e17c36b8baaa4513879d143280b10ad0fab4a5faf85cff50bb",
     "package-lock.json": "568caf0f455eab642abc58c036ea11f3b331b63ecf5ffbf865cf6df9a8525915",
-    ".github/workflows/ci-cd.yml": "ee359ef939016ffc84896d2f8a847ba2a80bf6eb9b8066cc4ee1d48b2de73036",
+    ".github/workflows/ci-cd.yml": "73b3f9f56d8973374f93331ddc5a8363199f8e35db0bd7621ad233ba0f37b65b",
     "src/rendezvous/dispatch.ts": "a9a89832a4d9027476b45a883ae87d8e87f2679dd9dfa7ea2c080990756a1bac",
     "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
     "qualification/rendezvous/root-integration.check.mjs": "b30be29743d836a3a4d0d3c006369c5ca9c1b2c5d3a25be05ef221c1727d193e",
@@ -342,7 +343,8 @@
     "org_governance_source_map_sha256": "74558e3841d3fe579079a5af7c58b66bd6ff58982bedd99ee03346eaf291ad57",
     "core_governance_transition_delta_sha256": "aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23",
     "core_governance_transition_source_map_sha256": "3cb7dabebff8c23d69772f17593fed2192da0aeceb1890e1a3d8a44b52410177",
-    "api_core_identity_delta_sha256": "dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab"
+    "api_core_identity_delta_sha256": "dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab",
+    "api_shared_governance_delta_sha256": "3762bb7018e12cbb3f31de8a1a9136a5f3c12c5fbf9d28fe01e9d1e46eb832e5"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",
