@@ -64,6 +64,7 @@
   },
   "public_entrypoint": null,
   "reference_hashes": {
+    "docs/rendezvous/api-guard-reference-source-delta-v1.json": "a8ab1f34ef94c7c2ea44095d0b990b1d8ce25a59956aef83d32fda06aa38b32a",
     "wrangler.jsonc": "e78d6760c1335121c471ce7f95c3f443c858400ddc4dce8faa479bc84507d5d8",
     ".github/workflows/api-worker-post-deployment-smoke.yml": "0960471fdd231e070fe5e638ec25efe85c6932dad0a7d90ceb2411af73e6b32f",
     ".github/workflows/deploy-api-worker.yml": "d208afa168b5dde7684d1d752a8ca3e1d8cf3f813d4d215be041ec4d18e98a45",
@@ -86,9 +87,9 @@
     "docs/rendezvous/native-first-category-source-delta-v1.json": "6c0a6e47f00057881fd4ecdab64c626c91a583617fe5ae6376c62cafbf06960e",
     "docs/rendezvous/private-receiving-mount-source-delta-v1.json": "8d4c6f7343c37bea54ac53709dd49d1c01e28a2d2ebe19a0102448cc7fccc960",
     "coordinator/host-app-wake-receiving/runtime/source-inputs.json": "f862668d2fdb355b227e4f12371f54255c3eb00487144f8bf3ec817458f0dcd3",
-    "coordinator/installation-principal/source-manifest.json": "b574996d09cc03389fc1395f61a5f634da23c00f0ded85c7f02a4eccf65fb962",
+    "coordinator/installation-principal/source-manifest.json": "aeba64121c9cb38e8a2fc90d35e76f10e2af76224aac0525397727afc89a22db",
     "coordinator/host-app-wake/source-manifest.json": "c5af46c29b284bc43cd44d153ca72fd3c7b02672649ff1e35ed2c1e1ba819a2b",
-    "coordinator/principal-possession/source-manifest.json": "8c3af7d1d0b971471fc388697fde9d9d34d1771771fcab2518f210b65a6eaae9",
+    "coordinator/principal-possession/source-manifest.json": "801de22c5dd017996d1824758aeb18f4c1b74bdfaf2597a3ad90d056c5b86ebd",
     "coordinator/rich-delivery/source-manifest.json": "673c041f6f8fa3530653dd0058cfa29b648ac6e212de22e166b98e55be25004f",
     "coordinator/rich-session/source-manifest.json": "b927dfae7bac87695d7e266fa4e3365bdae70811387dfbcdde7828313b86cf08",
     "coordinator/worker-do/source-manifest.json": "bb5ab6ead700c3bf3df3fc978e53c1af900aff1c7ee84dd9bdac7bd4d34ed910",
@@ -344,7 +345,8 @@
     "core_governance_transition_delta_sha256": "aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23",
     "core_governance_transition_source_map_sha256": "3cb7dabebff8c23d69772f17593fed2192da0aeceb1890e1a3d8a44b52410177",
     "api_core_identity_delta_sha256": "dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab",
-    "api_shared_governance_delta_sha256": "b9e44f138b5824cc29ca5fd99c3d822491486f2a720bb675303e65dc50a65376"
+    "api_shared_governance_delta_sha256": "b9e44f138b5824cc29ca5fd99c3d822491486f2a720bb675303e65dc50a65376",
+    "api_guard_reference_delta_sha256": "a8ab1f34ef94c7c2ea44095d0b990b1d8ce25a59956aef83d32fda06aa38b32a"
   },
   "status": "NOT_AUTHORIZED",
   "supplying_source_sha": "896ccdc69447c231d04da3a6af4f27ea1f763697",

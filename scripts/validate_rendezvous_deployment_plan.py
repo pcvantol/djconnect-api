@@ -1222,8 +1222,37 @@ API_SHARED_GOVERNANCE_NEW_PIN = b'djconnect-music-dj/djconnect-shared-workflows/
 SOURCE_PROVENANCE['api_shared_governance_delta_sha256'] = API_SHARED_GOVERNANCE_DELTA_SHA256
 
 
-def shared_governance_previous_bytes(name):
+API_GUARD_REFERENCE_DELTA_PATH = 'docs/rendezvous/api-guard-reference-source-delta-v1.json'
+API_GUARD_REFERENCE_DELTA_SHA256 = 'a8ab1f34ef94c7c2ea44095d0b990b1d8ce25a59956aef83d32fda06aa38b32a'
+API_GUARD_MANIFESTS = frozenset(('coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json'))
+SOURCE_PROVENANCE['api_guard_reference_delta_sha256'] = API_GUARD_REFERENCE_DELTA_SHA256
+
+
+def guard_previous_bytes(name):
     raw = safe_path(name).read_bytes()
+    if name not in API_GUARD_MANIFESTS:
+        return raw
+    delta = pinned_working_proof(API_GUARD_REFERENCE_DELTA_PATH, API_GUARD_REFERENCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'guard', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_GUARD_REFERENCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False)
+    guard = delta['guard']
+    require(set(guard) == {'path', 'before', 'after'} and guard['path'] == 'scripts/check_reusable_workflow_refs.sh'
+            and guard['before'] == 'dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5'
+            and guard['after'] == '6b127d78cfdfbcc65669ab43d2ab1967371cb9e136c691d882bf102adf68149c'
+            and digest(safe_path(guard['path']).read_bytes()) == guard['after'])
+    require(set(delta['manifest_changes']) == API_GUARD_MANIFESTS)
+    change = delta['manifest_changes'][name]
+    require(set(change) == {'before', 'after'} and digest(raw) == change['after']
+            and raw.count(guard['after'].encode()) == 1)
+    previous = raw.replace(guard['after'].encode(), guard['before'].encode())
+    require(digest(previous) == change['before'])
+    return previous
+
+
+def shared_governance_previous_bytes(name):
+    raw = guard_previous_bytes(name)
     if name in API_SHARED_GOVERNANCE_WORKFLOWS:
         require(raw.count(API_SHARED_GOVERNANCE_NEW_PIN) == 1)
         raw = raw.replace(API_SHARED_GOVERNANCE_NEW_PIN, API_SHARED_GOVERNANCE_OLD_PIN)
@@ -1253,7 +1282,7 @@ def baseline():
     for name, change in delta['manifest_changes'].items():
         require(set(change) == {'before', 'after', 'workflow'}
                 and change['workflow'] in API_SHARED_GOVERNANCE_WORKFLOWS
-                and digest(safe_path(name).read_bytes()) == change['after']
+                and digest(guard_previous_bytes(name)) == change['after']
                 and digest(shared_governance_previous_bytes(name)) == change['before'])
     sources, refs = baseline_before_api_shared_governance()
     require(set(delta['source_changes']) == API_SHARED_GOVERNANCE_SOURCES)
@@ -1264,6 +1293,11 @@ def baseline():
             require(change == {'before': entry['before'], 'after': entry['after']} and change['before'] == target[name])
             target[name] = change['after']
     refs[API_SHARED_GOVERNANCE_DELTA_PATH] = API_SHARED_GOVERNANCE_DELTA_SHA256
+    successor = pinned_working_proof(API_GUARD_REFERENCE_DELTA_PATH, API_GUARD_REFERENCE_DELTA_SHA256)
+    for name, change in successor['manifest_changes'].items():
+        require(name in API_GUARD_MANIFESTS and refs[name] == change['before'])
+        refs[name] = change['after']
+    refs[API_GUARD_REFERENCE_DELTA_PATH] = API_GUARD_REFERENCE_DELTA_SHA256
     return sources, refs
 
 
