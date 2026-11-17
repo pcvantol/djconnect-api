@@ -26,7 +26,7 @@
     "coordinator/worker-do/worker.ts": "8a007aca2501c7a9f685a10b59db2117d4fa8563a484729bc6703aa261d6a4ca",
     "package-lock.json": "568caf0f455eab642abc58c036ea11f3b331b63ecf5ffbf865cf6df9a8525915",
     "package.json": "ca276a728f63e8e17c36b8baaa4513879d143280b10ad0fab4a5faf85cff50bb",
-    "scripts/check_reusable_workflow_refs.sh": "dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5",
+    "scripts/check_reusable_workflow_refs.sh": "6b127d78cfdfbcc65669ab43d2ab1967371cb9e136c691d882bf102adf68149c",
     "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
     "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8",
     "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
