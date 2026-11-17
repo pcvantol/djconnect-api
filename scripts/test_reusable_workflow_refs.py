@@ -18,6 +18,8 @@ if scratch == root or root in scratch.parents:
     raise SystemExit("External scratch required")
 source = root / "scripts/check_reusable_workflow_refs.sh"
 reference = "pcvantol/djconnect/.github/workflows/example.yml@" + "1" * 40
+shared_reference = "djconnect-music-dj/djconnect-shared-workflows/.github/workflows/example.yml@" + "2" * 40
+new_core_reference = "djconnect-music-dj/djconnect/.github/workflows/example.yml@" + "3" * 40
 mock = """#!/bin/bash
 printf '%s\\n' "$*" >> "$CASE_LOG"
 case "$2" in
@@ -30,7 +32,7 @@ case "$2" in
 esac
 """
 cases = [
-    "valid_without_rg", "dedup_without_rg", "canonical_behind_refused",
+    "valid_without_rg", "dedup_without_rg", "shared_and_new_core", "shared_behind_refused", "shared_workflow_missing", "canonical_behind_refused",
     "canonical_compare_failure", "referenced_workflow_missing",
     "enumeration_git_failure", "enumeration_sort_failure",
     "no_matching_refs", "missing_git", "missing_gh",
@@ -48,6 +50,10 @@ def run(case):
         (workflows / "a.yml").write_text(
             content if case != "no_matching_refs" else "name: no canonical pins\n"
         )
+        if case in ["shared_behind_refused", "shared_workflow_missing"]:
+            (workflows / "a.yml").write_text("uses: " + shared_reference + "\n")
+        if case == "shared_and_new_core":
+            (workflows / "b.yml").write_text("uses: " + shared_reference + "\nuses: " + new_core_reference + "\n")
         if case == "dedup_without_rg":
             (workflows / "b.yml").write_text(content)
         for name in ["git", "sort"]:
@@ -72,9 +78,9 @@ def run(case):
             "PATH": str(binaries),
             "CASE_LOG": str(fixture / "calls"),
             "GH_MODE": "compare_failure" if case == "canonical_compare_failure"
-            else "contents_failure" if case == "referenced_workflow_missing"
+            else "contents_failure" if case in ["referenced_workflow_missing", "shared_workflow_missing"]
             else "normal",
-            "COMPARE_STATUS": "behind" if case == "canonical_behind_refused"
+            "COMPARE_STATUS": "behind" if case in ["canonical_behind_refused", "shared_behind_refused"]
             else "ahead",
         }
         result = subprocess.run(
@@ -84,12 +90,19 @@ def run(case):
         calls = (fixture / "calls").read_text().splitlines() if (
             fixture / "calls"
         ).exists() else []
-        if case in ["valid_without_rg", "dedup_without_rg"]:
+        if case in ["valid_without_rg", "dedup_without_rg", "shared_and_new_core"]:
             expected = [
                 "api repos/pcvantol/djconnect/compare/" + "1" * 40 + "...main --jq .status",
                 "api repos/pcvantol/djconnect/contents/.github/workflows/example.yml?ref="
                 + "1" * 40 + " --jq .path",
             ]
+            if case == "shared_and_new_core":
+                expected = [
+                    "api repos/djconnect-music-dj/djconnect-shared-workflows/compare/" + "2" * 40 + "...main --jq .status",
+                    "api repos/djconnect-music-dj/djconnect-shared-workflows/contents/.github/workflows/example.yml?ref=" + "2" * 40 + " --jq .path",
+                    "api repos/djconnect-music-dj/djconnect/compare/" + "3" * 40 + "...main --jq .status",
+                    "api repos/djconnect-music-dj/djconnect/contents/.github/workflows/example.yml?ref=" + "3" * 40 + " --jq .path",
+                ] + expected
             passed = result.returncode == 0 and calls == expected
         else:
             passed = result.returncode != 0
