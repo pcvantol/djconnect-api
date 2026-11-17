@@ -42,7 +42,7 @@
     "test/watch-moment.spec.ts": "75bbaacfaeacf8b8f04725da0ba4d232dcd817630fe00ec2fbd8d042151632ff",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "worker-configuration.d.ts": "1003bdb1be07ff380278e6713b08768d41be6c98ee21dcfaf799b9c2c4441738",
-    ".github/workflows/watch-moment-alert-source.yml": "8000de7369dd85d675b29d09082d8e3a6e93ced787de145e546a8651b68695ee",
+    ".github/workflows/watch-moment-alert-source.yml": "b01afcebc7a024219b280c597e6a9e88a13c47e402dfaf89261da3db95f76dcf",
     "src/watch-moment/http.ts": "2bac13b7ed295b07e8d19cfcb2e3d5a4eb430b3f570713e0567dc12001dbd2d1"
   }
 }
