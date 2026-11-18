@@ -154,6 +154,18 @@ export async function sourceSnapshot(){
  need(Object.keys(guard).sort().join(',')==='guard,manifest_changes,production_effect_authorized,public_activation_allowed,schema_version,scope'&&guard.schema_version===1&&guard.scope==='EXACT_API_GUARD_REFERENCE_SOURCE_ONLY_NOT_ACTIVATION'&&guard.public_activation_allowed===false&&guard.production_effect_authorized===false);
  need(Object.keys(guard.manifest_changes).sort().join(',')===guardManifests.join(',')&&Object.keys(guard.guard).sort().join(',')==='after,before,path');
  need(guard.guard.path==='scripts/check_reusable_workflow_refs.sh'&&guard.guard.before==='dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5'&&guard.guard.after==='6b127d78cfdfbcc65669ab43d2ab1967371cb9e136c691d882bf102adf68149c'&&sha(await readFile(join(repo,guard.guard.path)))===guard.guard.after);
+ const orgReleasePath='docs/rendezvous/api-org-only-release-source-delta-v1.json';
+ const orgReleaseRaw=await readFile(join(repo,orgReleasePath));
+ need(sha(orgReleaseRaw)==='9cdcbdcf78e1990adb86daa388feed9bc4f92a40b3140dddce05acf61bd16e00'&&plan.reference_hashes[orgReleasePath]===sha(orgReleaseRaw)&&provenance.api_org_release_delta_sha256===sha(orgReleaseRaw));
+ const orgRelease=JSON.parse(orgReleaseRaw),orgReleaseFiles=['.github/workflows/api-worker-post-deployment-smoke.yml','.github/workflows/deploy-api-worker.yml'];
+ need(Object.keys(orgRelease).sort().join(',')==='production_effect_authorized,public_activation_allowed,reference_changes,schema_version,scope'&&orgRelease.schema_version===1&&orgRelease.scope==='EXACT_API_ORG_ONLY_RELEASE_SOURCE_NOT_ACTIVATION'&&orgRelease.public_activation_allowed===false&&orgRelease.production_effect_authorized===false);
+ need(JSON.stringify(Object.keys(orgRelease.reference_changes).sort())===JSON.stringify(orgReleaseFiles));
+ const identityPath='docs/rendezvous/api-core-identity-source-delta-v1.json';
+ const identityRaw=await readFile(join(repo,identityPath));
+ need(sha(identityRaw)==='dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab'&&plan.reference_hashes[identityPath]===sha(identityRaw)&&provenance.api_core_identity_delta_sha256===sha(identityRaw));
+ const identity=JSON.parse(identityRaw);
+ need(identity.scope==='EXACT_API_CORE_IDENTITY_SOURCE_ONLY_NOT_ACTIVATION'&&identity.public_activation_allowed===false&&identity.production_effect_authorized===false);
+ for(const name of orgReleaseFiles){const c=orgRelease.reference_changes[name];need(Object.keys(c).sort().join(',')==='after,before'&&c.before===identity.reference_changes[name].after&&plan.reference_hashes[name]===c.after&&sha(await readFile(join(repo,name)))===c.after);}
  const summaryPath='docs/rendezvous/api-governance-summary-pin-source-delta-v1.json';
  const summaryRaw=await readFile(join(repo,summaryPath));
  need(sha(summaryRaw)==='15a78327a997ada80926e8443715787951b2a18967a7ddaac90fa373cd6efd32'&&plan.reference_hashes[summaryPath]===sha(summaryRaw)&&provenance.api_governance_summary_pin_delta_sha256===sha(summaryRaw));

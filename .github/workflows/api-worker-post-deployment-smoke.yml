@@ -65,7 +65,6 @@ jobs:
           trap 'rm -f "$manifest"' EXIT
           test "$GITHUB_REPOSITORY_ID" = 1275206655
           case "$GITHUB_REPOSITORY" in
-            pcvantol/djconnect-api) manifest_file=PLATFORM_4_0_RC2_API_OPERATIONAL_MANIFEST.json ;;
             djconnect-music-dj/djconnect-api) manifest_file=PLATFORM_4_0_API_ORG_OPERATIONAL_MANIFEST.json ;;
             *) echo "Unexpected API repository: $GITHUB_REPOSITORY" >&2; exit 1 ;;
           esac
