@@ -1194,6 +1194,11 @@ API_CORE_IDENTITY_REFERENCES = frozenset(('.github/workflows/deploy-api-worker.y
 SOURCE_PROVENANCE['api_core_identity_delta_sha256'] = API_CORE_IDENTITY_DELTA_SHA256
 
 
+API_ORG_RELEASE_DELTA_PATH = 'docs/rendezvous/api-org-only-release-source-delta-v1.json'
+API_ORG_RELEASE_DELTA_SHA256 = '9cdcbdcf78e1990adb86daa388feed9bc4f92a40b3140dddce05acf61bd16e00'
+SOURCE_PROVENANCE['api_org_release_delta_sha256'] = API_ORG_RELEASE_DELTA_SHA256
+
+
 def baseline_before_api_shared_governance():
     sources, refs = baseline_before_api_core_identity()
     delta = pinned_working_proof(API_CORE_IDENTITY_DELTA_PATH, API_CORE_IDENTITY_DELTA_SHA256)
@@ -1338,6 +1343,17 @@ def baseline():
                 require(target[name] == change['before'])
                 target[name] = change['after']
     refs[API_GOVERNANCE_SUMMARY_DELTA_PATH] = API_GOVERNANCE_SUMMARY_DELTA_SHA256
+    org_release = pinned_working_proof(API_ORG_RELEASE_DELTA_PATH, API_ORG_RELEASE_DELTA_SHA256)
+    require(set(org_release) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(org_release['schema_version']) is int and org_release['schema_version'] == 1
+            and org_release['scope'] == 'EXACT_API_ORG_ONLY_RELEASE_SOURCE_NOT_ACTIVATION'
+            and org_release['public_activation_allowed'] is False and org_release['production_effect_authorized'] is False
+            and set(org_release['reference_changes']) == API_CORE_IDENTITY_REFERENCES)
+    for name, change in org_release['reference_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and digest(safe_path(name).read_bytes()) == change['after'])
+        refs[name] = change['after']
+    refs[API_ORG_RELEASE_DELTA_PATH] = API_ORG_RELEASE_DELTA_SHA256
     return sources, refs
 
 

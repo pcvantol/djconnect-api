@@ -2,6 +2,7 @@
 import copy
 import importlib.util
 import json
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -11,6 +12,23 @@ from unittest.mock import patch
 spec = importlib.util.spec_from_file_location('plan_validator', Path(__file__).with_name('validate_rendezvous_deployment_plan.py'))
 v = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(v)
+
+
+FILES = (".github/workflows/deploy-api-worker.yml", ".github/workflows/api-worker-post-deployment-smoke.yml")
+
+class APIOrgReleaseIdentityTests(unittest.TestCase):
+    def test_only_exact_org_identity_selects_org_manifest(self):
+        for name in FILES:
+            text = (v.ROOT / name).read_text()
+            match = re.search(r'(?ms)^          test "\$GITHUB_REPOSITORY_ID" = 1275206655\n(          case "\$GITHUB_REPOSITORY" in\n.*?          esac)', text)
+            self.assertIsNotNone(match, name)
+            script = 'set -eu\n' + match.group(0) + '\nprintf "%s" "$manifest_file"\n'
+            for repo, ident, accepted in (("djconnect-music-dj/djconnect-api", "1275206655", True), ("pcvantol/djconnect-api", "1275206655", False), ("djconnect-music-dj/djconnect-api", "1", False), ("other/djconnect-api", "1275206655", False)):
+                with self.subTest(file=name, repo=repo, id=ident):
+                    result = subprocess.run(["bash", "-c", script], env={"GITHUB_REPOSITORY": repo, "GITHUB_REPOSITORY_ID": ident}, capture_output=True, text=True)
+                    self.assertEqual(result.returncode == 0, accepted)
+                    if accepted:
+                        self.assertEqual(result.stdout, "PLATFORM_4_0_API_ORG_OPERATIONAL_MANIFEST.json")
 
 
 class PreparationTests(unittest.TestCase):
@@ -80,7 +98,7 @@ class PreparationTests(unittest.TestCase):
                          v.WRANGLER_4160_PROVENANCE, v.WRANGLER_4160_DELTA_PATH,
                          *v.ORG_GOVERNANCE_SOURCES, *v.ORG_GOVERNANCE_REFERENCES,
                          v.ORG_GOVERNANCE_DELTA_PATH,
-                         v.API_CORE_IDENTITY_DELTA_PATH,
+                         v.API_CORE_IDENTITY_DELTA_PATH, v.API_ORG_RELEASE_DELTA_PATH,
                          v.API_SHARED_GOVERNANCE_DELTA_PATH, *v.API_SHARED_GOVERNANCE_WORKFLOWS, *v.API_SHARED_GOVERNANCE_MANIFESTS,
                          v.API_GUARD_REFERENCE_DELTA_PATH, v.API_GOVERNANCE_SUMMARY_DELTA_PATH, 'scripts/check_reusable_workflow_refs.sh',
                          v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
@@ -371,6 +389,15 @@ class PreparationTests(unittest.TestCase):
     def test_api_core_identity_delta_and_each_reference_are_pinned(self):
         original = Path.read_bytes
         for name in (v.API_CORE_IDENTITY_DELTA_PATH, *v.API_CORE_IDENTITY_REFERENCES):
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
+
+    def test_api_org_release_delta_and_each_reference_are_pinned(self):
+        original = Path.read_bytes
+        for name in (v.API_ORG_RELEASE_DELTA_PATH, *v.API_CORE_IDENTITY_REFERENCES):
             with self.subTest(name=name):
                 def changed(path):
                     return b'changed' if path == v.ROOT / name else original(path)
