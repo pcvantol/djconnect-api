@@ -232,7 +232,7 @@ Not allowed:
   `CODE_OF_CONDUCT.md`, `AGENTS.md` and this file current when workflow,
   public contracts or security assumptions change.
 - Keep cross-repo sync prompts and product roadmap only in
-  `/Users/pcvantol/Documents/GitHub/djconnect`.
+  [djconnect-music-dj/djconnect](https://github.com/djconnect-music-dj/djconnect).
 - Do not include secrets, private data or proprietary third-party material in
   prompts, agent logs, screenshots, issues or test fixtures.
 - Before every release, review third-party package and tool freshness:

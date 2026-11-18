@@ -66,8 +66,8 @@ source code that parses PEM headers are expected. Real secrets are not.
   `TECHNICAL_DESIGN_DECISIONS.md` and `CHANGELOG.md` when public behavior,
   setup, release flow or security posture changes.
 - Keep cross-repo source of truth in the Home Assistant integration repo:
-  `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md` and
-  `/Users/pcvantol/Documents/GitHub/djconnect/API_CONTRACT.md`.
+  [SYNC_PROMPTS.md](https://github.com/djconnect-music-dj/djconnect/blob/main/SYNC_PROMPTS.md) and
+  [API_CONTRACT.md](https://github.com/djconnect-music-dj/djconnect/blob/main/API_CONTRACT.md).
 
 ## AI-Assisted Development
 
@@ -95,13 +95,13 @@ watchOS and future Raspberry Pi clients.
 ## Releases
 
 Maintainer releases should follow the shared DJConnect release hygiene in
-`/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`.
+[SYNC_PROMPTS.md](https://github.com/djconnect-music-dj/djconnect/blob/main/SYNC_PROMPTS.md).
 
 For this repo, release validation includes:
 
 - Review canonical cross-repo contract docs.
-- Review the `DJ Announcement Output Sync` section in
-  `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`. For the central
+- Review the legacy, compatibility-only `DJ Announcement Output Sync` section in
+  [SYNC_PROMPTS.md](https://github.com/djconnect-music-dj/djconnect/blob/main/SYNC_PROMPTS.md). For the central
   API, confirm push payloads remain wake/sync only and carry only safe
   announcement hints such as delivery, audio availability and speaker delivery,
   never generated text, prompts, history, TTS audio or temporary `audio_url`

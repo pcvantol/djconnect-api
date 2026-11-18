@@ -13,7 +13,7 @@ Sources used for this document:
 - D1 migration in `migrations/0001_initial.sql`.
 - Worker config in `wrangler.jsonc`.
 - Tests under `test/`.
-- Cross-repo contracts in `/Users/pcvantol/Documents/GitHub/djconnect`.
+- Cross-repo contracts in [djconnect-music-dj/djconnect](https://github.com/djconnect-music-dj/djconnect).
 
 ## Scope
 
