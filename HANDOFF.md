@@ -309,9 +309,9 @@ tests and fixtures as public material.
 
 Do not copy these files into this repository:
 
-- `/Users/pcvantol/Documents/GitHub/djconnect/SYNC_PROMPTS.md`
-- `/Users/pcvantol/Documents/GitHub/djconnect/API_CONTRACT.md`
-- `/Users/pcvantol/Documents/GitHub/djconnect/PRODUCT_ROADMAP.md`
+- [SYNC_PROMPTS.md](https://github.com/djconnect-music-dj/djconnect/blob/main/SYNC_PROMPTS.md)
+- [API_CONTRACT.md](https://github.com/djconnect-music-dj/djconnect/blob/main/API_CONTRACT.md)
+- [PRODUCT_ROADMAP.md](https://github.com/djconnect-music-dj/djconnect/blob/main/PRODUCT_ROADMAP.md)
 
 The Home Assistant integration remains the source of truth for client-facing HA
 API contracts. This API repository owns only the central relay API surface under
