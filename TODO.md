@@ -78,7 +78,7 @@
 - Keep `/v1/push/*` aligned with the Home Assistant integration relay contract
   as the integration uses this central API.
 - Keep `API_CONTRACT.md` aligned with
-  `/Users/pcvantol/Documents/GitHub/djconnect/API_CONTRACT.md`.
+  [API_CONTRACT.md](https://github.com/djconnect-music-dj/djconnect/blob/main/API_CONTRACT.md).
 - Add a compatibility note if HA integration versions require a specific API
   release line.
 - Keep the HACS token provisioning docs aligned with the implemented automatic
@@ -101,7 +101,7 @@
   `DEVELOPMENT_ENVIRONMENT.md`, `THIRD_PARTY_NOTICES.md`, `CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, `CHAT_BOOTSTRAP.md` and `AGENTS.md` current.
 - Keep cross-repo sync prompts and product roadmap only in
-  `/Users/pcvantol/Documents/GitHub/djconnect`.
+  [djconnect-music-dj/djconnect](https://github.com/djconnect-music-dj/djconnect).
 
 ## Release Workflow
 
