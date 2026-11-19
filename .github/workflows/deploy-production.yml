@@ -1,0 +1,78 @@
+name: Legacy API production deployment (blocked)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Bounded Platform Release action.
+        required: true
+        type: choice
+        options: [deployment]
+      candidate_sha:
+        description: Qualified exact main SHA to deploy.
+        required: true
+        type: string
+      execution_mode:
+        description: Deployment execution mode.
+        required: true
+        type: choice
+        options: [execute]
+      manifest_id:
+        description: Qualified Platform Release manifest identifier.
+        required: true
+        type: string
+      platform_version:
+        description: Platform Major.Minor version.
+        required: true
+        type: string
+      release_profile:
+        description: Authorized release profile.
+        required: true
+        type: choice
+        options: [INTERNAL_RELEASE]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-production-deployment
+  cancel-in-progress: false
+
+jobs:
+  validate-release-dispatch:
+    name: Validate qualified deployment dispatch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 1
+      - name: Validate bounded internal release request
+        env:
+          ACTION: ${{ inputs.action }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          EXECUTION_MODE: ${{ inputs.execution_mode }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          PLATFORM_VERSION: ${{ inputs.platform_version }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+        run: |
+          set -euo pipefail
+          test "$ACTION" = deployment
+          test "$EXECUTION_MODE" = execute
+          test "$RELEASE_PROFILE" = INTERNAL_RELEASE
+          printf '%s' "$CANDIDATE_SHA" | grep -Eq '^[0-9a-f]{40}$'
+          printf '%s' "$PLATFORM_VERSION" | grep -Eq '^[0-9]+\.[0-9]+$'
+          printf '%s' "$MANIFEST_ID" | grep -Eq '^release-[A-Za-z0-9._-]+$'
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+
+  deploy:
+    name: Refuse legacy deployment path
+    needs: validate-release-dispatch
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Require the manifest-bound artifact consumer
+        run: |
+          echo "DEPLOYMENT_NOT_AUTHORIZED: this legacy workflow has no manifest-bound artifact and checksum inputs."
+          echo "Use Deploy API Worker release artifact after the operational manifest is approved."
+          exit 1

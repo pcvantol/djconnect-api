@@ -1,0 +1,54 @@
+name: API production readiness (read only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Check deployed version and D1 migration ledger
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_SEND_METRICS: 'false'
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          ./node_modules/.bin/wrangler deployments status --name djconnect-api --json > "$RUNNER_TEMP/deployment.json"
+          python3 - "$RUNNER_TEMP/deployment.json" <<'PY'
+          import json, sys
+          with open(sys.argv[1], encoding='utf-8') as f:
+              status = json.load(f)
+          versions = status.get('versions') if isinstance(status, dict) else None
+          expected = '234309bf-354c-4368-a127-5dd0e125c502'
+          if not isinstance(versions, list) or len(versions) != 1 or versions[0].get('version_id') != expected or versions[0].get('percentage') != 100:
+              raise SystemExit('Production deployment does not match the expected 100% rollback baseline')
+          print('Production deployment matches the expected 100% baseline.')
+          PY
+          ./node_modules/.bin/wrangler versions view 234309bf-354c-4368-a127-5dd0e125c502 --name djconnect-api --json > "$RUNNER_TEMP/version.json"
+          python3 - "$RUNNER_TEMP/version.json" <<'PY'
+          import json, sys
+          with open(sys.argv[1], encoding='utf-8') as f:
+              version = json.load(f)
+          if not isinstance(version, dict) or version.get('id') != '234309bf-354c-4368-a127-5dd0e125c502':
+              raise SystemExit('Expected Worker version is not readable')
+          print('Expected Worker version is readable.')
+          PY
+          ./node_modules/.bin/wrangler d1 execute djconnect_api --remote --config wrangler.jsonc --json --command 'SELECT name FROM d1_migrations ORDER BY id' > "$RUNNER_TEMP/ledger.json"
+          curl --fail --silent --show-error --location https://raw.githubusercontent.com/djconnect-music-dj/djconnect/main/docs/release/PLATFORM_4_0_API_ORG_OPERATIONAL_MANIFEST.json > "$RUNNER_TEMP/manifest.json"
+          python3 scripts/check_production_d1_migrations.py "$RUNNER_TEMP/manifest.json" migrations "$RUNNER_TEMP/ledger.json"
+          echo 'D1 migration ledger matches the proposed release.'

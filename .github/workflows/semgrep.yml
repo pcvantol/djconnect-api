@@ -1,0 +1,24 @@
+name: Semgrep
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  software-assurance-governance:
+    name: Software Assurance governance
+    permissions:
+      contents: read
+    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef
+    with:
+      execution_profile: balanced
+      owner: djconnect-music-dj/djconnect-api
+
+  semgrep:
+    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/djconnect-semgrep-733.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef # Reachable canonical main commit

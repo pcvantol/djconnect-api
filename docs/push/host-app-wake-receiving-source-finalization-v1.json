@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "classification": "PRIVATE_HOST_APP_WAKE_RECEIVING_SOURCE_SEPARATE_FINAL_NOT_RUNTIME_ADMISSION",
+  "source_PR": 183,
+  "source_main": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+  "source_candidate": "22ae368adbf6023eaff0ee7d6645cc747bdcd830",
+  "source_parent": "94d173331a906481d59c7114757de098ac0c2bea",
+  "source_tree": "96a441862311016934d45f37586a36fdaefa7cd0",
+  "new_files": 62,
+  "all_previous_tracked_entries_unchanged": 674,
+  "source_original_packet_sha256": "d205b5fd2872e029f1edd7889b0dc185fc021243896879d7681522bbbf3c66fe",
+  "exact_whole61_security_contract_review_sha256": "811197f63e3fd3dc4aac2e748be320f094957d1927479f8d8fb7bbf2563b4779",
+  "exact_two_file_CI_delta_review_sha256": "4c4dcb338bdc9439c1dd3c98285736e5c5a9e7a8e754f66d724927837e01bbf8",
+  "independent_original_source_closure_sha256": "b728a16fd8368c94363a192a98c0bed91d02fb057093fbd8e13a58585a516903",
+  "source_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 41279684855,
+      "event": "workflow_run",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Post-Merge Release Evidence",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279684581,
+      "event": "workflow_run",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "API release artifact",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536223,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Reusable workflow guard regression",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536185,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Rich delivery adapter",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536270,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Host app wake source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536389,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Native proof DATA journal source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536195,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Surface enrollment source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536228,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Rich Session raw DATA profile",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536289,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Native proof transcript source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536206,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Push coordinator source qualification",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536449,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Principal possession crypto DATA",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536395,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Worker DO registry source conformance",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536221,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Host app wake private receiving source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536373,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "CodeQL",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279536274,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Validate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279535900,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "AI-development projection",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279535873,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "TDE observe",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279535942,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Fixed rendezvous QA build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41279535908,
+      "event": "push",
+      "headSha": "2f56dbf6d58f882c2dd586dadb87734e044e95f3",
+      "name": "Local native experiment qualification",
+      "status": "completed"
+    }
+  ],
+  "receiving_qualification": {
+    "run": 41279536221,
+    "ordinary": {
+      "artifact": 13073135241,
+      "tests": 299,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "e215e38ee712513648c60231b2b87ab5775754ef58bc50a73908af28e1cc0e15",
+      "provider_zip_sha256": "6bac84e9e9550de8a0b7298a715e412f5f5d368e54185cf4e4beec5b4ae163f0"
+    },
+    "separate_explicit_vendor_MODEL": {
+      "artifact": 13073145274,
+      "tests": 14,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "9c62af861add2db0ec134e733d7bff91df49633ec490a4ca7002945f41fccc1f",
+      "provider_zip_sha256": "e99c09094085b6bd09fd77638d6f73c5e396eebf36d3a70de5d3f66f0561cad5"
+    },
+    "genuine_vendor_or_device_trust": false
+  },
+  "source181_qualification": {
+    "run": 41279536270,
+    "artifact": 13072084953,
+    "tests": 60,
+    "failed": 0,
+    "skipped": 0,
+    "report_sha256": "e7b8869e57e5deb8e974a8c10907fb49c86468751a893e5ed3ca09684c208112",
+    "provider_zip_sha256": "7f847e95dd4f7dfb3797b26b655e8038b3e62c397d1420f949aacd50dabe769d",
+    "module_sha256": "bdbe838209d727792728d9041d288dc16af89fc6688a2bc91970938549554183",
+    "same_as_original_Source181_and_parent": true
+  },
+  "formal_qualification": {
+    "run": 41279684855,
+    "canonical_digest": "ceb1de4311736749d64f52d9f854c759d99c870b03e227810b7a7cb5474649b0",
+    "pinned_policy": "733ecc2836d40611b2b7472308a7175a6130c91a",
+    "findings": []
+  },
+  "durable_qualification": {
+    "asset": 697496637,
+    "provider_sha256": "5d6b7926f4aa29ab9cd88095c9260d68d4de3e6ae659499ed911fa7220a53f54",
+    "canonical_integrity_verified": true,
+    "all12_checks": "PASS",
+    "source_formal_policy_joins": true
+  },
+  "worker_release": {
+    "run": 41279684581,
+    "artifact": 13072334389,
+    "TAR_sha256": "ce59a926e57e38089505cc6d8571cfa55d60a9891fd6b8df42ce1f12f03517f7",
+    "Worker_sha256": "6e01b054514d8f0293d86a62fc343b82a26181b11e001b49e1cf175cd2671aaf",
+    "Worker_bytes": 1291540,
+    "Worker_equals_parent_except_one_embedded_SHA": true,
+    "other_regular_members_equal": 18,
+    "private_receiving_in_public_bundle": false
+  },
+  "coverage": {
+    "artifact": 13072428861,
+    "zip_sha256": "4c77f6da938ea2002fe52c18051e82e36bbd0de1e8139fb9d8c465d37884762e",
+    "exact_main_marker": true
+  },
+  "source_input_sha256": {
+    ".github/workflows/host-app-wake-receiving.yml": "0428015dcbbba7d43f49298b1233a9819d7977cdb91d1f8987878d7ee4f0b934",
+    "coordinator/host-app-wake-receiving/README.md": "53e2b77ad6848c430dace1c4717c2cc9668369f413d315374d295ea6ee322cb6",
+    "coordinator/host-app-wake-receiving/authorization-resolve.ts": "a32966e2f5dcf3f29d20eb7e6ecd73e65c2bd130491f0037643f4d2c84d2b5ba",
+    "coordinator/host-app-wake-receiving/dispatch-guard.sql": "1a4f6f95ddfddd0fcfabb2c420839ed59edef481fc511f08a027cf300f79f599",
+    "coordinator/host-app-wake-receiving/eligibility-view.sql": "3d2eec6548b9c9821c9653718072a81d6c571e80273e13667d8447be0d5ee9b1",
+    "coordinator/host-app-wake-receiving/guard-schema.ts": "de6f0e42e9a8b412f0b68659f85cafde47f77b0f899883a9d23b14b12b14e1d0",
+    "coordinator/host-app-wake-receiving/issuer-guard.sql": "8f17457bf6f237ecf35dac2432b4551d47bfae8c0d11f68d1e90b9c1e24044de",
+    "coordinator/host-app-wake-receiving/native-apple-evidence.mjs": "31c9b7667a0b84db1f04604e1b8e8c254faad97ddceddae21444689cce28cee3",
+    "coordinator/host-app-wake-receiving/native-assertion.ts": "899fd463e5e3f7b601385fe2b2d38b74c3ad32aad74dc386c55cd121c7e96851",
+    "coordinator/host-app-wake-receiving/native-attestation.ts": "f85fbb3b935bc62b67db6c585fdc7ab6bf3fea9a7ac92913b3d2590e19095029",
+    "coordinator/host-app-wake-receiving/native-first-job-guard.sql": "cb5462532981462511bd35f9536be583376a31c5f048659480c1e4b885a3114a",
+    "coordinator/host-app-wake-receiving/native-first-proof-guard.sql": "bc8b44d715b56b6eafc17824b1af4a6fa5df5b178b648a683b121e0c3b691014",
+    "coordinator/host-app-wake-receiving/native-key-insert-guard.sql": "cfce586f9b8fca0e9b59eea981559fbc0cb44dfeb2d75bffc7f35310630676ba",
+    "coordinator/host-app-wake-receiving/native-policy-store.ts": "14cd32feb9de4b85211ad72eb5e51bf5173a2c3e71806d06ac0518f846e38517",
+    "coordinator/host-app-wake-receiving/native-policy.ts": "777ff00385ffb90d8dd351657d1aad1b53aaf90b576e7efd0db26657719207cd",
+    "coordinator/host-app-wake-receiving/native-state.ts": "f58b3188a3adb853cccd4dd03c5bbc75f4dd265a55148adcdd6cc78b515ce6bd",
+    "coordinator/host-app-wake-receiving/operator-auth.ts": "f3e30b0462aaad45687bf1fbd2e6b28cab24ef954b3698d9bf6853922cf671de",
+    "coordinator/host-app-wake-receiving/principal.ts": "1f658b0409fde1d91642ccb00900bb7b20c1d712f437f37e225830a8a751f89e",
+    "coordinator/host-app-wake-receiving/private-intake.ts": "124438f8c07f236e62c865d98734a9ec08b9c16ba422a45105ab74c3e9f18cc8",
+    "coordinator/host-app-wake-receiving/qualification/apple-evidence.check.ts": "8bde4ac4d985e9222d000bec259272f657a6507bfe30fba5f3f01c3197432b83",
+    "coordinator/host-app-wake-receiving/qualification/assertion.check.ts": "6569bfefbf8a9e1670d13dc0d3ba9bfa11b0b5125aae0364f03b2630f91ef83b",
+    "coordinator/host-app-wake-receiving/qualification/check_first_attestation_schema.py": "b024524ffc6266853e305303eff4bae63ca3a6dafe62a49fd8e3014581cff8fd",
+    "coordinator/host-app-wake-receiving/qualification/check_private_ports_schema.py": "f533a998d8e02c91cb6c9541653e46fe8876f5a6fd98f80ccf845a95909bd0dc",
+    "coordinator/host-app-wake-receiving/qualification/check_private_target_schema.py": "adfcdbe921d3e677408d2d8eeaf9a2b175fc754dde7cb579a088f0535054075a",
+    "coordinator/host-app-wake-receiving/qualification/enrollment-store.check.ts": "ba20ff5d3fc847b6110a6e58dd9950f0607cffe8074fc0c04623581d5b0de4f2",
+    "coordinator/host-app-wake-receiving/qualification/enrollment-store.config.mts": "dab876df7dcf86226bcb5cab64e8b8a565c618b91ba2e86a185ba67f5c8d0f2c",
+    "coordinator/host-app-wake-receiving/qualification/enrollment.check.ts": "ca7cf8a2b469537c7b4f3a97be3b822a96c70ac0ccbe584ca385a3f62eee6265",
+    "coordinator/host-app-wake-receiving/qualification/first-attestation-wire.check.ts": "19ee53fb7bfc412120f0c2658e88f6d3af8d27b5caf99194a88b8f30efb4d2e0",
+    "coordinator/host-app-wake-receiving/qualification/guard.check.ts": "de88bbf58321caa4fd15fff43f82550d1acb5d0e68c7bbb7aca0d67dd07db890",
+    "coordinator/host-app-wake-receiving/qualification/intake.check.ts": "27b443e469a5f580c1070d4a651212bceff08863eea1268a5651ebe21299a1d6",
+    "coordinator/host-app-wake-receiving/qualification/make_first_attestation_vectors.py": "c21f611103d2aadbe1dd480b14967718b49008ef19b5e6700d3b867108678dc8",
+    "coordinator/host-app-wake-receiving/qualification/make_native_policy_schema.py": "8813cb4964487112cc1d90219533678364a456e2de3069ee50ea5e6d3b6b5053",
+    "coordinator/host-app-wake-receiving/qualification/make_private_target_vectors.py": "94a21eb1c654d5c769b977900780d1c6cfbde3e9ed553254e4da93540124f18e",
+    "coordinator/host-app-wake-receiving/qualification/native-transcript-vectors.json": "1fdf68c34424f8ac5b98ad7e2a49c6c83c0a8e78bb763489a967d044cc05d295",
+    "coordinator/host-app-wake-receiving/qualification/private-first-attestation-vectors.json": "c395c56c81b70017c1feaf687ae683791031d2b678ae3b520027b4c87118cb7f",
+    "coordinator/host-app-wake-receiving/qualification/private-native-policy.schema.json": "df7c288627ad1c8b9ec4e9020c643611a44205e07f5b7229229b7de354c11106",
+    "coordinator/host-app-wake-receiving/qualification/private-receiving-ports.schema.json": "cd03bea7ed5e7b64c327182905eb5549e1d5484bb719826a9bf463643c9a202e",
+    "coordinator/host-app-wake-receiving/qualification/private-resolve-vectors.json": "57d64138a3d13f817e5e59b2c4b20e20f21f66b1b853d7ad4c26fa08351fd360",
+    "coordinator/host-app-wake-receiving/qualification/private-server-reply-vectors.json": "3c54207b2bc8d4d41c82b7cca04cfae405041e9b4ed32f129ba68e9686d99d00",
+    "coordinator/host-app-wake-receiving/qualification/private-target-ports-vectors.json": "f7e742f3c2f334a7e877ac50112fad964fde7e149263c0fda4b3d413a0132164",
+    "coordinator/host-app-wake-receiving/qualification/private-target-ports.schema.json": "850d3ba5928187283df820dcc8109883227803b337f499cc802d3329f3c88dd8",
+    "coordinator/host-app-wake-receiving/qualification/reply.check.ts": "4307561c41f66636ac98e6ab2da65997def896801ef0c6e73a6c8ccc3ec9435b",
+    "coordinator/host-app-wake-receiving/qualification/server.check.ts": "ba5167ede8bd61f442b3df47537d4d6c1e2ab199c6018823ef2facbc43be6b65",
+    "coordinator/host-app-wake-receiving/qualification/store.check.ts": "b934cabfb5591679e34d0f4e7b9765a7fe8ee323a7588cc66473b646afa8c814",
+    "coordinator/host-app-wake-receiving/qualification/target.check.ts": "a39b15ab1eec7e91e84394650ef45223e1f5004fae229469089fc52f4ca398d3",
+    "coordinator/host-app-wake-receiving/qualification/transcript.check.ts": "b6dfb7d58f66d53d0d16f094de239129f6c3c3acba92c9a4527890b759672296",
+    "coordinator/host-app-wake-receiving/qualification/tsconfig.json": "f1c305747173bfcb87d3251b6e70c4269792ae33f0079724690c4cbcb4c7a4dd",
+    "coordinator/host-app-wake-receiving/qualification/vitest.config.mts": "e2c765787acacea7f8456790a2965c66e721ef616a89d5758e8fd85f2785fc91",
+    "coordinator/host-app-wake-receiving/qualification/window.check.ts": "242c56c4be0f7d75972672d401104e85133c8365468bcdc483011affb4eeed05",
+    "coordinator/host-app-wake-receiving/qualification/wire.check.ts": "7a25c49b74126e000ae587fbec95a2b68af740bde8c33d805457475934a45ee4",
+    "coordinator/host-app-wake-receiving/qualification/worker.ts": "d11984203d2423eebe79639c323bc35ea2505326549e609a771625fc42d827ce",
+    "coordinator/host-app-wake-receiving/qualification/wrangler.jsonc": "1d4cf8657a4c56ec47cab1fa81efe2ce60bb5b2cbf316e293b6e555827d8a5ce",
+    "coordinator/host-app-wake-receiving/receiving-store.ts": "7d62aa3df7c461de6b932338e5cbab82cb349974fb39efaa023592a984976ce9",
+    "coordinator/host-app-wake-receiving/registration-guard.sql": "892b72f73438eb41efe0a0a3872f31fe980e6a6857d16693027ec7259124ba69",
+    "coordinator/host-app-wake-receiving/request-window.ts": "bb40c3ed3342601a07181078761a2dbc1e1403ba8e8e303fe609932d014a0f64",
+    "coordinator/host-app-wake-receiving/schema.sql": "3c445ae6c75e95bf16ef0c153f36fa8b73e8b818dc9e3a62a7c2354878ff0b72",
+    "coordinator/host-app-wake-receiving/server-reply.ts": "3d42eca8d56da4b70f9d2cf5672d5f690137b0487a4c7af393eed797ff129fbf",
+    "coordinator/host-app-wake-receiving/server-wire.ts": "b7670ff7b8ec0666369bdb5844858e1d7509e86077952d72289092c107dda665",
+    "coordinator/host-app-wake-receiving/service.ts": "508db4acf460c4cf7623d6a3d7164d27a05855e5af73a739d854322e4aa665ec",
+    "coordinator/host-app-wake-receiving/source-backend.ts": "9344ca283494a672025743b7417da2354d823a5fcd2cce63b1858688e726ca67",
+    "coordinator/host-app-wake-receiving/target-transport.ts": "72ba7156f6c93967f235a5eac4dc4ccce5010e28f41d915c5e0efbf170afde90",
+    "coordinator/host-app-wake-receiving/wire.ts": "e7f0964436fb63622294e6b1525aa9e1d82f18bc4bada514c00b1572faf06819"
+  },
+  "counterproofs": {
+    "issuer_original_private_claim": "Original concurrent loser counterexample retained; original claim/hash/principal now required by positive CAS",
+    "sent_original_reply_join": "Changed owner/source/token originals with correctly recomputed hash first failed; exact sent-original/retained-original equality now required",
+    "prepared_proof_kind": "Original second prepared child switched attestation to assertion after first child enrolled. Original RED retained; issuer reservation now freezes kind",
+    "signed_status_expiry": "Original actual D1 transactions returned positive after status expiry between UPDATE/key/proof statements. Two causal RED controls retained, now PASS among14 explicit vendor MODEL tests",
+    "status_expiry_correction": "Store original status expiry, clip key lifetime to original policy/evidence/status minimum; guarded key and proof inserts and positive readback retain same bound. Postcommit expiry leaves unusable history, no new lease or retry",
+    "preliminary_failures_not_pass": "Insufficient SQL delay failed only fixture precondition; initial correction pin-normalization rejection was retained and fixed before final299/14 qualification"
+  },
+  "implemented_source": {
+    "existing_install_principal": "djci lookup only, no bootstrap or rotation",
+    "custodian_channel": "Existing HMAC only, explicit operator role and native policy; no Bearer fallback",
+    "private_routes": "Issuer issue/status/withdraw; native challenge/complete/status; readonly authorization resolve; target register/wake/status/revoke; explicit operator authorize/withdraw/native-policy/native-policy-withdraw",
+    "public_R31_and_Core7": "UNCHANGED",
+    "first_attestation": "Pinned Apple roots and explicit app/build/category/environment policy; opaque receipt into atomic pending/key/counter-zero/proof commit",
+    "model_vendor_acceptance": false,
+    "original_native_job_max_ms": 30000,
+    "original_purpose_max_ms": 28800000,
+    "no_unknown_repair": true,
+    "new_production_schema_migration": false,
+    "new_public_Worker_import": false
+  },
+  "remaining_genuine_inputs": [
+    "Existing selected Core installation and genuine current custodian/operator bindings",
+    "Actual signed iOS host artifact, signing/environment/category policy and genuine SDK key/enrollment custody",
+    "Genuine positive Apple attestation and signed common-status qualification",
+    "Original qualified Core/Apple/API cross-domain clocks and selected HTTPS composition",
+    "Separately reviewed private provisioning/runtime composition and explicit activation effects"
+  ],
+  "effects": {
+    "key_or_SDK_or_provider_or_device": false,
+    "production_migration": false,
+    "deployment": false,
+    "activation": false
+  },
+  "separate_Final_own_review_CI_protected_merge_and_original_qualification": "REQUIRED_NOT_YET_PERFORMED"
+}

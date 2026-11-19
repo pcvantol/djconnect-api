@@ -1,0 +1,35 @@
+{
+  "account_plan": "UNVERIFIED",
+  "billing": "UNVERIFIED",
+  "created_on": "2026-10-01T12:48:58.77242Z",
+  "deployment_id": "35f47d4e-11fe-48cc-a8fe-82f770e260d2",
+  "namespace_inventory": "NOT_RUN",
+  "percentage": 100,
+  "proposed_secret_name_presence": {
+    "RECEIPT_ACTIVE_KEY": false,
+    "RECEIPT_PREVIOUS_KEY": false,
+    "RENDEZVOUS_IP_HASH_KEY": false
+  },
+  "provider_mutations": false,
+  "read_date": "2026-10-19",
+  "root_d1_matches": true,
+  "route_health": "NOT_RUN",
+  "scope": "READ_ONLY_EXISTING_WORKER_SELECTED_BINDING_PRESENCE_NOT_SERVICE_QUALIFICATION",
+  "selected_binding_presence": {
+    "ADMISSION_STATE": false,
+    "ALLOCATION_INDEX": false,
+    "COMPOSED_TRANSACTIONS": false,
+    "ENROLLMENT_COORDINATOR": false,
+    "REQUEST_ADMISSION": false
+  },
+  "selection": "newest_by_created_on_not_array_position",
+  "traffic_split": [
+    {
+      "percentage": 100,
+      "version_id": "d7f38154-51ca-4066-9d61-f64e0df0dda5"
+    }
+  ],
+  "version_id": "d7f38154-51ca-4066-9d61-f64e0df0dda5",
+  "version_response_id_matches_request": true,
+  "worker": "djconnect-api"
+}

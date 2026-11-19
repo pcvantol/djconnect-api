@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_PRODUCTION_D1_MIGRATION_GUARD_NOT_ACTIVATION",
+  "reference_changes": {
+    ".github/workflows/deploy-api-worker.yml": {
+      "before": "8fbfb0ec6d0291af560f353baa9e982c6059c87d948f1e5225201113ae1745db",
+      "after": "d45cbffb150b955a8f6cd4220ae85413463192da42feb2fbadcb365714ae7876"
+    }
+  },
+  "reference_additions": {
+    ".github/workflows/reusable-workflow-guard.yml": "1d1dccc80cfd681bf505961b0b581cbdeb227b2de6634f517bb06a0eb1161acb",
+    "scripts/check_production_d1_migrations.py": "1f574fef53a4ac24f0e2b8511bf207ae9ae3f5816e83e68e1037aee28a1268bb",
+    "scripts/test_production_d1_migrations.py": "c5387c7dd023997fecccc46e345e834961927e4cf803f295e223b0e7c4ba5254"
+  },
+  "public_activation_allowed": false
+}

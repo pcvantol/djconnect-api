@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_PRIVATE_FIRST_CATEGORY_SOURCE_NOT_ACTIVATION",
+  "base_source": "41549dadff8efb2da5fa0ab23ff7abeff86e19df",
+  "baseline_source_map_sha256": "7afaaefbee37a68f003badc1a2426fd9e02fe90ff3fe4a7e4ddff2198e035bfa",
+  "effective_source_map_sha256": "04dfade9e9e2573c27b1640f14a309a1f9f6feee0ea69d97f5b95c27713b6096",
+  "changes": {
+    "coordinator/host-app-wake-receiving/guard-schema.ts": {
+      "before": "de6f0e42e9a8b412f0b68659f85cafde47f77b0f899883a9d23b14b12b14e1d0",
+      "after": "a8abd4250a43b64f0b94567d7ee2e39224de22222ccc24f2067d16ba9d3ce2de"
+    },
+    "coordinator/host-app-wake-receiving/native-apple-evidence.mjs": {
+      "before": "31c9b7667a0b84db1f04604e1b8e8c254faad97ddceddae21444689cce28cee3",
+      "after": "3c2f7a7e322e524b986d71e0f6c71bb55b86dc6ecf4970ae3dca51f7e1a88434"
+    },
+    "coordinator/host-app-wake-receiving/native-attestation.ts": {
+      "before": "f5b41c667f158983ee4b9fda9b1b13c7f67272fad47c358b8bff5d3c55b08f5a",
+      "after": "971209abbcdceb029b9e07d5fb936ec3c5d59b229c8bb42ebff3a91dd20e60a3"
+    },
+    "coordinator/host-app-wake-receiving/native-policy.ts": {
+      "before": "777ff00385ffb90d8dd351657d1aad1b53aaf90b576e7efd0db26657719207cd",
+      "after": "634ed4334424a3ecd291b78a0df72d9d8093319d3b9c4c9e58080027ed5cc83c"
+    },
+    "coordinator/host-app-wake-receiving/native-state.ts": {
+      "before": "f58b3188a3adb853cccd4dd03c5bbc75f4dd265a55148adcdd6cc78b515ce6bd",
+      "after": "0402413b986acecf98d3a29cb7524cc1fde3d2426d6ebad5b64a21e819cd4f5d"
+    }
+  },
+  "public_activation_allowed": false
+}

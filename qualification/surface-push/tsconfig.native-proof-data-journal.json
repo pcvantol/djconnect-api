@@ -1,0 +1,12 @@
+{
+ "extends": "../../tsconfig.json",
+ "compilerOptions": { "types": ["node", "vite/client"] },
+ "include": [
+  "../../worker-configuration.d.ts",
+  "../../node_modules/@cloudflare/vitest-pool-workers/types/cloudflare-test.d.ts",
+  "../../test/env.d.ts",
+  "../../src/surface-push/native-proof-data-journal.ts",
+  "../../test/native-proof-data-journal.spec.ts"
+ ],
+ "exclude": []
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "source_slice_finalization",
+  "repository": "pcvantol/djconnect-api",
+  "assignment": "DJC-API-VIBECAST-RENDEZVOUS-V1-20261016",
+  "scope": "IMPLEMENTATION_CONTRACT_SOURCE_ONLY",
+  "status_outside_protected_main": "FINALIZATION_CANDIDATE",
+  "status_on_protected_main_and_exact_finalization_receipt": "SOURCE_SLICE_FINALIZED",
+  "exact_finalization_receipt_required": true,
+  "release_id": "djc-rendezvous/1-implementation.1",
+  "wire": "djc-rendezvous/1",
+  "source_pr": 96,
+  "source_candidate_sha": "c89a127c770942e1c1bff6eb42a1045b09ba4d6c",
+  "source_main_sha": "2dade83f338ae5f931856934ab0c23b6f6c66f05",
+  "source_candidate_main_tree": "10135afab6e502a31d23dd7bf27f1048fcc74bce",
+  "implementation_producer_receipt": "https://github.com/pcvantol/djconnect-api/issues/90#issuecomment-6272409413",
+  "implementation_contract_status": "IMPLEMENTATION_CONTRACT_RELEASED",
+  "contract_manifest_sha256": "189e71aca07ac49cc6f7db225d3acb10a3a9fc357be02a9eaacb8f30a798c596",
+  "contract_text_sha256": "a3be2c5fd6ca95a5b57f7a3687512670ebaa97a332f2df96d5259bb6c7530cf5",
+  "independent_review_receipt": "https://github.com/pcvantol/djconnect-api/pull/96#issuecomment-6271031794",
+  "candidate_ci": {
+    "all_six_runs": "SUCCESS",
+    "validate_run_id": 39278428898,
+    "validate_successful_attempt": 2,
+    "validate_attempt1": "CANCELLED_NOT_QUALIFIED",
+    "other_run_ids": [
+      39278428054,
+      39278428064,
+      39278428864,
+      39278429306,
+      39278429549
+    ]
+  },
+  "main_ci": {
+    "validate_run_id": 39287793982,
+    "conclusion": "SUCCESS",
+    "codeql_run_id": 39287794747,
+    "projection_run_id": 39287792882,
+    "post_merge_run_id": 39288246636,
+    "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "findings": [],
+    "evidence_digest": "f5f2f3f8d2cb97051fbbba46986be01f79d8512fec1da8eeef206e5bd80fabc7",
+    "coverage_artifact_digest": "552e7d9f326ad6234f1495edfb887b145b05a7cb0adf739f60a999a6750861bf"
+  },
+  "durable_evidence": {
+    "release_tag": "internal-api-2dade83f338ae5f931856934ab0c23b6f6c66f05",
+    "asset_id": 656829755,
+    "actual_download_sha256": "dca9f3516818a4bf85ec616bc44e5f68dbbc95f783649b6771cc571a65882b48",
+    "retention": "LONG_TERM",
+    "redaction": "REDACTED"
+  },
+  "existing_api_artifact": {
+    "run_id": 39288245953,
+    "conclusion": "SUCCESS",
+    "archive_artifact_id": 12203737766,
+    "evidence_artifact_id": 12205270129,
+    "actual_archive_sha256": "3505997863938a69c677b9a805f68fcb41594847035f3df4e58effc8b19f66a0",
+    "contains_integrated_rendezvous_product_runtime": false
+  },
+  "local_evidence": {
+    "workerd_tests_passed": 1208,
+    "isolated_strict_types": "PASS",
+    "api_regression_tests_passed": 40,
+    "preparation_checks_passed": 21,
+    "scope": "LOCAL_SYNTHETIC_NOT_NATIVE_PUBLIC_OR_PHYSICAL"
+  },
+  "closed_consumer_decisions": {
+    "receiver_exact_exception_ack": "https://github.com/pcvantol/djconnect-api/pull/96#issuecomment-6270491529",
+    "receiver_register": "https://github.com/pcvantol/djconnect-vibecast-receiver/issues/16#issuecomment-6270497278",
+    "apple_policy_design_ack": "https://github.com/pcvantol/djconnect-app/issues/87#issuecomment-6231637013"
+  },
+  "assignment_complete": false,
+  "public_activation_allowed": false,
+  "deployment_authorized": false,
+  "native_accepted": false,
+  "receiver_adoption_accepted": false,
+  "joint_e2e_accepted": false,
+  "production_ready": false,
+  "timer_enabled": false,
+  "remaining_api_source_work": [
+    "Default-disabled product ingress and product-only coordinator/build integration",
+    "Reviewed trusted-edge identity and public-path admission",
+    "Qualified default real verifier/provider composition and production app/environment policy"
+  ],
+  "remaining_external_evidence": [
+    "Fresh current server-bound signed-native enrollment and action composition",
+    "Actual receiver lifecycle/adoption tests",
+    "HA external route/proxy and separate B-screen admission",
+    "Physical iPhone/HA/TV chain"
+  ],
+  "remaining_operations": [
+    "Qualified exact product artifact and bindings/migration/rollback",
+    "Account/plan/shared usage/WAF/spend and load/cost qualification",
+    "Platform logging/retention/backups/cleanup qualification",
+    "Applicable central manifest and exact deployment authorization",
+    "Authorized live smoke and genuine chain readback"
+  ]
+}

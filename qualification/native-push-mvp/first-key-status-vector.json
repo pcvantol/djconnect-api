@@ -1,0 +1,39 @@
+{
+  "registerChallenge": {
+    "contract_version": 1,
+    "api_audience": "djc-native-push-ha-dev/1",
+    "operation_id": "first-key-operation-status-example",
+    "api_installation_id": "api-issued-installation-1",
+    "install_credential_id": "api-issued-credential-1",
+    "challenge_id": "api-issued-challenge-1",
+    "challenge_nonce": "DQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0",
+    "expires_at_ms": 1700000060000,
+    "expected_key_revision": 0
+  },
+  "binding": {
+    "pairing_generation": "opaque-pairing-generation-1",
+    "pair_binding": "14cd40c754cf0ba8771449e21d54f2cb84bdd94eeadc058d974294e74bb7a5ee",
+    "owner_binding": "f6950244a3a83f6942ee19da138ab6ee5795d91793304663c72a800ca5f48463",
+    "device_binding": "80b2f897e93e81f769edd02733c0f3e41ecf29e43d76d10a263c67b726b1fe67",
+    "core_key_thumbprint": "5635ab22bfa706e7c89e3d1d13352cda9665a57b12fba3552616fe5005a9d997"
+  },
+  "core_public_key_spki_b64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEilGCMok3rX4vIbPKv3RabHdlNLiRbOXE8IMzkSwef6QU9qQVF3yYFL8cX6rOnGQ7qXKgYhKzIziHGhkk9Evh7w==",
+  "registerSignatureB64url": "ANTknAsY1dvagTRTvJlRWbJhqQ_MExA7ELRB6FHjZDZDzRXPAcyFwYKe4L5RAK8I5-SYMhUJHGzdH67B_W8j3A",
+  "statusChallenge": {
+    "contract_version": 1,
+    "api_audience": "djc-native-push-ha-dev/1",
+    "operation_id": "first-key-operation-status-example",
+    "api_installation_id": "api-issued-installation-1",
+    "install_credential_id": "api-issued-credential-1",
+    "pairing_generation": "opaque-pairing-generation-1",
+    "core_key_thumbprint": "5635ab22bfa706e7c89e3d1d13352cda9665a57b12fba3552616fe5005a9d997",
+    "transcript_sha256": "717cd2e36a93e1c01732afa61888cd79e6a840009cfbd8972d79fc84b937384c",
+    "expires_at_ms": 1700000060000,
+    "status_nonce_id": "api-issued-status-nonce-1",
+    "status_nonce": "FxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxc",
+    "status_nonce_expires_at_ms": 1700000040000
+  },
+  "statusCanonicalUtf8": "[\"djc-native-first-key-status/1\",\"djc-native-push-ha-dev/1\",\"POST\",\"/v1/push/native/key/status\",\"widget-first-key\",\"first-key-operation-status-example\",\"api-issued-installation-1\",\"api-issued-credential-1\",\"opaque-pairing-generation-1\",\"5635ab22bfa706e7c89e3d1d13352cda9665a57b12fba3552616fe5005a9d997\",\"717cd2e36a93e1c01732afa61888cd79e6a840009cfbd8972d79fc84b937384c\",1700000060000,\"api-issued-status-nonce-1\",\"FxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxc\",1700000040000]",
+  "statusSha256": "0f2cf853a76201ba3c72357bc980565eed23f351d2f2e04897e2d5a5e8bbb2b6",
+  "statusSignatureB64url": "RBgRvn4wBGIBz9befXgRcH5B-DJvx-n9xeEMmt_AyGaLwDGnaQrCMfe-Z7XfD8edCH_c688TGTIRp16KIwm3WA"
+}

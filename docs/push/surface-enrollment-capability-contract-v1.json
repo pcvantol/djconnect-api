@@ -1,0 +1,155 @@
+{
+  "contract_version": 1,
+  "domain": "djc-surface-enrollment/1",
+  "status": "SOURCE_ONLY_CLOSED_CONTRACT_FOR_JOINT_REVIEW_NOT_EFFECT_ADMISSION",
+  "origin": "https://api.djconnect.dev",
+  "prefix": "/v1/push/surface/enrollment/",
+  "encoding": "POST application/json,strictUTF8,max16384bytes,no duplicate/unknown keys, no Content-Encoding/Origin/Cookie/query/fragment; existing API canonical serialization and exact ES256/P1363; response fixed no-store/no-referrer/nosniff",
+  "operator_authorize": {
+    "path": "operator/authorize",
+    "authentication": "Existing requireAdminAuth bearer/HMAC; never ordinary djci_/djcs_/djce_ authority or Core pairing. Existing operator credential is confined to authorized operator.",
+    "body_fields": [
+      "contract_version",
+      "purpose",
+      "action",
+      "operation_id",
+      "authorization_id",
+      "consent",
+      "enrollment"
+    ],
+    "fixed": {
+      "contract_version": 1,
+      "purpose": "surface_enrollment",
+      "action": "authorize"
+    },
+    "operation_id": "Original UUIDv7 authorization operation,5min execution window/30s future skew. Original enrollment has a separate UUIDv7; no refresh.",
+    "authorization_id": "Opaque [A-Za-z0-9_-]{1,128}, original planned authorization; cannot be reused/replaced after conflict/withdrawal",
+    "enrollment": "Exact existing closed issuer Enrolment v1; public JWK only, no private d, no operator credential/token. Additional widget-only bounds below.",
+    "winning_response_fields": [
+      "contract_version",
+      "success",
+      "authorization_id",
+      "operation_id",
+      "request_hash",
+      "consent_digest",
+      "key_thumbprint",
+      "scope_digest",
+      "expires_at_ms",
+      "state",
+      "credential_state",
+      "replayed",
+      "credential"
+    ],
+    "winning_response": "HTTP200,success true,state authorized,credential_state available,replayed false,credential djce_+canonicalbase64url32randombytes. This authorizes only one enrollment, not push or human consent.",
+    "repeat_response": "Same original input after winning mint: HTTP202 successfalse,stateunknown,credential_stateunavailable,replayedtrue,NO credential; no replacement/random-token disclosure. Expired/changed/conflicting operations may be409. Unknown mint reply stays unknown."
+  },
+  "consent": {
+    "exact_fields": [
+      "nonce",
+      "action_id",
+      "generation_id",
+      "plan_digest",
+      "expires_at_ms"
+    ],
+    "nonce": "Canonical base64url32bytes from original current Core consent action; API persists nonce hash only",
+    "action_id": "Opaque id1..128 from original affirmative owner action; API hashes domain/install/generation/action as unique action key",
+    "generation_id": "Opaque id1..128 identifying SAME original Core RAM/service/custodian generation; not restored after restart",
+    "plan_digest": "lowercase64hex SHA256 of exact reviewed original plan. Not a permission by itself.",
+    "expires_at_ms": "Original hard epoch-millisecond expiry, strict safe integer, future and <=validation now+900000; Core must preserve and independently enforce original local wall+monotonic start/end, never arrival renewal. Grant expiry must be <=this expiry.",
+    "actual_authority": "Authenticated operator must evaluate genuine original current owner/tuple/plan before authorize. Core must originate this consent from actual explicit owner management, not generic JSON import/admin boolean/pairing/default startup."
+  },
+  "bindings": {
+    "request_hash": "SHA256 UTF8 canonical([djc-surface-issuer/1,operator/enrol,enrollment])",
+    "consent_digest": "SHA256 UTF8 canonical([djc-surface-enrollment/1,consent,consent])",
+    "nonce_hash": "SHA256 UTF8 nonce",
+    "action_key": "SHA256 UTF8 canonical([djc-surface-enrollment/1,action,enrollment.install_id,consent.generation_id,consent.action_id])",
+    "key_thumbprint": "Existing issuer canonical-domain public-key hash, not RFC7638",
+    "scope_digest": "Existing issuer delegation scope digest, including JWK thumbprint and entire immutable enrollment subject/policy",
+    "token_storage": "SHA256 UTF8 complete djce_ credential; constant-time digest comparison. Raw token returned only to original winning authorized operator and not persisted in outcomes/logs.",
+    "uniqueness": "authorization ID, original authorization operation, nonce hash, action key, delegation ID and original enrollment operation remain unique/tombstoned; changed IDs cannot remint same original nonce/action. No pruning/restart renewal."
+  },
+  "bounds": {
+    "role": "widget",
+    "activity_profile": null,
+    "external_content_allowed": false,
+    "max_operations": 4,
+    "max_events": 2,
+    "max_challenges": 1,
+    "grant_and_consent_maximum_ms": 900000,
+    "ticket_deadline": "MIN(original consent expiry,original grant expiry,original authorization UUIDv7+300000,original enrollment UUIDv7+300000). It never changes on mint replay,redeem,read,restart or response.",
+    "producer_limits": "These are restrictions, not grants; existing Core original validity/purpose/field-history and budgets remain independently required."
+  },
+  "redeem": {
+    "path": "redeem",
+    "authentication": "Authorization: Bearer djce_<43canonicalbase64urlchars> plus signature by SAME approved K1 P256 key; no operator secret in Core",
+    "body_fields": [
+      "payload",
+      "signature"
+    ],
+    "payload_fields": [
+      "contract_version",
+      "purpose",
+      "action",
+      "authorization_id",
+      "consent",
+      "enrollment"
+    ],
+    "fixed": {
+      "contract_version": 1,
+      "purpose": "surface_enrollment",
+      "action": "redeem"
+    },
+    "signature": "canonicalbase64url64byte rawP1363 ES256(SHA256); DER/other algorithms/wrong key/domain/path refused",
+    "signing_bytes": "UTF8 canonical([djc-surface-enrollment/1,POST,/v1/push/surface/enrollment/redeem,payload]); signature excluded; authorization ID/complete consent/original enrollment are signed",
+    "before_commit": "Recompute exact hashes; validate same opaque credential/JWK signature,available/nonrevoked/current original ticket and enrollment UUIDv7 window. Recheck original window/cancel after crypto awaits.",
+    "atomic_commit": "One D1 batch claims the ticket, writes existing issuer operator ledger and delegation, and settles both outcomes. First claim checks original expiry against runtime clock AND actual SQLite unixepoch(subsec) clock; SQL error rolls back entire batch. No split consume/enrol or provider/capability issuance.",
+    "winning_response_fields": [
+      "contract_version",
+      "success",
+      "authorization_id",
+      "enrollment_operation_id",
+      "request_hash",
+      "consent_digest",
+      "key_thumbprint",
+      "scope_digest",
+      "expires_at_ms",
+      "state",
+      "replayed"
+    ],
+    "winning_response": "HTTP200,success true,stateenrolled,replayedfalse,expiry exactly original GRANT expiry; check remaining ticket/delegation validity before reply. All fields compared to the original Core attempt. Response is actual server-HTTPS result, not signed/portable authorization.",
+    "repeat_or_unknown": "No success replay; spent/revoked/expired/concurrent loser returns409,changedscope403,wrongcredential/signature401. No retry/newUUID/key/ticket/re-enrollment after possible send/unknown. No enrollment-status endpoint in v1; old issuer/status cannot repair this.",
+    "core_admission": "Only same still-live explicit consent,private K1 handle,original generation,scope and original wall+monotonic deadline can accept actual response. Check current authority before/after HTTPS and final no-await fence. Create owner only on exact original positive reply; historical metadata cannot create one. Subsequent existing issuer challenge/issue/adoption separately enforce current live delegation."
+  },
+  "operator_revoke": {
+    "path": "operator/revoke",
+    "authentication": "Existing privileged operator only; works after ticket expiry,with fresh bounded revocation UUIDv7; no K1 key/djce possession required",
+    "body_fields": [
+      "contract_version",
+      "purpose",
+      "action",
+      "operation_id",
+      "authorization_id"
+    ],
+    "fixed": {
+      "contract_version": 1,
+      "purpose": "surface_enrollment",
+      "action": "revoke"
+    },
+    "response_fields": [
+      "contract_version",
+      "success",
+      "authorization_id",
+      "operation_id",
+      "state",
+      "scope"
+    ],
+    "scope": "enrollment_authorization_only",
+    "early_revoke": "Records durable revocation before authorization exists; delayed mint of SAME authorization ID denied",
+    "after_enrollment": "Does not withdraw an already-enrolled delegation. Existing separately authorized issuer/operator/withdraw is required and remains independent of lost K1 key. Ticket revocation never provides a broader revocation credential.",
+    "concurrency": "Revoke-before-claim blocks redemption; claim-before-revoke may already have enrolled. Do not promise retraction of completed enrollment."
+  },
+  "private_transfer": "Selected explicit authenticated owner-management action imports only opaque djce_ credential into SAME pending Core attempt. Never operator secret, arbitrary purpose/tuple JSON or automatic configuration/default startup. API admin call and private transfer facility need actual qualified owning implementation and separate effect approval; none is fabricated by this contract. Do not put real tokens/nonce/tuple in public GitHub inputs/logs/artifacts.",
+  "deployment": "New internal handler is not imported/composed/routed by Worker. Existing compiled SURFACE_PUSH_HTTP_ENABLED=false reserves entire namespace with503 before credentials/body/env. Migration0011 is source only; never applied remotely here.",
+  "operational_grants": "No K1 generation,K2 execution,enrollment,provider config/deploy/native or CI cancellation. Activity/external-content/update/end/start rights remain separately closed.",
+  "normal_gates": "Joint exact contract review,local actual SQLite/crypto checks,independent exact whole source review,protected source/original own-main CI, separate Final and later exact admitted configuration/deployment/effect decision."
+}

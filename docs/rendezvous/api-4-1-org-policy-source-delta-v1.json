@@ -1,0 +1,238 @@
+{
+  "production_effect_authorized": false,
+  "public_activation_allowed": false,
+  "schema_version": 1,
+  "scope": "EXACT_API_4_1_ORGANIZATION_PIN_SOURCE_ONLY_NOT_ACTIVATION",
+  "version_source_changes": {
+    "package-lock.json": {
+      "after": "20f73ac58391eeef484b610426b1e2adc5c39775ed6bd9fd052ad66f129c46eb",
+      "before": "568caf0f455eab642abc58c036ea11f3b331b63ecf5ffbf865cf6df9a8525915"
+    },
+    "package.json": {
+      "after": "fd2181aef21d925fb0c1c62d32e582bead0f814a638e8bbc6e4a7ff988e4ba96",
+      "before": "ca276a728f63e8e17c36b8baaa4513879d143280b10ad0fab4a5faf85cff50bb"
+    },
+    "scripts/qualify_rendezvous_product_build.mjs": {
+      "after": "8edf85b7e17f97122dc67f7dd2b774d92d0da943131cb18e454f882b577d221d",
+      "before": "38cb31c0f3c719406bb09c3cc013851bee26712fa475258ed40afd28c56bf88f"
+    },
+    "src/releaseMetadata.ts": {
+      "after": "803c64b994c895b93b6b34a78b5c81cdc82bf90e9a8c689c05ea07b2e047a416",
+      "before": "3a6bdfbc9b5641544d3fb84adffe74c90368a88f5aff9b14a7f48f20a2b9fd72"
+    }
+  },
+  "workflow_changes": {
+    ".github/workflows/ci-cd.yml": {
+      "after": "3bb64ec946c186d166dae69f67f20a1c019385f923b1d30bf3ce4fdc87ed6986",
+      "before": "baa1fe545bb8d3de799d9a412929b798b7702c449c136280a62aa6045d7f48f9",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/codeql.yml": {
+      "after": "28ca1dac316e422654e40a5b42a3ec932e230a5c22163736c22899b7e7378545",
+      "before": "544532dd4070738bd20307cba6e199c16113da2f9a9fa5b75b43dd2bd7411aee",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        },
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/djconnect-codeql-191.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef # Current canonical workflow closure\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/djconnect-codeql-191.yml@4bd9731a6fe7bb50c932e36635eb3ff5c5372687 # Current canonical workflow closure\n"
+        }
+      ]
+    },
+    ".github/workflows/host-app-wake-receiving.yml": {
+      "after": "e84e48af21685efe2f7c01282b7fa73061bc1d5c9725831ca58d8fe5fc4de0e8",
+      "before": "fa0b21fa48f597dadc9ee76c55ee87aef8abfe2b215a26f08f05ccf45bb4e006",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/host-app-wake-source.yml": {
+      "after": "c4e9a969fd746d5c88e6ebca9f402c725f88a5365fae3cdeeeb36815e5565a0b",
+      "before": "c77dff5ab7527625c36c321ecce805e1f2833ba9d044bff04e50084065caae3c",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/installation-principal-data.yml": {
+      "after": "fd13fb6ef79b7d0ba6dc63ba248d900853a3fed0eff4038c460509419272d543",
+      "before": "1c39db1f7633a806269b147b07817056b2120de5e8f65b738fa3411fefc44100",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/installation-registry-transactions.yml": {
+      "after": "4fd3db7199e4abeb885fb52e644356b639684057b386cacd6176e523cea3a320",
+      "before": "b15769fe267c956da0f17ebb9a25bf392d226b280d37424cd6a6b3452dbdb332",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/native-proof-data-journal.yml": {
+      "after": "bc8d8494c8d753a8d394543b27a1a42c588c4aa95a91db00ebf0b9dacaf6b034",
+      "before": "ebacdbe4e79e7fe6131914633e9669c06ba4420f5507f8c0551eb59655e3b554",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/native-proof-transcript.yml": {
+      "after": "5c4390b17ed22f4a4d64811219e5923fae9f866136ee84cdc7d21d2c44bf966b",
+      "before": "b73049b49fcea1ee8ebc6de61bd61c62916757998bfc34d1f70e8efdcae5d0f3",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/post-merge-release-evidence.yml": {
+      "after": "09f29a1f876bfd519c189c15af8dc5841e52464046facd182f3539009cbbed09",
+      "before": "5942744c49fa8dcb65102d82fc098483ad2947b2c5bf750f78fae1927e31cb0c",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/post-merge-release-evidence-org-487.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/post-merge-release-evidence-org-487.yml@38018fb71005d09e2eb8a58277bd7bfc500c8528\n"
+        },
+        {
+          "after": "      policy_source_ref: 89a2a8b4c7571965249bed745bf7c5c37a1221f1\n",
+          "before": "      policy_source_ref: e02b452ed799b82a05500efbaa5ee41f74a046ed\n"
+        }
+      ]
+    },
+    ".github/workflows/principal-possession-data.yml": {
+      "after": "51afc78647279b127a858c36fd281ac1741be97cef48c62b635f4f99eb7a3dc0",
+      "before": "afd0e680624bb0dde56c1df21b8c6c534f50d5cea0eea2889f4d1889d2db69fa",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/push-coordinator-source.yml": {
+      "after": "9ade53b48ef52f65b56838aa6852db3487f1252b8176ba319b39e9d2162f2ec8",
+      "before": "0d8ede13c60fe2e8702b1db059ad40554bbdbef740bee68727fbadca7da2bacd",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/reusable-workflow-guard.yml": {
+      "after": "9d114b39b328477546712d7438d6860c624a66dba803574ae201915b6659ccdc",
+      "before": "b2b80a496836c67250ff12200ae01f3429e364015aa0239ac533112c50499b2f",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/rich-delivery-adapter.yml": {
+      "after": "ba1b23cb6ea269bf6c335865b0ccb61c64bf6cab9e871342c9e826728ab4f9b9",
+      "before": "f5a72cbe74ed70ca6ae6eb476b001eead75dd8252b0bd0d6896e8602799e9ce1",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/rich-session-data-profile.yml": {
+      "after": "c2343f7e6a28b79b2c7b1526e4187aadccc9f59abe1a0862bff61c54a66951b3",
+      "before": "815430c45fc49ff07f7b4ce37ea9c9fddf38ca609d2e0b7f8880138865bc0717",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/semgrep.yml": {
+      "after": "1d6d29f50853957f48000d81f5090cc2ddcd1db95ebf123b17ee5bd9a81841c3",
+      "before": "abae80d0f28fb46181b7e4319fe1c82ddb60ee8c316cd7f85304135080cee331",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        },
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/djconnect-semgrep-733.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef # Reachable canonical main commit\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/djconnect-semgrep-733.yml@4bd9731a6fe7bb50c932e36635eb3ff5c5372687 # Reachable canonical main commit\n"
+        }
+      ]
+    },
+    ".github/workflows/surface-enrollment-source.yml": {
+      "after": "57c2b0e9d07358ede7c02447eb9547fe3f9ae0cd09be3b3296900a409173285a",
+      "before": "868b5404314ead079931a3de8d5bd792f1fd1db63f2f81d6e9b6c3df1f61e848",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/trusted-delivery.yml": {
+      "after": "5e1080c7c8698d6f425d0a29e9697da4cc9715b6241ee0e10ecaeaa753cd20f7",
+      "before": "18dcea558fa7692be52c9ebbbf1f68760e34013bf4f9255fab0bf7f4e999bc8b",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/trusted-delivery-qualification.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/trusted-delivery-qualification.yml@b13461ebb5b7b4c6fd118df790fff6be4e0bed36\n"
+        }
+      ]
+    },
+    ".github/workflows/watch-moment-alert-source.yml": {
+      "after": "0c9b2da7ef6b69162766068fa72e1cfa9bb7fe8a392a7a54d0fa3bae727a6ead",
+      "before": "107e780f036f9450d72d1d7b5c9c7b2eae8665a4a202b9f816ef8f787e08dcff",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/widget-first-key-source.yml": {
+      "after": "1d97bccbe04aeaceb2fc6cae0310a5fe85e45acd7783eabfdb71f5613b09e162",
+      "before": "c37ee48dc7921c8c31c2bb139c5ee01323c34a4a8524f62e5a5b0ab0592a1db7",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    },
+    ".github/workflows/worker-do-registry-source.yml": {
+      "after": "1dd9804009649428212779f6d420192e2d6c8e21e65c19d1c453cf81dd065896",
+      "before": "9017b3e01243d1f61d705cf71142494a37a64bab3e6ebe9cb169b97a6dea97ed",
+      "replacements": [
+        {
+          "after": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@4025a68add8ba98f1f2e0307d7f3998e45c0d9ef\n",
+          "before": "    uses: djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@2a1c6fd2841b08630aee01402850f56840b50f70\n"
+        }
+      ]
+    }
+  }
+}

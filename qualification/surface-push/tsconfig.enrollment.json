@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "types": ["node", "vite/client"] },
+  "include": [
+    "../../worker-configuration.d.ts",
+    "../../node_modules/@cloudflare/vitest-pool-workers/types/cloudflare-test.d.ts",
+    "../../test/env.d.ts",
+    "../../src/surface-push/enrollment.ts",
+    "../../test/surface-enrollment.spec.ts"
+  ],
+  "exclude": []
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_SOURCE_DELTA_NOT_DEPLOYMENT_AUTHORIZATION",
+  "baseline_source_sha": "9c3f2849a2b82b7ebcc553681e30545757794810",
+  "baseline_source_map_sha256": "d0496e59cf4c0aff5f64fbeeba30d33c43f81136bb786e39e6891bae5cc7883f",
+  "effective_source_map_sha256": "f4a2dd15d49e01c12a0f825e898c7bd9a59d43ea8b03d8e16bc94b8d50e88686",
+  "changes": {
+    "qualification/rendezvous/assertion-key-state.ts": {
+      "before": "cc81329ff2db3af8f83dcb240791e176d8b1fb8fd0ffd71bbca02161bd2b7311",
+      "after": "6e7174c4af494ad79f84fb7044e47f1a0ccfa1e34a38064392d2c32e4d300100"
+    },
+    "qualification/rendezvous/assertion-key-state.check.mjs": {
+      "before": "3b0816b7b47e563d18f6bab5415a7730718a6fd6ae309f03a016d7a506bc7581",
+      "after": "7f52c563d3b7523a5973a5b5bb37bda1b42a3d842b87c1f6a448c308439a2b4f"
+    },
+    "qualification/rendezvous/challenge-budget.check.mjs": {
+      "before": "be281d7571d80e05d14bd2b6a2e79308659df037f1ae6442ef425335b03e5b55",
+      "after": "601278f10f1e0c214b04355bca1cb8fe1e8135a69c75a04e42b418f3bc0cd5c5"
+    }
+  },
+  "proofs": {
+    "shared": {
+      "path": "docs/rendezvous/authorization-internal-shared-observations-v1.json",
+      "sha256": "571a10a1eb554e37c6819f6781957ab170e76d7d2d1ba8cff00d52a023effe0b"
+    },
+    "root": {
+      "path": "docs/rendezvous/authorization-internal-build-observations-v1.json",
+      "sha256": "603d30bf24ce2a56032156975f838a7e5b9723f444e258de60f8fec95105138c"
+    }
+  }
+}

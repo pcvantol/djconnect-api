@@ -1,0 +1,230 @@
+{
+  "scope": "SOFTWARE_ONLY_API_JWE_GENERATOR_NODE_CLI_NOT_BROWSER_NATIVE_OR_SERVICE_GO",
+  "node": "v26.12.0",
+  "jose": "6.2.12",
+  "tests_passed": 52,
+  "tests_failed": 0,
+  "cases": [
+    {
+      "name": "CLI compact envelope decrypts via standard Node RSA-OAEP256/AES256GCM APIs",
+      "status": "passed"
+    },
+    {
+      "name": "jose decrypts CLI output to exact plaintext bytes",
+      "status": "passed"
+    },
+    {
+      "name": "RFC7638 thumbprint matches separate Node SHA256 canonical public tuple",
+      "status": "passed"
+    },
+    {
+      "name": "repeated public input gets library-managed fresh ciphertext and IV",
+      "status": "passed"
+    },
+    {
+      "name": "one optional final LF accepted",
+      "status": "passed"
+    },
+    {
+      "name": "past synthetic expiry remains expressible for consumer denial tests",
+      "status": "passed"
+    },
+    {
+      "name": "altered compact segment 0 fails authenticated decryption",
+      "status": "passed"
+    },
+    {
+      "name": "altered compact segment 1 fails authenticated decryption",
+      "status": "passed"
+    },
+    {
+      "name": "altered compact segment 2 fails authenticated decryption",
+      "status": "passed"
+    },
+    {
+      "name": "altered compact segment 3 fails authenticated decryption",
+      "status": "passed"
+    },
+    {
+      "name": "altered compact segment 4 fails authenticated decryption",
+      "status": "passed"
+    },
+    {
+      "name": "different software recipient cannot decrypt",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects private-key-field without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects extra-jwk-alg without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects wrong-exponent without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects padded-modulus without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects leading-zero-modulus without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects wrong-modulus-bitlength without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects even-modulus without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects mismatched-thumbprint without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects mismatched-plaintext-thumbprint without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects extra-request-field without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects credential-payload-field without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects wrong-protocol without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects wrong-origin without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects fractional-generation without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects invalid-uuid-variant without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-expiry-number without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects padded-epoch without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-17 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-18 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-19 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-20 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-21 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-22 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-23 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-24 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-25 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-26 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI rejects unsafe-or-nonexample-destination-27 without echo",
+      "status": "passed"
+    },
+    {
+      "name": "CLI denies framing duplicate-request-key",
+      "status": "passed"
+    },
+    {
+      "name": "CLI denies framing duplicate-jwk-key",
+      "status": "passed"
+    },
+    {
+      "name": "CLI denies framing duplicate-plaintext-key",
+      "status": "passed"
+    },
+    {
+      "name": "CLI denies framing pretty-cli-input",
+      "status": "passed"
+    },
+    {
+      "name": "CLI denies framing trailing-json",
+      "status": "passed"
+    },
+    {
+      "name": "CLI denies framing too-large-input",
+      "status": "passed"
+    },
+    {
+      "name": "CLI denies framing invalid-utf8",
+      "status": "passed"
+    },
+    {
+      "name": "wrong argument count is generic denial",
+      "status": "passed"
+    },
+    {
+      "name": "module encryption performs no outbound fetch",
+      "status": "passed"
+    },
+    {
+      "name": "changed dependency code rejected before import",
+      "status": "passed"
+    },
+    {
+      "name": "unexpected dependency file rejected",
+      "status": "passed"
+    },
+    {
+      "name": "dependency symlink rejected",
+      "status": "passed"
+    }
+  ],
+  "source_sha256": {
+    "generate_destination_vector.mjs": "15533bbd9e74c6557508ac11bbda26c4d851c3a62172c0790733b4b0c4891001",
+    "run_jwe_vectors.mjs": "3d062a1550188f58a8030a1d4ec2e7015b76e904ebcb92b183de6ec3dda3e83a",
+    "jwe-dependency-provenance-v1.json": "81f4cd24e597028127776e6e3cc632ac84c9d5302103e68bfa1589e0dc3fdae3"
+  },
+  "private_material": "software RSA private keys process-memory only; not exported or persisted",
+  "not_run": [
+    "receiver crossrun of this API generator",
+    "native signed-iOS action binding",
+    "production JSON/URL parser qualification",
+    "AppAttest/HA/service/DO/E2E",
+    "deployment"
+  ]
+}

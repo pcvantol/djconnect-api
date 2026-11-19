@@ -1,0 +1,82 @@
+{
+  "evidence": "UNAPPROVED_REFERENCE_BEHAVIOR_ONLY",
+  "reference_commit": "f16c4bb71b737466872bc8b8a7dfd215364eaa83",
+  "source_sha256": "919f9678106318e787eb61fca1c37d2f0b2bca9cfe081e4110caaf996bd9e01b",
+  "node": "v24.19.0",
+  "cbor": "10.0.11",
+  "nofilter": "3.1.0",
+  "cases": 15,
+  "results": [
+    {
+      "name": "positive-synthetic-signature-counter1",
+      "observed": "accepted"
+    },
+    {
+      "name": "zero-counter-known-state",
+      "observed": "rejected"
+    },
+    {
+      "name": "equal-counter",
+      "observed": "rejected"
+    },
+    {
+      "name": "lower-counter",
+      "observed": "rejected"
+    },
+    {
+      "name": "omitted-counter-state-zero-accepted",
+      "observed": "accepted"
+    },
+    {
+      "name": "nan-counter-state-zero-accepted",
+      "observed": "accepted"
+    },
+    {
+      "name": "second-cbor-object-ignored",
+      "observed": "accepted"
+    },
+    {
+      "name": "duplicate-map-key-accepted",
+      "observed": "accepted"
+    },
+    {
+      "name": "unparsed-extension-tail-accepted",
+      "observed": "accepted"
+    },
+    {
+      "name": "unsigned-counter-high-bit-rejected",
+      "observed": "rejected"
+    },
+    {
+      "name": "unsigned-counter-maximum-rejected",
+      "observed": "rejected"
+    },
+    {
+      "name": "changed-client-data",
+      "observed": "rejected"
+    },
+    {
+      "name": "wrong-app-identity",
+      "observed": "rejected"
+    },
+    {
+      "name": "changed-signature",
+      "observed": "rejected"
+    },
+    {
+      "name": "changed-signed-counter",
+      "observed": "rejected"
+    }
+  ],
+  "not_run": [
+    "Apple attestation",
+    "actual App Attest assertion",
+    "full certificate path validation",
+    "native interoperability",
+    "workerd/DO runtime",
+    "browser",
+    "HA",
+    "production"
+  ],
+  "second_node": "v26.12.0"
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "scope": "CLOSED_ENROLLMENT_SERVICE_JOIN_CAUSAL_SOURCE_NOT_PUBLIC_NATIVE_OR_PROVIDER_GO",
+  "base_main_sha": "796a9bdfe6e94f0cfac04da1171102d052407347",
+  "at": "2026-10-26T23:42:32.141318+00:00",
+  "source_sha256": {
+    "src/surface-push/composition.ts": "a0226eb2bf10dc9a2f436db8d8f83e241dc2cb6b0ce5bc316b441d50f6e30f04",
+    "src/surface-push/enrollment.ts": "ed19d08cdb685214cdddb4cdc76e5699383e83f04192a7b053d8756ca62eaf0e",
+    "test/surface-enrollment.spec.ts": "8c4767c4f4626b6110dd13d3aea4f1adf74380396040b97aebc61858b58d4bf8"
+  },
+  "actual_checks": {
+    "Worker_cases_passed": 306,
+    "retained_cases": 280,
+    "new_service_guard_cases": 26,
+    "composition_cases_passed": 49,
+    "product_checks_passed": 128,
+    "forbidden_RPC_rejections": 100,
+    "outbound_calls": 0,
+    "preparation_cases_passed": 43,
+    "preparation_seconds": 119.942
+  },
+  "original_log_sha256": {
+    "full_worker": "233feb89d376ac85174dc8a37eaed279da0a2ea09c8da6e0233dfe76aef69ca4",
+    "compiled_product": "e4574957fee6be39c00c1d0d6e507a36935327fe262015f39100a6fe0b346155",
+    "composition": "da5f945114b0dd8efbb91162ca98181a978a5fe5429c59e4d3da5c299d38beff",
+    "preparation": "760da74f1c1e11801392c3eb46563e6fc08497dd2ca1ffec3a8468664541d46e",
+    "root_types": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "enrollment_types": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "causal_controls": [
+    "Paused original admin digest and public-key import; service retirement or request abort prevents mutation; observed retirement cannot be restored",
+    "Synchronous statement preparation triggers retirement/abort before each authorize/redeem/revoke batch; final no-await guard submits zero batches",
+    "After actual D1 batch completion retirement/abort suppresses positive receipt/credential while real committed state persists; no rollback fiction",
+    "Immutable DB/secret/options clock callback/currentness callback replacement or original clock rollback during import permanently retires factory",
+    "Pending request body retires/aborts before admin hash or any mutation",
+    "Composed internal service authorizes/redeems synthetic widget enrollment with no APNs key/provider call",
+    "Observed outer currentness retirement and explicit service close during original import remain closed; no claim to detect unobserved ABA"
+  ],
+  "source_graph": {
+    "fresh_product_observation": "docs/rendezvous/closed-enrollment-service-product-observations-v1.json",
+    "fresh_product_map_inputs": 116,
+    "effective_tracked_inputs": 119,
+    "cumulative_source_deltas": 29,
+    "installed_runtime_inputs": 50,
+    "installed_runtime_hashes_equal_previous": true,
+    "retained_shared_module_maps": "Original v4 crypto/shared and coordinator observations retained byte-identical historical evidence; no unchanged crypto/state rerun claimed"
+  },
+  "historical_failures": [
+    "Initial root/dedicated types emitted TS2304 catch-path signal reference; fixed; original failure retained externally.",
+    "Early narrower60-case run was42 retained enrollment plus18 initial service cases, not final306 fullsuite."
+  ],
+  "closed_defaults": {
+    "public_dispatch_enabled": false,
+    "issuer_admitted_profiles": [],
+    "activity_profiles": [],
+    "rendezvous_full_service_gates_open": 22
+  },
+  "qualification_limits": "No new native/provider positive acceptance, source review, protected Source/Final or deployment from these local observations. Exact committed closed-runtime negative checks are separate subsequent evidence."
+}

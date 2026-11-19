@@ -1,0 +1,19 @@
+{
+  // Local fixture for a standalone and closed HA-dev Worker package.
+  "name": "djc-widget-publisher-ha-dev-dry-run",
+  "main": "../../src/native-push/widget-core-publisher-worker.ts",
+  "compatibility_date": "2026-06-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "send_metrics": false,
+  "observability": { "enabled": false },
+  "vars": { "WIDGET_PUBLISHER_MODE": "closed" },
+  "d1_databases": [
+    {
+      "binding": "WIDGET_HA_DEV_DB",
+      "database_name": "widget-core-ha-dev-local-fixture",
+      "database_id": "00000000-0000-4000-8000-000000000001"
+    }
+  ]
+}

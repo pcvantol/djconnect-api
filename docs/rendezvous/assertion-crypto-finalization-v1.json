@@ -1,0 +1,212 @@
+{
+  "main": "030d22571e2cfc0f260adae28aac31f294a1d4a7",
+  "artifacts": {
+    "12335801301": {
+      "name": "api-release-artifact-evidence",
+      "provider_zip_sha256": "d8f18875b91f10ad1bb94ccf833e5e3d086012a072c2cdb9f4382e674d3e153d",
+      "files": {
+        "api-release-artifact-evidence.json": "8d8c8b4fca0d24eea5c65efd2b43aeb1db07c24c713e050615c2ea9c839b721a"
+      }
+    },
+    "12335801296": {
+      "name": "djconnect-api-release-030d22571e2cfc0f260adae28aac31f294a1d4a7",
+      "provider_zip_sha256": "05b96fafa5c32f19a3460a92cb3b93a736541d330b368e32e2bc45eccb8171ca",
+      "files": {
+        "djconnect-api-release.tar.gz": "636f3cbbda35fa58612d5af8371507df2d928a2c8ef2656e88e6b4add455313f"
+      }
+    },
+    "12334707700": {
+      "name": "post-merge-release-evidence",
+      "provider_zip_sha256": "4364f40821353c81b0858340620e889167e28bc06f03a33500015bc99869e9cf",
+      "files": {
+        "post-merge-release-evidence.json": "a6d41cac0b9bb5414a27a2a9fb491c551aa0485d04e72f651184f8a520f0eb66"
+      }
+    }
+  },
+  "runs": {
+    "artifact": 39578706059,
+    "formal": 39578706805
+  },
+  "archive_sha256": "636f3cbbda35fa58612d5af8371507df2d928a2c8ef2656e88e6b4add455313f",
+  "worker_sha256": "cc7bb0dbb1820ee3138eb8bd35e9cab8b1cb49d5d0294d6f3a40727ca6ba62f2",
+  "worker_bytes": 1259120,
+  "release_main_stamp": true,
+  "license_sidecars_equal_source": true,
+  "artifact_evidence": {
+    "artifact_id": "12335801296",
+    "artifact_sha256": "636f3cbbda35fa58612d5af8371507df2d928a2c8ef2656e88e6b4add455313f",
+    "candidate_sha": "030d22571e2cfc0f260adae28aac31f294a1d4a7",
+    "kind": "api_worker_release_artifact",
+    "repository": "pcvantol/djconnect-api",
+    "schema_version": 1,
+    "timestamp": "2026-10-21T09:40:23Z"
+  },
+  "formal": {
+    "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "evidence_digest": "5bb30dbc8183dd84c06eb6d641dc801ecac9d8f7115e94a91a0d38f821f858c4",
+    "findings": [],
+    "kind": "post_merge_release_evidence",
+    "main_parents": [
+      "9261af97f9452b053468b1dbfc7275774b84a5ea"
+    ],
+    "main_sha": "030d22571e2cfc0f260adae28aac31f294a1d4a7",
+    "merge_actor": "pcvantol",
+    "merge_strategy": "SQUASH",
+    "originating_pr": {
+      "base_ref": "main",
+      "changed_files": [
+        "HANDOFF.md",
+        "TODO.md",
+        "docs/rendezvous/ASSERTION_CRYPTO_FAILURES_V1.md",
+        "docs/rendezvous/assertion-crypto-build-observations-v1.json",
+        "docs/rendezvous/assertion-crypto-core-observations-v1.json",
+        "docs/rendezvous/assertion-crypto-shared-observations-v1.json",
+        "docs/rendezvous/assertion-crypto-source-delta-v1.json",
+        "docs/rendezvous/deployment-preparation-v1.json",
+        "qualification/rendezvous/app-attest-core-candidate.mjs",
+        "qualification/rendezvous/app-attest-core.check.mjs",
+        "qualification/rendezvous/assertion-key-state.check.mjs",
+        "qualification/rendezvous/assertion-verifier.d.ts",
+        "qualification/rendezvous/local-native-runtime.mjs",
+        "qualification/rendezvous/provider-unavailable.check.mjs",
+        "scripts/validate_rendezvous_deployment_plan.py"
+      ],
+      "head_sha": "b05590496081046175d18d54b4242177f036c351",
+      "main_changed_files": [
+        "HANDOFF.md",
+        "TODO.md",
+        "docs/rendezvous/ASSERTION_CRYPTO_FAILURES_V1.md",
+        "docs/rendezvous/assertion-crypto-build-observations-v1.json",
+        "docs/rendezvous/assertion-crypto-core-observations-v1.json",
+        "docs/rendezvous/assertion-crypto-shared-observations-v1.json",
+        "docs/rendezvous/assertion-crypto-source-delta-v1.json",
+        "docs/rendezvous/deployment-preparation-v1.json",
+        "qualification/rendezvous/app-attest-core-candidate.mjs",
+        "qualification/rendezvous/app-attest-core.check.mjs",
+        "qualification/rendezvous/assertion-key-state.check.mjs",
+        "qualification/rendezvous/assertion-verifier.d.ts",
+        "qualification/rendezvous/local-native-runtime.mjs",
+        "qualification/rendezvous/provider-unavailable.check.mjs",
+        "scripts/validate_rendezvous_deployment_plan.py"
+      ],
+      "merge_actor": "pcvantol",
+      "merge_commit_sha": "030d22571e2cfc0f260adae28aac31f294a1d4a7",
+      "merge_strategy": "SQUASH",
+      "merged_at": "2026-10-21T09:38:28Z",
+      "number": 119,
+      "state": "MERGED"
+    },
+    "post_merge": {
+      "build_validation": "PASS",
+      "ci": "PASS",
+      "coverage": "PASS",
+      "coverage_artifact_sha": "sha256:fb695aeb93b2c72f766e7d612e2fcacc514b0c12a382114f084c5cdd4d13bb5d",
+      "coverage_report_sha": "030d22571e2cfc0f260adae28aac31f294a1d4a7",
+      "governance": "PASS",
+      "lint": "PASS",
+      "sha": "030d22571e2cfc0f260adae28aac31f294a1d4a7",
+      "static_analysis": "PASS",
+      "tests": "PASS",
+      "workflow_run_ids": [
+        "39578532152"
+      ]
+    },
+    "pre_merge": {
+      "candidate_sha": "b05590496081046175d18d54b4242177f036c351",
+      "owner_authorization": "PASS",
+      "required_checks": "PASS",
+      "risk_classification": "NORMAL_RISK",
+      "software_assurance": "PASS",
+      "trusted_delivery": "PASS",
+      "verification": "PASS",
+      "workflow_integrity": "PASS"
+    },
+    "provenance_result": "PASS",
+    "repository": "pcvantol/djconnect-api",
+    "repository_role": "active_source",
+    "schema_version": 1,
+    "source_qualified_pr_sha": "b05590496081046175d18d54b4242177f036c351",
+    "timestamp": "2026-10-21T09:40:04.163Z"
+  },
+  "durable": {
+    "asset_id": 662023661,
+    "sha256": "3a87314a3bf3658791abcd9e95cdeca92efdbfa48be0ac5f94ea9a4f5375b351",
+    "receipt": {
+      "commit_sha": "030d22571e2cfc0f260adae28aac31f294a1d4a7",
+      "integrity": {
+        "algorithm": "sha256-canonical-json",
+        "digest": "f7be9564f69be17b650f97393470fefecbc2d8315523e28638df125f56e0434c"
+      },
+      "kind": "durable_qualification_evidence",
+      "published_at": "2026-10-21T09:40:04Z",
+      "qualification": {
+        "outcome": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+        "profile": "post_merge_release_evidence",
+        "required_checks": {
+          "post_merge_build_validation": "PASS",
+          "post_merge_ci": "PASS",
+          "post_merge_coverage": "PASS",
+          "post_merge_governance": "PASS",
+          "post_merge_lint": "PASS",
+          "post_merge_static_analysis": "PASS",
+          "post_merge_tests": "PASS",
+          "required_checks": "PASS",
+          "software_assurance": "PASS",
+          "trusted_delivery": "PASS",
+          "verification": "PASS",
+          "workflow_integrity": "PASS"
+        }
+      },
+      "record_id": "pcvantol/djconnect-api@030d22571e2cfc0f260adae28aac31f294a1d4a7:post-merge-release-evidence",
+      "redaction": {
+        "included_data": "formal allowlisted decision fields only",
+        "policy_version": 1,
+        "status": "REDACTED"
+      },
+      "release_identifier": "internal-api-030d22571e2cfc0f260adae28aac31f294a1d4a7",
+      "repository": "pcvantol/djconnect-api",
+      "repository_role": "active_source",
+      "retention_class": "LONG_TERM",
+      "revision": 1,
+      "schema_version": 1,
+      "source_evidence_digest": "5bb30dbc8183dd84c06eb6d641dc801ecac9d8f7115e94a91a0d38f821f858c4",
+      "source_revision": "733ecc2836d40611b2b7472308a7175a6130c91a",
+      "supplemental_evidence": [
+        {
+          "kind": "coverage_artifact_digest",
+          "sha256": "fb695aeb93b2c72f766e7d612e2fcacc514b0c12a382114f084c5cdd4d13bb5d"
+        }
+      ],
+      "workflow_references": {
+        "post_merge_run_ids": [
+          "39578532152"
+        ],
+        "producer_run_id": "39578706805"
+      }
+    }
+  },
+  "schema_version": 1,
+  "kind": "assertion_crypto_source_finalization",
+  "status_outside_protected_main": "FINALIZATION_CANDIDATE",
+  "exact_finalization_receipt_required": true,
+  "source_candidate": "b05590496081046175d18d54b4242177f036c351",
+  "source_pr": 119,
+  "source_tree": "42f2e1a4df8166248e5fd94f11d9439bd82bc061",
+  "independent_reviews": "https://github.com/pcvantol/djconnect-api/pull/119#issuecomment-6312787095",
+  "main_ci": {
+    "private_browser": 39578531388,
+    "projection": 39578531549,
+    "observe": 39578531401,
+    "Validate": 39578532152,
+    "CodeQL": 39578532358,
+    "artifact": 39578706059,
+    "formal": 39578706805
+  },
+  "all_source_main_workflows": "SUCCESS",
+  "assignment_complete": false,
+  "deployment_authorized": false,
+  "public_activation_allowed": false,
+  "native_accepted": false,
+  "full_provider_taxonomy_closed": false,
+  "timer_enabled": false
+}

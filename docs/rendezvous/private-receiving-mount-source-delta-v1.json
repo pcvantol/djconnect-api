@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_PRIVATE_RECEIVING_MOUNT_NOT_EFFECT_AUTHORIZATION",
+  "base_source": "067a214b8f59524481ec1309d07cfa8270abb20f",
+  "baseline_source_map_sha256": "04dfade9e9e2573c27b1640f14a309a1f9f6feee0ea69d97f5b95c27713b6096",
+  "effective_source_map_sha256": "b734d7cdb32ef1785d40f3be6c2b6779b5203adf909c8fb4de48c78e12ac7b43",
+  "changes": {
+    "coordinator/host-app-wake-receiving/operator-auth.ts": {
+      "before": "f3e30b0462aaad45687bf1fbd2e6b28cab24ef954b3698d9bf6853922cf671de",
+      "after": "34a50718a1fb1e45dbc5382b971a2fbbbdf577adb08129728f15c35b621d7c52"
+    },
+    "coordinator/host-app-wake-receiving/service.ts": {
+      "before": "089bf19488ba7a79e75abc07c850e501ad055a82e014b96f4ca29ae6ce8578dc",
+      "after": "704333208d0f94a1dc03230915259880f1f250356d442b15ebafa828dba98a5d"
+    },
+    "scripts/qualify_rendezvous_product_build.mjs": {
+      "before": "fad69790ef5f3bea6047cc944412e16437f84ab85eeacbe7c8284c099d86968c",
+      "after": "c4ea3a8f970c5ef44912d046c75a7f2f671f7c1373030096592d4e83c282d170"
+    },
+    "src/host-wake-receiving/dispatch.ts": {
+      "before": "4ff554a563516752a07bf0c1b01d97e3c182f7df5527929d5ca566e281d26bbf",
+      "after": "f5f0fc8ac40c58e60e78600564055a0c33dcfa4cac21dade34c8eb9f1d713fb9"
+    }
+  },
+  "private_http_mount_selected": true,
+  "production_effect_authorized": false
+}

@@ -1,0 +1,210 @@
+{
+  "public_inputs_sha256": {
+    "synthetic-receipts-v1.json": "c39a0f2cea7d7092d4f8a6c57160f6e9cf072157cdc20c2c5096babd45357a29",
+    "apple-receipt-root.cer": "63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179"
+  },
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "scope": "LOCAL_WORKERD_CMS_EVIDENCE_ONLY_REVOCATION_UNCHECKED_NO_ENROLLMENT_GO",
+  "tests_passed": 44,
+  "genuine_receipts": 0,
+  "synthetic_cases": 43,
+  "cases": [
+    {
+      "name": "signed synthetic CMS: valid",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-app",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-attested-cert",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-client-hash",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-type",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-environment",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: duplicate-field",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: unknown-field",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: missing-field",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-field-version",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-field-value-type",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: invalid-date",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: expires-before-created",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: stale",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: future-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: fresh-at-300s",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: stale-at-300s-plus-1ms",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: expired-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: leaf-missing-aki",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: inter-missing-aki",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: leaf-missing-purpose",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: inter-missing-purpose",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: leaf-wrong-ca",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: inter-wrong-ca",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: root-wrong-ca",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: leaf-unknown-critical",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: inter-unknown-critical",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: leaf-expired",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: inter-expired",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: root-expired",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: leaf-future",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: inter-future",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: root-future",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: signed-attrs",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-digest",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: duplicate-signer",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: extra-certificate",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-signer-id",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: tampered-signature",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: tampered-payload",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: trailing-object",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: truncated",
+      "status": "passed"
+    },
+    {
+      "name": "signed synthetic CMS: wrong-root-pin",
+      "status": "passed"
+    },
+    {
+      "name": "fixed real-root wrapper cannot trust synthetic fixture root",
+      "status": "passed"
+    }
+  ],
+  "node": "v26.12.0",
+  "libraries": {
+    "pkijs": "3.4.1",
+    "asn1js": "3.1.0"
+  },
+  "source_sha256": {
+    "receipt-cms-candidate.mjs": "e5af70746c87afe87b5a407981857910481badc077708fe74985ce4961a43479",
+    "receipt-cms.check.mjs": "92709acc8d663568209e692f3006d1c3864c97bda8cb5a06133b5c4648eda4a9",
+    "run_receipt_workerd.mjs": "fabf26801ee35b02bba7ac3cbcecca345595271852c55941d50c33dcfdd2da3a",
+    "build_synthetic_receipts.py": "bcfd0f62a8637c0b3ef3b47f289acdf05a68018cea60857754fddcd8fb3acb6d"
+  },
+  "compatibility_date": "2026-06-20",
+  "not_run": [
+    "revocation availability/status policy",
+    "actual fresh enrollment/storage/encryption",
+    "exact action wire/DO state/replay atomicity",
+    "production/HA/TV chain",
+    "genuine private Apple fixtures"
+  ]
+}
