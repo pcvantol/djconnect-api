@@ -189,6 +189,16 @@ export async function sourceSnapshot(){
   need(sha(Buffer.from(current))===change.before);delta41Previous[name]=current;
  }
  for(const [name,change] of Object.entries(delta41.version_source_changes))need(Object.keys(change).sort().join(',')==='after,before'&&sha(await readFile(join(repo,name)))===change.after);
+ const manifest41Path='docs/rendezvous/api-4-1-manifest-refresh-delta-v1.json',manifest41Raw=await readFile(join(repo,manifest41Path));
+ need(sha(manifest41Raw)==='339f9911e7dcd8a7a5d6aaca6edba4dd574261318faf24647aa228429b40f760'&&plan.reference_hashes[manifest41Path]===sha(manifest41Raw)&&provenance.api_41_manifest_refresh_delta_sha256===sha(manifest41Raw));
+ const manifest41=JSON.parse(manifest41Raw),manifest41Files=['coordinator/host-app-wake-receiving/runtime/source-inputs.json','coordinator/host-app-wake/source-manifest.json','coordinator/installation-principal/source-manifest.json','coordinator/installation-registry/source-manifest.json','coordinator/principal-possession/source-manifest.json','coordinator/rich-delivery/source-manifest.json','coordinator/rich-session/source-manifest.json','coordinator/source-manifest.json','coordinator/worker-do/source-manifest.json','qualification/watch-moment/source-manifest.json'].sort(),manifest41Previous={};
+ need(Object.keys(manifest41).sort().join(',')==='manifest_changes,production_effect_authorized,public_activation_allowed,schema_version,scope'&&manifest41.schema_version===1&&manifest41.scope==='EXACT_API_4_1_ACTIVE_MANIFEST_PINS_NOT_ACTIVATION'&&manifest41.public_activation_allowed===false&&manifest41.production_effect_authorized===false&&JSON.stringify(Object.keys(manifest41.manifest_changes).sort())===JSON.stringify(manifest41Files));
+ for(const [name,change] of Object.entries(manifest41.manifest_changes)){
+  need(Object.keys(change).sort().join(',')==='after,before,replacements'&&Array.isArray(change.replacements)&&change.replacements.length>0);
+  let current=await readFile(join(repo,name),'utf8');need(sha(Buffer.from(current))===change.after);const seen=new Set();
+  for(const item of change.replacements){const pin=delta41.workflow_changes[item.input]||delta41.version_source_changes[item.input];need(Object.keys(item).sort().join(',')==='after,before,input'&&pin&&!seen.has(item.input));seen.add(item.input);const before=JSON.stringify(item.input)+': '+JSON.stringify(pin.before),after=JSON.stringify(item.input)+': '+JSON.stringify(pin.after);need(item.before===before&&item.after===after&&current.split(after).length===2);current=current.replace(after,before);}
+  need(sha(Buffer.from(current))===change.before);manifest41Previous[name]=current;
+ }
  const sharedPath='docs/rendezvous/api-shared-governance-source-delta-v1.json';
  const sharedRaw=await readFile(join(repo,sharedPath));
  need(sha(sharedRaw)==='b9e44f138b5824cc29ca5fd99c3d822491486f2a720bb675303e65dc50a65376'&&plan.reference_hashes[sharedPath]===sha(sharedRaw)&&provenance.api_shared_governance_delta_sha256===sha(sharedRaw));
@@ -213,7 +223,7 @@ export async function sourceSnapshot(){
  need(JSON.stringify(Object.keys(shared.manifest_changes).sort())===JSON.stringify(sharedManifests));
  need(JSON.stringify(Object.keys(summary.manifest_changes).sort())===JSON.stringify(sharedManifests));
  for(const name of sharedManifests){
-  let text=await readFile(join(repo,name),'utf8');
+  let text=manifest41Previous[name];need(typeof text==='string');
   const latest=summary.manifest_changes[name],latestWorkflow=summary.workflow_changes[latest.workflow];
   need(Object.keys(latest).sort().join(',')==='after,before,workflow'&&latestWorkflow&&sha(Buffer.from(text))===latest.after&&text.split(latestWorkflow.after).length===2);
   text=text.replace(latestWorkflow.after,latestWorkflow.before);need(sha(Buffer.from(text))===latest.before);

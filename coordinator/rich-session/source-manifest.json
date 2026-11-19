@@ -7,7 +7,7 @@
   "handoff_sha256": "40e1c28a82799464d1ec8a03841490eaee31a4f488768f4d6429f86846895a12",
   "esbuild_version": "0.28.1",
   "inputs_sha256": {
-    ".github/workflows/rich-session-data-profile.yml": "815430c45fc49ff07f7b4ce37ea9c9fddf38ca609d2e0b7f8880138865bc0717",
+    ".github/workflows/rich-session-data-profile.yml": "c2343f7e6a28b79b2c7b1526e4187aadccc9f59abe1a0862bff61c54a66951b3",
     "coordinator/rich-session/README.md": "a1609aac8b7bd3bb436f34ce55922c8fdd44a564af5684ab666ef4f7af25e6a2",
     "coordinator/rich-session/build-source.mjs": "5986717a09746370f93176f72b5bf71e99ab1cb6550b89425f93f910c8f4d8ae",
     "coordinator/rich-session/contract-v1.md": "2a4a4a4f49e0f6d5a1015169ff63b27091f80d6d857423940a0381d955bbb499",
@@ -54,7 +54,7 @@
     "coordinator/rich-session/qualification/vitest.config.mts": "4f43bcab8272f20b48cf518d8cbca709bb76f0262422656e0b1f4fd929983d5a",
     "coordinator/rich-session/qualification/worker.ts": "927409c6726c9462921b4e4b9e0abda01dc472a4f6094fc29dedfc3bd249c4fa",
     "coordinator/rich-session/qualification/wrangler.jsonc": "3cf49517fd574002f1b88f73ba40d9dabe444e1a2a86a1665a9610be00edcbd5",
-    "package-lock.json": "568caf0f455eab642abc58c036ea11f3b331b63ecf5ffbf865cf6df9a8525915",
+    "package-lock.json": "20f73ac58391eeef484b610426b1e2adc5c39775ed6bd9fd052ad66f129c46eb",
     "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
     "worker-configuration.d.ts": "1003bdb1be07ff380278e6713b08768d41be6c98ee21dcfaf799b9c2c4441738"
   }

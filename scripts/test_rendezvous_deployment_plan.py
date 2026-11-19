@@ -61,6 +61,21 @@ class PreparationTests(unittest.TestCase):
                 with self.subTest(source=name), patch.object(v, 'safe_path', side_effect=lambda path: candidate if path == name else safe_path(path)):
                     self.rejects(self.plan)
 
+    def test_api_41_manifest_refresh_reconstructs_and_rejects_tampering(self):
+        delta = v.api_41_manifest_delta()
+        original_safe_path = v.safe_path
+        with tempfile.TemporaryDirectory() as directory:
+            candidate = Path(directory) / 'manifest.json'
+            for name, change in delta['manifest_changes'].items():
+                raw = (v.ROOT / name).read_bytes()
+                previous = v.api_41_previous_manifest(name, raw)
+                self.assertEqual(v.digest(previous), change['before'])
+                for item in change['replacements']:
+                    candidate.write_bytes(raw.replace(item['after'].encode(), b'"tampered": "invalid"', 1))
+                    with self.subTest(manifest=name, source=item['input']), patch.object(v, 'safe_path', side_effect=lambda path: candidate if path == name else original_safe_path(path)):
+                        with self.assertRaises(ValueError):
+                            v.api_41_previous_manifest(name, candidate.read_bytes())
+
     def test_valid_is_always_blocked_not_authorized(self):
         out = v.validate(self.plan)
         self.assertEqual(out['status'], v.SUCCESS)
@@ -125,7 +140,7 @@ class PreparationTests(unittest.TestCase):
                          v.API_GUARD_REFERENCE_DELTA_PATH, v.API_GOVERNANCE_SUMMARY_DELTA_PATH, 'scripts/check_reusable_workflow_refs.sh',
                          v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
                          *v.CORE_GOVERNANCE_AUXILIARY,
-                         'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md', v.API_41_DELTA_PATH, *v.API_41_WORKFLOWS, *v.API_41_VERSION_SOURCES)
+                         'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md', v.API_41_DELTA_PATH, v.API_41_MANIFEST_DELTA_PATH, *v.API_41_WORKFLOWS, *v.API_41_VERSION_SOURCES)
             transition = json.loads((canonical / v.CORE_GOVERNANCE_TRANSITION_PATH).read_bytes())
             pinned = {**self.plan['source_hashes'], **self.plan['reference_hashes'],
                       **{name: change['after'] for name, change in transition['workflow_changes'].items()},
@@ -138,6 +153,8 @@ class PreparationTests(unittest.TestCase):
                       **{name: change['after'] for name, change in json.loads((canonical / v.API_GOVERNANCE_SUMMARY_DELTA_PATH).read_bytes())['manifest_changes'].items()}}
             delta41 = json.loads((canonical / v.API_41_DELTA_PATH).read_bytes())
             pinned.update({name: change['after'] for name, change in {**delta41['workflow_changes'], **delta41['version_source_changes']}.items()})
+            manifest41 = json.loads((canonical / v.API_41_MANIFEST_DELTA_PATH).read_bytes())
+            pinned.update({name: change['after'] for name, change in manifest41['manifest_changes'].items()})
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = pinned[path]

@@ -1275,8 +1275,44 @@ def api_41_previous_workflow(name):
     require(digest(raw) == change['before'])
     return raw
 
+API_41_MANIFEST_DELTA_PATH = 'docs/rendezvous/api-4-1-manifest-refresh-delta-v1.json'
+API_41_MANIFEST_DELTA_SHA256 = '339f9911e7dcd8a7a5d6aaca6edba4dd574261318faf24647aa228429b40f760'
+SOURCE_PROVENANCE['api_41_manifest_refresh_delta_sha256'] = API_41_MANIFEST_DELTA_SHA256
+
+
+def api_41_manifest_delta():
+    delta = pinned_working_proof(API_41_MANIFEST_DELTA_PATH, API_41_MANIFEST_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'}
+            and type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_4_1_ACTIVE_MANIFEST_PINS_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and set(delta['manifest_changes']) == API_SHARED_GOVERNANCE_MANIFESTS)
+    return delta
+
+
+def api_41_previous_manifest(name, raw):
+    changes = api_41_manifest_delta()['manifest_changes']
+    if name not in changes:
+        return raw
+    change = changes[name]
+    require(set(change) == {'before', 'after', 'replacements'} and digest(raw) == change['after']
+            and isinstance(change['replacements'], list) and change['replacements'])
+    allowed = {**api_41_delta()['workflow_changes'], **api_41_delta()['version_source_changes']}
+    seen = set()
+    for item in change['replacements']:
+        require(set(item) == {'input', 'before', 'after'} and item['input'] in allowed and item['input'] not in seen)
+        seen.add(item['input'])
+        pin = allowed[item['input']]
+        before = f'"{item["input"]}": "{pin["before"]}"'.encode()
+        after = f'"{item["input"]}": "{pin["after"]}"'.encode()
+        require(item['before'].encode() == before and item['after'].encode() == after and raw.count(after) == 1)
+        raw = raw.replace(after, before, 1)
+    require(digest(raw) == change['before'])
+    return raw
+
+
 def summary_previous_bytes(name):
-    raw = api_41_previous_workflow(name)
+    raw = api_41_previous_manifest(name, api_41_previous_workflow(name))
     delta = pinned_working_proof(API_GOVERNANCE_SUMMARY_DELTA_PATH, API_GOVERNANCE_SUMMARY_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'})
     require(type(delta['schema_version']) is int and delta['schema_version'] == 1
@@ -1416,6 +1452,15 @@ def baseline():
                 and digest(safe_path(name).read_bytes()) == change['after'])
         refs[name] = change['after']
     refs[API_ORG_CORE_AUTHORITY_DELTA_PATH] = API_ORG_CORE_AUTHORITY_DELTA_SHA256
+    manifest_delta = api_41_manifest_delta()
+    for name, change in manifest_delta['manifest_changes'].items():
+        previous = api_41_previous_manifest(name, safe_path(name).read_bytes())
+        require(digest(previous) == change['before'])
+        for target in (sources, refs):
+            if name in target:
+                require(target[name] == change['before'])
+                target[name] = change['after']
+    refs[API_41_MANIFEST_DELTA_PATH] = API_41_MANIFEST_DELTA_SHA256
     return sources, refs
 
 

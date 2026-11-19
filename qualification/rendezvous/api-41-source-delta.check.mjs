@@ -27,7 +27,9 @@ test('JS source transition rejects each tampered pinned file', {timeout: 90000},
     x=check();assert.equal(x.status,0,x.stderr);
     const deltaPath='docs/rendezvous/api-4-1-org-policy-source-delta-v1.json';
     const delta=JSON.parse(readFileSync(join(checkout,deltaPath),'utf8'));
-    for(const file of [...Object.keys(delta.workflow_changes),...Object.keys(delta.version_source_changes),deltaPath]){
+    const manifestPath='docs/rendezvous/api-4-1-manifest-refresh-delta-v1.json';
+    const manifests=JSON.parse(readFileSync(join(checkout,manifestPath),'utf8'));
+    for(const file of [...Object.keys(delta.workflow_changes),...Object.keys(delta.version_source_changes),...Object.keys(manifests.manifest_changes),deltaPath,manifestPath]){
       const path=join(checkout,file),original=readFileSync(path);
       git(['update-index','--assume-unchanged','--',file]);
       try {
