@@ -1,0 +1,1521 @@
+#!/usr/bin/env python3
+"""Offline preparation consistency only. Never grants or performs deployment."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+SUPPLYING_SHA = '896ccdc69447c231d04da3a6af4f27ea1f763697'
+
+DELTA_PATH = 'docs/rendezvous/closed-enrollment-service-source-delta-v2.json'
+DELTA_SHA256 = '8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5'
+DELTA_PROOFS = (('docs/rendezvous/compatible-runtime-shared-observations-v4.json',
+  '5bee972aa2bc3a02fe44b8f92543a90d7f1d42791e4aed59490fc7ac855153e0',
+  'source_sha256',
+  66,
+  'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
+ ('docs/rendezvous/closed-enrollment-service-product-observations-v2.json',
+  '82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15',
+  'source_hashes',
+  116,
+  'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'),
+ ('docs/rendezvous/compatible-runtime-module-observations-v4.json',
+  '5389556e1ee2ee1e1f1d90af1ac17f3346157121f21df4e031ed23011c9f69b6',
+  'source_sha256',
+  19,
+  'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'))
+DELTA_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/allocation-budget.ts', 'qualification/rendezvous/assertion-key-state.check.mjs', 'qualification/rendezvous/enrollment-evidence-candidate.mjs', 'qualification/rendezvous/enrollment-evidence.check.mjs', 'qualification/rendezvous/enrollment-key-state.check.mjs', 'qualification/rendezvous/provider-unavailable.check.mjs', 'qualification/rendezvous/request-admission.check.mjs', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/run_challenge_budget_workerd.mjs', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs', 'src/index.ts', 'src/rendezvous/composition.ts'))
+DELTA_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v3.json', 'src/surface-push/apns.ts', 'src/surface-push/composition.ts', 'src/surface-push/crypto.ts', 'src/surface-push/dispatch.ts', 'src/surface-push/enrollment-wire.ts', 'src/surface-push/enrollment.ts', 'src/surface-push/handler.ts', 'src/surface-push/issuer-wire.ts', 'src/surface-push/issuer.ts', 'src/surface-push/provider.ts', 'src/surface-push/store.ts', 'src/surface-push/wire.ts'))
+REFERENCE_DELTA = {'THIRD_PARTY_NOTICES.md': {'before': '6d6319ca3c47afc56d3d90a36533c97954c4f0e2f8234a15f179309b65be564e', 'after': '9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f'}, 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md': {'before': 'd01864598df3730714db3065143f08cb6d21765f3323f0c8db20c7f5f9e60442', 'after': 'c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e'}}
+INSTALLED_DEPENDENCY_DELTA = {'node_modules/@noble/hashes/_md.js': {'before': None, 'after': '60cf3010fda89e3e4d3f0e7ff1ce249e9c467f34b4fd41b6fd6101d9f69be763'}, 'node_modules/@noble/hashes/_u64.js': {'before': None, 'after': 'b09da8c07fe8187c07649494cdb7cd0bcf13df90b506a9473d19e4d5f8c2e102'}, 'node_modules/@noble/hashes/esm/_md.js': {'before': 'cefb1557e7715cb2117c83f82ef3e3175c7e0391c80bd5795b2d4effc45fc582', 'after': None}, 'node_modules/@noble/hashes/esm/_u64.js': {'before': 'e48c0cfc10810439a4807b46db136ce603a3fa09b62584f513ef2f3ca496af54', 'after': None}, 'node_modules/@noble/hashes/esm/crypto.js': {'before': '9211d026c5d21e60e0126dd6f01150d87da5ba7261b8f468215c1264372ff5a5', 'after': None}, 'node_modules/@noble/hashes/esm/legacy.js': {'before': '4906186a82438392443e3ac2a59d0acbbec2bee2595d048c8d8c0dd6584d4bdb', 'after': None}, 'node_modules/@noble/hashes/esm/sha1.js': {'before': 'cd708647a4aad36d820253fc75e3a821efe842652b2c9134903c5aec33a2926a', 'after': None}, 'node_modules/@noble/hashes/esm/sha2.js': {'before': 'e729088b82e5450bff54c3a0013582aa42e1fe8f58dd31f5967f6ebe34c52299', 'after': None}, 'node_modules/@noble/hashes/esm/utils.js': {'before': '4cf4c1e05affedcb4fd584a43d76ae1a3711e34a36e2251b90c27e33ecc74fad', 'after': None}, 'node_modules/@noble/hashes/legacy.js': {'before': None, 'after': '690553a41af2fdd1e32ff6b534ba8508e95f1861c09c2d62fe762b6b501e09be'}, 'node_modules/@noble/hashes/sha2.js': {'before': None, 'after': '471746bba6ec4c6238ca41358d1d3b40b6ff31cf3363f0b4d550c649c1a8e83b'}, 'node_modules/@noble/hashes/utils.js': {'before': None, 'after': '037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c'}, 'node_modules/@peculiar/utils/build/_virtual/_rolldown/runtime.js': {'before': None, 'after': '1b10431e13b4eb349c329aba7d2beb6e6c224de569eac52966731c8239a941c9'}, 'node_modules/@peculiar/utils/build/bytes.js': {'before': None, 'after': '3257233f9027e4bd4db558cbe9dd29a1bece8395f5c699eabf04169e38b02779'}, 'node_modules/@peculiar/utils/build/bytes/buffer-source.js': {'before': None, 'after': 'd3a77cab2b8426ce297e8429b9d2ba03dbdbe97865b8173c51da0c92226b0f49'}, 'node_modules/@peculiar/utils/build/bytes/concat.js': {'before': None, 'after': '0d7017fef27635bed4dfed715736209bdf8e6959953549be15fc79cb103f8ea9'}, 'node_modules/@peculiar/utils/build/bytes/equal.js': {'before': None, 'after': '535bd6636af131a226dc59dd3642c4edb787611b71d78b94693b16523c5bd950'}, 'node_modules/@peculiar/utils/build/bytes/sequence.js': {'before': None, 'after': '771d13453aa579693ff8f1538ee754a8a21921bd910fe97bb571bddea572a4e1'}, 'node_modules/@peculiar/utils/build/converters/convert.js': {'before': None, 'after': '86c63126f664051c739c52945ce076a4aeb1171da95ddf78dba7d95886b80a8c'}, 'node_modules/@peculiar/utils/build/converters/defaults.js': {'before': None, 'after': '1781d65e5ebe30b2340b023bbcfff40fb9cee2e70918ce7e7f0c84999bd2fd7e'}, 'node_modules/@peculiar/utils/build/converters/registry.js': {'before': None, 'after': '162d1ba3bdbc3d014a9c48bd8c5aa325f5eb8a958104c7fe03d7ea8ef1319b40'}, 'node_modules/@peculiar/utils/build/encoding/base64.js': {'before': None, 'after': '98b0130b60565fcadfed4aa50b8854de6eafe9c224dbd2c5c994c673a50066c4'}, 'node_modules/@peculiar/utils/build/encoding/base64url.js': {'before': None, 'after': 'a2131390bb30cce0d6ab42ff32e056f7d665552449cb1829787a3001fae9add1'}, 'node_modules/@peculiar/utils/build/encoding/binary.js': {'before': None, 'after': '92727e40c10bb92f0bcf9b8841590ef11df1764b3027be3041e44f04edf56794'}, 'node_modules/@peculiar/utils/build/encoding/hex.js': {'before': None, 'after': 'a7066c019c44348f1d1fa6bb1972bf368a304af41b04e2dff3e4805a5cef81e0'}, 'node_modules/@peculiar/utils/build/encoding/utf16.js': {'before': None, 'after': '20ce0b98604a618599e5831158f94a032f94aa0a50c0e280dea776656a7f166c'}, 'node_modules/@peculiar/utils/build/encoding/utf8.js': {'before': None, 'after': 'd0e538af363ad2c92b6578f62902d6a374e94b34c7e90a9f5261743642c7c8a5'}, 'node_modules/@peculiar/utils/build/index.js': {'before': None, 'after': '249fb0a4cf5b6dd1cbc12f2c109d9ad5afa55fc34f6696db8a971b09efc6ad36'}, 'node_modules/@peculiar/utils/build/integer/int.js': {'before': None, 'after': '0b2523f5a56762ebc749a77ecd9f8ad1914d1240300efffd7ac87926b27c31b5'}, 'node_modules/@peculiar/utils/build/integer/uint.js': {'before': None, 'after': '53609f035e2e0513d1321147b5dbb8cf8ce483cd0fa3023e61a70dd1e0f85bab'}, 'node_modules/@peculiar/utils/build/legacy/buffer-source-converter.js': {'before': None, 'after': '61261697f592eefdda6393751447b22db37708d8cef7b42ecb79e69c366c2a67'}, 'node_modules/@peculiar/utils/build/legacy/convert.js': {'before': None, 'after': 'd604e5ffd876889bb177cf9ec2ebef468bc165ac7ffe28d2ab87736cc4263a6f'}, 'node_modules/@peculiar/utils/build/legacy/functions.js': {'before': None, 'after': 'be5e4255b7b45de3415b35f136656f3e44a413577740622a90ecea8b32e02b5f'}, 'node_modules/@peculiar/utils/build/pem/pem.js': {'before': None, 'after': '4204fe9f301df4cb96ed08ededb41934ec33e784d3aab1a31af3b9867184520b'}, 'node_modules/asn1js/build/index.es.js': {'before': 'ee1dbac2b2f8bc0edd15f56932d847f5a8565b20d0b2b22d6c978360279899e4', 'after': None}, 'node_modules/asn1js/build/index.js': {'before': None, 'after': '4a3cfe45a598edb62cbfcf89426f6a2556dd505bf3838935c106829fbfe32024'}, 'node_modules/bytestreamjs/build/bit.js': {'before': None, 'after': 'a3b2c1f5f923a1ed39b55745a4e501b2b6092b081c380acc73a542456e6687f9'}, 'node_modules/bytestreamjs/build/bit_stream.js': {'before': None, 'after': '220bc62673ddcbd43073d2f1f056c3da3ed6a4f44dc183af569b2e7a876ecca4'}, 'node_modules/bytestreamjs/build/byte_stream.js': {'before': None, 'after': '1dec0f7089d75334e9b58ae9b4690879dd88043cd3f377e9af4b20f9f0ff1b39'}, 'node_modules/bytestreamjs/build/helpers.js': {'before': None, 'after': '0e8003c7739767109d5a4931dde4c3aedec18100b5a3e3bc327d560cb6ef606c'}, 'node_modules/bytestreamjs/build/index.js': {'before': None, 'after': '4794bc465f13842696ec8c1ad027de9c198ad55c3c482059fe1694204833ebc2'}, 'node_modules/bytestreamjs/build/mjs/bit.js': {'before': '948aa3449ba484a4b33b8d251714a655ec67544e991902cd1773cab0c8cc1bfe', 'after': None}, 'node_modules/bytestreamjs/build/mjs/bit_stream.js': {'before': '109291e1cfc9e95db75748154cffd39163145d66fd85a6240d28eb5d8335c2f8', 'after': None}, 'node_modules/bytestreamjs/build/mjs/byte_stream.js': {'before': 'd265091e6b5209c1839b2c3f4d91df681a37bb1d3e3834891619d422277b634c', 'after': None}, 'node_modules/bytestreamjs/build/mjs/helpers.js': {'before': '9fe919254ac3db6db045e008cce021c5223146d8d9fbb2b3c5aa45a9ec1b2abf', 'after': None}, 'node_modules/bytestreamjs/build/mjs/index.js': {'before': '3139b1bdc36c99c155d14ff24e46ae5f3ecf78900f56de49bd466da2ed022de1', 'after': None}, 'node_modules/bytestreamjs/build/mjs/seq_bit_stream.js': {'before': '01b075ad7bc1c49fa2854cbe3c82407c29f12d01a926e0e77c68fe266159e5f8', 'after': None}, 'node_modules/bytestreamjs/build/mjs/seq_stream.js': {'before': 'bfa20e5092a8b5387091c9b00133a0fcaedf8bff090840cbb3872045346c1dc4', 'after': None}, 'node_modules/bytestreamjs/build/seq_bit_stream.js': {'before': None, 'after': '656eb46b51688d11ca3eb6b673e5d9f7c837727378676447da564b9a9416518e'}, 'node_modules/bytestreamjs/build/seq_stream.js': {'before': None, 'after': '6d5446062668db78d3ca06dbf75f5a76544347a93781af69c458f6448b17a6b4'}, 'node_modules/pkijs/build/index.es.js': {'before': '5f5c08540929f01ee75373b9f317753aeb6a7239241658473bb37826e2f85a50', 'after': None}, 'node_modules/pkijs/build/index.js': {'before': None, 'after': '81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685'}, 'node_modules/pvtsutils/build/index.js': {'before': '8cf4300225298c7811fd72840f84ebd12dda5359f29fffdba09cb67a63a5943f', 'after': None}, 'node_modules/pvutils/build/utils.es.js': {'before': 'e1a942c322462a4a2b1a2311b2b40bd9ab1779273d98fca085e074532f96db98', 'after': None}}
+SOURCE_PROVENANCE = {'baseline_sha': '896ccdc69447c231d04da3a6af4f27ea1f763697', 'delta_sha256': '8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5', 'effective_source_map_sha256': 'e2d0a139879729c728ab89f85534987bbc28f95e47de9c05389f801a8028e239', 'kind': 'BASELINE_PLUS_PINNED_DELTA', 'closed_receiving_root_delta_sha256': 'c1aacd517175cd5a4a6ea976029af294b6fbc73fbe6013098d3c272aebb12628', 'closed_receiving_root_product_sha256': '1ae2f21996bf74c606ddfb80072dbe8f1c7bc87aa0f703821c35189e87ebff0a', 'closed_receiving_root_source_map_sha256': '5ca0758d825063e9dafcb519eef238d707d52d52fbc35d270d37af38c5c146fd', 'qualification_workflow_delta_sha256': '5af37a24c9dfe7ead48425ce3597f0d9eb6288c20bc8ca5e415b5f977a96d3f1', 'qualified_source_map_sha256': 'd75bef5d8a7ddcff4723639817f6f0e2c85967d528e9be3c2bbb0dc4fe1f5109'}
+
+WORKFLOW_DELTA_PATH = 'docs/rendezvous/qualification-workflow-delta-v1.json'
+WORKFLOW_DELTA_SHA256 = '5af37a24c9dfe7ead48425ce3597f0d9eb6288c20bc8ca5e415b5f977a96d3f1'
+WORKFLOW_DELTA_SOURCE = '.github/workflows/ci-cd.yml'
+SOURCE_PROVENANCE.update(qualification_workflow_delta_sha256=WORKFLOW_DELTA_SHA256,
+    qualified_source_map_sha256='d75bef5d8a7ddcff4723639817f6f0e2c85967d528e9be3c2bbb0dc4fe1f5109')
+
+PROOFS = (('docs/rendezvous/assertion-crypto-shared-observations-v1.json',
+  'd1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b',
+  'source_sha256',
+  66,
+  'LOCAL_SHARED_APP_KEY_API_NOT_NATIVE_EDGE_OR_RELEASE_GO'),
+ ('docs/rendezvous/sharp-0355-composition-observations-v1.json',
+  'd0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531',
+  'source_sha256',
+  19,
+  'INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE'),
+ ('docs/rendezvous/sharp-0355-build-observations-v1.json',
+  'cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089',
+  'source_hashes',
+  85,
+  'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY'))
+
+REFERENCES = ('wrangler.jsonc', '.github/workflows/deploy-api-worker.yml',
+              '.github/workflows/api-release-artifact.yml',
+              'docs/rendezvous/implementation-contract-release-v1.json',
+              'LICENSE', 'THIRD_PARTY_NOTICES.md',
+              'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md',
+              *(proof[0] for proof in PROOFS))
+PROPOSED_CONFIGURATION = {
+    'COMPOSED_POLICY_ENABLED': 'djc-http-composition-qualification/1',
+    'REQUEST_POLICY_ENABLED': 'djc-request-admission-qualification/2',
+    'ALLOCATION_POLICY_ENABLED': 'djc-allocation-qualification/1',
+    'INDEX_POLICY_ENABLED': 'djc-index-qualification/1',
+    'ASSERTION_POLICY_ENABLED': 'ios-dev-qualification/1',
+    'ASSERTION_POLICY_EXPIRES_AT': None,
+    'ENROLLMENT_POLICY_REVISION': None,
+    'RENDEZVOUS_EDGE_POLICY': 'djc-direct-edge-identity/1-candidate',
+}
+BINDINGS = {
+    'REQUEST_ADMISSION': 'RequestAdmission',
+    'ADMISSION_STATE': 'AllocationBudget',
+    'ALLOCATION_INDEX': 'AllocationIndex',
+    'ENROLLMENT_COORDINATOR': 'EnrollmentCoordinator',
+    'COMPOSED_TRANSACTIONS': 'BudgetedTransactionCoordinator',
+}
+GATES = ('joint_contract_freeze', 'independent_full_protocol_security',
+         'public_entrypoint_and_all_gated_paths', 'trusted_cf_ip_provenance',
+         'edge_waf_rejected_traffic_spend', 'account_plan_and_shared_usage',
+         'namespace_and_migration_collision', 'provider_status_and_error_taxonomy',
+         'genuine_supported_signed_ios', 'ha_external_route_and_display_admission',
+         'physical_iphone_ha_tv', 'load_latency_cpu_sql_duration',
+         'approved_spend_and_capacity', 'platform_logs_retention_backups_dpa',
+         'secret_presence_and_rotation', 'cleanup_alerts_and_physical_retention',
+         'immutable_product_artifact', 'protected_main_and_separate_finalization',
+         'applicable_central_manifest', 'exact_deployment_authorization',
+         'compatible_rollback_readback', 'authorized_live_smoke')
+SUCCESS = 'PREPARATION_CONSISTENT_BLOCKED_NOT_AUTHORIZED'
+
+
+def require(value):
+    if not value:
+        raise ValueError('invalid_preparation')
+
+
+def pairs(items):
+    result = {}
+    for key, value in items:
+        require(key not in result)
+        result[key] = value
+    return result
+
+
+def decode(raw):
+    require(len(raw) <= 1024 * 1024)
+    return json.loads(raw.decode('utf-8'), object_pairs_hook=pairs,
+                      parse_constant=lambda _: (_ for _ in ()).throw(ValueError('invalid_json')))
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def blob(name):
+    # Paths are pinned constants or come from the independently pinned proof.
+    safe_path(name)
+    environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}
+    environment.update(GIT_NO_LAZY_FETCH='1', GIT_TERMINAL_PROMPT='0',
+                       GIT_OPTIONAL_LOCKS='0', GIT_NO_REPLACE_OBJECTS='1')
+    result = subprocess.run(['git', 'cat-file', 'blob', SUPPLYING_SHA + ':' + name],
+                            cwd=ROOT, capture_output=True, timeout=10, check=True,
+                            env=environment)
+    require(len(result.stdout) <= 2 * 1024 * 1024)
+    return result.stdout
+
+
+def safe_path(name):
+    require(isinstance(name, str) and name and '\\' not in name)
+    parts = name.split('/')
+    require(all(part not in ('', '.', '..') for part in parts))
+    current = ROOT
+    for part in parts:
+        current = current / part
+        require(not current.is_symlink())
+    require(current.resolve().is_relative_to(ROOT))
+    return current
+
+
+def merge_sources(shared, module, root, *, with_closed_issuer=False):
+    """Only immutable proof maps define inputs; never discover mutable Git state."""
+    sources = {}
+    excluded = set()
+    for index, recorded in enumerate((shared, module, root)):
+        require(isinstance(recorded, dict) and len(recorded) == (66, 19, 116 if with_closed_issuer else 85)[index])
+        for name, expected in recorded.items():
+            require(isinstance(name, str) and isinstance(expected, str)
+                    and len(expected) == 64 and all(c in '0123456789abcdef' for c in expected))
+            path = (name if name.startswith(('docs/', 'src/'))
+                    else 'qualification/rendezvous/' + name) if index == 0 else name
+            if index == 2 and path.startswith('node_modules/'):
+                require('\\' not in path and all(p not in ('', '.', '..') for p in path.split('/')))
+                excluded.add(path)
+                continue  # Installed package bytes are not immutable Git blobs.
+            safe_path(path)
+            require(path not in sources or sources[path] == expected)
+            sources[path] = expected
+    require(len(excluded) == (50 if with_closed_issuer else 32) and len(sources) == (119 if with_closed_issuer else 106))
+    return sources
+
+
+def immutable_baseline():
+    maps = []
+    for name, pin, field, count, scope in PROOFS:
+        raw = blob(name)
+        require(digest(raw) == pin)
+        proof = decode(raw)
+        require(proof['scope'] == scope and isinstance(proof[field], dict) and len(proof[field]) == count)
+        maps.append(proof[field])
+    sources = merge_sources(*maps)
+    for path, expected in sources.items():
+        require(digest(blob(path)) == expected)
+    return sources, {name: digest(blob(name)) for name in REFERENCES}
+
+
+def source_map_digest(sources):
+    return digest(json.dumps(sources, sort_keys=True, separators=(',', ':')).encode('utf-8'))
+
+
+def pinned_working_proof(name, pin):
+    path = safe_path(name)
+    require(path.is_file())
+    raw = path.read_bytes()
+    require(digest(raw) == pin)
+    return decode(raw)
+
+
+def qualification_workflow_delta(sources, references):
+    # Retain all immutable runtime proofs. Only this exact, separately pinned
+    # qualification-workflow input may differ from their historical source map.
+    delta = pinned_working_proof(WORKFLOW_DELTA_PATH, WORKFLOW_DELTA_SHA256)
+    require(isinstance(delta, dict) and set(delta) == {'schema_version', 'scope', 'changes'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+        and delta['scope'] == 'EXACT_QUALIFICATION_WORKFLOW_DELTA_NOT_RUNTIME_OR_ACTIVATION')
+    changes = delta['changes']
+    require(isinstance(changes, dict) and set(changes) == {WORKFLOW_DELTA_SOURCE})
+    change = changes[WORKFLOW_DELTA_SOURCE]
+    require(isinstance(change, dict) and set(change) == {'before', 'after'}
+        and change['before'] == sources[WORKFLOW_DELTA_SOURCE]
+        and change['after'] != change['before']
+        and isinstance(change['after'], str) and len(change['after']) == 64
+        and all(c in '0123456789abcdef' for c in change['after']))
+    effective, refs = dict(sources), dict(references)
+    effective[WORKFLOW_DELTA_SOURCE] = change['after']
+    require(source_map_digest(effective) == SOURCE_PROVENANCE['qualified_source_map_sha256'])
+    refs[WORKFLOW_DELTA_PATH] = WORKFLOW_DELTA_SHA256
+    return effective, refs
+
+
+CLOSED_RECEIVING_DELTA_PATH = 'docs/rendezvous/host-wake-closed-root-source-delta-v1.json'
+CLOSED_RECEIVING_DELTA_SHA256 = 'c1aacd517175cd5a4a6ea976029af294b6fbc73fbe6013098d3c272aebb12628'
+CLOSED_RECEIVING_PRODUCT_PATH = 'docs/rendezvous/host-wake-closed-root-product-observations-v1.json'
+CLOSED_RECEIVING_PRODUCT_SHA256 = '1ae2f21996bf74c606ddfb80072dbe8f1c7bc87aa0f703821c35189e87ebff0a'
+CLOSED_RECEIVING_MAP_CHANGES = frozenset(('coordinator/host-app-wake-receiving/authorization-resolve.ts', 'coordinator/host-app-wake-receiving/guard-schema.ts', 'coordinator/host-app-wake-receiving/native-apple-evidence.mjs', 'coordinator/host-app-wake-receiving/native-assertion.ts', 'coordinator/host-app-wake-receiving/native-attestation.ts', 'coordinator/host-app-wake-receiving/native-policy-store.ts', 'coordinator/host-app-wake-receiving/native-policy.ts', 'coordinator/host-app-wake-receiving/native-state.ts', 'coordinator/host-app-wake-receiving/operator-auth.ts', 'coordinator/host-app-wake-receiving/principal.ts', 'coordinator/host-app-wake-receiving/private-intake.ts', 'coordinator/host-app-wake-receiving/receiving-store.ts', 'coordinator/host-app-wake-receiving/request-window.ts', 'coordinator/host-app-wake-receiving/server-reply.ts', 'coordinator/host-app-wake-receiving/server-wire.ts', 'coordinator/host-app-wake-receiving/service.ts', 'coordinator/host-app-wake-receiving/source-backend.ts', 'coordinator/host-app-wake-receiving/target-transport.ts', 'coordinator/host-app-wake-receiving/wire.ts', 'coordinator/host-app-wake/service.ts', 'coordinator/host-app-wake/store.ts', 'coordinator/host-app-wake/wire.ts', 'scripts/qualify_rendezvous_product_build.mjs', 'src/host-wake-receiving/dispatch.ts', 'src/index.ts'))
+
+
+def closed_receiving_root_delta(sources, references):
+    # Preserve every historical source/proof. Only this new exact additive
+    # closed-root import closure may differ; it is no activation approval.
+    delta = pinned_working_proof(CLOSED_RECEIVING_DELTA_PATH, CLOSED_RECEIVING_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'protected_source_parent', 'baseline_source_map_sha256', 'effective_source_map_sha256', 'changes', 'product_proof', 'map_additions_are_newly_compiled_inputs_not_claimed_git_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1 and delta['scope'] == 'EXACT_CLOSED_RECEIVING_ROOT_SOURCE_DELTA_NOT_ACTIVATION')
+    require(delta['public_activation_allowed'] is False and delta['map_additions_are_newly_compiled_inputs_not_claimed_git_additions'] is True)
+    require(delta['protected_source_parent'] == '2f56dbf6d58f882c2dd586dadb87734e044e95f3')
+    require(delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    require(set(delta['changes']) == CLOSED_RECEIVING_MAP_CHANGES)
+    effective, refs = dict(sources), dict(references)
+    for name, change in delta['changes'].items():
+        safe_path(name)
+        require(set(change) == {'before', 'after'} and change['before'] == sources.get(name)
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == SOURCE_PROVENANCE['closed_receiving_root_source_map_sha256'])
+    product = pinned_working_proof(CLOSED_RECEIVING_PRODUCT_PATH, CLOSED_RECEIVING_PRODUCT_SHA256)
+    require(product['scope'] == 'ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY' and product['result'] == 'PASS'
+            and product['checks'] == 128 and product['closed_receiving_prefix_checks'] == 64
+            and product['outbound_calls'] == 0 and product['native_positive_accepted'] is False
+            and product['service_activated'] is False and product['cloudflare_mutations'] is False)
+    require(delta['product_proof'] == {'path': CLOSED_RECEIVING_PRODUCT_PATH,
+        'sha256': CLOSED_RECEIVING_PRODUCT_SHA256, 'legacy_checks': 128,
+        'closed_receiving_prefix_checks': 64, 'installed_dependency_inputs_unchanged': 50})
+    old_product = pinned_working_proof(DELTA_PROOFS[1][0], DELTA_PROOFS[1][1])
+    installed = lambda p: {k: v for k, v in p['source_hashes'].items() if k.startswith('node_modules/')}
+    require(installed(product) == installed(old_product) and len(installed(product)) == 50)
+    for name, expected in product['source_hashes'].items():
+        # Offline preparation validates installed bytes through both immutable
+        # original build maps; it never needs or treats an installation as authority.
+        if name.startswith('node_modules/'):
+            continue
+        require(effective.get(name) == expected)
+        # Only exact pinned source-delta layers may supersede historical bytes.
+        # validate() checks EVERY effective input after applying those layers.
+        if name not in CATEGORY_SOURCES | MOUNT_SOURCES | DEPENDENCY_SOURCES | WATCH_SOURCES | RECEIPT_SOURCES | RELEASE_RETENTION_SOURCES | TOOLCHAIN_REFRESH_SOURCES | API_MAINTENANCE_SOURCES | STABLE_RELEASE_SOURCES | PUSH_ERASURE_SOURCES | SHARED_KEY_ADDRESS_SOURCES | TESTFLIGHT_PROFILE_SOURCES | PUBLIC_TRIAL_SOURCES | ALWAYS_ON_SOURCES:
+            require(digest(safe_path(name).read_bytes()) == expected)
+    refs[CLOSED_RECEIVING_DELTA_PATH] = CLOSED_RECEIVING_DELTA_SHA256
+    refs[CLOSED_RECEIVING_PRODUCT_PATH] = CLOSED_RECEIVING_PRODUCT_SHA256
+    return effective, refs
+
+
+def baseline_before_receiving_root():
+    # Original protected history remains authoritative, even after squash deletes PR refs.
+    original, references = immutable_baseline()
+    delta = pinned_working_proof(DELTA_PATH, DELTA_SHA256)
+    require(isinstance(delta, dict) and set(delta) == {'schema_version', 'scope',
+        'baseline_source_sha', 'baseline_source_map_sha256',
+        'effective_source_map_sha256', 'changes', 'proofs'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+        and delta['scope'] == 'EXACT_SOURCE_DELTA_NOT_DEPLOYMENT_AUTHORIZATION'
+        and delta['baseline_source_sha'] == SUPPLYING_SHA
+        and delta['baseline_source_map_sha256'] == source_map_digest(original))
+    changes = delta['changes']
+    require(isinstance(changes, dict) and set(changes) == DELTA_SOURCES | DELTA_ADDITIONS)
+    effective = dict(original)
+    for name, change in changes.items():
+        safe_path(name)
+        require(isinstance(change, dict) and set(change) == {'before', 'after'}
+            and ((name in DELTA_ADDITIONS and name not in original and change['before'] is None)
+                 or (name in DELTA_SOURCES and change['before'] == original[name]))
+            and change['after'] != change['before']
+            and isinstance(change['after'], str) and len(change['after']) == 64
+            and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+        == SOURCE_PROVENANCE['effective_source_map_sha256'])
+    require(delta['proofs'] == {key: {'path': record[0], 'sha256': record[1]}
+        for key, record in zip(('shared', 'root', 'module'), DELTA_PROOFS)})
+    fresh = []
+    for name, pin, field, count, scope in DELTA_PROOFS:
+        proof = pinned_working_proof(name, pin)
+        require(proof['scope'] == scope and isinstance(proof[field], dict)
+            and len(proof[field]) == count)
+        fresh.append(proof[field])
+        references[name] = pin
+    old_root = decode(blob(PROOFS[2][0]))[PROOFS[2][2]]
+    installed = lambda values: {key: value for key, value in values.items()
+                              if key.startswith('node_modules/')}
+    expected_installed = dict(installed(old_root))
+    # Explicit reviewed v4 add/remove/change paths; immutable original32 remain checked.
+    require(set(INSTALLED_DEPENDENCY_DELTA) == {'node_modules/@noble/hashes/esm/legacy.js', 'node_modules/@peculiar/utils/build/encoding/base64.js', 'node_modules/@peculiar/utils/build/legacy/convert.js', 'node_modules/asn1js/build/index.js', 'node_modules/bytestreamjs/build/bit.js', 'node_modules/@noble/hashes/esm/utils.js', 'node_modules/@peculiar/utils/build/bytes.js', 'node_modules/pkijs/build/index.js', 'node_modules/bytestreamjs/build/index.js', 'node_modules/@noble/hashes/esm/_md.js', 'node_modules/@peculiar/utils/build/converters/registry.js', 'node_modules/@peculiar/utils/build/integer/uint.js', 'node_modules/bytestreamjs/build/mjs/bit.js', 'node_modules/@noble/hashes/utils.js', 'node_modules/@peculiar/utils/build/bytes/equal.js', 'node_modules/bytestreamjs/build/mjs/index.js', 'node_modules/bytestreamjs/build/bit_stream.js', 'node_modules/@noble/hashes/_u64.js', 'node_modules/@peculiar/utils/build/integer/int.js', 'node_modules/@peculiar/utils/build/encoding/base64url.js', 'node_modules/pkijs/build/index.es.js', 'node_modules/bytestreamjs/build/byte_stream.js', 'node_modules/@peculiar/utils/build/legacy/buffer-source-converter.js', 'node_modules/@noble/hashes/esm/sha2.js', 'node_modules/bytestreamjs/build/mjs/bit_stream.js', 'node_modules/bytestreamjs/build/mjs/byte_stream.js', 'node_modules/bytestreamjs/build/mjs/helpers.js', 'node_modules/@peculiar/utils/build/encoding/utf8.js', 'node_modules/asn1js/build/index.es.js', 'node_modules/@peculiar/utils/build/index.js', 'node_modules/@noble/hashes/sha2.js', 'node_modules/@peculiar/utils/build/bytes/concat.js', 'node_modules/@peculiar/utils/build/converters/defaults.js', 'node_modules/@peculiar/utils/build/encoding/utf16.js', 'node_modules/@noble/hashes/_md.js', 'node_modules/@peculiar/utils/build/pem/pem.js', 'node_modules/bytestreamjs/build/mjs/seq_stream.js', 'node_modules/bytestreamjs/build/seq_bit_stream.js', 'node_modules/pvutils/build/utils.es.js', 'node_modules/@peculiar/utils/build/bytes/sequence.js', 'node_modules/@noble/hashes/esm/_u64.js', 'node_modules/bytestreamjs/build/seq_stream.js', 'node_modules/@noble/hashes/esm/crypto.js', 'node_modules/@peculiar/utils/build/bytes/buffer-source.js', 'node_modules/bytestreamjs/build/mjs/seq_bit_stream.js', 'node_modules/@noble/hashes/legacy.js', 'node_modules/bytestreamjs/build/helpers.js', 'node_modules/@noble/hashes/esm/sha1.js', 'node_modules/@peculiar/utils/build/encoding/binary.js', 'node_modules/pvtsutils/build/index.js', 'node_modules/@peculiar/utils/build/encoding/hex.js', 'node_modules/@peculiar/utils/build/converters/convert.js', 'node_modules/@peculiar/utils/build/legacy/functions.js', 'node_modules/@peculiar/utils/build/_virtual/_rolldown/runtime.js'})
+    for name, change in INSTALLED_DEPENDENCY_DELTA.items():
+        require(set(change) == {'before', 'after'}
+            and expected_installed.get(name) == change['before']
+            and (name in expected_installed) == (change['before'] is not None)
+            and change['before'] != change['after'])
+        for value in change.values():
+            require(value is None or isinstance(value, str) and len(value) == 64
+                and all(c in '0123456789abcdef' for c in value))
+        if change['after'] is None:
+            require(name in expected_installed)
+            del expected_installed[name]
+        else:
+            expected_installed[name] = change['after']
+    require(installed(fresh[1]) == expected_installed)
+    require(merge_sources(fresh[0], fresh[2], fresh[1], with_closed_issuer=True) == effective)
+    # Version-label updates retain the unchanged license texts, with exact supplier fences.
+    require(set(REFERENCE_DELTA) == {'THIRD_PARTY_NOTICES.md', 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md'})
+    for name, change in REFERENCE_DELTA.items():
+        require(set(change) == {'before', 'after'} and references.get(name) == change['before']
+            and change['before'] != change['after'] and isinstance(change['after'], str)
+            and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        references[name] = change['after']
+    references[DELTA_PATH] = DELTA_SHA256
+    return qualification_workflow_delta(effective, references)
+
+
+def baseline_before_ci_retention():
+    return closed_receiving_root_delta(*baseline_before_receiving_root())
+
+
+RETENTION_DELTA_PATH = 'docs/rendezvous/active-ci-retention-source-delta-v1.json'
+RETENTION_DELTA_SHA256 = 'a474ec1ca6579b0892348be55c06ab0122105615d379f7727357b4a401ce56db'
+RETENTION_SOURCE_MAP_SHA256 = '7afaaefbee37a68f003badc1a2426fd9e02fe90ff3fe4a7e4ddff2198e035bfa'
+RETENTION_SOURCES = frozenset(('.github/workflows/ci-cd.yml', 'scripts/cleanup_workflow_runs.py', 'scripts/test_cleanup_workflow_runs.py'))
+SOURCE_PROVENANCE.update(active_ci_retention_delta_sha256=RETENTION_DELTA_SHA256,
+                         active_ci_retention_source_map_sha256=RETENTION_SOURCE_MAP_SHA256)
+
+
+def baseline_before_native_category():
+    sources, refs = baseline_before_ci_retention()
+    delta = pinned_working_proof(RETENTION_DELTA_PATH, RETENTION_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_ACTIVE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'
+            and delta['base_source'] == 'b28a32e8fe80d612009c35a82961dba9c993e986'
+            and delta['public_activation_allowed'] is False)
+    require(delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == RETENTION_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources.get(name)
+                and change['before'] != change['after'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == RETENTION_SOURCE_MAP_SHA256)
+    references = dict(refs)
+    references[RETENTION_DELTA_PATH] = RETENTION_DELTA_SHA256
+    return effective, references
+
+
+CATEGORY_DELTA_PATH = 'docs/rendezvous/native-first-category-source-delta-v1.json'
+CATEGORY_DELTA_SHA256 = '6c0a6e47f00057881fd4ecdab64c626c91a583617fe5ae6376c62cafbf06960e'
+CATEGORY_SOURCE_MAP_SHA256 = '04dfade9e9e2573c27b1640f14a309a1f9f6feee0ea69d97f5b95c27713b6096'
+CATEGORY_SOURCES = frozenset(('coordinator/host-app-wake-receiving/guard-schema.ts', 'coordinator/host-app-wake-receiving/native-apple-evidence.mjs', 'coordinator/host-app-wake-receiving/native-attestation.ts', 'coordinator/host-app-wake-receiving/native-policy.ts', 'coordinator/host-app-wake-receiving/native-state.ts'))
+SOURCE_PROVENANCE.update(native_first_category_delta_sha256=CATEGORY_DELTA_SHA256,
+                         native_first_category_source_map_sha256=CATEGORY_SOURCE_MAP_SHA256)
+
+
+def baseline_before_private_mount():
+    sources, refs = baseline_before_native_category()
+    delta = pinned_working_proof(CATEGORY_DELTA_PATH, CATEGORY_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PRIVATE_FIRST_CATEGORY_SOURCE_NOT_ACTIVATION'
+            and delta['base_source'] == '41549dadff8efb2da5fa0ab23ff7abeff86e19df'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == CATEGORY_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective)
+            == CATEGORY_SOURCE_MAP_SHA256)
+    refs = dict(refs)
+    refs[CATEGORY_DELTA_PATH] = CATEGORY_DELTA_SHA256
+    return effective, refs
+
+
+MOUNT_DELTA_PATH = 'docs/rendezvous/private-receiving-mount-source-delta-v1.json'
+MOUNT_DELTA_SHA256 = '8d4c6f7343c37bea54ac53709dd49d1c01e28a2d2ebe19a0102448cc7fccc960'
+MOUNT_SOURCE_MAP_SHA256 = 'b734d7cdb32ef1785d40f3be6c2b6779b5203adf909c8fb4de48c78e12ac7b43'
+MOUNT_SOURCES = frozenset(('coordinator/host-app-wake-receiving/operator-auth.ts', 'coordinator/host-app-wake-receiving/service.ts', 'scripts/qualify_rendezvous_product_build.mjs', 'src/host-wake-receiving/dispatch.ts'))
+SOURCE_PROVENANCE.update(private_receiving_mount_delta_sha256=MOUNT_DELTA_SHA256,
+                         private_receiving_mount_source_map_sha256=MOUNT_SOURCE_MAP_SHA256)
+
+
+def baseline_before_dependency_refresh():
+    sources, refs = baseline_before_private_mount()
+    delta = pinned_working_proof(MOUNT_DELTA_PATH, MOUNT_DELTA_SHA256)
+    require(set(delta) == {'schema_version','scope','base_source','baseline_source_map_sha256',
+            'effective_source_map_sha256','changes','private_http_mount_selected','production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PRIVATE_RECEIVING_MOUNT_NOT_EFFECT_AUTHORIZATION'
+            and delta['base_source'] == '067a214b8f59524481ec1309d07cfa8270abb20f'
+            and delta['private_http_mount_selected'] is True and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == MOUNT_SOURCES)
+    effective = dict(sources)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before','after'} and change['before'] == sources[name]
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        effective[name] = change['after']
+    require(delta['effective_source_map_sha256'] == source_map_digest(effective) == MOUNT_SOURCE_MAP_SHA256)
+    refs = dict(refs)
+    refs[MOUNT_DELTA_PATH] = MOUNT_DELTA_SHA256
+    return effective, refs
+
+
+
+DEPENDENCY_DELTA_PATH = 'docs/rendezvous/pkijs-wrangler-dependency-refresh-source-delta-v1.json'
+DEPENDENCY_DELTA_SHA256 = 'd72223211a34f4556515499ffa4ea6e77ba931cba5b6febf9121d3748f6aeca2'
+DEPENDENCY_SOURCE_MAP_SHA256 = '272aeb7fb48586102d9e5dc6bab70724857539a022e7b2446c4e24ac9e40c1db'
+DEPENDENCY_SOURCES = frozenset(('package-lock.json', 'package.json', 'qualification/rendezvous/run_challenge_budget_workerd.mjs', 'qualification/rendezvous/run_shared_key_workerd.mjs', 'rendezvous-build-inputs.json', 'scripts/qualify_rendezvous_product_build.mjs'))
+DEPENDENCY_ADDITIONS = frozenset(('qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json',))
+DEPENDENCY_REFERENCE_CHANGES = frozenset(('THIRD_PARTY_NOTICES.md', 'docs/rendezvous/THIRD_PARTY_LICENSES_V1.md'))
+DEPENDENCY_REFERENCE_ADDITIONS = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json'))
+DEPENDENCY_INSTALLED_CHANGE = {'node_modules/pkijs/build/index.js': {'before': '81323b7ffbe635d9fbfeef6cb6db6166c8c1a9ff6e4b1158a4c09515ab8c1685', 'after': 'fcd402426e202ea647e51e0a1150cee1e66e41e1e18c2e7ef8cea013c92488c4'}}
+SOURCE_PROVENANCE.update(dependency_refresh_delta_sha256=DEPENDENCY_DELTA_SHA256,
+                         dependency_refresh_source_map_sha256=DEPENDENCY_SOURCE_MAP_SHA256)
+
+
+def baseline_before_watch_topic():
+    sources, refs = baseline_before_dependency_refresh()
+    delta = pinned_working_proof(DEPENDENCY_DELTA_PATH, DEPENDENCY_DELTA_SHA256)
+    require(set(delta) == {'schema_version','scope','base_source','baseline_source_map_sha256',
+            'effective_source_map_sha256','source_changes','source_additions','reference_changes',
+            'reference_additions','installed_changes','public_activation_allowed','production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PKIJS_WRANGLER_DEPENDENCY_REFRESH_NOT_ACTIVATION'
+            and delta['base_source'] == 'f156c3049a6320bc16d084b4b17b526090ccb7a7'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['source_changes']) == DEPENDENCY_SOURCES
+            and set(delta['source_additions']) == DEPENDENCY_ADDITIONS
+            and set(delta['reference_changes']) == DEPENDENCY_REFERENCE_CHANGES
+            and set(delta['reference_additions']) == DEPENDENCY_REFERENCE_ADDITIONS
+            and delta['installed_changes'] == DEPENDENCY_INSTALLED_CHANGE)
+    valid_hash = lambda h: isinstance(h, str) and len(h) == 64 and all(c in '0123456789abcdef' for c in h)
+    effective, refs = dict(sources), dict(refs)
+    for name, change in delta['source_changes'].items():
+        require(set(change) == {'before','after'} and change['before'] == sources[name]
+                and change['after'] != change['before'] and valid_hash(change['after']))
+        effective[name] = change['after']
+    for name, pin in delta['source_additions'].items():
+        require(name not in effective and valid_hash(pin))
+        effective[name] = pin
+    require(source_map_digest(effective) == delta['effective_source_map_sha256'] == DEPENDENCY_SOURCE_MAP_SHA256)
+    for name, change in delta['reference_changes'].items():
+        require(set(change) == {'before','after'} and change['before'] == refs[name]
+                and change['after'] != change['before'] and valid_hash(change['after']))
+        refs[name] = change['after']
+    for name, pin in delta['reference_additions'].items():
+        require(name not in refs and valid_hash(pin))
+        refs[name] = pin
+    previous = pinned_working_proof(CLOSED_RECEIVING_PRODUCT_PATH, CLOSED_RECEIVING_PRODUCT_SHA256)
+    installed = {k: h for k, h in previous['source_hashes'].items() if k.startswith('node_modules/')}
+    for name, change in DEPENDENCY_INSTALLED_CHANGE.items():
+        require(installed[name] == change['before'] and valid_hash(change['after']))
+        installed[name] = change['after']
+    provenance = pinned_working_proof('qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json', effective['qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json'])
+    require(provenance['installed_inputs_sha256'] == installed and len(installed) == 50
+            and provenance['installed_changes'] == DEPENDENCY_INSTALLED_CHANGE
+            and provenance['unchanged_installed_inputs'] == 49
+            and provenance['real_native_or_production_effect'] is False)
+    refs[DEPENDENCY_DELTA_PATH] = DEPENDENCY_DELTA_SHA256
+    return effective, refs
+
+
+WATCH_DELTA_PATH = 'docs/rendezvous/watch-topic-source-delta-v1.json'
+WATCH_DELTA_SHA256 = 'ea503efa3a57c86df670cfe2ab4ca5d02cee1d44e9ffef1446f06b6f177a85af'
+WATCH_SOURCE_MAP_SHA256 = 'e2d62207b25cb2435be51dfcbe5a4ef8a7254b8e4e920b6451ae944b060fec85'
+WATCH_SOURCES = frozenset(('wrangler.jsonc', 'rendezvous-build-inputs.json'))
+WATCH_REFERENCES = frozenset(('wrangler.jsonc', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-session/source-manifest.json'))
+SOURCE_PROVENANCE.update(watch_topic_delta_sha256=WATCH_DELTA_SHA256,
+                         watch_topic_source_map_sha256=WATCH_SOURCE_MAP_SHA256)
+
+
+def baseline_before_watch_registration_receipt():
+    sources, refs = baseline_before_watch_topic()
+    delta = pinned_working_proof(WATCH_DELTA_PATH, WATCH_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'source_changes', 'reference_changes', 'public_activation_allowed',
+            'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_WATCH_TOPIC_ALIGNMENT_NOT_ACTIVATION'
+            and delta['base_source'] == '7ac9ad160e1a8b0109262ea61d79c00bc94d659a'
+            and delta['public_activation_allowed'] is False
+            and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['source_changes']) == WATCH_SOURCES
+            and set(delta['reference_changes']) == WATCH_REFERENCES)
+    effective, references = dict(sources), dict(refs)
+    for changes, original, result in ((delta['source_changes'], sources, effective),
+                                      (delta['reference_changes'], refs, references)):
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'}
+                    and change['before'] == original[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            result[name] = change['after']
+    require(source_map_digest(effective) == delta['effective_source_map_sha256']
+            == WATCH_SOURCE_MAP_SHA256)
+    require(delta['reference_changes']['wrangler.jsonc'] == delta['source_changes']['wrangler.jsonc'])
+    references[WATCH_DELTA_PATH] = WATCH_DELTA_SHA256
+    return effective, references
+
+
+RECEIPT_DELTA_PATH = 'docs/rendezvous/watch-registration-receipt-source-delta-v1.json'
+RECEIPT_DELTA_SHA256 = '77dc038adb870e61263e2fafba22994815dc5c191fd00ae94dd8719c6b3ff13c'
+RECEIPT_SOURCE_MAP_SHA256 = 'f4e44f5a4221a0dbf4f1042fafb8c5c4ce8c927a6317da09b43e35c85010a938'
+RECEIPT_SOURCES = frozenset(('src/repositories/registrations.ts',))
+RECEIPT_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json',))
+SOURCE_PROVENANCE.update(watch_registration_receipt_delta_sha256=RECEIPT_DELTA_SHA256,
+                         watch_registration_receipt_source_map_sha256=RECEIPT_SOURCE_MAP_SHA256)
+
+
+def baseline_before_release_retention():
+    sources, refs = baseline_before_watch_registration_receipt()
+    delta = pinned_working_proof(RECEIPT_DELTA_PATH, RECEIPT_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'source_changes', 'reference_changes', 'public_activation_allowed',
+            'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_WATCH_REGISTRATION_RECEIPT_NOT_ACTIVATION'
+            and delta['base_source'] == '176d71afe111a70028fef0d7ed2c28f41f66aaab'
+            and delta['public_activation_allowed'] is False
+            and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['source_changes']) == RECEIPT_SOURCES
+            and set(delta['reference_changes']) == RECEIPT_REFERENCES)
+    for changes, current in ((delta['source_changes'], sources), (delta['reference_changes'], refs)):
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == current[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            current[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == RECEIPT_SOURCE_MAP_SHA256)
+    refs[RECEIPT_DELTA_PATH] = RECEIPT_DELTA_SHA256
+    return sources, refs
+
+
+RELEASE_RETENTION_DELTA_PATH = 'docs/rendezvous/release-ci-retention-source-delta-v1.json'
+RELEASE_RETENTION_DELTA_SHA256 = 'e57853f7ca1a0e7cab741fc6adbf2784bd86779605e9882a32098691345f2e0b'
+RELEASE_RETENTION_SOURCE_MAP_SHA256 = '95ed9d508a33a905d807bc422c525a3b8a6fc5ee3920e8e0020f174c6a23cfc5'
+RELEASE_RETENTION_SOURCES = frozenset(('.github/workflows/ci-cd.yml',))
+SOURCE_PROVENANCE.update(release_ci_retention_delta_sha256=RELEASE_RETENTION_DELTA_SHA256,
+                         release_ci_retention_source_map_sha256=RELEASE_RETENTION_SOURCE_MAP_SHA256)
+
+
+def baseline_before_closed_production_bindings():
+    sources, refs = baseline_before_release_retention()
+    delta = pinned_working_proof(RELEASE_RETENTION_DELTA_PATH, RELEASE_RETENTION_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source',
+            'baseline_source_map_sha256', 'effective_source_map_sha256',
+            'changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_RELEASE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME'
+            and delta['base_source'] == '664f68f9d7798188513c8b59aa46424a158c4630'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == RELEASE_RETENTION_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        sources[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == RELEASE_RETENTION_SOURCE_MAP_SHA256)
+    refs[RELEASE_RETENTION_DELTA_PATH] = RELEASE_RETENTION_DELTA_SHA256
+    return sources, refs
+
+
+CLOSED_PRODUCTION_BINDINGS_DELTA_PATH = 'docs/rendezvous/closed-production-bindings-source-delta-v1.json'
+CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256 = 'd08c9ebdde24f4e14e9004c96ca17f43663adac0b58e4ed69fb7d5c9c25eca0d'
+CLOSED_PRODUCTION_BINDINGS_SOURCE_MAP_SHA256 = '2ea924a5e904eb1e675f328be9a24ed5453cd62c2b040b7a5f90a31a3f10b950'
+CLOSED_PRODUCTION_BINDINGS_SOURCES = frozenset(('wrangler.jsonc', 'rendezvous-build-inputs.json'))
+SOURCE_PROVENANCE.update(closed_production_bindings_delta_sha256=CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256,
+                         closed_production_bindings_source_map_sha256=CLOSED_PRODUCTION_BINDINGS_SOURCE_MAP_SHA256)
+
+
+def baseline_before_toolchain_refresh():
+    sources, refs = baseline_before_closed_production_bindings()
+    delta = pinned_working_proof(CLOSED_PRODUCTION_BINDINGS_DELTA_PATH,
+                                 CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'public_activation_allowed',
+                           'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_CLOSED_PRODUCTION_BINDINGS_SOURCE_ONLY'
+            and delta['base_source'] == 'd0827f5f84d765d87f6d29f61add7a4d9570c9e2'
+            and delta['public_activation_allowed'] is False
+            and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == CLOSED_PRODUCTION_BINDINGS_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and change['after'] != change['before'])
+        sources[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == CLOSED_PRODUCTION_BINDINGS_SOURCE_MAP_SHA256)
+    refs['wrangler.jsonc'] = sources['wrangler.jsonc']
+    refs[CLOSED_PRODUCTION_BINDINGS_DELTA_PATH] = CLOSED_PRODUCTION_BINDINGS_DELTA_SHA256
+    return sources, refs
+
+
+TOOLCHAIN_REFRESH_DELTA_PATH = 'docs/rendezvous/toolchain-development-dependency-refresh-v1.json'
+TOOLCHAIN_REFRESH_DELTA_SHA256 = 'be5be570e953b72f87707d9feea4d6747fdfc2d3dca50cae3ca626953dc92142'
+TOOLCHAIN_REFRESH_SOURCE_MAP_SHA256 = '2205d9fcf236b9e179b376cad0a1739725bdcdb09bd1721366508f5ed411056b'
+TOOLCHAIN_REFRESH_SOURCES = frozenset(('package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs'))
+TOOLCHAIN_REFRESH_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json'))
+TOOLCHAIN_REFRESH_ADDITIONS = frozenset(('coordinator/installation-registry/source-manifest.json', 'qualification/watch-moment/source-manifest.json', 'qualification/rendezvous/compatible-runtime-dependency-provenance-v5.json'))
+SOURCE_PROVENANCE.update(toolchain_refresh_delta_sha256=TOOLCHAIN_REFRESH_DELTA_SHA256,
+                         toolchain_refresh_source_map_sha256=TOOLCHAIN_REFRESH_SOURCE_MAP_SHA256)
+
+
+def baseline_before_api_maintenance():
+    sources, refs = baseline_before_toolchain_refresh()
+    delta = pinned_working_proof(TOOLCHAIN_REFRESH_DELTA_PATH, TOOLCHAIN_REFRESH_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_TOOLCHAIN_AND_DEVELOPMENT_DEPENDENCY_REFRESH_NOT_ACTIVATION'
+            and delta['base_source'] == '1b75d268d9023740c10f89616761232c9e3b9357'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == TOOLCHAIN_REFRESH_SOURCES
+            and set(delta['reference_changes']) == TOOLCHAIN_REFRESH_REFERENCES
+            and set(delta['reference_additions']) == TOOLCHAIN_REFRESH_ADDITIONS)
+    valid_hash = lambda h: isinstance(h, str) and len(h) == 64 and all(c in '0123456789abcdef' for c in h)
+    for mapping, changes in ((sources, delta['changes']), (refs, delta['reference_changes'])):
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['before'] != change['after'] and valid_hash(change['after']))
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == TOOLCHAIN_REFRESH_SOURCE_MAP_SHA256)
+    for name, digest in delta['reference_additions'].items():
+        require(name not in refs and valid_hash(digest))
+        refs[name] = digest
+    old_path = 'qualification/rendezvous/compatible-runtime-dependency-provenance-v4.json'
+    new_path = 'qualification/rendezvous/compatible-runtime-dependency-provenance-v5.json'
+    previous = pinned_working_proof(old_path, sources[old_path])
+    current = pinned_working_proof(new_path, refs[new_path])
+    require(current['previous_provenance_sha256'] == sources[old_path]
+            and current['previous_lock_sha256'] == previous['dependency_lock_sha256']
+            and current['dependency_lock_sha256'] == sources['package-lock.json']
+            and current['installed_inputs_sha256'] == previous['installed_inputs_sha256']
+            and current['installed_changes'] == {} and current['unchanged_installed_inputs'] == 50
+            and current['real_native_or_production_effect'] is False)
+    refs[TOOLCHAIN_REFRESH_DELTA_PATH] = TOOLCHAIN_REFRESH_DELTA_SHA256
+    return sources, refs
+
+
+API_MAINTENANCE_DELTA_PATH = 'docs/rendezvous/api-maintenance-source-delta-v1.json'
+API_MAINTENANCE_DELTA_SHA256 = 'cd9128297a6aa9332e71bf3c2a3ce25dcd7cd4499cb68d79dd5d3905f63dc0be'
+API_MAINTENANCE_SOURCE_MAP_SHA256 = 'dee84f1d4f8208c3d1e5444a6cbe7c89f6df707413e6c325d01d550cf1aa0387'
+API_MAINTENANCE_SOURCES = frozenset((
+    'src/auth.ts', 'src/handlers/install.ts', 'src/messages.ts',
+    'src/repositories/installTokens.ts', 'src/repositories/registrations.ts',
+))
+SOURCE_PROVENANCE.update(api_maintenance_delta_sha256=API_MAINTENANCE_DELTA_SHA256,
+                         api_maintenance_source_map_sha256=API_MAINTENANCE_SOURCE_MAP_SHA256)
+
+
+def baseline_before_stable_release():
+    sources, refs = baseline_before_api_maintenance()
+    delta = pinned_working_proof(API_MAINTENANCE_DELTA_PATH, API_MAINTENANCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_MAINTENANCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['base_source'] == '663318ad6405d41de88ff7495113cbdc63e077ca'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == API_MAINTENANCE_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        sources[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == API_MAINTENANCE_SOURCE_MAP_SHA256)
+    require(set(delta['reference_changes']) == {'coordinator/host-app-wake-receiving/runtime/source-inputs.json',
+                                                    'qualification/watch-moment/source-manifest.json'})
+    for name, change in delta['reference_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and change['before'] != change['after']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        refs[name] = change['after']
+    refs[API_MAINTENANCE_DELTA_PATH] = API_MAINTENANCE_DELTA_SHA256
+    return sources, refs
+
+
+STABLE_RELEASE_DELTA_PATH = 'docs/rendezvous/stable-api-release-source-delta-v1.json'
+STABLE_RELEASE_DELTA_SHA256 = 'accd67d7b485632be51264120fe63cb2c8fd889e26ca1be77ad45bcdd5140d41'
+STABLE_RELEASE_SOURCE_MAP_SHA256 = '6bd122979c515ed8baca9f9404f2599da49e96512d7178f3fe9f9eaa5df72e70'
+STABLE_RELEASE_SOURCES = frozenset(('package.json', 'package-lock.json', 'src/releaseMetadata.ts', 'scripts/qualify_rendezvous_product_build.mjs'))
+STABLE_RELEASE_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'qualification/watch-moment/source-manifest.json'))
+SOURCE_PROVENANCE.update(stable_release_delta_sha256=STABLE_RELEASE_DELTA_SHA256,
+                         stable_release_source_map_sha256=STABLE_RELEASE_SOURCE_MAP_SHA256)
+
+
+def baseline_before_push_erasure():
+    sources, refs = baseline_before_stable_release()
+    delta = pinned_working_proof(STABLE_RELEASE_DELTA_PATH, STABLE_RELEASE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_STABLE_API_RELEASE_METADATA_NOT_ACTIVATION'
+            and delta['base_source'] == 'a52e3d31664b3ad6d7921d22779d5716fb636ed2'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources)
+            and set(delta['changes']) == STABLE_RELEASE_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['after'] != change['before']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        sources[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == STABLE_RELEASE_SOURCE_MAP_SHA256)
+    require(set(delta['reference_changes']) == STABLE_RELEASE_REFERENCES)
+    for name, change in delta['reference_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and change['before'] != change['after']
+                and isinstance(change['after'], str) and len(change['after']) == 64
+                and all(c in '0123456789abcdef' for c in change['after']))
+        refs[name] = change['after']
+    refs[STABLE_RELEASE_DELTA_PATH] = STABLE_RELEASE_DELTA_SHA256
+    return sources, refs
+
+
+PUSH_ERASURE_DELTA_PATH = 'docs/rendezvous/push-erasure-source-delta-v1.json'
+PUSH_ERASURE_DELTA_SHA256 = '61f5b3cb80baf70921ea0e1397d4b6cfb4f5f0065f2aea8e1e3cd9a1f017fcf9'
+PUSH_ERASURE_SOURCE_MAP_SHA256 = '95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002'
+PUSH_ERASURE_SOURCES = frozenset(('rendezvous-build-inputs.json', 'src/index.ts', 'src/messages.ts',
+    'src/repositories/auditEvents.ts', 'src/repositories/registrations.ts',
+    'src/services/pushDelivery.ts', 'src/validation.ts', 'wrangler.jsonc'))
+PUSH_ERASURE_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json',
+    'qualification/watch-moment/source-manifest.json', 'wrangler.jsonc'))
+PUSH_ERASURE_ADDITIONS = frozenset(('migrations/0013_push_registration_erasure.sql',))
+SOURCE_PROVENANCE.update(push_erasure_delta_sha256=PUSH_ERASURE_DELTA_SHA256,
+                         push_erasure_source_map_sha256=PUSH_ERASURE_SOURCE_MAP_SHA256)
+
+
+def baseline_before_production_d1_guard():
+    sources, refs = baseline_before_push_erasure()
+    delta = pinned_working_proof(PUSH_ERASURE_DELTA_PATH, PUSH_ERASURE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PUSH_ERASURE_SOURCE_NOT_RENDEZVOUS_ACTIVATION'
+            and delta['base_source'] == '6fdac58addde449bd78c0fed05aaaa3319e7aead'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for changes, allowed, mapping in ((delta['changes'], PUSH_ERASURE_SOURCES, sources),
+                                      (delta['reference_changes'], PUSH_ERASURE_REFERENCES, refs)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == PUSH_ERASURE_SOURCE_MAP_SHA256)
+    require(set(delta['reference_additions']) == PUSH_ERASURE_ADDITIONS
+            and not PUSH_ERASURE_ADDITIONS.intersection(refs))
+    refs.update(delta['reference_additions'])
+    refs[PUSH_ERASURE_DELTA_PATH] = PUSH_ERASURE_DELTA_SHA256
+    return sources, refs
+
+
+PRODUCTION_D1_GUARD_PATH = 'docs/rendezvous/production-d1-migration-guard-delta-v1.json'
+PRODUCTION_D1_GUARD_SHA256 = '3ecc560b779e3368d16826fe3d08383267d6eea78eb793c9423d007dc2edd877'
+PRODUCTION_D1_GUARD_REFERENCE = '.github/workflows/deploy-api-worker.yml'
+PRODUCTION_D1_GUARD_ADDITIONS = frozenset((
+    '.github/workflows/reusable-workflow-guard.yml',
+    'scripts/check_production_d1_migrations.py', 'scripts/test_production_d1_migrations.py'))
+SOURCE_PROVENANCE['production_d1_guard_delta_sha256'] = PRODUCTION_D1_GUARD_SHA256
+
+
+def baseline_before_repository_namespace():
+    sources, refs = baseline_before_production_d1_guard()
+    delta = pinned_working_proof(PRODUCTION_D1_GUARD_PATH, PRODUCTION_D1_GUARD_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_PRODUCTION_D1_MIGRATION_GUARD_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False)
+    require(set(delta['reference_changes']) == {PRODUCTION_D1_GUARD_REFERENCE})
+    change = delta['reference_changes'][PRODUCTION_D1_GUARD_REFERENCE]
+    require(set(change) == {'before', 'after'} and change['before'] == refs[PRODUCTION_D1_GUARD_REFERENCE]
+            and change['after'] != change['before'])
+    require(set(delta['reference_additions']) == PRODUCTION_D1_GUARD_ADDITIONS
+            and not PRODUCTION_D1_GUARD_ADDITIONS.intersection(refs))
+    refs[PRODUCTION_D1_GUARD_REFERENCE] = change['after']
+    refs.update(delta['reference_additions'])
+    refs[PRODUCTION_D1_GUARD_PATH] = PRODUCTION_D1_GUARD_SHA256
+    return sources, refs
+
+
+
+REPOSITORY_NAMESPACE_DELTA_PATH = 'docs/rendezvous/repository-namespace-release-delta-v1.json'
+REPOSITORY_NAMESPACE_DELTA_SHA256 = '263cc35ff6096eee31ffbc84ef4c82813ddc182407fe26cbde5d3dca826d6504'
+REPOSITORY_NAMESPACE_SMOKE_REFERENCE = '.github/workflows/api-worker-post-deployment-smoke.yml'
+SOURCE_PROVENANCE['repository_namespace_delta_sha256'] = REPOSITORY_NAMESPACE_DELTA_SHA256
+
+
+def baseline_before_shared_key_address():
+    sources, refs = baseline_before_repository_namespace()
+    delta = pinned_working_proof(REPOSITORY_NAMESPACE_DELTA_PATH, REPOSITORY_NAMESPACE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_RELEASE_REPOSITORY_NAMESPACE_DELTA_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False)
+    require(set(delta['reference_changes']) == {PRODUCTION_D1_GUARD_REFERENCE})
+    change = delta['reference_changes'][PRODUCTION_D1_GUARD_REFERENCE]
+    require(set(change) == {'before', 'after'} and change['before'] == refs[PRODUCTION_D1_GUARD_REFERENCE]
+            and change['after'] != change['before'])
+    require(set(delta['reference_additions']) == {REPOSITORY_NAMESPACE_SMOKE_REFERENCE}
+            and REPOSITORY_NAMESPACE_SMOKE_REFERENCE not in refs)
+    refs[PRODUCTION_D1_GUARD_REFERENCE] = change['after']
+    refs.update(delta['reference_additions'])
+    refs[REPOSITORY_NAMESPACE_DELTA_PATH] = REPOSITORY_NAMESPACE_DELTA_SHA256
+    return sources, refs
+
+
+SHARED_KEY_ADDRESS_PATH = 'docs/rendezvous/shared-key-address-delta-v1.json'
+SHARED_KEY_ADDRESS_SHA256 = '4b54f394d75cd2fde180c0abb0fff5faf06abd61060d8ec62fe678f7f37ee824'
+SHARED_KEY_ADDRESS_SOURCE_MAP_SHA256 = 'b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5'
+SHARED_KEY_ADDRESS_SOURCES = frozenset((
+    'qualification/rendezvous/assertion-key-state.ts',
+    'qualification/rendezvous/enrollment-key-state.ts',
+    'qualification/rendezvous/key-routing.ts',
+    'qualification/rendezvous/transaction-state.ts',
+    'qualification/rendezvous/product-composition.check.ts'))
+SHARED_KEY_ADDRESS_ADDITION = 'qualification/rendezvous/key-address.ts'
+SOURCE_PROVENANCE.update(shared_key_address_delta_sha256=SHARED_KEY_ADDRESS_SHA256,
+                         shared_key_address_source_map_sha256=SHARED_KEY_ADDRESS_SOURCE_MAP_SHA256)
+
+
+def baseline_before_testflight_profile():
+    sources, refs = baseline_before_shared_key_address()
+    delta = pinned_working_proof(SHARED_KEY_ADDRESS_PATH, SHARED_KEY_ADDRESS_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'source_additions',
+                           'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_SHARED_KEY_ADDRESS_DERIVATION_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    require(set(delta['changes']) == SHARED_KEY_ADDRESS_SOURCES)
+    for name, change in delta['changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == sources[name]
+                and change['before'] != change['after'])
+        sources[name] = change['after']
+    require(set(delta['source_additions']) == {SHARED_KEY_ADDRESS_ADDITION}
+            and SHARED_KEY_ADDRESS_ADDITION not in sources)
+    sources.update(delta['source_additions'])
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == SHARED_KEY_ADDRESS_SOURCE_MAP_SHA256)
+    refs[SHARED_KEY_ADDRESS_PATH] = SHARED_KEY_ADDRESS_SHA256
+    return sources, refs
+
+
+TESTFLIGHT_PROFILE_PATH = 'docs/rendezvous/testflight-release-source-delta-v1.json'
+TESTFLIGHT_PROFILE_SHA256 = 'c9970d27238b62fcce60a041dacfe0dcb4cc9ddc25d17ee28ace399729f98f80'
+TESTFLIGHT_PROFILE_MAP_SHA256 = '89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f'
+TESTFLIGHT_PROFILE_SOURCES = frozenset((
+    'qualification/rendezvous/app-attest-core-candidate.mjs',
+    'qualification/rendezvous/assertion-key-state.check.mjs',
+    'qualification/rendezvous/assertion-key-state.ts',
+    'qualification/rendezvous/assertion-verifier.d.ts',
+    'qualification/rendezvous/composed-http.ts',
+    'qualification/rendezvous/enrollment-evidence-candidate.d.mts',
+    'qualification/rendezvous/enrollment-evidence-candidate.mjs',
+    'qualification/rendezvous/enrollment-key-state.ts',
+    'qualification/rendezvous/key-routing.ts',
+    'qualification/rendezvous/product-composition.check.ts',
+    'qualification/rendezvous/receipt-cms-candidate.mjs',
+    'qualification/rendezvous/receipt-key-store.ts',
+    'qualification/rendezvous/run_challenge_budget_workerd.mjs',
+    'qualification/rendezvous/run_composed_http_workerd.mjs',
+    'qualification/rendezvous/run_index_workerd.mjs',
+    'qualification/rendezvous/run_key_routing_workerd.mjs',
+    'qualification/rendezvous/run_provider_unavailable_workerd.mjs',
+    'qualification/rendezvous/run_registration_workerd.mjs',
+    'qualification/rendezvous/run_request_admission_workerd.mjs',
+    'qualification/rendezvous/run_retry_hint_workerd.mjs',
+    'qualification/rendezvous/run_shared_key_workerd.mjs',
+    'qualification/rendezvous/run_transaction_workerd.mjs',
+    'qualification/rendezvous/transaction-state.ts',
+    'src/rendezvous/composition.ts',
+))
+TESTFLIGHT_PROFILE_ADDITIONS = frozenset((
+    'qualification/rendezvous/testflight-release.mjs',
+    'qualification/rendezvous/testflight-release.d.mts',
+))
+TESTFLIGHT_PROFILE_REFERENCES = frozenset()
+TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS = frozenset((
+    'qualification/rendezvous/private-profile-40381.check.mjs',
+    'docs/rendezvous/TESTFLIGHT_RELEASE_POLICY_V1.md',
+    'qualification/rendezvous/qa-build-profile.json',
+    'qualification/rendezvous/run_assertion_state_workerd.mjs',
+    'qualification/rendezvous/run_capacity_workerd.mjs',
+    'qualification/rendezvous/run_create_recovery_workerd.mjs',
+    'qualification/rendezvous/run_enrollment_workerd.mjs',
+    'qualification/rendezvous/run_partition_capacity_workerd.mjs',
+    'qualification/rendezvous/run_receipt_workerd.mjs',
+    'qualification/rendezvous/run_store_workerd.mjs',
+    'scripts/build_rendezvous_qa.mjs',
+    'src/rendezvous/qa-entry.ts',
+))
+SOURCE_PROVENANCE.update(testflight_profile_delta_sha256=TESTFLIGHT_PROFILE_SHA256,
+                         testflight_profile_source_map_sha256=TESTFLIGHT_PROFILE_MAP_SHA256)
+
+
+def baseline_before_public_trial():
+    sources, refs = baseline_before_testflight_profile()
+    delta = pinned_working_proof(TESTFLIGHT_PROFILE_PATH, TESTFLIGHT_PROFILE_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'source_additions',
+                           'reference_changes', 'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_TESTFLIGHT_RELEASE_PROFILE_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in ((sources, delta['changes'], TESTFLIGHT_PROFILE_SOURCES),
+                                      (refs, delta['reference_changes'], TESTFLIGHT_PROFILE_REFERENCES)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['before'] != change['after'])
+            mapping[name] = change['after']
+    for mapping, additions, allowed in ((sources, delta['source_additions'], TESTFLIGHT_PROFILE_ADDITIONS),
+                                         (refs, delta['reference_additions'], TESTFLIGHT_PROFILE_REFERENCE_ADDITIONS)):
+        require(set(additions) == allowed and not allowed.intersection(mapping))
+        mapping.update(additions)
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == TESTFLIGHT_PROFILE_MAP_SHA256)
+    refs[TESTFLIGHT_PROFILE_PATH] = TESTFLIGHT_PROFILE_SHA256
+    return sources, refs
+
+
+
+PUBLIC_TRIAL_DELTA_PATH = 'docs/rendezvous/public-testflight-trial-source-delta-v1.json'
+PUBLIC_TRIAL_DELTA_SHA256 = '08bc849f8c4f5463d4e23f2a50f76b24df07cf28708a9757a4b32acb7b6a8ada'
+PUBLIC_TRIAL_MAP_SHA256 = '5701251f20432ea063643f0308dc41c8133dbb8f02db346bfc15fc36b8e47334'
+PUBLIC_TRIAL_SOURCES = frozenset(('qualification/rendezvous/allocation-index.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/request-admission.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'qualification/rendezvous/transaction-state.ts', 'rendezvous-build-inputs.json', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts', 'wrangler.jsonc'))
+SOURCE_PROVENANCE.update(public_trial_delta_sha256=PUBLIC_TRIAL_DELTA_SHA256,
+                         public_trial_source_map_sha256=PUBLIC_TRIAL_MAP_SHA256)
+
+
+def baseline_before_always_on():
+    sources, refs = baseline_before_public_trial()
+    delta = pinned_working_proof(PUBLIC_TRIAL_DELTA_PATH, PUBLIC_TRIAL_DELTA_SHA256)
+    require(delta['schema_version'] == 1
+            and delta['scope'] == 'PUBLIC_TESTFLIGHT_TRIAL_CONFIGURED_NOT_DEPLOYED'
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in (
+        (sources, delta['source_changes'], PUBLIC_TRIAL_SOURCES),
+        (refs, delta['reference_changes'], {
+            'coordinator/host-app-wake/source-manifest.json',
+            'coordinator/installation-principal/source-manifest.json',
+            'coordinator/installation-registry/source-manifest.json',
+            'coordinator/principal-possession/source-manifest.json',
+            'coordinator/rich-session/source-manifest.json',
+            'qualification/rendezvous/qa-build-profile.json',
+            'qualification/watch-moment/source-manifest.json',
+            'wrangler.jsonc',
+        }),
+    ):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(change['before'] == mapping[name] and change['before'] != change['after'])
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == PUBLIC_TRIAL_MAP_SHA256)
+    require(set(delta['reference_additions']) == {'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md'})
+    refs.update(delta['reference_additions'])
+    refs[PUBLIC_TRIAL_DELTA_PATH] = PUBLIC_TRIAL_DELTA_SHA256
+    return sources, refs
+
+
+
+ALWAYS_ON_DELTA_PATH = 'docs/rendezvous/always-on-testflight-source-delta-v1.json'
+ALWAYS_ON_DELTA_SHA256 = '57e84804cc8d697eb6236fdfaa952a6319aae9892feb95ccbf6292698dd45532'
+ALWAYS_ON_MAP_SHA256 = '89e6c6cab440cbcbc709ee9093d2b6e0ac8f92496532e51b4d1ca942b41f9dc8'
+ALWAYS_ON_SOURCES = frozenset(('qualification/rendezvous/assertion-key-state.ts', 'qualification/rendezvous/enrollment-key-state.ts', 'qualification/rendezvous/product-composition.check.ts', 'qualification/rendezvous/testflight-release.d.mts', 'qualification/rendezvous/testflight-release.mjs', 'rendezvous-build-inputs.json', 'src/rendezvous/composition.ts', 'src/rendezvous/dispatch.ts', 'wrangler.jsonc'))
+ALWAYS_ON_REFERENCES = frozenset(('coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'qualification/rendezvous/qa-build-profile.json', 'qualification/watch-moment/source-manifest.json', 'wrangler.jsonc'))
+SOURCE_PROVENANCE.update(always_on_testflight_delta_sha256=ALWAYS_ON_DELTA_SHA256,
+                         always_on_testflight_source_map_sha256=ALWAYS_ON_MAP_SHA256)
+
+
+def baseline_before_org_operational_manifest_path():
+    sources, refs = baseline_before_always_on()
+    delta = pinned_working_proof(ALWAYS_ON_DELTA_PATH, ALWAYS_ON_DELTA_SHA256)
+    require(delta['schema_version'] == 1
+            and delta['scope'] == 'PUBLIC_TESTFLIGHT_ALWAYS_ON_SOURCE_NOT_DEPLOYED'
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in (
+        (sources, delta['source_changes'], ALWAYS_ON_SOURCES),
+        (refs, delta['reference_changes'], ALWAYS_ON_REFERENCES),
+    ):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['before'] != change['after'])
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == ALWAYS_ON_MAP_SHA256)
+    refs[ALWAYS_ON_DELTA_PATH] = ALWAYS_ON_DELTA_SHA256
+    return sources, refs
+
+
+ORG_OPERATIONAL_MANIFEST_PATH_DELTA = 'docs/rendezvous/org-operational-manifest-path-delta-v1.json'
+ORG_OPERATIONAL_MANIFEST_PATH_SHA256 = '0005e3efafd7732f156ff53ef0eab53d7d7bf1145035ee8f9c9bdbe1b6547605'
+SOURCE_PROVENANCE['org_operational_manifest_path_delta_sha256'] = ORG_OPERATIONAL_MANIFEST_PATH_SHA256
+
+
+def baseline_before_wrangler_4160():
+    sources, refs = baseline_before_org_operational_manifest_path()
+    delta = pinned_working_proof(ORG_OPERATIONAL_MANIFEST_PATH_DELTA, ORG_OPERATIONAL_MANIFEST_PATH_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_ORG_OPERATIONAL_MANIFEST_PATH_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False)
+    changes = delta['reference_changes']
+    require(set(changes) == {PRODUCTION_D1_GUARD_REFERENCE, REPOSITORY_NAMESPACE_SMOKE_REFERENCE})
+    for name, change in changes.items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and change['after'] != change['before'])
+        refs[name] = change['after']
+    refs[ORG_OPERATIONAL_MANIFEST_PATH_DELTA] = ORG_OPERATIONAL_MANIFEST_PATH_SHA256
+    return sources, refs
+
+
+WRANGLER_4160_DELTA_PATH = 'docs/rendezvous/wrangler-4160-toolchain-source-delta-v1.json'
+WRANGLER_4160_DELTA_SHA256 = 'abede1a68b5eb3336bc91ce838eed2a977e5a41ac915bcf82861ebeb3b0dd0be'
+WRANGLER_4160_SOURCE_MAP_SHA256 = '1a549cc6a6585cead234d4edac427fab3d7ab00538b88d12e90d527144a2dbcf'
+WRANGLER_4160_SOURCES = frozenset(('package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs'))
+WRANGLER_4160_REFERENCES = STABLE_RELEASE_REFERENCES
+WRANGLER_4160_PROVENANCE = 'qualification/rendezvous/compatible-runtime-dependency-provenance-v6.json'
+SOURCE_PROVENANCE.update(wrangler_4160_delta_sha256=WRANGLER_4160_DELTA_SHA256,
+                         wrangler_4160_source_map_sha256=WRANGLER_4160_SOURCE_MAP_SHA256)
+
+
+def baseline_before_org_governance():
+    sources, refs = baseline_before_wrangler_4160()
+    delta = pinned_working_proof(WRANGLER_4160_DELTA_PATH, WRANGLER_4160_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'base_source', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'changes', 'reference_changes',
+                           'reference_additions', 'public_activation_allowed'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_WRANGLER_4160_TOOLCHAIN_REFRESH_NOT_ACTIVATION'
+            and delta['base_source'] == 'a6dfec8c67c8c8f05224bca9de984df30ab5bddb'
+            and delta['public_activation_allowed'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in (
+        (sources, delta['changes'], WRANGLER_4160_SOURCES),
+        (refs, delta['reference_changes'], WRANGLER_4160_REFERENCES),
+    ):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before']
+                    and isinstance(change['after'], str) and len(change['after']) == 64
+                    and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256']
+            == WRANGLER_4160_SOURCE_MAP_SHA256)
+    require(set(delta['reference_additions']) == {WRANGLER_4160_PROVENANCE}
+            and WRANGLER_4160_PROVENANCE not in refs)
+    refs.update(delta['reference_additions'])
+    refs[WRANGLER_4160_DELTA_PATH] = WRANGLER_4160_DELTA_SHA256
+    return sources, refs
+
+
+ORG_GOVERNANCE_DELTA_PATH = 'docs/rendezvous/org-governance-source-delta-v1.json'
+ORG_GOVERNANCE_DELTA_SHA256 = 'e5c736b6f5bf3d1e7528504d8fc791fa29bc103c88faf5a490f24ed1ba1fbb85'
+ORG_GOVERNANCE_SOURCE_MAP_SHA256 = '74558e3841d3fe579079a5af7c58b66bd6ff58982bedd99ee03346eaf291ad57'
+ORG_GOVERNANCE_SOURCES = frozenset(('.github/workflows/ci-cd.yml',))
+ORG_GOVERNANCE_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'qualification/watch-moment/source-manifest.json', '.github/workflows/reusable-workflow-guard.yml'))
+SOURCE_PROVENANCE.update(org_governance_delta_sha256=ORG_GOVERNANCE_DELTA_SHA256,
+                         org_governance_source_map_sha256=ORG_GOVERNANCE_SOURCE_MAP_SHA256)
+
+
+def baseline_before_core_governance_transition():
+    sources, refs = baseline_before_org_governance()
+    delta = pinned_working_proof(ORG_GOVERNANCE_DELTA_PATH, ORG_GOVERNANCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'source_changes', 'reference_changes',
+                           'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_ORGANIZATION_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    for mapping, changes, allowed in ((sources, delta['source_changes'], ORG_GOVERNANCE_SOURCES),
+                                      (refs, delta['reference_changes'], ORG_GOVERNANCE_REFERENCES)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before'] and isinstance(change['after'], str)
+                    and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == ORG_GOVERNANCE_SOURCE_MAP_SHA256)
+    refs[ORG_GOVERNANCE_DELTA_PATH] = ORG_GOVERNANCE_DELTA_SHA256
+    return sources, refs
+
+
+CORE_GOVERNANCE_TRANSITION_PATH = 'docs/rendezvous/core-governance-transition-source-delta-v1.json'
+CORE_GOVERNANCE_TRANSITION_SHA256 = 'aac6ae192990a26c8c65cb4cab1fd7e080c4a06398c4b61cb72a288784dd4a23'
+CORE_GOVERNANCE_TRANSITION_MAP_SHA256 = '3cb7dabebff8c23d69772f17593fed2192da0aeceb1890e1a3d8a44b52410177'
+CORE_GOVERNANCE_WORKFLOWS = frozenset(('.github/workflows/ci-cd.yml', '.github/workflows/host-app-wake-receiving.yml', '.github/workflows/host-app-wake-source.yml', '.github/workflows/installation-principal-data.yml', '.github/workflows/installation-registry-transactions.yml', '.github/workflows/native-proof-data-journal.yml', '.github/workflows/native-proof-transcript.yml', '.github/workflows/principal-possession-data.yml', '.github/workflows/push-coordinator-source.yml', '.github/workflows/reusable-workflow-guard.yml', '.github/workflows/rich-delivery-adapter.yml', '.github/workflows/rich-session-data-profile.yml', '.github/workflows/surface-enrollment-source.yml', '.github/workflows/watch-moment-alert-source.yml', '.github/workflows/worker-do-registry-source.yml'))
+CORE_GOVERNANCE_REFERENCES = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/worker-do/source-manifest.json', 'qualification/watch-moment/source-manifest.json', '.github/workflows/reusable-workflow-guard.yml'))
+CORE_GOVERNANCE_AUXILIARY = frozenset(('coordinator/source-manifest.json',))
+SOURCE_PROVENANCE.update(core_governance_transition_delta_sha256=CORE_GOVERNANCE_TRANSITION_SHA256,
+                         core_governance_transition_source_map_sha256=CORE_GOVERNANCE_TRANSITION_MAP_SHA256)
+
+
+def baseline_before_api_core_identity():
+    sources, refs = baseline_before_core_governance_transition()
+    delta = pinned_working_proof(CORE_GOVERNANCE_TRANSITION_PATH, CORE_GOVERNANCE_TRANSITION_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'baseline_source_map_sha256',
+                           'effective_source_map_sha256', 'workflow_changes', 'source_changes',
+                           'reference_changes', 'auxiliary_changes', 'public_activation_allowed',
+                           'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_CORE_GOVERNANCE_WORKFLOW_TRANSITION_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and delta['baseline_source_map_sha256'] == source_map_digest(sources))
+    require(set(delta['workflow_changes']) == CORE_GOVERNANCE_WORKFLOWS)
+    old_pin = b'software-assurance-governance.yml@dd02d6470f061e6e755e6fb47ae5331c34f89875'
+    new_pin = b'software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508'
+    for name, change in delta['workflow_changes'].items():
+        raw = shared_governance_previous_bytes(name)
+        require(set(change) == {'before', 'after'} and raw.count(new_pin) == 1
+                and digest(raw) == change['after']
+                and digest(raw.replace(new_pin, old_pin)) == change['before'])
+    for mapping, changes, allowed in ((sources, delta['source_changes'], frozenset(('.github/workflows/ci-cd.yml',))),
+                                      (refs, delta['reference_changes'], CORE_GOVERNANCE_REFERENCES)):
+        require(set(changes) == allowed)
+        for name, change in changes.items():
+            require(set(change) == {'before', 'after'} and change['before'] == mapping[name]
+                    and change['after'] != change['before'] and isinstance(change['after'], str)
+                    and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+            mapping[name] = change['after']
+    require(set(delta['auxiliary_changes']) == CORE_GOVERNANCE_AUXILIARY)
+    for name, change in delta['auxiliary_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] != change['after']
+                and digest(shared_governance_previous_bytes(name)) == change['after'])
+    require(source_map_digest(sources) == delta['effective_source_map_sha256'] == CORE_GOVERNANCE_TRANSITION_MAP_SHA256)
+    refs[CORE_GOVERNANCE_TRANSITION_PATH] = CORE_GOVERNANCE_TRANSITION_SHA256
+    return sources, refs
+
+
+API_CORE_IDENTITY_DELTA_PATH = 'docs/rendezvous/api-core-identity-source-delta-v1.json'
+API_CORE_IDENTITY_DELTA_SHA256 = 'dc2ef35dd624d60efb99b3048e3617bc214578e57449dc9e2a73e8901719e2ab'
+API_CORE_IDENTITY_REFERENCES = frozenset(('.github/workflows/deploy-api-worker.yml', '.github/workflows/api-worker-post-deployment-smoke.yml'))
+SOURCE_PROVENANCE['api_core_identity_delta_sha256'] = API_CORE_IDENTITY_DELTA_SHA256
+
+
+API_ORG_RELEASE_DELTA_PATH = 'docs/rendezvous/api-org-only-release-source-delta-v1.json'
+API_ORG_RELEASE_DELTA_SHA256 = '9cdcbdcf78e1990adb86daa388feed9bc4f92a40b3140dddce05acf61bd16e00'
+SOURCE_PROVENANCE['api_org_release_delta_sha256'] = API_ORG_RELEASE_DELTA_SHA256
+
+API_ORG_CORE_AUTHORITY_DELTA_PATH = 'docs/rendezvous/api-org-core-authority-source-delta-v1.json'
+API_ORG_CORE_AUTHORITY_DELTA_SHA256 = 'a4a87feb002f94f8a8db3afe3414372ea51ae11b04dd7167f0f832d4c1967de1'
+SOURCE_PROVENANCE['api_org_core_authority_delta_sha256'] = API_ORG_CORE_AUTHORITY_DELTA_SHA256
+
+
+def baseline_before_api_shared_governance():
+    sources, refs = baseline_before_api_core_identity()
+    delta = pinned_working_proof(API_CORE_IDENTITY_DELTA_PATH, API_CORE_IDENTITY_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_CORE_IDENTITY_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False)
+    require(set(delta['reference_changes']) == API_CORE_IDENTITY_REFERENCES)
+    for name, change in delta['reference_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and change['after'] != change['before'] and isinstance(change['after'], str)
+                and len(change['after']) == 64 and all(c in '0123456789abcdef' for c in change['after']))
+        refs[name] = change['after']
+    refs[API_CORE_IDENTITY_DELTA_PATH] = API_CORE_IDENTITY_DELTA_SHA256
+    return sources, refs
+
+
+API_SHARED_GOVERNANCE_DELTA_PATH = 'docs/rendezvous/api-shared-governance-source-delta-v1.json'
+API_SHARED_GOVERNANCE_DELTA_SHA256 = 'b9e44f138b5824cc29ca5fd99c3d822491486f2a720bb675303e65dc50a65376'
+API_SHARED_GOVERNANCE_WORKFLOWS = frozenset(('.github/workflows/ci-cd.yml', '.github/workflows/codeql.yml', '.github/workflows/host-app-wake-receiving.yml', '.github/workflows/host-app-wake-source.yml', '.github/workflows/installation-principal-data.yml', '.github/workflows/installation-registry-transactions.yml', '.github/workflows/native-proof-data-journal.yml', '.github/workflows/native-proof-transcript.yml', '.github/workflows/principal-possession-data.yml', '.github/workflows/push-coordinator-source.yml', '.github/workflows/reusable-workflow-guard.yml', '.github/workflows/rich-delivery-adapter.yml', '.github/workflows/rich-session-data-profile.yml', '.github/workflows/semgrep.yml', '.github/workflows/surface-enrollment-source.yml', '.github/workflows/watch-moment-alert-source.yml', '.github/workflows/widget-first-key-source.yml', '.github/workflows/worker-do-registry-source.yml'))
+API_SHARED_GOVERNANCE_MANIFESTS = frozenset(('coordinator/host-app-wake-receiving/runtime/source-inputs.json', 'coordinator/host-app-wake/source-manifest.json', 'coordinator/installation-principal/source-manifest.json', 'coordinator/installation-registry/source-manifest.json', 'coordinator/principal-possession/source-manifest.json', 'coordinator/rich-delivery/source-manifest.json', 'coordinator/rich-session/source-manifest.json', 'coordinator/source-manifest.json', 'coordinator/worker-do/source-manifest.json', 'qualification/watch-moment/source-manifest.json'))
+API_SHARED_GOVERNANCE_SOURCES = frozenset(('.github/workflows/ci-cd.yml',))
+API_SHARED_GOVERNANCE_REFERENCES = frozenset(('.github/workflows/reusable-workflow-guard.yml',)) | (API_SHARED_GOVERNANCE_MANIFESTS - frozenset(('coordinator/source-manifest.json',)))
+API_SHARED_GOVERNANCE_OLD_PIN = b'pcvantol/djconnect/.github/workflows/software-assurance-governance.yml@aabd5de46ae438478eb894707e5b1ea27aca8508'
+API_SHARED_GOVERNANCE_NEW_PIN = b'djconnect-music-dj/djconnect-shared-workflows/.github/workflows/software-assurance-governance-aabd.yml@b4e6470be61fee895af0e13ca1a63f101f03d647'
+SOURCE_PROVENANCE['api_shared_governance_delta_sha256'] = API_SHARED_GOVERNANCE_DELTA_SHA256
+
+
+API_GUARD_REFERENCE_DELTA_PATH = 'docs/rendezvous/api-guard-reference-source-delta-v1.json'
+API_GUARD_REFERENCE_DELTA_SHA256 = 'a8ab1f34ef94c7c2ea44095d0b990b1d8ce25a59956aef83d32fda06aa38b32a'
+API_GUARD_MANIFESTS = frozenset(('coordinator/installation-principal/source-manifest.json', 'coordinator/principal-possession/source-manifest.json'))
+SOURCE_PROVENANCE['api_guard_reference_delta_sha256'] = API_GUARD_REFERENCE_DELTA_SHA256
+
+
+API_GOVERNANCE_SUMMARY_DELTA_PATH = 'docs/rendezvous/api-governance-summary-pin-source-delta-v1.json'
+API_GOVERNANCE_SUMMARY_DELTA_SHA256 = '15a78327a997ada80926e8443715787951b2a18967a7ddaac90fa373cd6efd32'
+API_GOVERNANCE_SUMMARY_PIN = b'2a1c6fd2841b08630aee01402850f56840b50f70'
+SOURCE_PROVENANCE['api_governance_summary_pin_delta_sha256'] = API_GOVERNANCE_SUMMARY_DELTA_SHA256
+
+
+
+API_41_DELTA_PATH = 'docs/rendezvous/api-4-1-org-policy-source-delta-v1.json'
+API_41_DELTA_SHA256 = '91645102ead4fa549b1b71c5d131516ea14b3024c9213518e27bb1aeee01e010'
+API_41_WORKFLOWS = frozenset(('.github/workflows/ci-cd.yml', '.github/workflows/codeql.yml', '.github/workflows/host-app-wake-receiving.yml', '.github/workflows/host-app-wake-source.yml', '.github/workflows/installation-principal-data.yml', '.github/workflows/installation-registry-transactions.yml', '.github/workflows/native-proof-data-journal.yml', '.github/workflows/native-proof-transcript.yml', '.github/workflows/post-merge-release-evidence.yml', '.github/workflows/principal-possession-data.yml', '.github/workflows/push-coordinator-source.yml', '.github/workflows/reusable-workflow-guard.yml', '.github/workflows/rich-delivery-adapter.yml', '.github/workflows/rich-session-data-profile.yml', '.github/workflows/semgrep.yml', '.github/workflows/surface-enrollment-source.yml', '.github/workflows/trusted-delivery.yml', '.github/workflows/watch-moment-alert-source.yml', '.github/workflows/widget-first-key-source.yml', '.github/workflows/worker-do-registry-source.yml'))
+API_41_VERSION_SOURCES = frozenset(('package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs', 'src/releaseMetadata.ts'))
+SOURCE_PROVENANCE['api_41_org_policy_source_delta_sha256'] = API_41_DELTA_SHA256
+
+def api_41_delta():
+    delta = pinned_working_proof(API_41_DELTA_PATH, API_41_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'version_source_changes', 'public_activation_allowed', 'production_effect_authorized'}
+            and type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_4_1_ORGANIZATION_PIN_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and set(delta['workflow_changes']) == API_41_WORKFLOWS
+            and set(delta['version_source_changes']) == API_41_VERSION_SOURCES)
+    return delta
+
+def api_41_previous_workflow(name):
+    raw = safe_path(name).read_bytes()
+    if name not in API_41_WORKFLOWS:
+        return raw
+    change = api_41_delta()['workflow_changes'][name]
+    require(set(change) == {'before', 'after', 'replacements'} and digest(raw) == change['after'])
+    require(isinstance(change['replacements'], list) and change['replacements'])
+    for replacement in change['replacements']:
+        require(set(replacement) == {'before', 'after'})
+        before, after = replacement['before'].encode(), replacement['after'].encode()
+        require(before != after and raw.count(after) == 1)
+        raw = raw.replace(after, before)
+    require(digest(raw) == change['before'])
+    return raw
+
+API_41_MANIFEST_DELTA_PATH = 'docs/rendezvous/api-4-1-manifest-refresh-delta-v1.json'
+API_41_MANIFEST_DELTA_SHA256 = '339f9911e7dcd8a7a5d6aaca6edba4dd574261318faf24647aa228429b40f760'
+SOURCE_PROVENANCE['api_41_manifest_refresh_delta_sha256'] = API_41_MANIFEST_DELTA_SHA256
+
+
+def api_41_manifest_delta():
+    delta = pinned_working_proof(API_41_MANIFEST_DELTA_PATH, API_41_MANIFEST_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'}
+            and type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_4_1_ACTIVE_MANIFEST_PINS_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and set(delta['manifest_changes']) == API_SHARED_GOVERNANCE_MANIFESTS)
+    return delta
+
+
+def api_41_previous_manifest(name, raw):
+    changes = api_41_manifest_delta()['manifest_changes']
+    if name not in changes:
+        return raw
+    change = changes[name]
+    require(set(change) == {'before', 'after', 'replacements'} and digest(raw) == change['after']
+            and isinstance(change['replacements'], list) and change['replacements'])
+    allowed = {**api_41_delta()['workflow_changes'], **api_41_delta()['version_source_changes']}
+    seen = set()
+    for item in change['replacements']:
+        require(set(item) == {'input', 'before', 'after'} and item['input'] in allowed and item['input'] not in seen)
+        seen.add(item['input'])
+        pin = allowed[item['input']]
+        before = f'"{item["input"]}": "{pin["before"]}"'.encode()
+        after = f'"{item["input"]}": "{pin["after"]}"'.encode()
+        require(item['before'].encode() == before and item['after'].encode() == after and raw.count(after) == 1)
+        raw = raw.replace(after, before, 1)
+    require(digest(raw) == change['before'])
+    return raw
+
+
+def summary_previous_bytes(name):
+    raw = api_41_previous_manifest(name, api_41_previous_workflow(name))
+    delta = pinned_working_proof(API_GOVERNANCE_SUMMARY_DELTA_PATH, API_GOVERNANCE_SUMMARY_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_GOVERNANCE_SUMMARY_PIN_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and set(delta['workflow_changes']) == API_SHARED_GOVERNANCE_WORKFLOWS
+            and set(delta['manifest_changes']) == API_SHARED_GOVERNANCE_MANIFESTS)
+    if name in API_SHARED_GOVERNANCE_WORKFLOWS:
+        change = delta['workflow_changes'][name]
+        require(set(change) == {'before', 'after'} and digest(raw) == change['after'] and raw.count(API_GOVERNANCE_SUMMARY_PIN) == 1)
+        previous = raw.replace(API_GOVERNANCE_SUMMARY_PIN, b'b4e6470be61fee895af0e13ca1a63f101f03d647')
+    elif name in API_SHARED_GOVERNANCE_MANIFESTS:
+        change = delta['manifest_changes'][name]
+        require(set(change) == {'before', 'after', 'workflow'} and change['workflow'] in API_SHARED_GOVERNANCE_WORKFLOWS)
+        workflow = delta['workflow_changes'][change['workflow']]
+        require(digest(raw) == change['after'] and raw.count(workflow['after'].encode()) == 1)
+        previous = raw.replace(workflow['after'].encode(), workflow['before'].encode())
+    else:
+        return raw
+    require(digest(previous) == change['before'])
+    return previous
+
+
+def guard_previous_bytes(name):
+    raw = summary_previous_bytes(name)
+    if name not in API_GUARD_MANIFESTS:
+        return raw
+    delta = pinned_working_proof(API_GUARD_REFERENCE_DELTA_PATH, API_GUARD_REFERENCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'guard', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_GUARD_REFERENCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False)
+    guard = delta['guard']
+    require(set(guard) == {'path', 'before', 'after'} and guard['path'] == 'scripts/check_reusable_workflow_refs.sh'
+            and guard['before'] == 'dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5'
+            and guard['after'] == '6b127d78cfdfbcc65669ab43d2ab1967371cb9e136c691d882bf102adf68149c'
+            and digest(safe_path(guard['path']).read_bytes()) == guard['after'])
+    require(set(delta['manifest_changes']) == API_GUARD_MANIFESTS)
+    change = delta['manifest_changes'][name]
+    require(set(change) == {'before', 'after'} and digest(raw) == change['after']
+            and raw.count(guard['after'].encode()) == 1)
+    previous = raw.replace(guard['after'].encode(), guard['before'].encode())
+    require(digest(previous) == change['before'])
+    return previous
+
+
+def shared_governance_previous_bytes(name):
+    raw = guard_previous_bytes(name)
+    if name in API_SHARED_GOVERNANCE_WORKFLOWS:
+        require(raw.count(API_SHARED_GOVERNANCE_NEW_PIN) == 1)
+        raw = raw.replace(API_SHARED_GOVERNANCE_NEW_PIN, API_SHARED_GOVERNANCE_OLD_PIN)
+    elif name in API_SHARED_GOVERNANCE_MANIFESTS:
+        delta = pinned_working_proof(API_SHARED_GOVERNANCE_DELTA_PATH, API_SHARED_GOVERNANCE_DELTA_SHA256)
+        change = delta['manifest_changes'][name]
+        workflow = delta['workflow_changes'][change['workflow']]
+        old, new = workflow['before'].encode(), workflow['after'].encode()
+        require(raw.count(new) == 1)
+        raw = raw.replace(new, old)
+    return raw
+
+
+def baseline():
+    delta = pinned_working_proof(API_SHARED_GOVERNANCE_DELTA_PATH, API_SHARED_GOVERNANCE_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'manifest_changes', 'source_changes', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_SHARED_GOVERNANCE_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False)
+    require(set(delta['workflow_changes']) == API_SHARED_GOVERNANCE_WORKFLOWS)
+    for name, change in delta['workflow_changes'].items():
+        raw = summary_previous_bytes(name)
+        require(set(change) == {'before', 'after'} and raw.count(API_SHARED_GOVERNANCE_NEW_PIN) == 1
+                and digest(raw) == change['after']
+                and digest(shared_governance_previous_bytes(name)) == change['before'])
+    require(set(delta['manifest_changes']) == API_SHARED_GOVERNANCE_MANIFESTS)
+    for name, change in delta['manifest_changes'].items():
+        require(set(change) == {'before', 'after', 'workflow'}
+                and change['workflow'] in API_SHARED_GOVERNANCE_WORKFLOWS
+                and digest(guard_previous_bytes(name)) == change['after']
+                and digest(shared_governance_previous_bytes(name)) == change['before'])
+    sources, refs = baseline_before_api_shared_governance()
+    require(set(delta['source_changes']) == API_SHARED_GOVERNANCE_SOURCES)
+    require(set(delta['reference_changes']) == API_SHARED_GOVERNANCE_REFERENCES)
+    for target, changes in ((sources, delta['source_changes']), (refs, delta['reference_changes'])):
+        for name, change in changes.items():
+            entry = delta['workflow_changes'].get(name) or delta['manifest_changes'][name]
+            require(change == {'before': entry['before'], 'after': entry['after']} and change['before'] == target[name])
+            target[name] = change['after']
+    refs[API_SHARED_GOVERNANCE_DELTA_PATH] = API_SHARED_GOVERNANCE_DELTA_SHA256
+    successor = pinned_working_proof(API_GUARD_REFERENCE_DELTA_PATH, API_GUARD_REFERENCE_DELTA_SHA256)
+    for name, change in successor['manifest_changes'].items():
+        require(name in API_GUARD_MANIFESTS and refs[name] == change['before'])
+        refs[name] = change['after']
+    refs[API_GUARD_REFERENCE_DELTA_PATH] = API_GUARD_REFERENCE_DELTA_SHA256
+    summary = pinned_working_proof(API_GOVERNANCE_SUMMARY_DELTA_PATH, API_GOVERNANCE_SUMMARY_DELTA_SHA256)
+    for name in API_SHARED_GOVERNANCE_WORKFLOWS | API_SHARED_GOVERNANCE_MANIFESTS:
+        summary_previous_bytes(name)
+        change = summary['workflow_changes'].get(name) or summary['manifest_changes'][name]
+        for target in (sources, refs):
+            if name in target:
+                require(target[name] == change['before'])
+                target[name] = change['after']
+    refs[API_GOVERNANCE_SUMMARY_DELTA_PATH] = API_GOVERNANCE_SUMMARY_DELTA_SHA256
+    org_release = pinned_working_proof(API_ORG_RELEASE_DELTA_PATH, API_ORG_RELEASE_DELTA_SHA256)
+    require(set(org_release) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'})
+    require(type(org_release['schema_version']) is int and org_release['schema_version'] == 1
+            and org_release['scope'] == 'EXACT_API_ORG_ONLY_RELEASE_SOURCE_NOT_ACTIVATION'
+            and org_release['public_activation_allowed'] is False and org_release['production_effect_authorized'] is False
+            and set(org_release['reference_changes']) == API_CORE_IDENTITY_REFERENCES)
+    for name, change in org_release['reference_changes'].items():
+        current = safe_path(name).read_bytes()
+        old_names = b"['pcvantol/djconnect', 'djconnect-music-dj/djconnect']"
+        new_names = b"['djconnect-music-dj/djconnect']"
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and current.count(new_names) == 1
+                and digest(current.replace(new_names, old_names, 1)) == change['after'])
+        refs[name] = change['after']
+    refs[API_ORG_RELEASE_DELTA_PATH] = API_ORG_RELEASE_DELTA_SHA256
+    delta41 = api_41_delta()
+    for name in API_41_WORKFLOWS:
+        api_41_previous_workflow(name)
+    for name, change in {**delta41['workflow_changes'], **delta41['version_source_changes']}.items():
+        require(set(change) == ({'before', 'after', 'replacements'} if name in API_41_WORKFLOWS else {'before', 'after'}))
+        require(digest(safe_path(name).read_bytes()) == change['after'])
+        for target in (sources, refs):
+            if name in target:
+                require(target[name] == change['before'])
+                target[name] = change['after']
+    refs[API_41_DELTA_PATH] = API_41_DELTA_SHA256
+    authority = pinned_working_proof(API_ORG_CORE_AUTHORITY_DELTA_PATH, API_ORG_CORE_AUTHORITY_DELTA_SHA256)
+    require(set(authority) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'}
+            and type(authority['schema_version']) is int and authority['schema_version'] == 1
+            and authority['scope'] == 'EXACT_API_ORGANIZATION_CORE_AUTHORITY_NOT_ACTIVATION'
+            and authority['public_activation_allowed'] is False and authority['production_effect_authorized'] is False
+            and set(authority['reference_changes']) == API_CORE_IDENTITY_REFERENCES)
+    for name, change in authority['reference_changes'].items():
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and digest(safe_path(name).read_bytes()) == change['after'])
+        refs[name] = change['after']
+    refs[API_ORG_CORE_AUTHORITY_DELTA_PATH] = API_ORG_CORE_AUTHORITY_DELTA_SHA256
+    manifest_delta = api_41_manifest_delta()
+    for name, change in manifest_delta['manifest_changes'].items():
+        previous = api_41_previous_manifest(name, safe_path(name).read_bytes())
+        require(digest(previous) == change['before'])
+        for target in (sources, refs):
+            if name in target:
+                require(target[name] == change['before'])
+                target[name] = change['after']
+    refs[API_41_MANIFEST_DELTA_PATH] = API_41_MANIFEST_DELTA_SHA256
+    return sources, refs
+
+
+def validate(plan):
+    expected = {'schema_version', 'kind', 'status', 'supplying_source_sha', 'source_provenance',
+                'profile', 'wire', 'worker', 'service_origin', 'browser_origin',
+                'compatibility_date', 'activation_allowed', 'public_entrypoint',
+                'central_manifest_id', 'artifact_id', 'artifact_sha256', 'approval',
+                'account_id', 'account_plan', 'bindings', 'migration', 'secret_names',
+                'gates', 'source_hashes', 'reference_hashes', 'proposed_configuration'}
+    require(isinstance(plan, dict) and set(plan) == expected)
+    constants = {'schema_version': 1, 'kind': 'rendezvous_deployment_preparation',
+                 'status': 'NOT_AUTHORIZED', 'supplying_source_sha': SUPPLYING_SHA,
+                 'profile': '0.4.0-draft', 'wire': 'djc-rendezvous/1',
+                 'worker': 'djconnect-api', 'service_origin': 'https://api.djconnect.dev',
+                 'browser_origin': 'https://vibecast.tv', 'compatibility_date': '2026-06-20'}
+    for key, value in constants.items():
+        require(type(plan[key]) is type(value) and plan[key] == value)
+    require(plan['source_provenance'] == SOURCE_PROVENANCE)
+    require(plan['activation_allowed'] is False)
+    for key in ('public_entrypoint', 'central_manifest_id', 'artifact_id',
+                'artifact_sha256', 'approval', 'account_id', 'account_plan'):
+        require(plan[key] is None)
+    require(plan['bindings'] == BINDINGS)
+    require(plan['migration'] == {'proposed_tag': 'djc-rendezvous-sqlite-v1',
+                                 'status': 'PROPOSED_COLLISION_UNVERIFIED',
+                                 'new_sqlite_classes': sorted(BINDINGS.values())})
+    require(plan['secret_names'] == ['RENDEZVOUS_IP_HASH_KEY', 'RECEIPT_ACTIVE_KEY',
+                                     'RECEIPT_PREVIOUS_KEY'])
+    require(plan['proposed_configuration'] == PROPOSED_CONFIGURATION)
+    require(plan['gates'] == {name: 'OPEN' for name in GATES})
+    sources, references = baseline()
+    require(plan['source_hashes'] == sources and plan['reference_hashes'] == references)
+    for path, expected_hash in {**sources, **references}.items():
+        require(digest(safe_path(path).read_bytes()) == expected_hash)
+    return {'status': SUCCESS, 'activation_allowed': False,
+            'supplying_source_sha': SUPPLYING_SHA, 'source_provenance': SOURCE_PROVENANCE,
+            'open_gate_count': len(GATES),
+            'qualification_workflow_delta': pinned_working_proof(
+                WORKFLOW_DELTA_PATH, WORKFLOW_DELTA_SHA256)['changes']}
+
+
+def main():
+    # No execute/deploy/approve mode. This output cannot be a dispatch receipt.
+    try:
+        require(len(sys.argv) == 1)
+        raw = safe_path('docs/rendezvous/deployment-preparation-v1.json').read_bytes()
+        result = validate(decode(raw))
+    except Exception:
+        print(json.dumps({'status': 'PREPARATION_INVALID_NOT_AUTHORIZED',
+                          'activation_allowed': False}))
+        return 1
+    print(json.dumps(result, sort_keys=True))
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

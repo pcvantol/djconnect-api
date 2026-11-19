@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_SHARED_KEY_ADDRESS_DERIVATION_NOT_ACTIVATION",
+  "baseline_source_map_sha256": "95313d7f7afd6165ff590bc51759d049f478f8a3c1e982b3442104bde93b4002",
+  "effective_source_map_sha256": "b66af67e7cbd6b89c0bdd74473c615f068042b9baac6216706d71ac70bf797c5",
+  "changes": {
+    "qualification/rendezvous/assertion-key-state.ts": {
+      "before": "fa7b29c185c2163e1ec652f6fe2808f9f2d687dfe70ae48572ec4f44ba7dc2e6",
+      "after": "d65abe4ec101f52372340f47a159efa2f725c3ea0e4aa03fca8efeb5143b1917"
+    },
+    "qualification/rendezvous/enrollment-key-state.ts": {
+      "before": "a6782474798f90f0d338bbcfd518cda6ee9338c5ce40205b1020258897c448b0",
+      "after": "2e713fb51bb8e775ecd070c20984136ac32ed42b318454d72d9394b7b7630de5"
+    },
+    "qualification/rendezvous/key-routing.ts": {
+      "before": "8ce1268598a5c12c448510f81691c185f0a0d5688ccc163e01d0bfd5fe3a97af",
+      "after": "56d05029e953617b078680c8e31a79d15e81ab90abe941d5895d0d94025885c4"
+    },
+    "qualification/rendezvous/transaction-state.ts": {
+      "before": "40d84abd12043f00da12b50a14bd178e85228662815b894aea6618227ea4423b",
+      "after": "fc6342c2265a1c53f78fbefd8800b6819c1e1d8c3b612fa7b21c23a5a7410e0e"
+    },
+    "qualification/rendezvous/product-composition.check.ts": {
+      "before": "9f0459d1d825413936086974f63e22d8b164cc0ff9c8a194aa97872546f93b93",
+      "after": "515f985f368f5c07712eec2034bef8c45757b60efc2021e3a719c3033cb6df44"
+    }
+  },
+  "source_additions": {
+    "qualification/rendezvous/key-address.ts": "1f26277b64c54123833f702f30a55149c7fdbcfdcd56fc168d7401a84ed2f277"
+  },
+  "public_activation_allowed": false
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "classification": "INSTALLATION_REGISTRY_TRANSACTION_SOURCE_FINALIZATION_ONLY",
+  "source_PR": 191,
+  "candidate": "46d7fd10580f7a0bcc3f6358dbcbed84893200fe",
+  "protected_main": "842bb66909dc1ebd102b3e857caf1734ec22e882",
+  "actual_parent": "13cb4f3ef82e16e6f4998f68cd5d867fdf8fc1c5",
+  "source_tree": "d7d3953896501f9b9bb99e36227104853e19d6e6",
+  "source_review": {
+    "independent_personal_read_only_reviewers": 2,
+    "exact_candidate": "46d7fd10580f7a0bcc3f6358dbcbed84893200fe",
+    "security": "BOUNDED_SOURCE_GO",
+    "correctness": "BOUNDED_SOURCE_GO",
+    "resolved_observation": "Isolate nonce-only and challenge-only conflicts with distinct operation IDs."
+  },
+  "qualification": {
+    "own_main_workflows": 21,
+    "all_success": true,
+    "original_provider_ZIPs_verified": 15,
+    "actual_test_reports": {
+      "rich-delivery-tests.json": 45,
+      "possession-data-tests.json": 65,
+      "host-wake-receiving-packaged.json": 340,
+      "worker-do-registry-tests.json": 36,
+      "host-wake-receiving-isolated-vendor-model.json": 21,
+      "installation-registry-tests.json": 49,
+      "installation-codec-tests.json": 67,
+      "host-app-wake-tests.json": 60,
+      "host-wake-receiving-ordinary.json": 324,
+      "rich-profile-data-tests.json": 117,
+      "host-wake-receiving-production-caller.json": 37
+    },
+    "own_original_join_SHA256": "40b710cbeb8131b2730bd2245f390359aa7d73c4610536d5e12bcbcf0eaeb632",
+    "formal_canonical_SHA256": "9a86be5f4a24aae5451dce7f8a1959febb2277f54e16bb5616ac260f72e89156",
+    "durable_asset": 701007941,
+    "durable_provider_digest": "sha256:ede84cf0e56cbd674a5cda86524236e57b73cfef0e655ca9c913abc567d11a7a",
+    "durable_canonical_SHA256": "bbbf3ddfc885b5c53c3cbc3d41290b69fc0fbfd799e880be52c2ca06f756aad0"
+  },
+  "release": {
+    "release_run": 41411304771,
+    "release_artifact": 13125353402,
+    "release_TAR_SHA256": "dc5aa58afcad56307c041211e44a5b3ad998fdd5f69cf2b2f75412dd0915ff46",
+    "Worker_SHA256": "83d6fa8cce70ea236377241df965a52c40694ed305588730733b781f06a382d8",
+    "Worker_bytes": 1468601,
+    "regular_TAR_members": 19,
+    "actual_parent_comparison": "All18 other regular TAR files byte-equal actual parent13cb4; Worker only exact embedded release SHA"
+  },
+  "registry_module_SHA256": "66e803bcd0b6d2e144609648e4c7c87aad80129e371e863a398dd84cc4f1e705",
+  "local_evidence": {
+    "registry_workerd_pass": 49,
+    "root_API_pass": 40,
+    "root_and_registry_strict_types": "PASS",
+    "actual_packaged_module_Node_SQLite": "PASS",
+    "initial_restricted_listener_attempt": "EPERM before test execution; retained, not PASS"
+  },
+  "limits": [
+    "Required independent management/operator/install/custody/clock/restore/withdrawal authority is not implemented by this source.",
+    "Closed registry Worker target returns503 and production factory throws; no real namespace, numeric limits, management service or live registration selected.",
+    "Synthetic test authority and public possession proof do not establish installation or operator admission.",
+    "The historical47stateful design declarations are not claimed executed by these49focused tests.",
+    "No genuine process eviction/restore/power-loss/device/native/provider acceptance follows.",
+    "Actual deployment remains separately qualified757; this main artifact is not deployed."
+  ],
+  "production_source_unchanged": "75763b9bf5e8f76d94f2dec189f1baf54a4cc8c8",
+  "effects": {
+    "deployment": false,
+    "registration": false,
+    "namespace_provisioning": false,
+    "key_or_SDK": false,
+    "HA_or_APNs": false
+  },
+  "documentary_delivery": "These two documents require their own exact review, protected merge and own main/original qualification; none is claimed by this record."
+}

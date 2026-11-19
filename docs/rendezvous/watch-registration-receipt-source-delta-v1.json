@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_WATCH_REGISTRATION_RECEIPT_NOT_ACTIVATION",
+  "base_source": "176d71afe111a70028fef0d7ed2c28f41f66aaab",
+  "baseline_source_map_sha256": "e2d62207b25cb2435be51dfcbe5a4ef8a7254b8e4e920b6451ae944b060fec85",
+  "effective_source_map_sha256": "f4e44f5a4221a0dbf4f1042fafb8c5c4ce8c927a6317da09b43e35c85010a938",
+  "source_changes": {
+    "src/repositories/registrations.ts": {
+      "before": "3731530859d9ebc274d64cd0483e6f555c15ebc91a36dc2d06777b949f181e95",
+      "after": "4f46e18fcae5433896e2443fb4022000f03d639cc076910a04dc3da0143e8a80"
+    }
+  },
+  "reference_changes": {
+    "coordinator/host-app-wake-receiving/runtime/source-inputs.json": {
+      "before": "d8b3977cff475348de7485b0e710f21b45b328bf80150befc956f8de4ec49288",
+      "after": "e0e0e688b681d468b660c26c4aad440a27c3b2c66e2523d7130974abf9213e1a"
+    }
+  },
+  "public_activation_allowed": false,
+  "production_effect_authorized": false
+}

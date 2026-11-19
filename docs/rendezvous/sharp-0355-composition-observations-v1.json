@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "scope": "INTERNAL_PRODUCT_MODULE_WITH_REAL_PRIVATE_DO_NOT_ROOT_HTTP_OR_EDGE_PROVENANCE",
+  "base_main_sha": "ec8029dbe7e4b0f4405253a3bf265d505303866b",
+  "tests_passed": 49,
+  "typecheck": "PASS",
+  "source_sha256": {
+    "src/rendezvous/composition.ts": "d78fdc0a92794dd0399f3ca618babbf011d3a186a4f6d83f780775c23e2e8325",
+    "qualification/rendezvous/product-composition.check.ts": "9f0459d1d825413936086974f63e22d8b164cc0ff9c8a194aa97872546f93b93",
+    "qualification/rendezvous/vitest.product-composition.config.mts": "1cdee7d422e0692ad695f9649f2cba333cf91a557958a88fc9dca739fd78a461",
+    "qualification/rendezvous/tsconfig.product-composition.json": "bce6f6a2c178917c31576224f39194576a9fc745efb55625611161f253ae386c",
+    "qualification/rendezvous/allocation-budget.ts": "c5cb28a0178f1b7e97d9303b66248f3d735fafb813ce122dc184cb2c13ecda4e",
+    "qualification/rendezvous/composed-http.ts": "21fad11bb8c0317084950f68bb3462fb737d31fdcbfbd82e054ab3a74eebde02",
+    "qualification/rendezvous/transaction-state.ts": "40d84abd12043f00da12b50a14bd178e85228662815b894aea6618227ea4423b",
+    "src/index.ts": "a94d2a7cc34c9cf09c722789aa838964ff49c23fdbdf5a04636a92d24856bd55",
+    "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
+    "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
+    "rendezvous-build-inputs.json": "c0dff3c47cf35122813b2a728df1759c14cc20e3b28f76118f1572f61d644d79",
+    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+    "package.json": "d32e8c6706816ae91682453a54b13d989f442f7da4c49fab66e80a054668a386",
+    "package-lock.json": "9947367deb9b7028fb58fd431f3e3bfd57fc2db207d00497224e833dde911948",
+    ".github/workflows/ci-cd.yml": "546ad4495db1fbf8f83489c16cf7e32919525c3fa4e58e69e4e62b61ce5ab82b",
+    "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
+    "qualification/rendezvous/root-integration-runtime.mjs": "27e9f5ae2a7b7350f3ae51352cf4efb023ec17f79bc8f42968cc3bdfbfe34854",
+    "qualification/rendezvous/root-integration.check.mjs": "b30be29743d836a3a4d0d3c006369c5ca9c1b2c5d3a25be05ef221c1727d193e",
+    "qualification/rendezvous/root-integration-derivation.check.mjs": "e78eeedda2c1830bafc91ad20fdc3147f0047b8f6301445ff5ef1be257c69c76"
+  },
+  "cases": [
+    {
+      "name": "internal product configuration and fixed identity local egress guard intercepts an explicit QA-only positive control",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing RENDEZVOUS_EDGE_POLICY rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing RENDEZVOUS_IP_HASH_KEY rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing RECEIPT_ACTIVE_KEY rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing COMPOSED_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing REQUEST_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ALLOCATION_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing INDEX_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ASSERTION_POLICY_ENABLED rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ASSERTION_POLICY_EXPIRES_AT rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity missing ENROLLMENT_POLICY_REVISION rejects before body or namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid HMAC material is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 0",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 1",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 2",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 3",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 4",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 5",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 6",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 7",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 8",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 9",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 10",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 11",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 12",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 13",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 14",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 15",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 16",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity invalid identity fixture rejects before body or namespace calls 17",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity factory does not cache a prior valid configuration",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rejects caller-selected extra factory parameters",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rechecks configuration after HMAC before namespace or body access",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rejects backward clock or minute crossing after HMAC: -1",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity rejects backward clock or minute crossing after HMAC: 60000",
+      "status": "passed"
+    },
+    {
+      "name": "internal product configuration and fixed identity normalizes equivalent IPv6 identities and does not expose raw IP",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module creates a temporary QR, inspects, reconnects, rejects wrong browser and cancels without native authority",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module default genuine verifier rejects malformed registration; original challenge persists and no key is installed",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module wrong Origin retains existing wire403 and safe CORS",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module unknown route preserves cheap invalid_request without namespace calls",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: http://api.djconnect.dev/v1/rendezvous/create",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://other.example/v1/rendezvous/create",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://api.djconnect.dev:444/v1/rendezvous/create",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://api.djconnect.dev/v1/rendezvous/create?extra=1",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module noncanonical service URL is rejected cheaply: https://api.djconnect.dev/v1/rendezvous/create#fragment",
+      "status": "passed"
+    },
+    {
+      "name": "real five-DO product module proper preflight uses existing policy and credentials stay denied",
+      "status": "passed"
+    }
+  ],
+  "raw_results_sha256": "4ce613f007de8104d2be9c9106aa8233f7cf9dd37c4d3f1bde9d22d7a50d2aba"
+}

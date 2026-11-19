@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "scope": "KNOWN_VERSION_BINDINGS_ONLY_NOT_DEPLOYMENT_ROUTING_OR_BILLING_PROOF",
+  "read_at_utc": "2026-10-19T18:06:07.027948+00:00",
+  "command": "wrangler versions view d7f38154-51ca-4066-9d61-f64e0df0dda5 --name djconnect-api --json",
+  "worker": "djconnect-api",
+  "version_id": "d7f38154-51ca-4066-9d61-f64e0df0dda5",
+  "version_number": 50,
+  "runtime": {
+    "compatibility_date": "2026-06-20",
+    "compatibility_flags": [
+      "nodejs_compat"
+    ],
+    "usage_model": "standard"
+  },
+  "bindings": [
+    {
+      "name": "APNS_ENVIRONMENT",
+      "type": "plain_text"
+    },
+    {
+      "name": "APNS_KEY_ID",
+      "type": "plain_text"
+    },
+    {
+      "name": "APNS_PRIVATE_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "APNS_TEAM_ID",
+      "type": "plain_text"
+    },
+    {
+      "name": "APNS_TOKEN_ENCRYPTION_KEY",
+      "type": "secret_text"
+    },
+    {
+      "name": "APNS_TOPIC_IOS",
+      "type": "plain_text"
+    },
+    {
+      "name": "APNS_TOPIC_MACOS",
+      "type": "plain_text"
+    },
+    {
+      "name": "APNS_TOPIC_WATCHOS",
+      "type": "plain_text"
+    },
+    {
+      "name": "DB",
+      "type": "d1"
+    },
+    {
+      "name": "DJCONNECT_PAIRING_ISSUER_SECRET",
+      "type": "secret_text"
+    },
+    {
+      "name": "DJCONNECT_RELAY_SECRET",
+      "type": "secret_text"
+    },
+    {
+      "name": "DJCONNECT_SMOKE_TEST_MODE",
+      "type": "secret_text"
+    }
+  ],
+  "durable_object_bindings": 0,
+  "rendezvous_secret_names_present": [],
+  "raw_response_sha256": "642f3efa79bd6f8bd5016072ed7ef0cb2c86c25b89fb0f5a2e65ddc66d383544",
+  "credential_values_exported": false,
+  "current_deployment_split_verified": false,
+  "account_billing_plan_verified": false,
+  "namespace_migration_collision_verified": false,
+  "cloudflare_mutations": false
+}

@@ -1,0 +1,253 @@
+{
+  "APS_envelope" : "Not constructed or qualified; full4096 and combined attributes\/state caps remain separate checks",
+  "attributes_and_initial_state_bytes" : 1273,
+  "case_count" : 28,
+  "cases" : [
+    {
+      "bytes" : 57,
+      "category" : "existing genuine Attributes; identity is synthetic DATA",
+      "name" : "attributes_original_uuid",
+      "native_admission" : false,
+      "sha256" : "f3a40f9865cc311e0dbb7009c8d460b68192e6e7e85e1ad8f402db10b065b132",
+      "type" : "DJConnectCore.DJConnectSessionLiveActivityAttributes"
+    },
+    {
+      "bytes" : 33,
+      "category" : "Codec accepts arbitrary String; NOT an eligible original native identity",
+      "name" : "attributes_unicode_codec_only",
+      "native_admission" : false,
+      "sha256" : "2335b95cffc97e0b86636798ed10498c9bcb92dbf93325caa18cbf94fb94e348",
+      "type" : "DJConnectCore.DJConnectSessionLiveActivityAttributes"
+    },
+    {
+      "bytes" : 32,
+      "category" : "typed initializer; absent theme\/rich omitted",
+      "name" : "state_minimal_reference_epoch",
+      "native_admission" : false,
+      "sha256" : "2c6760299a23b5476ed4e6793de39f8513f4d792ace57849c01d029334c5ee43",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 48,
+      "category" : "typed initializer; absent theme\/rich omitted",
+      "name" : "state_minimal_unix_epoch",
+      "native_admission" : false,
+      "sha256" : "074a5e54b31748632c2406bcf7469721c914ed51ced8d254db327806cd48a470",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 40,
+      "category" : "typed initializer; absent theme\/rich omitted",
+      "name" : "state_minimal_positive_fraction",
+      "native_admission" : false,
+      "sha256" : "17d5c1f409c713dc03d9f48db2d224e73ed838dc58e5667d3c36d3fe0ad3e586",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 41,
+      "category" : "typed initializer; absent theme\/rich omitted",
+      "name" : "state_minimal_negative_fraction",
+      "native_admission" : false,
+      "sha256" : "ec737627dd2ffe7fec7e3814edb3c037422ecce31e4cc49820f306bb1b2b0577",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 54,
+      "category" : "typed initializer; absent theme\/rich omitted",
+      "name" : "state_minimal_recent_fraction",
+      "native_admission" : false,
+      "sha256" : "44ed6080dc83f78eac69d020a074087ed2068b7537f0da0dbed9a804d890617a",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 60,
+      "category" : "typed initializer; absent theme\/rich omitted",
+      "name" : "state_minimal_micro_fraction",
+      "native_admission" : false,
+      "sha256" : "0316b429f32b25b7c1e0cc4c445a919473a4850e7e4b860d2b21913f8d2b09a0",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 70,
+      "category" : "existing closed theme enum",
+      "name" : "state_theme_brand",
+      "native_admission" : false,
+      "sha256" : "fb6830f77f101b98a1be02f95bda8adc69596740f8e22a1574b28cd82b43471e",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 70,
+      "category" : "existing closed theme enum",
+      "name" : "state_theme_chill",
+      "native_admission" : false,
+      "sha256" : "af42ee2a2384f390a319cd072b2781df4282da9d1a02ffa83cc031ef80fa29c3",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 71,
+      "category" : "existing closed theme enum",
+      "name" : "state_theme_groove",
+      "native_admission" : false,
+      "sha256" : "04d33b77f7f2ae4f3d23aef33b73df3deb9ba82f79f961521db8766ec9805af2",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 71,
+      "category" : "existing closed theme enum",
+      "name" : "state_theme_energy",
+      "native_admission" : false,
+      "sha256" : "c9ae0c3cf89184f4d2cef534765eace8f1a931a81ef7d0224857d40c180e5761",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 70,
+      "category" : "existing closed theme enum",
+      "name" : "state_theme_party",
+      "native_admission" : false,
+      "sha256" : "191b7538570dd4f778aba16f5055b33d81a68161c22b06de85827e1a473074ab",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1216,
+      "category" : "genuine current initializer; preserved original receive pin",
+      "name" : "state_rich_both",
+      "native_admission" : false,
+      "sha256" : "ca6a3ce305d5777226108dd5cf469ecedf9d116afcb4348b01725f6c0e110974",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 802,
+      "category" : "typed initializer; same original local receive pin",
+      "name" : "state_rich_playback_only",
+      "native_admission" : false,
+      "sha256" : "007ccee3a249097f638aba18bcd31910b227e9b222bad42b6cf35c033e812257",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 691,
+      "category" : "typed initializer; same original local receive pin",
+      "name" : "state_rich_contribution_only",
+      "native_admission" : false,
+      "sha256" : "13203235bd43a08a717512c5355c12b4f28c8d501b06e877e11ba5391d66c993",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1213,
+      "category" : "typed initializer; same original local receive pin",
+      "name" : "state_rich_playback_idle",
+      "native_admission" : false,
+      "sha256" : "b77d5d878a6d9ad6e8154f854916ee2af87d1499293d734f2f905d10864c06d4",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1216,
+      "category" : "typed initializer; same original local receive pin",
+      "name" : "state_rich_playback_stopped",
+      "native_admission" : false,
+      "sha256" : "47809a5c8a44c816ca11c13812dc83ab9b7fe501c2083a15f6cef504f99e59a3",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1216,
+      "category" : "typed initializer; same original local receive pin",
+      "name" : "state_rich_playback_playing",
+      "native_admission" : false,
+      "sha256" : "112e047605071dd8cbb36b2162fb624cd2c3b23b575d351a639a47054ed45e5c",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1215,
+      "category" : "typed initializer; same original local receive pin",
+      "name" : "state_rich_playback_paused",
+      "native_admission" : false,
+      "sha256" : "638f698dcefa988617f3d2d08678056fdca3541c991f60ea836b9354856982e7",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1289,
+      "category" : "typed initializer; same original local receive pin",
+      "name" : "state_rich_unicode_escaping",
+      "native_admission" : false,
+      "sha256" : "acd3bee71dc8d8dca60bd1a72428a290f417cd8c2f6edc4f6f793e492eb274d9",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 54,
+      "category" : "decoder null -> typed nil -> encoder omission",
+      "name" : "state_optional_null",
+      "native_admission" : false,
+      "sha256" : "9397f8078201593feb362c73254e4607085cc68f759b2ae0144a90f0e460692c",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1190,
+      "category" : "existing optional legacy field; not new start admission",
+      "name" : "state_legacy_missing_playbackState",
+      "native_admission" : false,
+      "sha256" : "f842e10e0693b377bf700cabc3e572612bbbd758a567d0d026b3f52a2539d135",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 277,
+      "category" : "decoder permits shape native initializer does not mint; no positive eligibility",
+      "name" : "state_empty_rich_codec_only",
+      "native_admission" : false,
+      "sha256" : "3377cee63e2a21d51b1b7499d91effe461311f368ff28544add926396083052a",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1216,
+      "category" : "Codable ignores unknown root key; successor strict preflight must reject",
+      "name" : "state_unknown_key_codec_only",
+      "native_admission" : false,
+      "sha256" : "4ff440a52c06d5e71cf6a227e5459f7db89c95f530fec54df792434335d7a4a8",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 1216,
+      "category" : "original owner\/field caps MUST reject; decoder alone does not",
+      "name" : "state_same_pin_extended_deadline_codec_only",
+      "native_admission" : false,
+      "sha256" : "5bf215032d17c4bf268ab021f2500e4a6969a6065c7f471f16566191b5f40ed6",
+      "type" : "DJConnectCore.DJConnectSessionSurfaceSnapshot"
+    },
+    {
+      "bytes" : 2800,
+      "category" : "native initializer exact existing limit",
+      "name" : "rich_bytes_2800",
+      "native_admission" : false,
+      "sha256" : "089f91ba1bff7d09973e6e00ee17bb6a6e231849ff1e9cfd5226c65ca87b2369",
+      "type" : "DJConnectCore.DJConnectPassiveActivityContent"
+    },
+    {
+      "bytes" : 2801,
+      "category" : "codec-only oversize, initializer rejects",
+      "name" : "rich_bytes_2801",
+      "native_admission" : false,
+      "sha256" : "1c3b36734573fd94082a876d43932e015b6fc2f26fb5b153640dc72513e5b4e3",
+      "type" : "DJConnectCore.DJConnectPassiveActivityContent"
+    }
+  ],
+  "codec_gap" : "Same receive pair plus extended aggregate deadline can be current while nested contribution expired; independent original field\/purpose\/native guards required",
+  "default_key_order" : "Frozen original encoder bytes, not cross-process canonical ordering",
+  "expiry_checks" : {
+    "after" : false,
+    "before" : true,
+    "equal" : false
+  },
+  "original_pin" : {
+    "receivedAt_reference_seconds" : 821692800.125,
+    "receivedUptime" : 1000503.756441875
+  },
+  "rich_budget_checks" : [
+    {
+      "encoded_rich_bytes" : 2800,
+      "initializer_accepted" : true
+    },
+    {
+      "encoded_rich_bytes" : 2801,
+      "initializer_accepted" : false
+    }
+  ],
+  "scope" : "Existing genuine iOS Core Attributes\/ContentState Codable DATA fixtures only; no Activity lifecycle, push, authority or new wire"
+}

@@ -1,0 +1,14 @@
+{
+  "scope": "SUPPLEMENTAL_POST_EXECUTION_INPUT_PIN_READBACK_NOT_A_BROWSER_RERUN",
+  "browser_trace_sha256": "1a1e26f68efc03860e2de29d42ddae216a93c30228a57000cdb63935815c9492",
+  "immutable_input_source": "083ddb2d16351b4f785e52a23aad675b0a2cf9ef",
+  "additional_input_sha256": {
+    "docs/rendezvous/wire-schema-cases-v1.json": "3443cc6580997678d54d1f57ce0b30271134069cdd256d16ccea7446b9545e4a"
+  },
+  "explanation": "The CORS trace source list omitted the read create-structural-positive fixture. Its bytes remain equal to immutable083ddb2 and current runtime proof. This additional readback pin supplements c, without relabeling or rerunning it.",
+  "tools": {
+    "miniflare": "5.20260815.0-alpha",
+    "esbuild": "0.28.1",
+    "playwright": "1.64.1"
+  }
+}

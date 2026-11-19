@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "kind": "CUMULATIVE_SOURCE169_AND_SOURCE174_DOCUMENTARY_FINALIZATION",
+  "documentary_delivery": "PENDING_EXACT_REVIEW_NORMAL_PROTECTED_MERGE_AND_OWN_ORIGINAL_FINAL_QUALIFICATION",
+  "actual_parent_for_this_Final": "5c715d1841b75c648638e546a9385b4cd8cb120a",
+  "sources": [
+    {
+      "PR": 169,
+      "candidate": "ce0c6101b021e086e6aacb77164d32c5bc9d8758",
+      "protected_main": "f156c3049a6320bc16d084b4b17b526090ccb7a7",
+      "actual_parent": "75763b9bf5e8f76d94f2dec189f1baf54a4cc8c8",
+      "own_main_originals": {
+        "path": "/Volumes/Shared Data/tmp/pcvantol/djc-api-host-wake-auth-bridge-20261031/Source169-own-main-originals-20261101T230520Z/original-Source169-join-packet.json",
+        "SHA256": "1312da1effc969ecbad3b4d654201c2b6b3e1dbcc6b33dc15ffd4bcfa3d813bc",
+        "workflow_count": 20,
+        "provider_ZIP_count": 10,
+        "actual_cases": {
+          "host-wake-receiving-isolated-vendor-model.json": 21,
+          "host-app-wake-tests.json": 60,
+          "host-wake-receiving-ordinary.json": 324,
+          "host-wake-receiving-production-caller.json": 37,
+          "host-wake-receiving-packaged.json": 340,
+          "installation-codec-tests.json": 67
+        },
+        "formal_canonical": "ff4a687a9c3ec8d0e2b5f658d0dacb54b1f33183a689723e9edec7f937caeefd",
+        "durable_provider": "sha256:f0ee1c3ffc4a7af06a94e79ce09c1ecb7a573b3ed493af7f891a97fc02e368c9",
+        "durable_canonical": "b123890d59f49a0bb010b24cd3c6b3306e2e48b4edd0fede295d1cb952efd1c2",
+        "durable_asset": 699784921,
+        "release_artifact": 13105140106,
+        "release_run": 41360141123,
+        "release_TAR_SHA256": "d520ab1d60f1e41d58190ceacf90cec4964fd47ca3c8fcb4cee54114a78e47bb",
+        "qualified_Worker_SHA256": "32db25f25c224fdb050c864dbe3d30919aa56d480aa5bba1c9a956dd6d6317a2",
+        "qualified_Worker_bytes": 1468037,
+        "artifact_comparison": "All18 other members byte-equal; Worker only embedded release SHA"
+      },
+      "independent_original_closure": {
+        "path": "/Volumes/Shared Data/tmp/pcvantol/core-window-20261021-12h/api169-root-personal-original-closure-20261101.json",
+        "SHA256": "61897f58869d0a7da54d75fbc2a179b836a242ba3f4712277eaced4388f7f8af",
+        "decision": "ORIGINAL_SOURCE_QUALIFIED_BOUNDED_SOURCE_ONLY"
+      }
+    },
+    {
+      "PR": 174,
+      "candidate": "feea4a9f067b1c1f3db942f810cda3b52fb581f7",
+      "protected_main": "5c715d1841b75c648638e546a9385b4cd8cb120a",
+      "actual_parent": "f156c3049a6320bc16d084b4b17b526090ccb7a7",
+      "own_main_originals": {
+        "path": "/Volumes/Shared Data/tmp/pcvantol/djc-api-host-wake-auth-bridge-20261031/Source174-own-main-originals-20261101T235755Z/original-Source174-join-packet.json",
+        "SHA256": "cedd64ba5f58d171446ffe3f8b5532457402a3aa03bf6460ee000e6582be02ee",
+        "workflow_count": 20,
+        "provider_ZIP_count": 14,
+        "actual_cases": {
+          "host-wake-receiving-packaged.json": 340,
+          "host-wake-receiving-production-caller.json": 37,
+          "worker-do-registry-tests.json": 36,
+          "host-wake-receiving-ordinary.json": 324,
+          "installation-codec-tests.json": 67,
+          "rich-profile-data-tests.json": 117,
+          "possession-data-tests.json": 65,
+          "host-wake-receiving-isolated-vendor-model.json": 21,
+          "host-app-wake-tests.json": 60,
+          "rich-delivery-tests.json": 45
+        },
+        "formal_canonical": "877d081f6dddfb573179b2dde75465259ade511c31dfb3bcbd46003d4d460e49",
+        "durable_provider": "sha256:81960992e6c6435385e5689aca2c10f22cc486d271230950a48a7b5e196fa0ab",
+        "durable_canonical": "5febe0487934393db1759d8278b90598367d6dc04f684316ced2eac4daf0c984",
+        "durable_asset": 699895394,
+        "release_artifact": 13106602286,
+        "release_run": 41364547879,
+        "release_TAR_SHA256": "94ead70f71a18d3fcaf53a4bf38569476c9b62d69e35e822e4d144c45e3642ed",
+        "qualified_Worker_SHA256": "429afe80477b5f3e4dbe6b0f2f291ecf7c13b2fc3910ed7b73dac2f892ff5b7b",
+        "qualified_Worker_bytes": 1468601,
+        "artifact_comparison": "13 unchanged; exact4 source manifests/notices plus LICENSES hashes and qualified actual new Worker with exact release stamp"
+      },
+      "independent_original_closure": {
+        "path": "/Volumes/Shared Data/tmp/pcvantol/core-window-20261021-12h/api174-root-personal-original-closure-20261101.json",
+        "SHA256": "89efd5a2aa6e7700f5b626f299137cfb648f6be5d59e7c8ef49f91ac1d4e7c1d",
+        "decision": "ORIGINAL_SOURCE_QUALIFIED_BOUNDED_SOURCE_ONLY"
+      }
+    }
+  ],
+  "Source169_boundaries": {
+    "scope": "CLOSED_INSTALLATION_PRINCIPAL_DATA_LIBRARY",
+    "module_SHA256": "adc59535576e479330bc5e51cdeb6ae1aeda485d70002b2e4130d8b4f4faf19e",
+    "packaged_records": 11,
+    "statuses": 6,
+    "primitive_helpers": 6,
+    "declared_stateful_expectations": 47,
+    "executed_stateful_expectations": 0,
+    "production_caller_or_registry_admission": false
+  },
+  "Source174_boundaries": {
+    "PKIJS": "4.0.1",
+    "Wrangler": "4.154.0",
+    "installed_selected_runtime_inputs": 50,
+    "unchanged_selected_runtime_inputs": 49,
+    "changed_selected_runtime_input": "node_modules/pkijs/build/index.js",
+    "same_claim_applies_to_every_installed_toolchain_file": false,
+    "official_archives_and_locked_integrity_checked": true,
+    "source_build_equivalence": "NOT_PROVEN",
+    "paired_DER_controls": "Only newly built signed attributes sort; received signed bytes and unsigned order preserved",
+    "five_actual_old_new_standalone_modules_byteequal": true,
+    "all7_current_standalone_input_manifests_verified": true,
+    "historical_v3_preserved": true,
+    "new_v4_delta_closed": true,
+    "local_development_registry_enabled": false,
+    "final_local_preparation_passed": 64,
+    "final_default_private40381_and_derivation_passed": 17,
+    "genuine_native_positive": false
+  },
+  "retained_failures": [
+    "Initial obsolete144-versus145 preparation count failed; correction and final64 pass",
+    "Missing supplied package-proof and missing old JOSE inputs stopped preparation; no tests claimed from failed staging",
+    "Earlier 5dfe hosted package-lock and challenge version-pin failures retained; later feea exact20 workflows all pass",
+    "Source169 original collector filenames contain historical19/9 labels; actual verified counts are20 workflows/10ZIPs"
+  ],
+  "separate_existing_production_acceptance": {
+    "scope": "PRIOR_EXACT_API757_SERVER_DEPLOYMENT_NOT_SOURCE169_OR174_RUNTIME_OR_DEVICE_ACCEPTANCE",
+    "selected_source": "75763b9bf5e8f76d94f2dec189f1baf54a4cc8c8",
+    "artifact": 13101098852,
+    "TAR_SHA256": "a88e34aa62ec64dda095d51ef8003dc90a28dd90a501dd9b7d62c6558dbaa5dd",
+    "deployment_run": 41363060412,
+    "smoke_run": 41363193980,
+    "independent_receipt": "/Volumes/Shared Data/tmp/pcvantol/core-window-20261021-12h/api757-production-root-original-and-live-acceptance-20261101.json",
+    "independent_receipt_SHA256": "fd4e6572dba8fc22d6451c6e98b94d96b8792e0eb2a15fea634be149f9aeb65e",
+    "actual_schema_old28_preserved_new20_exact_guards7_new12tables_empty": true,
+    "private_negative_checks": 16,
+    "all12bindings_preserved": true,
+    "Source174_artifact_deployed": false
+  },
+  "activation": {
+    "rendezvous_public_root_compiled_off": true,
+    "full_service_gates_open": 22,
+    "activation_allowed": false,
+    "operator_native_policy_seeded_by_these_sources_or_Final": false,
+    "key_generation_rotation_or_SDK_action": false,
+    "HA_mutation": false,
+    "genuine_widget_LiveActivity_or_APNs_acceptance": false,
+    "new_service_container_or_account_upgrade": false
+  },
+  "this_Final_effect": {
+    "two_document_files_only": true,
+    "deployment_or_provisioning": false,
+    "UI_or_translation_change": false
+  }
+}

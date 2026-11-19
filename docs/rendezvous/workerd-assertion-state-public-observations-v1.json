@@ -1,0 +1,332 @@
+{
+  "scope": "LOCAL_SQLITE_ASSERTION_COUNTER_CHALLENGE_COMPOSITION_TRUSTED_TEST_ENROLLMENT_NO_PUBLIC_ADMISSION",
+  "genuine_diagnostic_assertions": 0,
+  "libraries": {
+    "cbor": "10.0.12",
+    "pkijs": "3.4.1",
+    "asn1js": "3.1.0"
+  },
+  "tests_passed": 73,
+  "typecheck": "PASS",
+  "cases": [
+    {
+      "name": "all public requests remain unavailable and unverified helper RPCs denied",
+      "status": "passed"
+    },
+    {
+      "name": "recover uses exact saved wire bytes then atomically removes nonce and commits counter/receipt",
+      "status": "passed"
+    },
+    {
+      "name": "management challenge coalesces without renewal, known=false",
+      "status": "passed"
+    },
+    {
+      "name": "management challenge coalesces without renewal, known=true",
+      "status": "passed"
+    },
+    {
+      "name": "concurrent management issuance stores one challenge",
+      "status": "passed"
+    },
+    {
+      "name": "random-ID collision cannot overwrite an existing challenge",
+      "status": "passed"
+    },
+    {
+      "name": "unknown key cannot authorize or allocate a key through recovery",
+      "status": "passed"
+    },
+    {
+      "name": "32-record bound includes unknown-key operations and cleanup permits a new bounded attempt",
+      "status": "passed"
+    },
+    {
+      "name": "unknown management cleanup alarm removes state without client retry",
+      "status": "passed"
+    },
+    {
+      "name": "failed precommit alarm creates no challenge",
+      "status": "passed"
+    },
+    {
+      "name": "invalid proof request preserves nonce/counter: clientData",
+      "status": "passed"
+    },
+    {
+      "name": "invalid proof request preserves nonce/counter: action",
+      "status": "passed"
+    },
+    {
+      "name": "invalid proof request preserves nonce/counter: operation",
+      "status": "passed"
+    },
+    {
+      "name": "invalid proof request preserves nonce/counter: proof",
+      "status": "passed"
+    },
+    {
+      "name": "changed valid signature for same operation conflicts with original immutable receipt",
+      "status": "passed"
+    },
+    {
+      "name": "parallel same proof advances once; exact retry recovers original receipt",
+      "status": "passed"
+    },
+    {
+      "name": "one key across two operations never lowers highest counter",
+      "status": "passed"
+    },
+    {
+      "name": "unsigned maximum counter never wraps",
+      "status": "passed"
+    },
+    {
+      "name": "submit clientData and immutable lease bind exact authoritative internal tuple",
+      "status": "passed"
+    },
+    {
+      "name": "lost submit response retry retains original five-second deadline",
+      "status": "passed"
+    },
+    {
+      "name": "postcommit alarm failure burns counter and retry recovers only original lease",
+      "status": "passed"
+    },
+    {
+      "name": "known policy deadline caps lease",
+      "status": "passed"
+    },
+    {
+      "name": "original transaction and key deadline cap lease",
+      "status": "passed"
+    },
+    {
+      "name": "challenge expiry equality denies even before alarm",
+      "status": "passed"
+    },
+    {
+      "name": "SQL receipt fault rolls back counter and nonce; same proof succeeds after repair",
+      "status": "passed"
+    },
+    {
+      "name": "post-crypto recheck denies intervening revoke",
+      "status": "passed"
+    },
+    {
+      "name": "post-crypto recheck denies intervening expiry",
+      "status": "passed"
+    },
+    {
+      "name": "post-crypto recheck denies intervening policy",
+      "status": "passed"
+    },
+    {
+      "name": "post-crypto recheck denies intervening point",
+      "status": "passed"
+    },
+    {
+      "name": "post-crypto recheck denies intervening counter",
+      "status": "passed"
+    },
+    {
+      "name": "authenticated deletion erases key evidence and every operation atomically",
+      "status": "passed"
+    },
+    {
+      "name": "deletion SQL fault preserves key and challenges until repaired",
+      "status": "passed"
+    },
+    {
+      "name": "revoke wins over cached recovery receipt and submit lookup",
+      "status": "passed"
+    },
+    {
+      "name": "local instance restart preserves encrypted key, counter and original operation receipt",
+      "status": "passed"
+    },
+    {
+      "name": "no public enrollment/storage endpoint",
+      "status": "passed"
+    },
+    {
+      "name": "actual SQLite contains encrypted evidence and finite context, never plaintext",
+      "status": "passed"
+    },
+    {
+      "name": "exact enrollment retry keeps expiry/counter/ciphertext",
+      "status": "passed"
+    },
+    {
+      "name": "different operation/digest cannot overwrite active row",
+      "status": "passed"
+    },
+    {
+      "name": "encryption fails closed before commit: missing-key",
+      "status": "passed"
+    },
+    {
+      "name": "encryption fails closed before commit: invalid-short-key",
+      "status": "passed"
+    },
+    {
+      "name": "encryption fails closed before commit: noncanonical-key",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: stale-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: future-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: expired-challenge",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: too-long-challenge",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: invalid-key-id",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: wrong-app-policy",
+      "status": "passed"
+    },
+    {
+      "name": "stored material bounds: too-large-receipt",
+      "status": "passed"
+    },
+    {
+      "name": "SQL failure rolls back complete registration; original bounded retry can commit",
+      "status": "passed"
+    },
+    {
+      "name": "enrollment operation receipt is erased at its original deadline",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: ciphertext",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: nonce",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: keyVersion",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: keyAddress",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: appPolicy",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: environment",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: createdAt",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: expiresAt",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: receiptCreatedAt",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: objectId",
+      "status": "passed"
+    },
+    {
+      "name": "tampered authenticated context denied: publicPoint",
+      "status": "passed"
+    },
+    {
+      "name": "whole row transplanted into another DO is denied",
+      "status": "passed"
+    },
+    {
+      "name": "wrong/missing decryption key denied; previous key supports bounded rotation",
+      "status": "passed"
+    },
+    {
+      "name": "parallel duplicate installs commit once with one immutable expiry",
+      "status": "passed"
+    },
+    {
+      "name": "same counter cannot be committed twice under parallel calls",
+      "status": "passed"
+    },
+    {
+      "name": "revocation erases evidence and public key, retains only finite tombstone",
+      "status": "passed"
+    },
+    {
+      "name": "expiry at equality denies access even before alarm and purges at tombstone deadline",
+      "status": "passed"
+    },
+    {
+      "name": "alarm expiry is idempotent and removes operation metadata first",
+      "status": "passed"
+    },
+    {
+      "name": "local DO restart preserves ciphertext/counter/expiry and retry result",
+      "status": "passed"
+    },
+    {
+      "name": "rotation concurrent with revoke never resurrects receipt or key",
+      "status": "passed"
+    },
+    {
+      "name": "first alarm failure prevents sensitive commit without client retry",
+      "status": "passed"
+    },
+    {
+      "name": "postcommit rearm failure retains durable trigger and cleans without client retry",
+      "status": "passed"
+    },
+    {
+      "name": "cleanup SQL failure denies access and manual retry removes sensitive fields",
+      "status": "passed"
+    }
+  ],
+  "source_sha256": {
+    "receipt-key-store.ts": "943c5d37ab28efa316d1d29d7a6b8b172692e1840fa743312e247c346b59876d",
+    "receipt-key-store.check.ts": "f234cbbd2c0164ab29bc98b6727c4843efe1fce22e5fe5410fb099968c806ef5",
+    "assertion-key-state.ts": "90cee82e51f2d9ac106c34bc9ef254bc3155ea13fe8697b581a2648c9cb728b8",
+    "assertion-verifier.d.ts": "0badd04ddfa466b69eaa98d9425fe0f6c5d208786bea50afe14ebbadf0c38473",
+    "assertion-key-state.check.mjs": "b9549c7f695025d28f332b8aef9f0e596d4b9def0ebb4f591c91bf2912bc7b78",
+    "assertion-state-harness.ts": "bc257394b71a4367e72b99359e44ecb2fc6987a87c05441ce52f8f4f00816c34",
+    "app-attest-core-candidate.mjs": "272396b17f4cb4fdc836ae1a5929ab4f47520795bcf5f513f524c76f7b7e9b0e",
+    "worker-path-candidate.mjs": "f3de5f68cf10e1374e7fa48b2ccf46cc4089390c66af7fe936b4410add04f831",
+    "run_assertion_state_workerd.mjs": "9d434f11ca44f4b1b40323faf68f98e17adb183782881392253776e556152b08",
+    "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881"
+  },
+  "node": "v26.12.0",
+  "typescript": "7.0.2",
+  "pool": "0.22.0",
+  "miniflare": "5.20260815.0-alpha",
+  "workerd": "1.20260815.1",
+  "compatibility_date": "2026-06-20",
+  "not_run": [
+    "complete AppAttest/CMS/status enrollment",
+    "native signed action wire",
+    "transaction DO/cross-object ready/consume",
+    "global admission/rate limits",
+    "genuine private diagnostic Apple assertions",
+    "provider deployment/physical deletion/backups/cleanup monitoring",
+    "production/HA/iPhone/TV chain"
+  ]
+}

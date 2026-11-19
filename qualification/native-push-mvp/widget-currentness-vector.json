@@ -1,0 +1,24 @@
+{
+  "scope": {
+    "operationId": "trial-operation-1",
+    "nonce": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc",
+    "deadlineMs": 1700000060000,
+    "apiInstallationId": "trial-installation-1",
+    "installCredentialId": "trial-credential-1",
+    "coreKeyThumbprint": "9cd00bb012ff765f8d9f983060c05d86229e378b45fcaeb2b64ebacd97661bb0",
+    "keyRevision": 1,
+    "pairingGeneration": "trial-pairing-1",
+    "pairBinding": "4f19a45fe692a578a6ee3c610afbf3e3f98a8ee810cfeab41e4ab4b2c588cde9",
+    "ownerBinding": "90f9d7c2dc3a74b071652feddec532207e1aad02a37030875aa70b9266e8a4e8",
+    "deviceBinding": "098a78ad05bcf1d7bd99630f0e87b0c2d08305ca974debe656af0d377f7bd714",
+    "consentGeneration": "trial-consent-1",
+    "targetDigest": "43eedc21e70750842c6c49846933e2d2ddff5884003612887f3d5b879e047c9b",
+    "purposeKeyThumbprint": "7e70806ce00d2b3a6ea5af631c7d27f52c7e5fb889e45eb1092446472234001b",
+    "registrationId": "trial-registration-1",
+    "requestDigest": "240224f12e0d83078b05f1cfb13b0f6d718e75bb7d19db22c7793c60ae220a10"
+  },
+  "publicKeySpkiB64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEct8+7vkuLfGZ3FcKuGmhw4zNvckju1e1ihZ2ZuMD1G2BdhakwP6IHzD/iexTvAgqCPLKrkkgRbpH0qhEOAvWmg==",
+  "canonicalUtf8": "[\"djc-native-widget-currentness/1\",\"djc-native-push-ha-dev/1\",\"POST\",\"/v1/push/native/enrollment/issue\",\"opt_in\",\"trial-operation-1\",\"BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc\",1700000060000,\"trial-installation-1\",\"trial-credential-1\",\"9cd00bb012ff765f8d9f983060c05d86229e378b45fcaeb2b64ebacd97661bb0\",1,\"trial-pairing-1\",\"4f19a45fe692a578a6ee3c610afbf3e3f98a8ee810cfeab41e4ab4b2c588cde9\",\"90f9d7c2dc3a74b071652feddec532207e1aad02a37030875aa70b9266e8a4e8\",\"098a78ad05bcf1d7bd99630f0e87b0c2d08305ca974debe656af0d377f7bd714\",\"widget\",\"widget\",\"trial-consent-1\",\"43eedc21e70750842c6c49846933e2d2ddff5884003612887f3d5b879e047c9b\",\"7e70806ce00d2b3a6ea5af631c7d27f52c7e5fb889e45eb1092446472234001b\",\"trial-registration-1\",\"240224f12e0d83078b05f1cfb13b0f6d718e75bb7d19db22c7793c60ae220a10\"]",
+  "canonicalSha256": "f2d189f3eda12e0264107db5b60dda1b6989441ebbd55841d8ec1ec59fcf942f",
+  "signatureB64url": "rSGlyhDxo4ctrwOTZmqFHA2nMWL9-enrUMg0FswBBhByEufZsinmZWu4Cvz3-Ey0gAM83uiLTazVkXYHGnl6mw"
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_SOURCE_DELTA_NOT_DEPLOYMENT_AUTHORIZATION",
+  "baseline_source_sha": "3458ad603350ab9481073277c7dbe561433b4453",
+  "baseline_source_map_sha256": "3c19aad0730203f8d6b77300568deb85c1925b713b22b63a5f91907446b03c4e",
+  "effective_source_map_sha256": "b52dd7b0793f928cadaa413ad4c04188435b89518ff9ccbb7c24de22c1f85d44",
+  "changes": {
+    "qualification/rendezvous/enrollment-key-state.check.mjs": {
+      "before": "b6710349af970551e7e5b1b2dfb6b73f15eb2d1e48cb37c44cf3cba1382c653e",
+      "after": "d714d0c3f20440b51f284f8ece64d1b6e71b47621a051c2794cb9fea39427a68"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.mjs": {
+      "before": "0001a9197ee3c10833b1b2053e227841f56cf788d40a30d12d82ec28295ccf05",
+      "after": "c6a022e0d191348b0a50fdd939cf4a464ba67e1dc679a2ab8c516108dce87a2d"
+    },
+    "qualification/rendezvous/enrollment-evidence-candidate.d.mts": {
+      "before": "8b8419c66fd10cb274942e972362b99269c8dbe5bae68d53bde3340390578e89",
+      "after": "176ad10c9ee9b9ea92846576b8db115271e33ff09eaf485edf1285020b543209"
+    },
+    "qualification/rendezvous/enrollment-evidence.check.mjs": {
+      "before": "f34b335ecc7f0c713d56293a3b823308b22873c1b60facd387af5ee4255808dd",
+      "after": "8e02891faa40d848d0e28b18fde268638f352eba5742694072d1145bb570ea14"
+    },
+    "qualification/rendezvous/provider-unavailable.check.mjs": {
+      "before": "c77f8f9862df3ac04a92b4e35328d2ecfc91f9c29570d2013f7b3ffb66d85bae",
+      "after": "7584c41a7c2e45087b025a4356b1b7430c6dfb27b52ad4fca1892ed2c329bb76"
+    }
+  },
+  "proofs": {
+    "shared": {
+      "path": "docs/rendezvous/enrollment-callback-shared-observations-v1.json",
+      "sha256": "f126bdc4f74b66ef3aec69a104482dfa9e4c7edc95678efc69c104dc3720fb82"
+    },
+    "root": {
+      "path": "docs/rendezvous/enrollment-callback-build-observations-v1.json",
+      "sha256": "9f35c273262a4a8fce06875e16cf1a01925616eba7b28eae59e3911bba84c9a9"
+    }
+  }
+}

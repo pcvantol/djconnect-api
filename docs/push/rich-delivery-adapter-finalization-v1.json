@@ -1,0 +1,378 @@
+{
+  "schema_version": 1,
+  "classification": "SEPARATE_DOCUMENTARY_FINAL_OF_ORIGINAL_QUALIFIED_SOURCE172_NOT_ACTIVATION",
+  "source_PR": 172,
+  "source_candidate": "d4e66c532cc96c043638b9b29390d8a0c7b7d7d7",
+  "protected_source_main": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+  "protected_source_parent": "e2ad9be00253e2ae4b23c3b42e3f6f3c31a57024",
+  "source_tree": "076fcf575c3c2bbaf37276a204a646085c26434b",
+  "actual_candidate_testmerge": "bf19026b5591d72f9a90e4ac33fbb9f2b08195a2",
+  "reviewed_tested_merged_tree_equal": true,
+  "source_whole11_exact_review_sha256": "3ea6f9e91a61f3b4baacd42ca9556187c71b05eec82063178520059f8d5ae6ee",
+  "source_original_join_packet_sha256": "7fa868d29a808c109ca089786b58f5bde26690dbf4fd2a05a8782949f8133454",
+  "independent_source_original_closure": {
+    "sha256": "6427a434ded546831638fa52d770eb220aa7bbead8bcf251b948a3b6df84f416",
+    "receipt": {
+      "at": "2026-10-30T11:47:37.021334+00:00",
+      "reviewer": "Root independent personal original Source join",
+      "verdict": "ORIGINAL_SOURCE_QUALIFIED",
+      "head": "d4e66c532cc96c043638b9b29390d8a0c7b7d7d7",
+      "protected": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "tree": "076fcf575c3c2bbaf37276a204a646085c26434b",
+      "parent": "e2ad9be00253e2ae4b23c3b42e3f6f3c31a57024",
+      "packet_sha256": "cf4e081a8bd68f862de551fa5f4d92da05999b4812a3a0801fef44b9c90daddf",
+      "packet_native_pending_superseded_by_actual_live_success": 41049936832,
+      "live_readback": {
+        "method": "Personally read successful gh run view, gh run list and gh pr view outputs in this turn; later redundant persistence requery had network failure, not qualification failure",
+        "PR172": "MERGED exact reviewed d4e66 -> protected cc19; main branch; merged_at2026-10-30T11:41:53Z",
+        "all16_main_run_ids": [
+          41050135816,
+          41050135179,
+          41049937719,
+          41049937253,
+          41049937232,
+          41049937175,
+          41049937165,
+          41049937239,
+          41049936880,
+          41049937211,
+          41049937314,
+          41049936834,
+          41049937169,
+          41049936830,
+          41049937231,
+          41049936832
+        ],
+        "all16_status": "completed",
+        "all16_conclusion": "success",
+        "all16_head": "cc19b8212cfbfcac2daf63905821faa2917f707b"
+      },
+      "original_files_personally_hashed": 28,
+      "checks": [
+        "Exact reviewed tree equals protected tree and sole parent is qualified Final171",
+        "All five own original ZIP provider digests, unique safe members and extracted bytes matched",
+        "Own actual45 PASS0FAIL0SKIP; all six own package members byteequal PR CI originals",
+        "Own coverage XML and exact41-byte protectedSHA marker, own Validate run",
+        "Own formal canonical digest db396c3c6d0ab6b32f8b06066606096cc63e4ad46ac7790e8a07b67a94ade481 joined original durable record source digest",
+        "Exact Core-sourced API policy733ecc hash2734b55 validated original durable record with zero findings and all12PASS",
+        "Own release TAR and exact parent171 original TAR personally opened: Worker1291540 bytes differs only one embedded releaseSHA; other18 regular members identical",
+        "All16 own main runs including native, formal and release personally observed live SUCCESS"
+      ],
+      "original_files_sha256": {
+        "12973134293/artifact-metadata.json": "61cdaf7f106c5401033510ccbcd2be1a3fe7cab29a719bcb7513fa93651d3b99",
+        "12973134293/coverage/cobertura-coverage.xml": "3801e628b78596f6c505697ec8f41602177bcb6524fa199253f572e0185ac301",
+        "12973134293/coverage-main-sha.txt": "e18afee0f6061472fb19d4f8392f5db22e6684d90bf0ab1eb02d24daf8bfe607",
+        "12973134293/download.zip": "84bd030ef387adca923d362363ceb7cb2408d8988c447ae5275ea993e037e417",
+        "12973478424/artifact-metadata.json": "b4c370472f7276b4a1fade024a1532d4af071dc90bb6e44fee140b43e547547c",
+        "12973478424/download.zip": "cd301cef90b78022a43ffa0829a01ca6060df1bbd46bae129269d712e5ba1cea",
+        "12973478424/rich-delivery-package/adapter.mjs": "2eb02bc4bd51dfc6a699e007b7e38015743b7f7a681af8fd883fde426c6e4a55",
+        "12973478424/rich-delivery-package/attributes.json": "f3a40f9865cc311e0dbb7009c8d460b68192e6e7e85e1ad8f402db10b065b132",
+        "12973478424/rich-delivery-package/metafile.json": "baa29c4b7483b6d6c220ae1c009c2b3c6226cedade18136db12259278572122a",
+        "12973478424/rich-delivery-package/package-check.json": "ebd593f59342574e12576647b732a212e6f7027ec9b59da7f2f8505c785a4b6d",
+        "12973478424/rich-delivery-package/source-package.json": "6f4773e835a34a404a87eeb09ad42ebb0851754c605dfcade2821b66ffcccfb3",
+        "12973478424/rich-delivery-package/state.json": "ca6a3ce305d5777226108dd5cf469ecedf9d116afcb4348b01725f6c0e110974",
+        "12973478424/rich-delivery-tests.json": "f9cd3d4260b827a5e10b5970903134f65c3b440648c71ac4ae50f4eccfc3a1a0",
+        "12974277182/api-release-artifact-evidence.json": "576e1933eb72d22ceacb6845af08ee5f2b863900655d9636cae5b0b2ea4e68c3",
+        "12974277182/artifact-metadata.json": "6f4c3cd176bef42a9d8c76e6240f7cc2984b4a2d1ba8f58da69bdd77c4417550",
+        "12974277182/download.zip": "14a310a40b12c4056f564cd2432743f228dde608e4b4c5c31d9f08474bd327b6",
+        "12974486694/artifact-metadata.json": "b72583003da7ce476b0dc4e612dab90859f2e89d10973f62bdf4e42833908002",
+        "12974486694/djconnect-api-release.tar.gz": "dfc3bf3cfa064ee14adf08c335000ab401737c9be6f5eba813edc3ca010de79a",
+        "12974486694/download.zip": "1eabc72aa32362e24b1b1b6f62df622cfd6ad3964e1ccaa89ced706a2da6608e",
+        "12974855287/artifact-metadata.json": "ec365886354c48bb69344f2d4f35ae1b00405fcf95df231817d8449687d18381",
+        "12974855287/download.zip": "d4d0e11476dc095e1ae14a43b10f72d158a1ab794b2b3f3bbff636fb2dc1f1a9",
+        "12974855287/post-merge-release-evidence.json": "d9d05b0216e93456ad18c169a808a6622bb8442045387607d771f9cd596bde68",
+        "durable-metadata.json": "e6610c2e6a0a72d086e533cdc5ad9e78aa7ad25f760990a93a5427122d496b72",
+        "durable-original.json": "76789145d4874f7c92928e94f5e6b463875c4c305c9168a640dc86d5a067d882",
+        "main-runs-progress.json": "d31f7241b44b8a476faa1988622b00081c55b343338e091966de7a3defba97d4",
+        "main-validate-watch.log": "9edbf584f1a66827de75b1a8c6091cffff7d9bfa441f7aaf0d065c410847ee1f",
+        "merge-receipt.json": "9c145106880289be1adbd23eabfb94ec5b439b19e02d99f6891605ec02f88c66",
+        "original-source-verification.json": "db58abab97e732ad76489e6ed44723ce4016582ec4492eb39bedf43512a8fb04"
+      },
+      "qualification_scope": "Explicit-port rich transport source only; separate Final not yet qualified",
+      "no_effects": [
+        "No deployment or production composition",
+        "No keys, actual provider, enrollment, device or native push acceptance",
+        "No PR169 hold bypass"
+      ]
+    }
+  },
+  "source_qualification": {
+    "at": "2026-10-30T10:59:45.647473+00:00",
+    "source_base": "e2ad9be00253e2ae4b23c3b42e3f6f3c31a57024",
+    "initial_tests": {
+      "passed": 31,
+      "failed": 1,
+      "skipped": 0,
+      "reason": "Async guard negative expected not_sent; finalguard conservativelyreturnedUNKNOWN. Testexpectation corrected; not relabeledPASS."
+    },
+    "initial_types": "Two test-only cast/mockliteral diagnostics, corrected; finaldedicatedstrict typesPASS",
+    "expanded_tests_r2": {
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0
+    },
+    "final_45_same_adapter": {
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0,
+      "source": "fullmatch-before.json",
+      "LF_cases": "All4alreadyPASS; no regexbug/repair/counterproof claimed",
+      "global_network_keygeneration_signing": "Spies assert allforbidden/notcalled"
+    },
+    "packaged_module_SHA256": "2eb02bc4bd51dfc6a699e007b7e38015743b7f7a681af8fd883fde426c6e4a55",
+    "actual_effects": false,
+    "ports": "Mandatory server-only actual admission/reservation/currentness/provider/onceledger/observation/time/transport; synthetic only inqualification",
+    "production_composition": false,
+    "public_authenticated_wire": "Not selected or fabricated; independentlyreviewabletransportimplementation only",
+    "test_logs": {
+      "initial-tests.log": "9dec1faa1c8a3a47b13f74182070204dc996d4408a72c9ed51f0f4efcca025dd",
+      "initial-tests.json": "750145c978c65b0ff215e0cc141efc6c102493d87ec7d8de6a05a01329c7c51a",
+      "adapter-before-fullmatch.ts": "5330d1527ba717bbccf098bbcde4ae809f6f3554a748538b28742a6944801573",
+      "fullmatch-before.log": "cf344763b585f1d32faf6ad7b7c57f6265120a058d9aa21860374a16ffa0a7da",
+      "types-initial.log": "4255d6cc765d434b30d0f34d59a665d443940353f59dd84a575db090fa6c9148",
+      "fullmatch-before.json": "8a8af99b6a0625ce0d76a9e558fcd1b2a6033fce078b9c17fa26b5e00cc5d95d",
+      "tests-r2.log": "d2ba9ba4171471a9b13d3c8c528984bd8d091e64843cc6fbe7c0e75539cce026",
+      "tests-r2.json": "6c44648314483063f60b835012bd6af25e0cfbf179b392a3bb75f41754f57b8f"
+    }
+  },
+  "source_PR_CI_original": {
+    "at": "2026-10-30T11:03:38.485773+00:00",
+    "head": "d4e66c532cc96c043638b9b29390d8a0c7b7d7d7",
+    "run": 41044870179,
+    "artifact": 12972062272,
+    "provider_zip_sha256": "1cb8b4ce8a03023956358b0bd453a7a34b86c22b17f0357bc7d72bc05ac44813",
+    "tests": {
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0
+    },
+    "compiled_module_sha256": "2eb02bc4bd51dfc6a699e007b7e38015743b7f7a681af8fd883fde426c6e4a55",
+    "module_fixtures_hostcheck_byteequal_local": true,
+    "CI_toolchain": {
+      "node": "v26.13.0",
+      "platform": "linux",
+      "arch": "x64",
+      "esbuild": "0.28.1"
+    },
+    "local_toolchain": {
+      "node": "v26.13.0",
+      "platform": "darwin",
+      "arch": "arm64",
+      "esbuild": "0.28.1"
+    },
+    "platform_installed_binaries_retained_separately": true,
+    "actual_provider_key_native_effect": false
+  },
+  "own_source_main": {
+    "main": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+    "head": "d4e66c532cc96c043638b9b29390d8a0c7b7d7d7",
+    "tree": "076fcf575c3c2bbaf37276a204a646085c26434b",
+    "parent": "e2ad9be00253e2ae4b23c3b42e3f6f3c31a57024",
+    "own_adapter45": {
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0,
+      "run": 41049937232,
+      "artifact": 12973478424
+    },
+    "package_all6_files_exact_PR_CI": true,
+    "formal_run": 41050135816,
+    "formal_digest": "db396c3c6d0ab6b32f8b06066606096cc63e4ad46ac7790e8a07b67a94ade481",
+    "durable_asset": 691944789,
+    "durable_sha256": "76789145d4874f7c92928e94f5e6b463875c4c305c9168a640dc86d5a067d882",
+    "all12_durablechecks": "PASS",
+    "pinned_API_policy_validate_record_findings": [],
+    "own_coverage_artifact": 12973134293,
+    "own_coverage_zip_sha256": "84bd030ef387adca923d362363ceb7cb2408d8988c447ae5275ea993e037e417",
+    "own_coverage_XML_sha256": "3801e628b78596f6c505697ec8f41602177bcb6524fa199253f572e0185ac301",
+    "release_run": 41050135179,
+    "release_TAR_sha256": "dfc3bf3cfa064ee14adf08c335000ab401737c9be6f5eba813edc3ca010de79a",
+    "Worker_sha256": "e59f78e38da0464fb468f5025a6fe7e3bdc2650caac3c1e18aae9e249a5761cf",
+    "Worker_bytes": 1291540,
+    "Worker_exact_parent_except_one_releaseSHA": true,
+    "all18other_members_exact_parent": {
+      "release/LICENSE": "9056c5ecea9aa888ff0a79e9b07a91470a5c2e782dc9ba1774dce70aae031d44",
+      "release/package-lock.json": "4adcdaa9f953fdb39e81f2c76e330c23385836e7cf9ca9f069270bfa9703e846",
+      "release/docs/rendezvous/THIRD_PARTY_LICENSES_V1.md": "c1475aaa3964043219feb95d430bb53a7b8151e230e88c569cd3e72e07f36f0e",
+      "release/migrations/0001_initial.sql": "c2b0766871eddd1a2e8ced36521c70ae36a2045786f4b8d8c09924cc119d73a9",
+      "release/migrations/0004_bootstrap_proofs.sql": "7ba97c189b1d98ca4ee673410cbb9161d22c46ce6a5a3404c5a49500fba80621",
+      "release/migrations/0010_surface_delegations.sql": "65fae4fb0f4898ffca798337b706bc3d6ae4e1950de08d0b008f51f1bf7511c3",
+      "release/migrations/0007_restrict_apns_push_contract.sql": "ea26be9d40a39b4676ab59d181ab3dcdaf7c735a4b2aacde8c82a84784568f5e",
+      "release/migrations/0011_surface_enrollment_authorizations.sql": "6fd3be56034da4a8d1bfcfa56b9286f3ccf4ce596e44ddf73cfc100852044c3b",
+      "release/migrations/0005_install_token_revoke.sql": "3e9e959c404388de6bac5dc044057557fac60e72644e7cbbe0c4b7798fad1b02",
+      "release/migrations/0008_restore_bootstrap_proof_metadata.sql": "e6bec14f7fa00f839ecdc3d4ccf8602e8e7992008607388fff2d025242a6d53f",
+      "release/migrations/0009_surface_push.sql": "41991f8fe361b9bec957e94fd7090cbaf45dbb35f55ee5aba82bb289240e9c0e",
+      "release/migrations/0006_privacy_safe_diagnostics.sql": "ed192a4a5304d708a4fac4733e7dc8ef338f50f4fdecbf81c43acdcc60435770",
+      "release/migrations/0003_encrypt_apns_tokens.sql": "1bf6b40882ff1f8f91015bf62e709dc2062232cfeca429eb95f5e0514668e87a",
+      "release/migrations/0002_install_tokens.sql": "c1983e4081b45347414a857c35a27601fc805abb94e6b0456c2dec4e58512772",
+      "release/package.json": "283b9097bbede9bea36ecbb96b0866435d6c986fec992e2fed528465594b160a",
+      "release/THIRD_PARTY_NOTICES.md": "9809ddd902af8e05a2fe651476437aac6f2f54534774a4cc98e4afe798422c6f",
+      "release/wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+      "release/LICENSES.sha256": "cdeffa56aff14864e5ec4e27d2f8396431954c7efaac479ea7c205d84636a217"
+    },
+    "production_composition": false,
+    "deployed": false,
+    "native_workflow": {
+      "run": 41049936832,
+      "conclusion": "SUCCESS"
+    },
+    "independent_original_source_join": "PENDING",
+    "all16_ownmain_workflows": "SUCCESS"
+  },
+  "own_source_main_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 41050135816,
+      "event": "workflow_run",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Post-Merge Release Evidence"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41050135179,
+      "event": "workflow_run",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "API release artifact"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937719,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "CodeQL"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937253,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Native proof transcript source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937232,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Rich delivery adapter"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937175,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Principal possession crypto DATA"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937165,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Rich Session raw DATA profile"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937239,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Native proof DATA journal source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049936880,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "AI-development projection"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937211,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Push coordinator source qualification"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937314,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Worker DO registry source conformance"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049936834,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Fixed rendezvous QA build"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937169,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Surface enrollment source"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049936830,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "TDE observe"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049937231,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Validate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 41049936832,
+      "event": "push",
+      "headSha": "cc19b8212cfbfcac2daf63905821faa2917f707b",
+      "status": "completed",
+      "workflowName": "Local native experiment qualification"
+    }
+  ],
+  "boundaries": {
+    "required_actual_ports": [
+      "Original authenticated admission and irreversible original reservation",
+      "Original current permission/relay/field/installation/target/qualifiedclock check",
+      "Actual provider authorization without default keys",
+      "Durable once marker retaining lostACK and permanent operation decisions across processes",
+      "Observation persistence which never recreates authority",
+      "Actual qualified time and bounded network transport"
+    ],
+    "process_negative_fence": "4096 operations per adapter/service generation, no eviction; durable crossprocess once remains required owner port, not supplied by RAM",
+    "source_scope": "Server-side bytepreserving update/end transport only; all mandatory trusted composition ports explicit",
+    "public_auth_wire": "Not selected or implemented by this source",
+    "production_root_composition": "Unchanged, compiled surface gate off, no new profile admission",
+    "provider_observation": "APNs acceptance only, not actual device delivery",
+    "remaining_provider_handling": "Original ownerstore must handle exact target-generation retirement; adapter returns status and does not invent store writes",
+    "initial_native_start": "Not this update/end adapter; actual original permission before SDK and laterA/B remain distinct",
+    "PR169_registry": "Separate held dependency, not included"
+  },
+  "effects": {
+    "deployment": false,
+    "activation": false,
+    "key_generation_or_signing": false,
+    "actual_APNs_or_native_acceptance": false,
+    "new_production_migration_or_namespace": false
+  },
+  "separate_Final_gate": "Two documentary additions require own independent exact review, normal CI/protected merge and originalmain qualification; Source172 proof is not Final proof."
+}

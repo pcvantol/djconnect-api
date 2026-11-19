@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_RELEASE_CI_RETENTION_SOURCE_ONLY_NOT_RUNTIME",
+  "base_source": "664f68f9d7798188513c8b59aa46424a158c4630",
+  "baseline_source_map_sha256": "f4e44f5a4221a0dbf4f1042fafb8c5c4ce8c927a6317da09b43e35c85010a938",
+  "effective_source_map_sha256": "95ed9d508a33a905d807bc422c525a3b8a6fc5ee3920e8e0020f174c6a23cfc5",
+  "changes": {
+    ".github/workflows/ci-cd.yml": {
+      "before": "2cc317e25d159fccf2593143dc8ca6b4bae62f128bdf05bf8db56b74da2c81d2",
+      "after": "e1e90326dcb5d25c5f1e661d55cbd48f965700d171b0a3ad9b03fed185e2a60d"
+    }
+  },
+  "public_activation_allowed": false
+}

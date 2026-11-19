@@ -1,0 +1,217 @@
+name: Deploy API Worker release artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      action: {required: true, type: choice, options: [deployment]}
+      candidate_sha: {required: true, type: string}
+      execution_mode: {required: true, type: choice, options: [execute]}
+      manifest_id: {required: true, type: string}
+      artifact_id: {required: true, type: string}
+      artifact_sha256: {required: true, type: string}
+      target: {required: true, type: choice, options: [cloudflare_workers_production]}
+      platform_version: {required: true, type: string}
+      release_profile: {required: true, type: choice, options: [INTERNAL_RELEASE]}
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: api-worker-production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Validate manifest-bound deployment request
+        env:
+          ACTION: ${{ inputs.action }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          EXECUTION_MODE: ${{ inputs.execution_mode }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+          PLATFORM_VERSION: ${{ inputs.platform_version }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+        run: |
+          set -euo pipefail
+          test "$ACTION" = deployment
+          test "$EXECUTION_MODE" = execute
+          test "$TARGET" = cloudflare_workers_production
+          test "$RELEASE_PROFILE" = INTERNAL_RELEASE
+          printf '%s' "$CANDIDATE_SHA" | grep -Eq '^[0-9a-f]{40}$'
+          printf '%s' "$MANIFEST_ID" | grep -Eq '^release-[A-Za-z0-9._-]+$'
+          printf '%s' "$ARTIFACT_ID" | grep -Eq '^[0-9]+$'
+          printf '%s' "$ARTIFACT_SHA256" | grep -Eq '^[0-9a-f]{64}$'
+          printf '%s' "$PLATFORM_VERSION" | grep -Eq '^[0-9]+\.[0-9]+$'
+      - name: Require unused preflight checkout path
+        run: |
+          set -euo pipefail
+          test ! -e .canonical-api-preflight && test ! -L .canonical-api-preflight
+      - id: canonical_source
+        name: Resolve canonical Core by immutable repository ID
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          script: |
+            const repo = (await github.request('GET /repositories/{repository_id}', {repository_id: 1258575431})).data;
+            if (repo.id !== 1258575431 || repo.private !== false || !['djconnect-music-dj/djconnect'].includes(repo.full_name)) throw new Error('Canonical Core identity is not authorized');
+            core.setOutput('repository', repo.full_name);
+      - name: Checkout immutable canonical preflight
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ steps.canonical_source.outputs.repository }}
+          ref: 191b4561bdb659bd2e02905b5bce9643d4390a63
+          path: .canonical-api-preflight
+          persist-credentials: false
+      - name: Verify exact canonical preflight bytes
+        run: |
+          set -euo pipefail
+          test "$(git -C .canonical-api-preflight rev-parse HEAD)" = 191b4561bdb659bd2e02905b5bce9643d4390a63
+          printf '%s  %s\n' 8af709b8a6ddf29843562d4f1b09de0747204feb086eeebbb485d16f5423fd37 .canonical-api-preflight/.github/actions/deployment-readiness-preflight/action.yml | sha256sum --check
+      - name: Verify target deployment readiness
+        uses: ./.canonical-api-preflight/.github/actions/deployment-readiness-preflight
+        with:
+          target: ${{ inputs.target }}
+          manifest_id: ${{ inputs.manifest_id }}
+          candidate_sha: ${{ inputs.candidate_sha }}
+          artifact_id: ${{ inputs.artifact_id }}
+          artifact_sha256: ${{ inputs.artifact_sha256 }}
+          expected_runner_os: Linux
+          expected_runner_arch: X64
+          required_configuration: READINESS_CLOUDFLARE_API_TOKEN
+          smoke_contract: api-worker-post-deployment-health-v1
+        env:
+          READINESS_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Checkout migration guard from the workflow revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - name: Require approved central operational manifest source
+        shell: bash
+        env:
+          CORE_REPOSITORY: ${{ steps.canonical_source.outputs.repository }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+        run: |
+          set -euo pipefail
+          manifest="$RUNNER_TEMP/api-operational-manifest.json"
+          test "$GITHUB_REPOSITORY_ID" = 1275206655
+          case "$GITHUB_REPOSITORY" in
+            djconnect-music-dj/djconnect-api) manifest_file=PLATFORM_4_0_API_ORG_OPERATIONAL_MANIFEST.json ;;
+            *) echo "Unexpected API repository: $GITHUB_REPOSITORY" >&2; exit 1 ;;
+          esac
+          curl --fail --silent --show-error --location \
+            "https://raw.githubusercontent.com/${CORE_REPOSITORY}/main/docs/release/$manifest_file" \
+            --output "$manifest"
+          test "$(jq -r '.status' "$manifest")" = APPROVED_DEPLOYMENT_DISPATCH_PENDING
+          test "$(jq -r '.approval.state' "$manifest")" = APPROVED
+          test "$(jq -r '.manifest_id' "$manifest")" = "$MANIFEST_ID"
+          test "$(jq -r '.release_profile' "$manifest")" = "$RELEASE_PROFILE"
+          jq -e --arg repository "$GITHUB_REPOSITORY" --arg sha "$CANDIDATE_SHA" \
+            '.repositories[] | select(.repository == $repository and .source_sha == $sha)' \
+            "$manifest" >/dev/null
+          jq -e --arg target "$TARGET" --arg artifact "$ARTIFACT_ID" --arg sha "$ARTIFACT_SHA256" \
+            '.artifact_bindings[] | select(.target == $target and (.artifact_id | tostring) == $artifact and .artifact_sha256 == $sha)' \
+            "$manifest" >/dev/null
+      - id: artifact
+        name: Verify immutable artifact provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          metadata="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}")"
+          test "$(jq -r '.expired' <<<"$metadata")" = false
+          run_id="$(jq -r '.workflow_run.id' <<<"$metadata")"
+          run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")"
+          test "$(jq -r '.conclusion' <<<"$run")" = success
+          test "$(jq -r '.head_branch' <<<"$run")" = main
+          test "$(jq -r '.head_sha' <<<"$run")" = "$CANDIDATE_SHA"
+          test "$(jq -r '.name' <<<"$run")" = 'API release artifact'
+          printf 'run_id=%s\n' "$run_id" >> "$GITHUB_OUTPUT"
+      - name: Download immutable API artifact
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ inputs.artifact_id }}
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.artifact.outputs.run_id }}
+          path: artifact
+      - name: Deploy exact bundled Worker and migrations
+        env:
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          mapfile -t release_artifacts < <(find artifact -type f -name djconnect-api-release.tar.gz -print)
+          test "${#release_artifacts[@]}" -eq 1
+          release_artifact="${release_artifacts[0]}"
+          test "$(sha256sum "$release_artifact" | awk '{print $1}')" = "$ARTIFACT_SHA256"
+          mkdir release
+          tar -xzf "$release_artifact" -C release
+          cd release/release
+          test -f bundle/index.js
+          test -f wrangler.jsonc
+          test -d migrations
+          npm ci --ignore-scripts
+          node --input-type=module <<'JS'
+          import { unstable_readConfig } from "wrangler";
+          const { d1_databases } = unstable_readConfig({ config: "wrangler.jsonc" });
+          const databases = d1_databases.filter(({ binding, database_name }) =>
+            binding === "djconnect_api" || database_name === "djconnect_api");
+          const [database] = databases;
+          if (databases.length !== 1 || database.database_name !== "djconnect_api" ||
+              database.migrations_dir !== "migrations" ||
+              (database.migrations_table ?? "d1_migrations") !== "d1_migrations" ||
+              database.migrations_pattern !== undefined) {
+            throw new Error("Unexpected production D1 migration configuration");
+          }
+          JS
+          read_migration_ledger() {
+            ./node_modules/.bin/wrangler d1 execute djconnect_api --remote --config wrangler.jsonc \
+              --json --command 'SELECT name FROM d1_migrations ORDER BY id' > "$RUNNER_TEMP/api-d1-ledger.json"
+          }
+          migration_guard() {
+            python3 "$GITHUB_WORKSPACE/scripts/check_production_d1_migrations.py" \
+              "$RUNNER_TEMP/api-operational-manifest.json" migrations "$RUNNER_TEMP/api-d1-ledger.json" "$@"
+          }
+          read_migration_ledger
+          pending="$(migration_guard)"
+          if [[ -n "$pending" ]]; then
+            printf 'Applying manifest-approved D1 migrations:\n%s\n' "$pending"
+            ./node_modules/.bin/wrangler d1 migrations apply djconnect_api --remote --config wrangler.jsonc
+            read_migration_ledger
+            migration_guard --after-apply
+          fi
+          ./node_modules/.bin/wrangler deploy bundle/index.js --no-bundle --config wrangler.jsonc
+      - name: Publish redacted deployment evidence
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          MANIFEST_ID: ${{ inputs.manifest_id }}
+          ARTIFACT_ID: ${{ inputs.artifact_id }}
+          ARTIFACT_SHA256: ${{ inputs.artifact_sha256 }}
+          TARGET: ${{ inputs.target }}
+          PLATFORM_VERSION: ${{ inputs.platform_version }}
+          RELEASE_PROFILE: ${{ inputs.release_profile }}
+          DEPLOYMENT_WORKFLOW_RUN: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          from datetime import UTC, datetime
+          import json, os
+          with open("api-worker-deployment-evidence.json", "w", encoding="utf-8") as file:
+              json.dump({"schema_version": 1, "kind": "api_worker_production_deployment", "repository": os.environ["GITHUB_REPOSITORY"], "candidate_sha": os.environ["CANDIDATE_SHA"], "manifest_id": os.environ["MANIFEST_ID"], "artifact_id": os.environ["ARTIFACT_ID"], "artifact_sha256": os.environ["ARTIFACT_SHA256"], "target": os.environ["TARGET"], "platform_version": os.environ["PLATFORM_VERSION"], "release_profile": os.environ["RELEASE_PROFILE"], "deployment_workflow_run": os.environ["DEPLOYMENT_WORKFLOW_RUN"], "deployment_result": "DEPLOYED_PENDING_SMOKE", "timestamp": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")}, file, sort_keys=True)
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: api-worker-deployment-evidence
+          path: api-worker-deployment-evidence.json
+          if-no-files-found: error

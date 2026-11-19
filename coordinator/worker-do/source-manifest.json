@@ -1,0 +1,25 @@
+{
+  "classification": "WORKER_DO_REGISTRY_SOURCE_DATA_ONLY",
+  "base": "2d8637e634f5b2db84151e66027204db885d4369",
+  "Core_passive_contract_sha256": "af201f6a74f358b09460f3cea026b6104aef93d54d8ac9ea05bac32d43874492",
+  "owning_Core_join_sha256": "39b9c478a95df770d889fcae5071bef5143a3b8afa695f313e36fb6866257347",
+  "Worker_only_assessment_sha256": "a58edbda51815f31ed439b1b8ae541af94b742b1c221be934a72f745d088c54a",
+  "wrangler_version": "4.160.0",
+  "wrangler_schema_sha256": "fdf17b1ee9a637182af0678cd3725ad2845e63394fec9cb324765b4ec9ae46d0",
+  "inputs_sha256": {
+    "coordinator/worker-do/README.md": "aefdde3b3fc45602ef486082c0fdd8b650b973408f864ea2bfc6e811b71cd42b",
+    "coordinator/worker-do/build-source.mjs": "2d120315d01ff3d7d828b990176a36d245e8e6034299eaae062d92bac0029e00",
+    "coordinator/worker-do/model.ts": "32721b4275b62ee75600a2c50537cbc2214bd9cba8369ed10acebc4669b2f094",
+    "coordinator/worker-do/qualification/registry.check.ts": "b9ef6d2e956b4d224618a443ef2da3f0dc0c3d6ff0c0147f9250d53f6895fdf0",
+    "coordinator/worker-do/qualification/tsconfig.json": "b965eac3f62f191625e54245773ae34842cdced00c0c76d0a9ff73a6380f354f",
+    "coordinator/worker-do/qualification/vitest.config.mts": "3ffb48ecfcb6cadb57e30a892714e532f2d72c315f82e0d51420db57f5abe391",
+    "coordinator/worker-do/qualification/wrangler.jsonc": "136fd9b2cdac6e5fafcff91109844d49adacd1ece79db6f857c758d51ee577a6",
+    "coordinator/worker-do/registry.ts": "de457d315db7746be016a202c35a5eb3e4de4064d7a37d688dd68c29968a187b",
+    "coordinator/worker-do/worker.ts": "8a007aca2501c7a9f685a10b59db2117d4fa8563a484729bc6703aa261d6a4ca",
+    ".github/workflows/worker-do-registry-source.yml": "1dd9804009649428212779f6d420192e2d6c8e21e65c19d1c453cf81dd065896",
+    "package-lock.json": "20f73ac58391eeef484b610426b1e2adc5c39775ed6bd9fd052ad66f129c46eb",
+    "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
+    "src/surface-push/wire.ts": "d4f255431b4429b724455e347841e992aef8f639a2b7799dfb510752cdb834b7",
+    "src/surface-push/issuer-wire.ts": "c46e0a42e03a49321c8934bc49eb88b6589a7d0506784f771b722d0f6a56a2d8"
+  }
+}

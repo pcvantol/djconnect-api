@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_WRANGLER_4160_TOOLCHAIN_REFRESH_NOT_ACTIVATION",
+  "base_source": "a6dfec8c67c8c8f05224bca9de984df30ab5bddb",
+  "baseline_source_map_sha256": "89e6c6cab440cbcbc709ee9093d2b6e0ac8f92496532e51b4d1ca942b41f9dc8",
+  "effective_source_map_sha256": "1a549cc6a6585cead234d4edac427fab3d7ab00538b88d12e90d527144a2dbcf",
+  "changes": {
+    "package-lock.json": {
+      "before": "d4da700e4b50c9365d2237e4e25380713303d000d978fa20247c26c4eb06fe4f",
+      "after": "568caf0f455eab642abc58c036ea11f3b331b63ecf5ffbf865cf6df9a8525915"
+    },
+    "package.json": {
+      "before": "b684c815c993c080483dc9d9be50f5546d07a39ee18408ea46535f39a75f143e",
+      "after": "ca276a728f63e8e17c36b8baaa4513879d143280b10ad0fab4a5faf85cff50bb"
+    },
+    "scripts/qualify_rendezvous_product_build.mjs": {
+      "before": "05637605cbc2e6691097eff71850d173e17ff23690488352324e3072e432c949",
+      "after": "38cb31c0f3c719406bb09c3cc013851bee26712fa475258ed40afd28c56bf88f"
+    }
+  },
+  "reference_changes": {
+    "coordinator/host-app-wake-receiving/runtime/source-inputs.json": {
+      "before": "1c9126cffe9eb586c82e686e044d07f4ce31e120c4dbaf669c62a3da7404cd47",
+      "after": "5e6e3e984588b409ea5fbf66a12e757011222e0de56f15112fcea15e7d584d50"
+    },
+    "coordinator/host-app-wake/source-manifest.json": {
+      "before": "0146de390fd9cd65dab816d3e30a703ce07784553787e631795e6a0e32e4cf95",
+      "after": "cd4de9decb77011b64721f4f0a4ac555630ca81ac125b6033c6049ed4b027d6d"
+    },
+    "coordinator/installation-principal/source-manifest.json": {
+      "before": "e07ff79aacb554aa0b410d1f1dc468df9e8106e36939b5e4eae70886d95ffe66",
+      "after": "4abf5547b6b19bec51972465108bfa427d77aeab738933185994f40d970567d3"
+    },
+    "coordinator/installation-registry/source-manifest.json": {
+      "before": "3d0a353fd82324094acc9ac1bd8f815ec4963074bd21f6dca426e192cba18938",
+      "after": "754180447d6141e4973fa41898cac3a05bc13d1d5fa6a64d029858a691371ba0"
+    },
+    "coordinator/principal-possession/source-manifest.json": {
+      "before": "5f13b0360a71e001eb3fb4e611c1a5250e4d1a9aa59c32a517086ead8f4d9402",
+      "after": "75badf9b9c25433655f8e0548f28dc4086a4df251edc7ebd65a20377bb015474"
+    },
+    "coordinator/rich-delivery/source-manifest.json": {
+      "before": "1cba576cff2a7a210703685b9dff877a6ccd8000cefa2a014845bcb339a17cf0",
+      "after": "c244219e530f4c68c7406dc6159866765b95e8a28b271c6d1f75ee2acc0bf7cc"
+    },
+    "coordinator/rich-session/source-manifest.json": {
+      "before": "e02dd62f3efaba6de7df14449b0bdc97a9fe2dac24cd47a6fc9bbc829c4522bc",
+      "after": "f5edf932f03eb34a9e6ba990c130a5700c68a931977795888bbf48c673a87d9b"
+    },
+    "coordinator/worker-do/source-manifest.json": {
+      "before": "90d2dda7888435f15ef9abd6a22b8033652803bb90a4afcd5033ae9676bd16cd",
+      "after": "45890863d8352ee0f9a261f312c96e5dbbc5fc42007aba2254e2cf1f9e2fc927"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "308c1eec31e2d09b093568b8c418d221cb317171d346c02baf758e08a16faa28",
+      "after": "e3594586a426d57e70fa684f2ac953c07f54d0592d76daa1795af35da04502ce"
+    }
+  },
+  "reference_additions": {
+    "qualification/rendezvous/compatible-runtime-dependency-provenance-v6.json": "63dc62f098db2b915e086df819645632df663d9d84e4523f0fd44f75a60efb90"
+  },
+  "public_activation_allowed": false
+}

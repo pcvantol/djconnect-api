@@ -1,0 +1,195 @@
+{
+  "kind": "ORIGINAL_EXISTING_IOS_CORE_ENCODER_FIXTURE_RECEIPT",
+  "source_head": "590634144e94dfcfc2a83297f6ae5cd5dab2b5c2",
+  "source_all719_before_after_equal": true,
+  "sources_sha256": {
+    "DJConnectApp.xcodeproj/project.pbxproj": "57a1535df9d8dc540c9687a5a54cb8c502a572189aa6296a0522f700e20ac0ac",
+    "Sources/DJConnectCore/DJConnectBackgroundSession.swift": "86b72a695bad9f66f5656c898bf131bbd4dd7e873d090571f9a468fed2feb8f1",
+    "Sources/DJConnectCore/DJConnectLiveActivities.swift": "1d2733a6fd2a4e102a90a9e48db67a947c46aa7afc2b2e701bd45b12deb01f92",
+    "Sources/DJConnectCore/DJConnectPassiveSession.swift": "1c771bf3970547b0b9baccf4e3e1681f0fb2a30f48dacb26777b3921ba5092bb",
+    "Tests/Fixtures/passive-session-core-2cb87cb7.json": "53128a4d168467160dbf2180b7c81be6b35b2f892daff4602627365c379326ab",
+    "project.yml": "6ef4a80e1d8437bde8dd60cf032b19f2a73a815aa9a950f6353198709e4fa4fb"
+  },
+  "framework_sha256": "64bdd4f4f9f54fe2fa185a9f83aa1e3f33d14eba1779485f075df3fadeac56af",
+  "helper_sha256": "74f3db8e5a1f1387181df089717399d2b0c1ea6ee2e9d6f68cfa9f169aef0071",
+  "executable_sha256": "a4d8f469e72870f8e5d47150d8755d54f38ede185673dd4a13fbdc91a437ebb5",
+  "actual_core_ios_build_exit": 0,
+  "actual_encoder_compile_exit": 0,
+  "actual_encoder_simulator_process_exit": 0,
+  "actual_runtime": "iOS27.0 simulator arm64, genuine CoreIOS ActivityAttributes type; no Activity lifecycle",
+  "case_count": 28,
+  "fixture_inventory": {
+    "attributes_original_uuid.json": {
+      "bytes": 57,
+      "sha256": "f3a40f9865cc311e0dbb7009c8d460b68192e6e7e85e1ad8f402db10b065b132"
+    },
+    "attributes_unicode_codec_only.json": {
+      "bytes": 33,
+      "sha256": "2335b95cffc97e0b86636798ed10498c9bcb92dbf93325caa18cbf94fb94e348"
+    },
+    "manifest.json": {
+      "bytes": 10290,
+      "sha256": "4f9baa00789cf42c90896e9f4a11e919f5e7e72d7e68552a912edbc0374f4c5a"
+    },
+    "rich_bytes_2800.json": {
+      "bytes": 2800,
+      "sha256": "089f91ba1bff7d09973e6e00ee17bb6a6e231849ff1e9cfd5226c65ca87b2369"
+    },
+    "rich_bytes_2801.json": {
+      "bytes": 2801,
+      "sha256": "1c3b36734573fd94082a876d43932e015b6fc2f26fb5b153640dc72513e5b4e3"
+    },
+    "state_empty_rich_codec_only.input.json": {
+      "bytes": 336,
+      "sha256": "8bc88f76d35d9ae0a07d901660800041cf057725c71902393275e8811f0b62b2"
+    },
+    "state_empty_rich_codec_only.json": {
+      "bytes": 277,
+      "sha256": "3377cee63e2a21d51b1b7499d91effe461311f368ff28544add926396083052a"
+    },
+    "state_legacy_missing_playbackState.input.json": {
+      "bytes": 1190,
+      "sha256": "9dbf47aeadd4d0abf5b20b0c2ef738583aa16bbfe75b49eaa96c2c8b43ad04d4"
+    },
+    "state_legacy_missing_playbackState.json": {
+      "bytes": 1190,
+      "sha256": "f842e10e0693b377bf700cabc3e572612bbbd758a567d0d026b3f52a2539d135"
+    },
+    "state_minimal_micro_fraction.json": {
+      "bytes": 60,
+      "sha256": "0316b429f32b25b7c1e0cc4c445a919473a4850e7e4b860d2b21913f8d2b09a0"
+    },
+    "state_minimal_negative_fraction.json": {
+      "bytes": 41,
+      "sha256": "ec737627dd2ffe7fec7e3814edb3c037422ecce31e4cc49820f306bb1b2b0577"
+    },
+    "state_minimal_positive_fraction.json": {
+      "bytes": 40,
+      "sha256": "17d5c1f409c713dc03d9f48db2d224e73ed838dc58e5667d3c36d3fe0ad3e586"
+    },
+    "state_minimal_recent_fraction.json": {
+      "bytes": 54,
+      "sha256": "44ed6080dc83f78eac69d020a074087ed2068b7537f0da0dbed9a804d890617a"
+    },
+    "state_minimal_reference_epoch.json": {
+      "bytes": 32,
+      "sha256": "2c6760299a23b5476ed4e6793de39f8513f4d792ace57849c01d029334c5ee43"
+    },
+    "state_minimal_unix_epoch.json": {
+      "bytes": 48,
+      "sha256": "074a5e54b31748632c2406bcf7469721c914ed51ced8d254db327806cd48a470"
+    },
+    "state_optional_null.input.json": {
+      "bytes": 79,
+      "sha256": "2f72f014d4bec07e7007fa2407dbfb01ea022bec9f19afafadf868155b7f030f"
+    },
+    "state_optional_null.json": {
+      "bytes": 54,
+      "sha256": "9397f8078201593feb362c73254e4607085cc68f759b2ae0144a90f0e460692c"
+    },
+    "state_rich_both.json": {
+      "bytes": 1216,
+      "sha256": "ca6a3ce305d5777226108dd5cf469ecedf9d116afcb4348b01725f6c0e110974"
+    },
+    "state_rich_contribution_only.json": {
+      "bytes": 691,
+      "sha256": "13203235bd43a08a717512c5355c12b4f28c8d501b06e877e11ba5391d66c993"
+    },
+    "state_rich_playback_idle.json": {
+      "bytes": 1213,
+      "sha256": "b77d5d878a6d9ad6e8154f854916ee2af87d1499293d734f2f905d10864c06d4"
+    },
+    "state_rich_playback_only.json": {
+      "bytes": 802,
+      "sha256": "007ccee3a249097f638aba18bcd31910b227e9b222bad42b6cf35c033e812257"
+    },
+    "state_rich_playback_paused.json": {
+      "bytes": 1215,
+      "sha256": "638f698dcefa988617f3d2d08678056fdca3541c991f60ea836b9354856982e7"
+    },
+    "state_rich_playback_playing.json": {
+      "bytes": 1216,
+      "sha256": "112e047605071dd8cbb36b2162fb624cd2c3b23b575d351a639a47054ed45e5c"
+    },
+    "state_rich_playback_stopped.json": {
+      "bytes": 1216,
+      "sha256": "47809a5c8a44c816ca11c13812dc83ab9b7fe501c2083a15f6cef504f99e59a3"
+    },
+    "state_rich_unicode_escaping.json": {
+      "bytes": 1289,
+      "sha256": "acd3bee71dc8d8dca60bd1a72428a290f417cd8c2f6edc4f6f793e492eb274d9"
+    },
+    "state_same_pin_extended_deadline_codec_only.input.json": {
+      "bytes": 1216,
+      "sha256": "2919eabb2cc336c7dab75adbe50c64fe298b146b0f7363eb74a0dd288bae4158"
+    },
+    "state_same_pin_extended_deadline_codec_only.json": {
+      "bytes": 1216,
+      "sha256": "5bf215032d17c4bf268ab021f2500e4a6969a6065c7f471f16566191b5f40ed6"
+    },
+    "state_theme_brand.json": {
+      "bytes": 70,
+      "sha256": "fb6830f77f101b98a1be02f95bda8adc69596740f8e22a1574b28cd82b43471e"
+    },
+    "state_theme_chill.json": {
+      "bytes": 70,
+      "sha256": "af42ee2a2384f390a319cd072b2781df4282da9d1a02ffa83cc031ef80fa29c3"
+    },
+    "state_theme_energy.json": {
+      "bytes": 71,
+      "sha256": "c9ae0c3cf89184f4d2cef534765eace8f1a931a81ef7d0224857d40c180e5761"
+    },
+    "state_theme_groove.json": {
+      "bytes": 71,
+      "sha256": "04d33b77f7f2ae4f3d23aef33b73df3deb9ba82f79f961521db8766ec9805af2"
+    },
+    "state_theme_party.json": {
+      "bytes": 70,
+      "sha256": "191b7538570dd4f778aba16f5055b33d81a68161c22b06de85827e1a473074ab"
+    },
+    "state_unknown_key_codec_only.input.json": {
+      "bytes": 1246,
+      "sha256": "81841ca278090f1ead6309bb8f0792cc49bc13e05f8d2c6c290b4d5eb95c6e05"
+    },
+    "state_unknown_key_codec_only.json": {
+      "bytes": 1216,
+      "sha256": "4ff440a52c06d5e71cf6a227e5459f7db89c95f530fec54df792434335d7a4a8"
+    }
+  },
+  "native_initializer_budget": [
+    {
+      "encoded_rich_bytes": 2800,
+      "initializer_accepted": true
+    },
+    {
+      "encoded_rich_bytes": 2801,
+      "initializer_accepted": false
+    }
+  ],
+  "expiry_checks": {
+    "after": false,
+    "before": true,
+    "equal": false
+  },
+  "original_pin_data": {
+    "receivedAt_reference_seconds": 821692800.125,
+    "receivedUptime": 1000503.756441875
+  },
+  "artifacts_sha256": {
+    "core-ios-build.log": "f2bb5a72d28926d19fb7f58da0319631758ca0ab8d68add7a73e5d8ae4b661c6",
+    "encoder-compile.log": "7d08fbeb3ecd35c374e10c9d9e0a7f9ed122d9b72912c45468a5e5af7504646e",
+    "encoder-compile-r2.log": "9913d8429ffb382b6e8175f7cc541b729765b73d1a5baf223e7a9be52f0a1732",
+    "encoder-run.log": "36b7c4eedc8c89e44ed0569ec810dad4fe88d20b3797b71ccebf93b195af35ae",
+    "inputs-before.json": "fd9d1f5e904ec26f199c603997566ff4bd8b808ddddd16b807787afe86854d9a",
+    "owned-simulator.json": "a368c810d7d357558b5784c5cdf94ee891bbcf4e18010ec3f68da391f2663af5",
+    "boot.log": "fd79a6860f4e5698d0e6bec400cfd5b2869cc32a3f81151d6ddb74e295de64e8"
+  },
+  "diagnostics_preserved": "Sandbox inventory initially unavailable; repeated readonly outside sandbox. First standaloneencodercompileexit0 carried Macsysroot warning; not used for fixtures. Second explicit simulator xcrun compile has no warnings/actual0; only r2 executable ran.",
+  "limits": [
+    "Raw original default Foundation encoder JSON bytes; key order is not cross-runtime canonical.",
+    "Synthetic metadata and explicit test timestamps, no source/field/native/clock/boot/restore permission.",
+    "No Activity.request/update/end, native push token, key/provisioning/provider/network operation from fixture program, ordinary app install or physical device.",
+    "No new R4 DATAcarrier/permission wire or APS payload constructed; combined and complete-body4096 require separate producer qualification.",
+    "28cases include deliberately codec-only/ineligible shapes and counterexamples; do not publish them all as admissible native frames."
+  ]
+}

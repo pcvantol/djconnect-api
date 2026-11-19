@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_QUALIFICATION_WORKFLOW_DELTA_NOT_RUNTIME_OR_ACTIVATION",
+  "changes": {
+    ".github/workflows/ci-cd.yml": {
+      "before": "546ad4495db1fbf8f83489c16cf7e32919525c3fa4e58e69e4e62b61ce5ab82b",
+      "after": "b9ad8dee552c9c91189fa816cbb5f922068c6d5af72b5f311c73a8172bf9f2de"
+    }
+  }
+}

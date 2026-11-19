@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_SOURCE_DELTA_NOT_DEPLOYMENT_AUTHORIZATION",
+  "baseline_source_sha": "ec8029dbe7e4b0f4405253a3bf265d505303866b",
+  "baseline_source_map_sha256": "519740ef7c01904ac2531fcc37f243bd1677035a26d1e6761dee0fc7571dd3e3",
+  "effective_source_map_sha256": "db164f236aa78435430266049dd145f231540e4f9ceae288c1a0827d648eba8a",
+  "changes": {
+    "package.json": {
+      "before": "7ea809d8f6fde96882d7897c4dbc0b9f26e2b0d54b5a5e9297a28d7fae59dfce",
+      "after": "d32e8c6706816ae91682453a54b13d989f442f7da4c49fab66e80a054668a386"
+    },
+    "package-lock.json": {
+      "before": "7b3088c7a885e1c02b03a6080540a70b97b3635fa70ce45497791c861caf0059",
+      "after": "9947367deb9b7028fb58fd431f3e3bfd57fc2db207d00497224e833dde911948"
+    }
+  },
+  "proofs": {
+    "shared": {
+      "path": "docs/rendezvous/assertion-crypto-shared-observations-v1.json",
+      "sha256": "d1b5d6bdc6a2009c31ba96ce2af1833c69b3794420fa6d0096103f2911701a4b"
+    },
+    "root": {
+      "path": "docs/rendezvous/sharp-0355-build-observations-v1.json",
+      "sha256": "cd0c1df612e1218edc1483c9f04d6166d40680652ff463105f84446de99a5089"
+    },
+    "module": {
+      "path": "docs/rendezvous/sharp-0355-composition-observations-v1.json",
+      "sha256": "d0ef8018d7b494e27667ef9915c68a9849754b36d944f2cddf3ae910092ed531"
+    }
+  }
+}

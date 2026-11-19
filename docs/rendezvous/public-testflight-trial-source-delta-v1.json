@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "scope": "PUBLIC_TESTFLIGHT_TRIAL_CONFIGURED_NOT_DEPLOYED",
+  "baseline_source_map_sha256": "89808747e3ca777c38c3c5ce127eaa8b3019925e3688ca4ebfbb88bb0aca801f",
+  "effective_source_map_sha256": "5701251f20432ea063643f0308dc41c8133dbb8f02db346bfc15fc36b8e47334",
+  "source_changes": {
+    "src/rendezvous/dispatch.ts": {
+      "before": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
+      "after": "c3e4c9e2b72eba18873c649ca2452f029c060339de829182fa94108a230541c1"
+    },
+    "src/rendezvous/composition.ts": {
+      "before": "b1a04b3f35b27c4597105f5bbb4e68315d16010eb336a3492be82954d52cacd0",
+      "after": "b57ba14b066882cb7c3e3467b3e54225dfae42b697c9166fd08c888f1c1c452b"
+    },
+    "qualification/rendezvous/product-composition.check.ts": {
+      "before": "8223295b4684bc1d665e43c26541cb9c64922fcd46c9e6333dd60ce49b2f71e8",
+      "after": "b00eb730ddff7b59887b3e5a84ce19835f27938a941c120c5d15e29d41e22a56"
+    },
+    "qualification/rendezvous/allocation-index.ts": {
+      "before": "980a2bf7ccc3a28c95794ca2a1148b26a36ef94ab384ba817e5bee9147e11557",
+      "after": "bbd274d795ad7f6d8b902ca357fa103af592177310eab6eea62e141d4ed2f93a"
+    },
+    "qualification/rendezvous/request-admission.ts": {
+      "before": "d3604825e83218e44eeaa69aabea3dc4fe5820d7532ab3600bc101d2d032ce29",
+      "after": "564a8d37928fd96948e4826a1ab51bc12dadbef156a13b7bcd4809b1e6edab5a"
+    },
+    "qualification/rendezvous/transaction-state.ts": {
+      "before": "bcd9b0a0e4b91fe9fa2506de0d1cdc44172716911ec5f027c7b78fda9eb96999",
+      "after": "e194dbe0282aa9fc6e3f41ea20ffe6b053334b22f7daf1141f5e64694ee9485b"
+    },
+    "qualification/rendezvous/testflight-release.mjs": {
+      "before": "c44979c2fc4329037f8a464934a22ce7fdfb1943db641e6a85f6f1e23cfd8d69",
+      "after": "5cf90a1df302169ba6e7bcc388236db87cfa6e27c727bb2163463864fcdc23c1"
+    },
+    "qualification/rendezvous/testflight-release.d.mts": {
+      "before": "6ed5cbc9c7dfd3619b701c199edf0618020d823b9ab4fe42a7c6e92b270d317d",
+      "after": "76d33a30ba96e9cd7606afba9f61c46cd798e8c4d74a2363bd5d0ac84bb4e3d2"
+    },
+    "wrangler.jsonc": {
+      "before": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
+      "after": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a"
+    },
+    "rendezvous-build-inputs.json": {
+      "before": "2b96897393242c9b66def0350f73c6cc91b9e2059757d731b3b8b448c6def8ef",
+      "after": "f28f25617c8628c7c842fcf7e6bd62a8d278defe9dbc8bc788920e9335bd4a8e"
+    }
+  },
+  "reference_changes": {
+    "coordinator/host-app-wake/source-manifest.json": {
+      "before": "3ea9d21af5f2534c875ceca48edda48cdaac0b3758f9dd72ceb74fc93c5e4ffd",
+      "after": "9327b772b48a76ab9eefe8fb11c5f6ca4131edc6107280505b2e729ac103ffaf"
+    },
+    "coordinator/installation-principal/source-manifest.json": {
+      "before": "061c4fe5991b243f4bdbbde2439f1ae99a286248009f908c69a3a10b112bbb3a",
+      "after": "3ef5dc83caba58cbf2d9f222ab67b60c4b4cb286e8ff3311ee2023f46218db51"
+    },
+    "coordinator/installation-registry/source-manifest.json": {
+      "before": "06d03531d4f08cb5110d7239c91c1b475631e4a8d970e1e573b5af74a290d07b",
+      "after": "07b3a98e493c992761eab67157d007ea85388293a15e203cabaae23e19bf6f67"
+    },
+    "coordinator/principal-possession/source-manifest.json": {
+      "before": "647f6ae3b398c9188fda44bda1384b91c840af83bdad500404b299fbdfbfafcd",
+      "after": "0ceb43305045743fcf9c05e6ef2d996aabf61df6b8826d243ba6a1ecb7bc77a1"
+    },
+    "coordinator/rich-session/source-manifest.json": {
+      "before": "3bd24a4a5d5aeaabafbdb9401c18581b9a386e1cd17a634fd99a958d569ff8d9",
+      "after": "89257dfeee965277839e4692447ca4da7b9152bed295567a807cade30bbd6e07"
+    },
+    "qualification/rendezvous/qa-build-profile.json": {
+      "before": "0aa52b27a4f9e9d57200a6abeeae8728c87fd0e99b623e220c034fc446a99d3b",
+      "after": "00c8f784262ec3b54169453bade031e4587f54cc7b7dbf0a6361ad4760ea2ab4"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "67f8340015fdd1801e73335e6eac001e46ca1f647fe0ffb8facbfc16cfd04dcd",
+      "after": "d4b34bcd922188afd2d33497f88a375b7793e90b81165916992268fab765c924"
+    },
+    "wrangler.jsonc": {
+      "before": "e7576e5cd1f4317bf899c2b4269f36f012c4fcf52613f7dd43e8a0af964516f1",
+      "after": "e0243d727047d61b1bdfa326ac500984a827e229da351e05c50fababb869c94a"
+    }
+  },
+  "reference_additions": {
+    "docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md": "2d8766f46a75a686735573ab91731caac9471f43c5d2b2d70a7e2f76e47d3043"
+  }
+}
