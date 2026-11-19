@@ -1198,6 +1198,10 @@ API_ORG_RELEASE_DELTA_PATH = 'docs/rendezvous/api-org-only-release-source-delta-
 API_ORG_RELEASE_DELTA_SHA256 = '9cdcbdcf78e1990adb86daa388feed9bc4f92a40b3140dddce05acf61bd16e00'
 SOURCE_PROVENANCE['api_org_release_delta_sha256'] = API_ORG_RELEASE_DELTA_SHA256
 
+API_ORG_CORE_AUTHORITY_DELTA_PATH = 'docs/rendezvous/api-org-core-authority-source-delta-v1.json'
+API_ORG_CORE_AUTHORITY_DELTA_SHA256 = 'a4a87feb002f94f8a8db3afe3414372ea51ae11b04dd7167f0f832d4c1967de1'
+SOURCE_PROVENANCE['api_org_core_authority_delta_sha256'] = API_ORG_CORE_AUTHORITY_DELTA_SHA256
+
 
 def baseline_before_api_shared_governance():
     sources, refs = baseline_before_api_core_identity()
@@ -1239,8 +1243,76 @@ API_GOVERNANCE_SUMMARY_PIN = b'2a1c6fd2841b08630aee01402850f56840b50f70'
 SOURCE_PROVENANCE['api_governance_summary_pin_delta_sha256'] = API_GOVERNANCE_SUMMARY_DELTA_SHA256
 
 
-def summary_previous_bytes(name):
+
+API_41_DELTA_PATH = 'docs/rendezvous/api-4-1-org-policy-source-delta-v1.json'
+API_41_DELTA_SHA256 = '91645102ead4fa549b1b71c5d131516ea14b3024c9213518e27bb1aeee01e010'
+API_41_WORKFLOWS = frozenset(('.github/workflows/ci-cd.yml', '.github/workflows/codeql.yml', '.github/workflows/host-app-wake-receiving.yml', '.github/workflows/host-app-wake-source.yml', '.github/workflows/installation-principal-data.yml', '.github/workflows/installation-registry-transactions.yml', '.github/workflows/native-proof-data-journal.yml', '.github/workflows/native-proof-transcript.yml', '.github/workflows/post-merge-release-evidence.yml', '.github/workflows/principal-possession-data.yml', '.github/workflows/push-coordinator-source.yml', '.github/workflows/reusable-workflow-guard.yml', '.github/workflows/rich-delivery-adapter.yml', '.github/workflows/rich-session-data-profile.yml', '.github/workflows/semgrep.yml', '.github/workflows/surface-enrollment-source.yml', '.github/workflows/trusted-delivery.yml', '.github/workflows/watch-moment-alert-source.yml', '.github/workflows/widget-first-key-source.yml', '.github/workflows/worker-do-registry-source.yml'))
+API_41_VERSION_SOURCES = frozenset(('package-lock.json', 'package.json', 'scripts/qualify_rendezvous_product_build.mjs', 'src/releaseMetadata.ts'))
+SOURCE_PROVENANCE['api_41_org_policy_source_delta_sha256'] = API_41_DELTA_SHA256
+
+def api_41_delta():
+    delta = pinned_working_proof(API_41_DELTA_PATH, API_41_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'version_source_changes', 'public_activation_allowed', 'production_effect_authorized'}
+            and type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_4_1_ORGANIZATION_PIN_SOURCE_ONLY_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and set(delta['workflow_changes']) == API_41_WORKFLOWS
+            and set(delta['version_source_changes']) == API_41_VERSION_SOURCES)
+    return delta
+
+def api_41_previous_workflow(name):
     raw = safe_path(name).read_bytes()
+    if name not in API_41_WORKFLOWS:
+        return raw
+    change = api_41_delta()['workflow_changes'][name]
+    require(set(change) == {'before', 'after', 'replacements'} and digest(raw) == change['after'])
+    require(isinstance(change['replacements'], list) and change['replacements'])
+    for replacement in change['replacements']:
+        require(set(replacement) == {'before', 'after'})
+        before, after = replacement['before'].encode(), replacement['after'].encode()
+        require(before != after and raw.count(after) == 1)
+        raw = raw.replace(after, before)
+    require(digest(raw) == change['before'])
+    return raw
+
+API_41_MANIFEST_DELTA_PATH = 'docs/rendezvous/api-4-1-manifest-refresh-delta-v1.json'
+API_41_MANIFEST_DELTA_SHA256 = '339f9911e7dcd8a7a5d6aaca6edba4dd574261318faf24647aa228429b40f760'
+SOURCE_PROVENANCE['api_41_manifest_refresh_delta_sha256'] = API_41_MANIFEST_DELTA_SHA256
+
+
+def api_41_manifest_delta():
+    delta = pinned_working_proof(API_41_MANIFEST_DELTA_PATH, API_41_MANIFEST_DELTA_SHA256)
+    require(set(delta) == {'schema_version', 'scope', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'}
+            and type(delta['schema_version']) is int and delta['schema_version'] == 1
+            and delta['scope'] == 'EXACT_API_4_1_ACTIVE_MANIFEST_PINS_NOT_ACTIVATION'
+            and delta['public_activation_allowed'] is False and delta['production_effect_authorized'] is False
+            and set(delta['manifest_changes']) == API_SHARED_GOVERNANCE_MANIFESTS)
+    return delta
+
+
+def api_41_previous_manifest(name, raw):
+    changes = api_41_manifest_delta()['manifest_changes']
+    if name not in changes:
+        return raw
+    change = changes[name]
+    require(set(change) == {'before', 'after', 'replacements'} and digest(raw) == change['after']
+            and isinstance(change['replacements'], list) and change['replacements'])
+    allowed = {**api_41_delta()['workflow_changes'], **api_41_delta()['version_source_changes']}
+    seen = set()
+    for item in change['replacements']:
+        require(set(item) == {'input', 'before', 'after'} and item['input'] in allowed and item['input'] not in seen)
+        seen.add(item['input'])
+        pin = allowed[item['input']]
+        before = f'"{item["input"]}": "{pin["before"]}"'.encode()
+        after = f'"{item["input"]}": "{pin["after"]}"'.encode()
+        require(item['before'].encode() == before and item['after'].encode() == after and raw.count(after) == 1)
+        raw = raw.replace(after, before, 1)
+    require(digest(raw) == change['before'])
+    return raw
+
+
+def summary_previous_bytes(name):
+    raw = api_41_previous_manifest(name, api_41_previous_workflow(name))
     delta = pinned_working_proof(API_GOVERNANCE_SUMMARY_DELTA_PATH, API_GOVERNANCE_SUMMARY_DELTA_SHA256)
     require(set(delta) == {'schema_version', 'scope', 'workflow_changes', 'manifest_changes', 'public_activation_allowed', 'production_effect_authorized'})
     require(type(delta['schema_version']) is int and delta['schema_version'] == 1
@@ -1350,10 +1422,45 @@ def baseline():
             and org_release['public_activation_allowed'] is False and org_release['production_effect_authorized'] is False
             and set(org_release['reference_changes']) == API_CORE_IDENTITY_REFERENCES)
     for name, change in org_release['reference_changes'].items():
+        current = safe_path(name).read_bytes()
+        old_names = b"['pcvantol/djconnect', 'djconnect-music-dj/djconnect']"
+        new_names = b"['djconnect-music-dj/djconnect']"
+        require(set(change) == {'before', 'after'} and change['before'] == refs[name]
+                and current.count(new_names) == 1
+                and digest(current.replace(new_names, old_names, 1)) == change['after'])
+        refs[name] = change['after']
+    refs[API_ORG_RELEASE_DELTA_PATH] = API_ORG_RELEASE_DELTA_SHA256
+    delta41 = api_41_delta()
+    for name in API_41_WORKFLOWS:
+        api_41_previous_workflow(name)
+    for name, change in {**delta41['workflow_changes'], **delta41['version_source_changes']}.items():
+        require(set(change) == ({'before', 'after', 'replacements'} if name in API_41_WORKFLOWS else {'before', 'after'}))
+        require(digest(safe_path(name).read_bytes()) == change['after'])
+        for target in (sources, refs):
+            if name in target:
+                require(target[name] == change['before'])
+                target[name] = change['after']
+    refs[API_41_DELTA_PATH] = API_41_DELTA_SHA256
+    authority = pinned_working_proof(API_ORG_CORE_AUTHORITY_DELTA_PATH, API_ORG_CORE_AUTHORITY_DELTA_SHA256)
+    require(set(authority) == {'schema_version', 'scope', 'reference_changes', 'public_activation_allowed', 'production_effect_authorized'}
+            and type(authority['schema_version']) is int and authority['schema_version'] == 1
+            and authority['scope'] == 'EXACT_API_ORGANIZATION_CORE_AUTHORITY_NOT_ACTIVATION'
+            and authority['public_activation_allowed'] is False and authority['production_effect_authorized'] is False
+            and set(authority['reference_changes']) == API_CORE_IDENTITY_REFERENCES)
+    for name, change in authority['reference_changes'].items():
         require(set(change) == {'before', 'after'} and change['before'] == refs[name]
                 and digest(safe_path(name).read_bytes()) == change['after'])
         refs[name] = change['after']
-    refs[API_ORG_RELEASE_DELTA_PATH] = API_ORG_RELEASE_DELTA_SHA256
+    refs[API_ORG_CORE_AUTHORITY_DELTA_PATH] = API_ORG_CORE_AUTHORITY_DELTA_SHA256
+    manifest_delta = api_41_manifest_delta()
+    for name, change in manifest_delta['manifest_changes'].items():
+        previous = api_41_previous_manifest(name, safe_path(name).read_bytes())
+        require(digest(previous) == change['before'])
+        for target in (sources, refs):
+            if name in target:
+                require(target[name] == change['before'])
+                target[name] = change['after']
+    refs[API_41_MANIFEST_DELTA_PATH] = API_41_MANIFEST_DELTA_SHA256
     return sources, refs
 
 

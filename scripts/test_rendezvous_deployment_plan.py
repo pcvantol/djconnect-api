@@ -39,6 +39,43 @@ class PreparationTests(unittest.TestCase):
         with self.assertRaises((ValueError, OSError, subprocess.SubprocessError)):
             v.validate(plan)
 
+    def test_api_41_workflow_delta_rejects_modified_source(self):
+        name = '.github/workflows/ci-cd.yml'
+        original = (v.ROOT / name).read_bytes()
+        previous = v.api_41_previous_workflow(name)
+        self.assertIn(b'2a1c6fd2841b08630aee01402850f56840b50f70', previous)
+        with tempfile.TemporaryDirectory() as directory:
+            candidate = Path(directory) / 'workflow.yml'
+            candidate.write_bytes(original + b'\n# tampered\n')
+            safe_path = v.safe_path
+            with patch.object(v, 'safe_path', side_effect=lambda path: candidate if path == name else safe_path(path)):
+                with self.assertRaises(ValueError):
+                    v.api_41_previous_workflow(name)
+
+    def test_api_41_version_sources_reject_tampering(self):
+        safe_path = v.safe_path
+        with tempfile.TemporaryDirectory() as directory:
+            candidate = Path(directory) / 'modified'
+            for name in v.API_41_VERSION_SOURCES:
+                candidate.write_bytes((v.ROOT / name).read_bytes() + b'\n')
+                with self.subTest(source=name), patch.object(v, 'safe_path', side_effect=lambda path: candidate if path == name else safe_path(path)):
+                    self.rejects(self.plan)
+
+    def test_api_41_manifest_refresh_reconstructs_and_rejects_tampering(self):
+        delta = v.api_41_manifest_delta()
+        original_safe_path = v.safe_path
+        with tempfile.TemporaryDirectory() as directory:
+            candidate = Path(directory) / 'manifest.json'
+            for name, change in delta['manifest_changes'].items():
+                raw = (v.ROOT / name).read_bytes()
+                previous = v.api_41_previous_manifest(name, raw)
+                self.assertEqual(v.digest(previous), change['before'])
+                for item in change['replacements']:
+                    candidate.write_bytes(raw.replace(item['after'].encode(), b'"tampered": "invalid"', 1))
+                    with self.subTest(manifest=name, source=item['input']), patch.object(v, 'safe_path', side_effect=lambda path: candidate if path == name else original_safe_path(path)):
+                        with self.assertRaises(ValueError):
+                            v.api_41_previous_manifest(name, candidate.read_bytes())
+
     def test_valid_is_always_blocked_not_authorized(self):
         out = v.validate(self.plan)
         self.assertEqual(out['status'], v.SUCCESS)
@@ -98,12 +135,12 @@ class PreparationTests(unittest.TestCase):
                          v.WRANGLER_4160_PROVENANCE, v.WRANGLER_4160_DELTA_PATH,
                          *v.ORG_GOVERNANCE_SOURCES, *v.ORG_GOVERNANCE_REFERENCES,
                          v.ORG_GOVERNANCE_DELTA_PATH,
-                         v.API_CORE_IDENTITY_DELTA_PATH, v.API_ORG_RELEASE_DELTA_PATH,
+                         v.API_CORE_IDENTITY_DELTA_PATH, v.API_ORG_RELEASE_DELTA_PATH, v.API_ORG_CORE_AUTHORITY_DELTA_PATH,
                          v.API_SHARED_GOVERNANCE_DELTA_PATH, *v.API_SHARED_GOVERNANCE_WORKFLOWS, *v.API_SHARED_GOVERNANCE_MANIFESTS,
                          v.API_GUARD_REFERENCE_DELTA_PATH, v.API_GOVERNANCE_SUMMARY_DELTA_PATH, 'scripts/check_reusable_workflow_refs.sh',
                          v.CORE_GOVERNANCE_TRANSITION_PATH, *v.CORE_GOVERNANCE_WORKFLOWS,
                          *v.CORE_GOVERNANCE_AUXILIARY,
-                         'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md')
+                         'docs/rendezvous/PUBLIC_TESTFLIGHT_TRIAL_V1.md', v.API_41_DELTA_PATH, v.API_41_MANIFEST_DELTA_PATH, *v.API_41_WORKFLOWS, *v.API_41_VERSION_SOURCES)
             transition = json.loads((canonical / v.CORE_GOVERNANCE_TRANSITION_PATH).read_bytes())
             pinned = {**self.plan['source_hashes'], **self.plan['reference_hashes'],
                       **{name: change['after'] for name, change in transition['workflow_changes'].items()},
@@ -114,6 +151,10 @@ class PreparationTests(unittest.TestCase):
                       'scripts/check_reusable_workflow_refs.sh': json.loads((canonical / v.API_GUARD_REFERENCE_DELTA_PATH).read_bytes())['guard']['after'],
                       **{name: change['after'] for name, change in json.loads((canonical / v.API_GOVERNANCE_SUMMARY_DELTA_PATH).read_bytes())['workflow_changes'].items()},
                       **{name: change['after'] for name, change in json.loads((canonical / v.API_GOVERNANCE_SUMMARY_DELTA_PATH).read_bytes())['manifest_changes'].items()}}
+            delta41 = json.loads((canonical / v.API_41_DELTA_PATH).read_bytes())
+            pinned.update({name: change['after'] for name, change in {**delta41['workflow_changes'], **delta41['version_source_changes']}.items()})
+            manifest41 = json.loads((canonical / v.API_41_MANIFEST_DELTA_PATH).read_bytes())
+            pinned.update({name: change['after'] for name, change in manifest41['manifest_changes'].items()})
             for path in additions:
                 raw = (canonical / path).read_bytes()
                 expected = pinned[path]
@@ -398,6 +439,15 @@ class PreparationTests(unittest.TestCase):
     def test_api_org_release_delta_and_each_reference_are_pinned(self):
         original = Path.read_bytes
         for name in (v.API_ORG_RELEASE_DELTA_PATH, *v.API_CORE_IDENTITY_REFERENCES):
+            with self.subTest(name=name):
+                def changed(path):
+                    return b'changed' if path == v.ROOT / name else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    self.rejects(self.plan)
+
+    def test_api_org_core_authority_delta_and_each_workflow_are_pinned(self):
+        original = Path.read_bytes
+        for name in (v.API_ORG_CORE_AUTHORITY_DELTA_PATH, *v.API_CORE_IDENTITY_REFERENCES):
             with self.subTest(name=name):
                 def changed(path):
                     return b'changed' if path == v.ROOT / name else original(path)
