@@ -58,7 +58,7 @@ jobs:
         with:
           script: |
             const repo = (await github.request('GET /repositories/{repository_id}', {repository_id: 1258575431})).data;
-            if (repo.id !== 1258575431 || repo.private !== false || !['pcvantol/djconnect', 'djconnect-music-dj/djconnect'].includes(repo.full_name)) throw new Error('Canonical Core identity is not authorized');
+            if (repo.id !== 1258575431 || repo.private !== false || !['djconnect-music-dj/djconnect'].includes(repo.full_name)) throw new Error('Canonical Core identity is not authorized');
             core.setOutput('repository', repo.full_name);
       - name: Checkout immutable canonical preflight
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1

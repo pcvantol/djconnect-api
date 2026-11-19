@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_API_ORGANIZATION_CORE_AUTHORITY_NOT_ACTIVATION",
+  "reference_changes": {
+    ".github/workflows/api-worker-post-deployment-smoke.yml": {
+      "before": "dbec38063e587731f059715552ea65805f254a2486fa0c4c4c813066145346d4",
+      "after": "5feaba57af45d880f0a46e322a854023cbaad766c9da99bad6f8e4a52d070693"
+    },
+    ".github/workflows/deploy-api-worker.yml": {
+      "before": "e5f6444939541fe3917ab48512019abcae934c24d43afa2f2ec7078e8d561feb",
+      "after": "7d2adc2d151cb4747a5bc2333ed01c138cf437a5141516d260c15267da0ab782"
+    }
+  },
+  "public_activation_allowed": false,
+  "production_effect_authorized": false
+}

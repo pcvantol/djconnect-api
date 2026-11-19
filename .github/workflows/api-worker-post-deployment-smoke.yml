@@ -46,7 +46,7 @@ jobs:
         with:
           script: |
             const repo = (await github.request('GET /repositories/{repository_id}', {repository_id: 1258575431})).data;
-            if (repo.id !== 1258575431 || repo.private !== false || !['pcvantol/djconnect', 'djconnect-music-dj/djconnect'].includes(repo.full_name)) throw new Error('Canonical Core identity is not authorized');
+            if (repo.id !== 1258575431 || repo.private !== false || !['djconnect-music-dj/djconnect'].includes(repo.full_name)) throw new Error('Canonical Core identity is not authorized');
             core.setOutput('repository', repo.full_name);
       - id: manifest
         name: Require approved central operational manifest source

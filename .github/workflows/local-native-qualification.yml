@@ -37,6 +37,9 @@ jobs:
       - name: Fixed root sourceguard derivation refuses drift
         if: matrix.suite == 'source-history'
         run: node --test qualification/rendezvous/root-integration-derivation.check.mjs
+      - name: API 4.1 source transition rejects tampering
+        if: matrix.suite == 'source-history'
+        run: node --test qualification/rendezvous/api-41-source-delta.check.mjs
       - name: Immutable public receiver and isolated policy dependencies
         if: matrix.suite == 'receiver-policy' || matrix.suite == 'qa-profile'
         run: |

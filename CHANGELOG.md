@@ -1,3 +1,7 @@
+## 4.1.0 - Unreleased
+
+- Prepare API release metadata for version 4.1.0.
+
 ## 4.0.0 - 2026-11-09
 
 - Promote the API release metadata to the stable platform version.

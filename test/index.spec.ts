@@ -423,7 +423,7 @@ describe("DJConnect API worker", () => {
 		expect(await health.json()).toEqual({
 			ok: true,
 			service: "djconnect-api",
-			version: "4.0.0",
+			version: "4.1.0",
 			release_sha: "development",
 			runtime: "cloudflare_worker",
 		});
