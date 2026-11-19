@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "kind": "single_use_surface_enrollment_source_separate_finalization",
+  "at": "2026-10-26T23:20:38.508474+00:00",
+  "previous_finalization": "docs/push/development-security-undici-zod-finalization-v1.json",
+  "source_PR": 153,
+  "source_base": "b554df90ab8db4d96d75b1dc34bb5a2a1fdfceed",
+  "source_candidate": "2d6c6292a6865d6f4525ad51ab175a3819069344",
+  "qualified_source_main": "9b718865e6ccce77b23b25f89761cdd219436db9",
+  "source_tree": "ec701ed1326b4feff2c4f71d146208e49677ad54",
+  "candidate_test_merge": "dbfc88c083df3772a254478b6f2b6ff35c41a9e9",
+  "reviewed_tested_merged_tree_equal": true,
+  "scope": "Unimported, uncomposed, unrouted internal enrollment factory; source delivery only",
+  "source_summary": [
+    "One-use operator-issued opaque32byte credential; hash-only storage, original consent/scope/key/request/expiry binding",
+    "Atomic D1 consume plus issuer enrollment; no positive redemption replay or automatic retry/renewal",
+    "Separate operator withdrawal for authorization; already enrolled delegation withdrawal remains separate",
+    "Read-only dedicated strict type workflow preserves original rendezvous CI byte pin"
+  ],
+  "contract_sha256": "3c5ddc01cfcd0469e0223c27f6dcb451d6b63fffb1d31676076a5f6092e0ed59",
+  "public_vectors_sha256": "34b33575373c547bf6b6464320af02d8665f03a4c95c22d2326741c2ef90ffb3",
+  "independent_exact_source_review": {
+    "at": "2026-10-26T21:43:08.523135+00:00",
+    "decision": "BOUNDED_WHOLE_NINE_SUCCESSOR_SOURCE_NO_BLOCKERS_EXACT_2D6C",
+    "head": "2d6c6292a6865d6f4525ad51ab175a3819069344",
+    "tree": "ec701ed1326b4feff2c4f71d146208e49677ad54",
+    "base": "b554df90ab8db4d96d75b1dc34bb5a2a1fdfceed",
+    "findings": [],
+    "files": {
+      ".github/workflows/surface-enrollment-source.yml": "ff848c832b5992fbd47e540b8b6b68ba480d12aed1cf0e00aef7d6167a194c3a",
+      "docs/push/SURFACE_ENROLLMENT_CAPABILITY_V1.md": "b4739afa60979e1a7c6b5daa71a58347fd34ef06b905cc337dc637455eeb0342",
+      "docs/push/surface-enrollment-capability-contract-v1.json": "3c5ddc01cfcd0469e0223c27f6dcb451d6b63fffb1d31676076a5f6092e0ed59",
+      "migrations/0011_surface_enrollment_authorizations.sql": "6fd3be56034da4a8d1bfcfa56b9286f3ccf4ce596e44ddf73cfc100852044c3b",
+      "qualification/surface-push/enrollment-public-vectors-v1.json": "34b33575373c547bf6b6464320af02d8665f03a4c95c22d2326741c2ef90ffb3",
+      "qualification/surface-push/tsconfig.enrollment.json": "13b0e62ec64b13233dcc0c0b0574a6448b4d81e16cde31ad7f21825cadd50fdb",
+      "src/surface-push/enrollment-wire.ts": "14667c49a45fe71dc0e0c2f92befa7819b1c20a2b36bdaa2dc7094b5e0ecc255",
+      "src/surface-push/enrollment.ts": "a4e338bf8466cf446db70f15b2b8cd7b32f78829af220e26c3cb1a60988f62a0",
+      "test/surface-enrollment.spec.ts": "21db77173f8060c06cd38d159d12eda8ba41483cf01e0e778f34f671da3950b9"
+    },
+    "review_method": "Root personally read entire new50line workflow and full delta from f2df. All8 retained source paths byte-identical to personal whole9 f2df review; existing ci-cd restored exactprotectedbase bytes, no changed provenance pin or rehash/waiver. Same strict enrollment typecheck in dedicated bounded read-only pinned workflow.",
+    "prior_whole_review_sha256": "b099dd2caa88a3a5d6464d39b763b7e16e1296bec5717eced5828a6503dd33d6",
+    "old_original_CI_failure": "Retained actual run40406082481 two deployment-preparation errors; no retrospective PASS and no claim Worker runtime executed in failing predecessor",
+    "current_CI_tests": "No new hosted CI PASS claimed; exact successor current source checks/OwnerAuth/originaldelivery still required",
+    "scope": "Uncomposed source only; original contract/vector unchanged; no operator/key generation/enrollment/servicecomposition/provider/deployment/native/ActivityadmissionGO"
+  },
+  "source_review_receipt_sha256": "13b17a21d08417a015e74a4e2fa225bf7573a54f1e6586443a8393d17b5c792e",
+  "independent_original_main_review": {
+    "at": "2026-10-26T23:19:23.101550+00:00",
+    "decision": "ROOT_ORIGINAL_SOURCE153_FORMAL_DURABLE_CANONICAL_REVIEWED_TREE_AND_ALL9_FILE_JOIN_PASS",
+    "main": "9b718865e6ccce77b23b25f89761cdd219436db9",
+    "reviewed": "2d6c6292a6865d6f4525ad51ab175a3819069344",
+    "tree": "ec701ed1326b4feff2c4f71d146208e49677ad54",
+    "formal_run": 40407613796,
+    "formal_live_conclusion": "success",
+    "formal_actual_sha256": "0e3f579b947e2b2e116007f108c2faa994095f6cb796a7d0f3a5e5283f7d07c5",
+    "durable_asset": 679583239,
+    "durable_actual_and_live_provider_sha256": "6582db86298096754a898f5cca25678e577f28bfb950e29bdc02cd5adbd96f62",
+    "all12_checks": "PASS",
+    "canonical_integrity": "PASS",
+    "source_digest": "PASS",
+    "all9_exact_reviewed_file_hashes_equal_main": true,
+    "contract_and_vector_pins": {
+      "docs/push/surface-enrollment-capability-contract-v1.json": "3c5ddc01cfcd0469e0223c27f6dcb451d6b63fffb1d31676076a5f6092e0ed59",
+      "qualification/surface-push/enrollment-public-vectors-v1.json": "34b33575373c547bf6b6464320af02d8665f03a4c95c22d2326741c2ef90ffb3"
+    },
+    "separate_Final": "OPEN_NOT_QUALIFIED",
+    "scope": "Uncomposed/unrouted source only; no deployment/artifactbinary/remoteSQL/owner/enrollment/provider/native acceptance. Root did not independently download/reverify API release binary."
+  },
+  "independent_original_main_review_sha256": "eaa4e72444d2e0f7eb2bff0419f463533b840e8a3a0319b7bec8649b1c3e79c2",
+  "candidate_checks": {
+    "success": 18,
+    "skipped_cleanup": 1,
+    "exact_owner_authorization_run": 40406685807,
+    "actual_candidate_Validate_run": 40406592876,
+    "actual_candidate_Validate_results": {
+      "Worker_cases": 280,
+      "product_checks": 128,
+      "forbidden_RPC_denials": 100,
+      "composition_cases": 49,
+      "local_E2E_cases_passed": 1,
+      "local_E2E_cases_skipped": 39
+    },
+    "actual_candidate_browser_host_run": 40406592327,
+    "original_Validate_log_sha256": "bcfe982b824f0577ad3f46f50944f4b6e3152788a9b722517d25c9ba1bfcb404"
+  },
+  "local_successor_preparation": {
+    "tests_passed": 43,
+    "seconds": 108.597,
+    "dedicated_enrollment_types": "PASS",
+    "qualification": "No source fixture or validation criterion weakened"
+  },
+  "own_main_runs": {
+    "Validate": 40407404360,
+    "native_browser": 40407403862,
+    "enrollment_types": 40407404350,
+    "CodeQL": 40407405067,
+    "projection": 40407403860,
+    "fixed_QA": 40407403856,
+    "observe": 40407403899,
+    "API_release_artifact": 40407613292,
+    "Post_Merge_Release_Evidence": 40407613796
+  },
+  "all_nine_own_main_workflows": "SUCCESS independently read original GitHub run inventory",
+  "release": {
+    "tar_sha256": "b80a4ece510de159a312e007c0ef03eba9176867880e954edf14d44ccaa6e5e6",
+    "artifact_id": "12690917911",
+    "worker_sha256": "a9aa968483f180d1fcb7015523c0ff47bdfe48f17e1755fc7992c9cc19ab8365",
+    "worker_embeds_exact_main": true,
+    "packaged_sidecars_and_migrations_exact_Git": [
+      "package.json",
+      "package-lock.json",
+      "wrangler.jsonc",
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md",
+      "migrations/0001_initial.sql",
+      "migrations/0002_install_tokens.sql",
+      "migrations/0003_encrypt_apns_tokens.sql",
+      "migrations/0004_bootstrap_proofs.sql",
+      "migrations/0005_install_token_revoke.sql",
+      "migrations/0006_privacy_safe_diagnostics.sql",
+      "migrations/0007_restrict_apns_push_contract.sql",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql",
+      "migrations/0009_surface_push.sql",
+      "migrations/0010_surface_delegations.sql",
+      "migrations/0011_surface_enrollment_authorizations.sql"
+    ],
+    "remote_migrations_applied": false,
+    "deployment": false
+  },
+  "formal_original": {
+    "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "evidence_digest": "3d60874f8dd7fcc0e365dfb575a5921b7ef26b0f3258b4a4b90fdd91e85fbd05",
+    "findings": [],
+    "kind": "post_merge_release_evidence",
+    "main_parents": [
+      "b554df90ab8db4d96d75b1dc34bb5a2a1fdfceed"
+    ],
+    "main_sha": "9b718865e6ccce77b23b25f89761cdd219436db9",
+    "merge_actor": "pcvantol",
+    "merge_strategy": "SQUASH",
+    "originating_pr": {
+      "base_ref": "main",
+      "changed_files": [
+        ".github/workflows/surface-enrollment-source.yml",
+        "docs/push/SURFACE_ENROLLMENT_CAPABILITY_V1.md",
+        "docs/push/surface-enrollment-capability-contract-v1.json",
+        "migrations/0011_surface_enrollment_authorizations.sql",
+        "qualification/surface-push/enrollment-public-vectors-v1.json",
+        "qualification/surface-push/tsconfig.enrollment.json",
+        "src/surface-push/enrollment-wire.ts",
+        "src/surface-push/enrollment.ts",
+        "test/surface-enrollment.spec.ts"
+      ],
+      "head_sha": "2d6c6292a6865d6f4525ad51ab175a3819069344",
+      "main_changed_files": [
+        ".github/workflows/surface-enrollment-source.yml",
+        "docs/push/SURFACE_ENROLLMENT_CAPABILITY_V1.md",
+        "docs/push/surface-enrollment-capability-contract-v1.json",
+        "migrations/0011_surface_enrollment_authorizations.sql",
+        "qualification/surface-push/enrollment-public-vectors-v1.json",
+        "qualification/surface-push/tsconfig.enrollment.json",
+        "src/surface-push/enrollment-wire.ts",
+        "src/surface-push/enrollment.ts",
+        "test/surface-enrollment.spec.ts"
+      ],
+      "merge_actor": "pcvantol",
+      "merge_commit_sha": "9b718865e6ccce77b23b25f89761cdd219436db9",
+      "merge_strategy": "SQUASH",
+      "merged_at": "2026-10-26T21:48:15Z",
+      "number": 153,
+      "state": "MERGED"
+    },
+    "post_merge": {
+      "build_validation": "PASS",
+      "ci": "PASS",
+      "coverage": "PASS",
+      "coverage_artifact_sha": "sha256:33efbfd3de79badf417cc8c27a6f3daa41e7def0d5a7d701c7358966f6f8a379",
+      "coverage_report_sha": "9b718865e6ccce77b23b25f89761cdd219436db9",
+      "governance": "PASS",
+      "lint": "PASS",
+      "sha": "9b718865e6ccce77b23b25f89761cdd219436db9",
+      "static_analysis": "PASS",
+      "tests": "PASS",
+      "workflow_run_ids": [
+        "40407404360"
+      ]
+    },
+    "pre_merge": {
+      "candidate_sha": "2d6c6292a6865d6f4525ad51ab175a3819069344",
+      "owner_authorization": "PASS",
+      "required_checks": "PASS",
+      "risk_classification": "HIGH_RISK",
+      "software_assurance": "PASS",
+      "trusted_delivery": "PASS",
+      "verification": "PASS",
+      "workflow_integrity": "PASS"
+    },
+    "provenance_result": "PASS",
+    "repository": "pcvantol/djconnect-api",
+    "repository_role": "active_source",
+    "schema_version": 1,
+    "source_qualified_pr_sha": "2d6c6292a6865d6f4525ad51ab175a3819069344",
+    "timestamp": "2026-10-26T21:49:59.122Z"
+  },
+  "formal_original_file_sha256": "0e3f579b947e2b2e116007f108c2faa994095f6cb796a7d0f3a5e5283f7d07c5",
+  "durable_original": {
+    "commit_sha": "9b718865e6ccce77b23b25f89761cdd219436db9",
+    "integrity": {
+      "algorithm": "sha256-canonical-json",
+      "digest": "f1a104948cf2bd7dfb85194f6ebc467202f9b4a176c97c31b9f45be707955388"
+    },
+    "kind": "durable_qualification_evidence",
+    "published_at": "2026-10-26T21:49:59Z",
+    "qualification": {
+      "outcome": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+      "profile": "post_merge_release_evidence",
+      "required_checks": {
+        "post_merge_build_validation": "PASS",
+        "post_merge_ci": "PASS",
+        "post_merge_coverage": "PASS",
+        "post_merge_governance": "PASS",
+        "post_merge_lint": "PASS",
+        "post_merge_static_analysis": "PASS",
+        "post_merge_tests": "PASS",
+        "required_checks": "PASS",
+        "software_assurance": "PASS",
+        "trusted_delivery": "PASS",
+        "verification": "PASS",
+        "workflow_integrity": "PASS"
+      }
+    },
+    "record_id": "pcvantol/djconnect-api@9b718865e6ccce77b23b25f89761cdd219436db9:post-merge-release-evidence",
+    "redaction": {
+      "included_data": "formal allowlisted decision fields only",
+      "policy_version": 1,
+      "status": "REDACTED"
+    },
+    "release_identifier": "internal-api-9b718865e6ccce77b23b25f89761cdd219436db9",
+    "repository": "pcvantol/djconnect-api",
+    "repository_role": "active_source",
+    "retention_class": "LONG_TERM",
+    "revision": 1,
+    "schema_version": 1,
+    "source_evidence_digest": "3d60874f8dd7fcc0e365dfb575a5921b7ef26b0f3258b4a4b90fdd91e85fbd05",
+    "source_revision": "733ecc2836d40611b2b7472308a7175a6130c91a",
+    "supplemental_evidence": [
+      {
+        "kind": "coverage_artifact_digest",
+        "sha256": "33efbfd3de79badf417cc8c27a6f3daa41e7def0d5a7d701c7358966f6f8a379"
+      }
+    ],
+    "workflow_references": {
+      "post_merge_run_ids": [
+        "40407404360"
+      ],
+      "producer_run_id": "40407613796"
+    }
+  },
+  "durable_asset_id": 679583239,
+  "durable_actual_and_provider_sha256": "6582db86298096754a898f5cca25678e577f28bfb950e29bdc02cd5adbd96f62",
+  "durable_canonical_integrity_recomputed": "PASS",
+  "durable_all_twelve_checks": "PASS",
+  "historical_failure": {
+    "head": "f2df2d290aab582f0535f4f47b07f74ad2522411",
+    "run": 40406082481,
+    "job": 121864062136,
+    "preparation_tests": 43,
+    "errors": 2,
+    "cause": "Initial extra step changed pinned ci-cd.yml bytes; successor restored exact original and uses separate dedicated workflow",
+    "original_log_sha256": "d2d00354751c581632ac2f143a4acf1527fe15805958845d88c20d90af69f7ca",
+    "status": "FAILED retained; not Worker-runtime failure or retrospectively PASS"
+  },
+  "closed_defaults": {
+    "public_surface_dispatch": "COMPILED_OFF",
+    "issuer_admitted_profiles": [],
+    "activity_profiles": [],
+    "rendezvous_full_service_gates": "22 OPEN"
+  },
+  "not_granted": [
+    "Deployment or remote migration",
+    "Real operator/enrollment/owner approval/key generation or credential transfer",
+    "Provider/APNs/native device/ordinary installation acceptance",
+    "B read credential or native target registration",
+    "Normative status-only or AppAttest proof contract adoption"
+  ],
+  "next_API_source": "Separate exact closed service/provenance join with original immutable service epoch, isCurrent/cancellation checks around awaits and immediately before mutation; not implemented by Source153 or this Final",
+  "separate_Final_status": "These two documents require fresh exact review, normal protected merge and original own-main qualification; no self-qualification claim"
+}

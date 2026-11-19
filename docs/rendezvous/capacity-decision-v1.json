@@ -1,0 +1,60 @@
+{
+  "profile": "0.4.0-draft",
+  "wire": "djc-rendezvous/1",
+  "scope": "LOCAL_FUNCTIONAL_CAPACITY_TARGET_NOT_PROVIDER_LOAD_OR_RELEASE",
+  "runtime_source_sha": "083ddb2d16351b4f785e52a23aad675b0a2cf9ef",
+  "parent_producer_sha": "6463927ad2bc8f26cde64064bf81be3192deceab",
+  "receiver_request": "https://github.com/pcvantol/djconnect-api/pull/96#issuecomment-6266032306",
+  "proposed_shared_nat_target_screens": 4,
+  "released_supported_concurrency": null,
+  "capacity_decision": "HOLD_CURRENT_POLICY_FAILS_TARGET",
+  "contract_frozen": false,
+  "public_activation": false,
+  "deployment_authorized": false,
+  "tests_passed": 1068,
+  "capacity_tests_with_individual_passed_receipt": 66,
+  "handoff_scenarios": 54,
+  "scenarios_meeting_target": 40,
+  "tv_outcomes": {
+    "consumed": 80,
+    "expired": 46
+  },
+  "groups": [
+    {
+      "category": "measured",
+      "scenarios": 24,
+      "target_met_scenarios": 24,
+      "tv_outcomes": {
+        "consumed": 56
+      }
+    },
+    {
+      "category": "sustained",
+      "scenarios": 24,
+      "target_met_scenarios": 12,
+      "tv_outcomes": {
+        "consumed": 18,
+        "expired": 38
+      }
+    },
+    {
+      "category": "scanner_or_repair",
+      "scenarios": 6,
+      "target_met_scenarios": 4,
+      "tv_outcomes": {
+        "consumed": 6,
+        "expired": 8
+      }
+    }
+  ],
+  "worker_proof_sha256": "bfcb3e0153fcf7c0857b7e5761658b326ece96acabc048d6048345133153110d",
+  "browser_trace_sha256": "1a1e26f68efc03860e2de29d42ddae216a93c30228a57000cdb63935815c9492",
+  "limitations": [
+    "CORS probe is actual local browser transport only, with always-admit synthetic ingress responses",
+    "Fixed offered-script replay is not coupled browser feedback after429/503 and retains synthetic authority through reload/context transitions",
+    "Synthetic sustained worst-preflight schedules are not measured browser traces",
+    "Controlled server Date is not wall latency/provider load",
+    "Software initial P256/JOSE is not genuine signed-iOS/HA/physical-TV acceptance"
+  ],
+  "api_next_decision": "Revise and independently qualify admission/polling/terminal headroom, or obtain an explicit jointly accepted narrower capacity target. No silent receiver workaround or threshold change is selected."
+}

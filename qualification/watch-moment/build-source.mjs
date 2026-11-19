@@ -1,0 +1,23 @@
+// Packages exact source only. No Worker config, cloud API, migration or deployment.
+import {readFile,mkdir,writeFile,realpath,copyFile} from 'node:fs/promises';
+import {resolve,dirname,basename,join,isAbsolute,relative,sep} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+import {build} from 'esbuild';
+const root=fileURLToPath(new URL('../../',import.meta.url)),dir=fileURLToPath(new URL('./',import.meta.url));
+const out=process.argv[2];if(!out||!isAbsolute(out))throw Error('new absolute external scratch required');
+const target=join(await realpath(dirname(resolve(out))),basename(resolve(out))),rootReal=await realpath(root);
+const rel=relative(rootReal,target);if(rel===''||(!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith('..'+sep)))throw Error('output inside source');
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const manifestRaw=await readFile(join(dir,'source-manifest.json')),manifest=JSON.parse(manifestRaw);
+for(const [path,pin] of Object.entries(manifest.inputs_sha256))if(sha(await readFile(join(root,path)))!==pin)throw Error('source input drift: '+path);
+if(JSON.parse(await readFile(join(root,'node_modules/esbuild/package.json'))).version!==manifest.esbuild_version)throw Error('bundler version drift');
+await mkdir(target);
+const result=await build({entryPoints:[join(root,'src/watch-moment/index.ts')],outfile:join(target,'watch-moment.mjs'),bundle:true,metafile:true,platform:'browser',format:'esm',target:'es2024'});
+const graph=Object.keys(result.metafile.inputs).sort();
+if(JSON.stringify(graph)!==JSON.stringify(manifest.bundle_inputs))throw Error('source graph drift');
+for(const [from,to] of [['src/watch-moment/schema.sql','schema.sql'],['docs/push/watch-moment-alert-proposal-v1.json','contract-proposal.json'],['docs/push/WATCH_MOMENT_ALERT_TRANSPORT_V1.md','README.md']])await copyFile(join(root,from),join(target,to));
+const installed={};for(const path of ['node_modules/esbuild/package.json','node_modules/esbuild/lib/main.js',`node_modules/@esbuild/${process.platform}-${process.arch}/bin/esbuild`])installed[path]=sha(await readFile(join(root,path)));
+const proof={classification:'WATCH_MOMENT_TRANSPORT_SOURCE_EXPLICIT_PORTS_NOT_LIVE_ADMISSION',source_manifest_sha256:sha(manifestRaw),module_sha256:sha(await readFile(join(target,'watch-moment.mjs'))),schema_sha256:sha(await readFile(join(target,'schema.sql'))),fixture_sha256:sha(await readFile(join(target,'contract-proposal.json'))),bundle_inputs:graph,installed_inputs_sha256:installed,toolchain:{node:process.version,platform:process.platform,arch:process.arch,esbuild:manifest.esbuild_version},Core_authority_supplier:false,Apple_decoder_adopted:false,root_endpoint_selected:false,live_schema_migration:false,provisioned:false,deployed:false};
+await writeFile(join(target,'metafile.json'),JSON.stringify(result.metafile,null,2)+'\n');
+await writeFile(join(target,'source-package.json'),JSON.stringify(proof,null,2)+'\n');console.log(JSON.stringify(proof));

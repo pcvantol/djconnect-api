@@ -1,0 +1,248 @@
+# DJConnect API Development Environment
+
+This document describes the local development setup for the DJConnect API
+Cloudflare Worker.
+
+## Repository
+
+Work from the repository root:
+
+```sh
+cd /Users/pcvantol/Documents/GitHub/djconnect-api
+```
+
+The Worker source lives in:
+
+```text
+src/
+```
+
+D1 migrations live in:
+
+```text
+migrations/
+```
+
+## Required Tools
+
+- Node.js compatible with the installed Wrangler/Vitest toolchain.
+- npm.
+- Wrangler through the project dependency (`npx wrangler ...`).
+- GitHub CLI (`gh`) for release cleanup and GitHub Release operations.
+
+Install the versions recorded in the lockfile with:
+
+```sh
+npm ci
+```
+
+## Local Checks
+
+Run these before release or non-trivial code changes:
+
+```sh
+npx wrangler types
+npx tsc --noEmit
+npm test -- --run
+npm run test:rendezvous-product
+npm run test:rendezvous-composition
+npx wrangler d1 migrations apply djconnect_api --local
+git diff --check
+```
+
+The Worker test runner may need permission to write Wrangler logs under
+`~/.wrangler` and start a local runtime listener.
+
+To check install-token rotation in isolation, run
+`npm test -- --run test/index.spec.ts -t 'rotation|rotates|rotating|preserves the old install token'`.
+These tests use local D1 to check concurrent requests and rollback when either
+database write fails.
+
+The rendezvous product check builds the actual root Worker and probes its five
+private Durable Object facades in isolated local SQLite storage. Its temporary
+QA driver, synthetic local configuration and host-side storage inspection never
+enter the product graph. It performs no upload or Cloudflare mutation. The root
+configuration has no rendezvous bindings/migrations and the public entrypoint
+always returns503. See [product build](docs/rendezvous/PRODUCT_COORDINATOR_BUILD_V1.md).
+
+The separate composition command runs strict module/test types and local workerd
+tests using five test-only bindings and synthetic server secrets. It exercises
+the ordinary internal source module with real private product DOs. Fixture
+`request.cf` values are not proof of Cloudflare ingress provenance. This command
+adds no product root export or reachable endpoint.
+
+## Local Development Server
+
+Start the Worker locally:
+
+```sh
+npm run dev
+```
+
+The default local URL is usually:
+
+```text
+http://localhost:8787
+```
+
+Never put production secrets in `.dev.vars`, `.env` or test fixtures. Use only
+example values locally.
+
+## Cloudflare Configuration
+
+The D1 binding is configured in `wrangler.jsonc`:
+
+- binding: `DB`
+- database name: `djconnect_api`
+- migrations directory: `migrations`
+
+Before remote operations, confirm the active Wrangler account or
+`CLOUDFLARE_API_TOKEN` can edit Workers and D1 resources for the Cloudflare
+account that owns database `476a564f-08b2-4966-83b0-1221e2a4d063`, and can
+edit Workers Routes/read Zone metadata for the `djconnect.dev` zone.
+
+Previously observed blocked states before the production token permissions were
+fixed:
+
+- Remote D1 migration: Cloudflare error `7403`.
+- Worker deploy: Wrangler/Cloudflare auth error `10000`.
+
+The explicit production deployment workflow can deploy a qualified
+internal-release candidate with the GitHub Actions `CLOUDFLARE_API_TOKEN`
+secret. CI validation itself has no deployment step.
+
+Deployment and post-deployment smoke bind the approved Core manifest entry
+to GitHub repository ID `1275206655`, the executing repository name, and the
+exact source SHA. After transfer to `djconnect-music-dj/djconnect-api`, use a new
+approved manifest naming that repository. Keep historical manifests under
+their original identity. Before transfer, the reusable Core Owner
+Authorization workflow must also accept the destination name.
+
+Required secrets must be set through Cloudflare secrets/configuration:
+
+```sh
+npx wrangler secret put APNS_PRIVATE_KEY
+npx wrangler secret put DJCONNECT_RELAY_SECRET
+npx wrangler secret put DJCONNECT_PAIRING_ISSUER_SECRET
+npx wrangler secret put APNS_TOKEN_ENCRYPTION_KEY
+npx wrangler secret put DJCONNECT_SMOKE_TEST_MODE
+```
+
+When setting `APNS_PRIVATE_KEY`, paste the full Apple `.p8` file contents into
+the Wrangler prompt. Do not print the key or pipe it into shell history/logs.
+
+Generate `APNS_TOKEN_ENCRYPTION_KEY` with:
+
+```sh
+openssl rand -base64 32
+```
+
+The value must decode to exactly 32 bytes and must remain only in Cloudflare
+Worker secrets.
+
+Set `DJCONNECT_SMOKE_TEST_MODE` to `enabled` only for the production Worker when
+the CI staging-safe E2E smoke test is allowed to bypass real APNs delivery for
+`example-...` APNs tokens. This mode must never bypass APNs for non-example
+tokens.
+
+Do not commit `.p8` files, `.dev.vars`, `.env`, API tokens or command output
+that contains secrets.
+
+The repository includes a dry-run-first provisioning helper:
+
+```sh
+npm run provision:cloudflare -- --dry-run --all
+```
+
+Run selected actions with `--execute` only after reviewing the dry-run:
+
+```sh
+npm run provision:cloudflare -- --execute --migrate --deploy --custom-domain --smoke-test
+```
+
+To set secrets safely:
+
+```sh
+DJCONNECT_RELAY_SECRET_VALUE='replace-with-long-random-secret' \
+APNS_TOKEN_ENCRYPTION_KEY_VALUE="$(openssl rand -base64 32)" \
+  npm run provision:cloudflare -- --execute --set-secrets \
+  --apns-private-key-file /secure/path/to/key.p8
+```
+
+The script refuses shell tracing and redacts secret values from its own output.
+When `--execute` is used for Cloudflare changes, it verifies
+`CLOUDFLARE_API_TOKEN` with Cloudflare before running Wrangler or custom-domain
+actions. Custom-domain automation also requires `CLOUDFLARE_ACCOUNT_ID` and
+only works after the token has permissions for the target account.
+
+After secrets, remote migration and deploy are configured, route the Worker to
+`https://api.djconnect.dev` and smoke test:
+
+```sh
+curl https://api.djconnect.dev/health
+```
+
+## Migration Validation
+
+Validate locally:
+
+```sh
+npx wrangler d1 migrations apply djconnect_api --local
+```
+
+Apply remotely only when Cloudflare account permissions are correct:
+
+```sh
+npx wrangler d1 migrations apply djconnect_api --remote
+```
+
+If Cloudflare returns account or token errors, document the skipped remote step
+in `CHANGELOG.md` or `HANDOFF.md` and do not work around it by committing
+credentials.
+
+## Public Repository Secret Scan
+
+Before every release, run:
+
+```sh
+rg -n "BEGIN PRIVATE KEY|AuthKey|DJCONNECT_RELAY_SECRET|DJCONNECT_PAIRING_ISSUER_SECRET|APNS_PRIVATE_KEY|Bearer [A-Za-z0-9]|sk-|xox|ghp_|spotify_refresh|refresh_token|device_token" .
+```
+
+Allowed hits:
+
+- Environment variable names.
+- Placeholder documentation such as `Authorization: Bearer <DJCONNECT_RELAY_SECRET>`.
+- Source code that parses PEM headers.
+- Generated dependency comments or package integrity strings.
+- Example test values.
+
+Not allowed:
+
+- Real APNs `.p8` content.
+- Real relay secrets.
+- Real APNs device tokens.
+- Real Home Assistant, Spotify, GitHub or Cloudflare tokens.
+- Production user, device or install identifiers.
+
+## Development Hygiene
+
+- Keep `README.md`, `API_CONTRACT.md`, `SECURITY.md`, `CHANGELOG.md`,
+  `HANDOFF.md`, `TODO.md`, `ISSUES.md`, `TECHNICAL_DESIGN_DECISIONS.md`,
+  `THIRD_PARTY_NOTICES.md`, `CHAT_BOOTSTRAP.md`, `CONTRIBUTING.md`,
+  `CODE_OF_CONDUCT.md`, `AGENTS.md` and this file current when workflow,
+  public contracts or security assumptions change.
+- Keep cross-repo sync prompts and product roadmap only in
+  [djconnect-music-dj/djconnect](https://github.com/djconnect-music-dj/djconnect).
+- Do not include secrets, private data or proprietary third-party material in
+  prompts, agent logs, screenshots, issues or test fixtures.
+- Before every release, review third-party package and tool freshness:
+  `npm outdated`, `npm run deps:report`, `node --version`, `npm --version` and
+  `npx wrangler --version`. Update intentionally, keep `package-lock.json`
+  committed and refresh `THIRD_PARTY_NOTICES.md` if declared tooling changes.
+- Before every release, review translations in all five supported languages:
+  `en`, `nl`, `de`, `fr` and `es`.
+- Release cleanup is part of the normal release cycle: run
+  `./cleanup_old_releases.sh --keep 1` as a dry-run first, then
+  `./cleanup_old_releases.sh --keep 1 --execute` after the new GitHub Release
+  is published and verified. The cleanup removes old releases/tags and old
+  completed GitHub Actions workflow runs by default.

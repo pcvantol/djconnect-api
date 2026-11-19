@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "kind": "closed_enrollment_service_separate_finalization",
+  "at": "2026-10-27T00:27:23.179432+00:00",
+  "previous_finalization": "docs/push/surface-enrollment-source-finalization-v1.json",
+  "source_PR": 155,
+  "source_base": "796a9bdfe6e94f0cfac04da1171102d052407347",
+  "source_candidate": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+  "qualified_source_main": "1f0659ee38efc786901aaf5925f797547317b83e",
+  "source_tree": "106a156f957edb670212890d73a10f5ca74cfce1",
+  "candidate_test_merge": "05a3feaabdf12a70da78314b668b9b37b13e8f9c",
+  "reviewed_tested_merged_tree_equal": true,
+  "scope": "Closed internal enrollment composition and original service/cancellation guards; no public admission or activation",
+  "source_review_sha256": "c96f469feedadb546d6db0f4ca350f536e3e69934c07813b9f84f11dcb3fc03a",
+  "independent_source_review": {
+    "at": "2026-10-27T00:04:38.469242+00:00",
+    "decision": "BOUNDED_WHOLE_FOURTEEN_FILE_SOURCE_NO_BLOCKERS",
+    "head": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+    "tree": "106a156f957edb670212890d73a10f5ca74cfce1",
+    "base": "796a9bdfe6e94f0cfac04da1171102d052407347",
+    "frozen_packet_sha256": "aecbb233c528cb1f3ac5abb1cbfd749d962c8850e30559f98211d13c3b794474",
+    "method": "Root personally readonly reviewed exactwhole14 cumulative source/document/test/provenance delta from Final154 and successor delta from held6fc; no otherlane edits, no delegation, no Root test execution claim. Unchanged reviewed predecessor file content retains own review; changed outer guard,3causal tests and all v2/provenance changes personally read.",
+    "files": {
+      "docs/push/CLOSED_ENROLLMENT_SERVICE_JOIN_V1.md": {
+        "before_sha256": null,
+        "after_sha256": "009cb55a036c1c8cc01b54c51e606ed5720dda2d64de45a8c4864a129074c1cc"
+      },
+      "docs/push/closed-enrollment-service-observations-v1.json": {
+        "before_sha256": null,
+        "after_sha256": "45ca5be3876b83feecc4e0e06da7cc4d4a2486ff2064d5da7ad93a75c91af464"
+      },
+      "docs/push/closed-enrollment-service-observations-v2.json": {
+        "before_sha256": null,
+        "after_sha256": "24bce95f6c5007cb133b76c8a8f0e613600c132cde49d2cd442eef3d1e2499d0"
+      },
+      "docs/rendezvous/closed-enrollment-service-product-observations-v1.json": {
+        "before_sha256": null,
+        "after_sha256": "ad432c3e9f25b2c1004940ef35ee7a20fb7dd0f512a8d8b880dc77d459aaaa1e"
+      },
+      "docs/rendezvous/closed-enrollment-service-product-observations-v2.json": {
+        "before_sha256": null,
+        "after_sha256": "82b0084e162f8ba73669b8a634884bd4a26e2d9ba1263191e1af26b5c9433c15"
+      },
+      "docs/rendezvous/closed-enrollment-service-source-delta-v1.json": {
+        "before_sha256": null,
+        "after_sha256": "1b608c3debde2539437d784acc52a532ab72cc14302c97e7d3a932969a1948aa"
+      },
+      "docs/rendezvous/closed-enrollment-service-source-delta-v2.json": {
+        "before_sha256": null,
+        "after_sha256": "8353b2c06755d12ea08c304d6ddb4b691863ee0a774fc314bd95a938d85407e5"
+      },
+      "docs/rendezvous/deployment-preparation-v1.json": {
+        "before_sha256": "b566c3d17c80cff7cd17dee7c6db824e97183c4afe3b7d0323d1960e02cf8d4c",
+        "after_sha256": "7836b0a37febab58d821d26f8d0d20953a88e51baaed4b580beba883b0f9067e"
+      },
+      "qualification/rendezvous/local-native-runtime.mjs": {
+        "before_sha256": "36f14feb77dc70faae99a75eeb73010205cb964b6761183770185f21bf0877c4",
+        "after_sha256": "0ae61a9a575955ec2b6a8798c3a89c57e6c772a1e4aeab8c5cef0cff614d0e2c"
+      },
+      "scripts/test_rendezvous_deployment_plan.py": {
+        "before_sha256": "f61ab3ad96bd1489cb80390e60a9ff55a42efe14d6791cd917cc1972089fd838",
+        "after_sha256": "c3fbf6218f9e1af3b0e47aaac7739089bf3a42d5a0f38995ee42bfad6edf2ad8"
+      },
+      "scripts/validate_rendezvous_deployment_plan.py": {
+        "before_sha256": "1581cdbf79cd342bdf8ad6b1d78ae52006c0c267b5792aa252c4770371f7494a",
+        "after_sha256": "43fdbfaf3ab28d6bc827556731ace896914ea4fe68409af4305af594cd964e5d"
+      },
+      "src/surface-push/composition.ts": {
+        "before_sha256": "e03a67ef6f4759bb52207c8c690b34877c183eecdb072619a6d077df438a8600",
+        "after_sha256": "c9221316839a98f1d0351f1b8fbaa283e89a232042efc89abf87aaa2ecfe0101"
+      },
+      "src/surface-push/enrollment.ts": {
+        "before_sha256": "a4e338bf8466cf446db70f15b2b8cd7b32f78829af220e26c3cb1a60988f62a0",
+        "after_sha256": "ed19d08cdb685214cdddb4cdc76e5699383e83f04192a7b053d8756ca62eaf0e"
+      },
+      "test/surface-enrollment.spec.ts": {
+        "before_sha256": "21db77173f8060c06cd38d159d12eda8ba41483cf01e0e778f34f671da3950b9",
+        "after_sha256": "4858e8c557505bd23f03d7d24cbc045af96575460cb4ab3be46af7ffcd7abe43"
+      }
+    },
+    "SERVICE_OUTER_ABORT_1": {
+      "closed_on_successor_only": true,
+      "fix": "Capture original signal before outerawait; currentness plus cancellation checked after handler completion, no await before response return",
+      "same_causal_tests": "Owner original logs actual3FAIL68SKIP on6fc ->3PASS68SKIP privatefix; current full309 includes all71 enrollmentcases; Root personally verified logs/hashes",
+      "database_truth": "Tests assert committed SQL persists; no rollback fiction",
+      "predecessor_HOLD_audit_sha256": "a298e0d7a2b220ff26ec7eeeccc2f05e69abbe860f7d8481269cb4f0f07fa5ab"
+    },
+    "root_actual_readback": {
+      "all14_before_after_Git_hashes": "PASS",
+      "actual119_plan_source_hashes": "PASS_EXACT_GIT_AND_INSTALLED_INPUTS",
+      "actual116_compiled_product_source_hashes": "PASS_EXACT_GIT_AND_INSTALLED_INPUTS",
+      "all14_plan_reference_hashes": "PASS",
+      "all3_delta_proof_hashes": "PASS",
+      "all3_historical_v1_records": "BYTE_EQUAL_FROZEN6FC",
+      "validator_literal_changes": "ONLY_DELTA_PATH_DELTA_SHA256_DELTA_PROOFS_SOURCE_PROVENANCE_FROM6FC",
+      "actual_compiled_bundle_sha256": "04970fbd1259b3e9e4a9ecc2de1a137efde95f4223cf42265097bb8c710b65c8",
+      "actual_compiled_bundle_bytes": 1291545,
+      "all10_original_log_hashes": "PASS",
+      "full_Worker_log": "309PASS",
+      "composition_log": "49PASS",
+      "preparation_log": "43PASS108.822s",
+      "product_log": "128PASS100FORBIDDEN_ZEROEGRESS",
+      "exact_closed_runtime_log": "17PASS0FAIL0SKIP124.815s",
+      "typechecks": "Owner reports both actualexit0; original empty log hashes verified, not independent Rootexecution",
+      "head_and_clean_after_review": "PASS"
+    },
+    "findings": [],
+    "scope": "Closed internal enrollment factory composition and cancellation/currentness guards only. Permits normal owninglane publication/exact-head CI/protected merge, ownmain qualification and separate Final under existing authorization. Not protected-delivery/installed/activation acceptance.",
+    "remaining": [
+      "Normal exact source protected delivery and ownmain originals plus separate documentary Final",
+      "Full Core status-bootstrap/proofport/canonical transcripts implementation and qualification",
+      "Genuine owner/operator/custody/native app provisioning/target token/provider admission and actual reception"
+    ],
+    "closed_defaults": "public compiledOFF/503; issuer and Activity profiles[]; all22 full-service gatesOPEN. No config/remote migration/enrollment/provider/device/HA/key operations.",
+    "effects": "Readonly review and private receipt only; no key/token/native/provider/remoteSQL/HA/deploy effect"
+  },
+  "independent_original_main_review_sha256": "d5e840bdbaadcfa991303fcb4215e7b898cbf4643ecf9a21b3287b172671ec89",
+  "independent_original_main_review": {
+    "at": "2026-10-27T00:25:16.611907+00:00",
+    "decision": "ROOT_ORIGINAL_SOURCE155_FORMAL_DURABLE_LOCAL_RELEASE_JOIN_VERIFIED_MAIN_HOST_STILL_PENDING",
+    "source_main": "1f0659ee38efc786901aaf5925f797547317b83e",
+    "candidate": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+    "equal_tree": "106a156f957edb670212890d73a10f5ca74cfce1",
+    "source_review_sha256": "c96f469feedadb546d6db0f4ca350f536e3e69934c07813b9f84f11dcb3fc03a",
+    "original_formal_sha256": "0b2c1d328f582b8db0f62eb3ad1a5dfa4c3474619bce8f876ae82fa4fedbdd7e",
+    "formal_canonical_and_source_digest": "PASS",
+    "source_evidence_digest": "a5949d35252d85abe78e9fdd84bc0492bd908fc2bb5cc098fb12ef5e5c74dfd6",
+    "durable_asset": 679931716,
+    "durable_bytes": 1821,
+    "durable_actual_sha256": "55c4542d7d08d8d64b736bb48ed1944f3057dadaba9be4f28fdd0847397a8cff",
+    "Root_live_provider_asset_digest": "sha256:55c4542d7d08d8d64b736bb48ed1944f3057dadaba9be4f28fdd0847397a8cff",
+    "durable_canonical_all12_checks": "PASS",
+    "API_downloaded_original_release_TAR_actual_sha256": "bb9c90f076ae7dab5fdef200c3b6e0aaf3b666e837eb89247dab37a37f5fb9ec",
+    "actual_worker_sha256": "d525c54fbf3b3227e306f01a1a6bf015ff3f9ae0943358cc014c67d6d14b7e01",
+    "all17_packaged_sidecars_exact_main_Git": [
+      "wrangler.jsonc",
+      "package-lock.json",
+      "LICENSE",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql",
+      "migrations/0006_privacy_safe_diagnostics.sql",
+      "migrations/0010_surface_delegations.sql",
+      "migrations/0003_encrypt_apns_tokens.sql",
+      "migrations/0011_surface_enrollment_authorizations.sql",
+      "migrations/0009_surface_push.sql",
+      "migrations/0005_install_token_revoke.sql",
+      "migrations/0004_bootstrap_proofs.sql",
+      "migrations/0002_install_tokens.sql",
+      "migrations/0007_restrict_apns_push_contract.sql",
+      "migrations/0001_initial.sql",
+      "THIRD_PARTY_NOTICES.md",
+      "package.json",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md"
+    ],
+    "Root_download_scope": "Root personally inspected owningAPI-downloaded local originals and independently livequeried provider durablemetadata. No Root independent artifactZIP download or productionacceptance claim.",
+    "main_host_browser_run": {
+      "id": 40425908207,
+      "Root_live_status": "in_progress",
+      "conclusion": null
+    },
+    "separate_Final": "PENDING_NOT_ACCEPTED",
+    "no_operative_effects": true
+  },
+  "original_main_review_scope": "Core reviewed original source/formal/durable and API-downloaded TAR locally; its historical main-host-pending observation remains unchanged. Owning API subsequently verifies terminal all-nine outcomes below. No independent Core artifact ZIP download claim.",
+  "source_merge_and_candidate_checks": {
+    "at": "2026-10-27T00:22:19.943706+00:00",
+    "status": "SOURCE155_NORMAL_PROTECTED_MERGE_OWN_MAIN_QUALIFICATION_PENDING",
+    "head": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+    "tree": "106a156f957edb670212890d73a10f5ca74cfce1",
+    "base": "796a9bdfe6e94f0cfac04da1171102d052407347",
+    "PR": "https://github.com/pcvantol/djconnect-api/pull/155",
+    "independent_whole14_review_sha256": "c96f469feedadb546d6db0f4ca350f536e3e69934c07813b9f84f11dcb3fc03a",
+    "all14_Git_hashes": "PASS",
+    "packet_sha256": "aecbb233c528cb1f3ac5abb1cbfd749d962c8850e30559f98211d13c3b794474",
+    "no_source_changes_after_review": true,
+    "no_deployment_or_native_effects": true,
+    "main": "1f0659ee38efc786901aaf5925f797547317b83e",
+    "main_tree": "106a156f957edb670212890d73a10f5ca74cfce1",
+    "candidate_success_checks": 18,
+    "skipped_cleanup": 1,
+    "owner_authorization": "SUCCESS_NOT_REQUIRED_LOW_OR_NORMAL_RISK",
+    "actual_testmerge": "05a3feaabdf12a70da78314b668b9b37b13e8f9c",
+    "reviewed_tested_merged_tree_equal": true,
+    "original_candidate_Validate_run": 40425239975,
+    "original_candidate_native_browser_run": 40425239488,
+    "original_candidate_validate_log_sha256": "6105183762cde3d7dcd6ff6919f55755f83df0be70d534bf99e8fb4c30979ab5",
+    "original_candidate_native_browser_log_sha256": "8416150ce509939e96b3557686945a46e11357e82e6b61e69a1a0bc68ba72356",
+    "actual_candidate_Validate": {
+      "Worker": 309,
+      "composition": 49,
+      "product": 128,
+      "forbidden_RPC": 100,
+      "local_E2E_pass": 1,
+      "local_E2E_skip": 39
+    },
+    "actual_candidate_host": "1365 local HTTP/key-routing/index/budget/transaction/framing/registration/assertion/storage cases plus strict types; pinned receiver interoperability and actual browser workflow succeeded, distinct from native-device/provider qualification"
+  },
+  "own_main_runs": [
+    {
+      "conclusion": "success",
+      "databaseId": 40426070956,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "Post-Merge Release Evidence",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40426070696,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "API release artifact",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40425908668,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "Surface enrollment source",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40425908633,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "Validate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40425909026,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "CodeQL",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40425908135,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "Fixed rendezvous QA build",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40425908201,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "AI-development projection",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40425908145,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "TDE observe",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40425908207,
+      "headSha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "name": "Local native experiment qualification",
+      "status": "completed"
+    }
+  ],
+  "all_nine_own_main_workflows": "SUCCESS original GitHub run inventory",
+  "release_verification": {
+    "at": "2026-10-27T00:24:28.434443+00:00",
+    "status": "ORIGINAL_MAIN_FORMAL_DURABLE_RELEASE_VERIFIED_NO_ACTIVATION",
+    "main": "1f0659ee38efc786901aaf5925f797547317b83e",
+    "candidate": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+    "tree": "106a156f957edb670212890d73a10f5ca74cfce1",
+    "formal_original_sha256": "0b2c1d328f582b8db0f62eb3ad1a5dfa4c3474619bce8f876ae82fa4fedbdd7e",
+    "formal_decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "formal_source_evidence_digest": "a5949d35252d85abe78e9fdd84bc0492bd908fc2bb5cc098fb12ef5e5c74dfd6",
+    "durable_asset_id": 679931716,
+    "durable_actual_and_provider_sha256": "55c4542d7d08d8d64b736bb48ed1944f3057dadaba9be4f28fdd0847397a8cff",
+    "durable_canonical_integrity": "PASS",
+    "durable_checks": 12,
+    "release_artifact_id": "12698494727",
+    "tar_sha256": "bb9c90f076ae7dab5fdef200c3b6e0aaf3b666e837eb89247dab37a37f5fb9ec",
+    "worker_sha256": "d525c54fbf3b3227e306f01a1a6bf015ff3f9ae0943358cc014c67d6d14b7e01",
+    "worker_bytes": 1291540,
+    "worker_embeds_exact_main": true,
+    "exact_Git_packaged_sidecars": [
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "docs/rendezvous/THIRD_PARTY_LICENSES_V1.md",
+      "migrations/0001_initial.sql",
+      "migrations/0002_install_tokens.sql",
+      "migrations/0003_encrypt_apns_tokens.sql",
+      "migrations/0004_bootstrap_proofs.sql",
+      "migrations/0005_install_token_revoke.sql",
+      "migrations/0006_privacy_safe_diagnostics.sql",
+      "migrations/0007_restrict_apns_push_contract.sql",
+      "migrations/0008_restore_bootstrap_proof_metadata.sql",
+      "migrations/0009_surface_push.sql",
+      "migrations/0010_surface_delegations.sql",
+      "migrations/0011_surface_enrollment_authorizations.sql",
+      "package-lock.json",
+      "package.json",
+      "wrangler.jsonc"
+    ],
+    "no_deployment_remote_SQL_or_native_effects": true
+  },
+  "formal_original_file_sha256": "0b2c1d328f582b8db0f62eb3ad1a5dfa4c3474619bce8f876ae82fa4fedbdd7e",
+  "formal_original": {
+    "decision": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+    "evidence_digest": "a5949d35252d85abe78e9fdd84bc0492bd908fc2bb5cc098fb12ef5e5c74dfd6",
+    "findings": [],
+    "kind": "post_merge_release_evidence",
+    "main_parents": [
+      "796a9bdfe6e94f0cfac04da1171102d052407347"
+    ],
+    "main_sha": "1f0659ee38efc786901aaf5925f797547317b83e",
+    "merge_actor": "pcvantol",
+    "merge_strategy": "SQUASH",
+    "originating_pr": {
+      "base_ref": "main",
+      "changed_files": [
+        "docs/push/CLOSED_ENROLLMENT_SERVICE_JOIN_V1.md",
+        "docs/push/closed-enrollment-service-observations-v1.json",
+        "docs/push/closed-enrollment-service-observations-v2.json",
+        "docs/rendezvous/closed-enrollment-service-product-observations-v1.json",
+        "docs/rendezvous/closed-enrollment-service-product-observations-v2.json",
+        "docs/rendezvous/closed-enrollment-service-source-delta-v1.json",
+        "docs/rendezvous/closed-enrollment-service-source-delta-v2.json",
+        "docs/rendezvous/deployment-preparation-v1.json",
+        "qualification/rendezvous/local-native-runtime.mjs",
+        "scripts/test_rendezvous_deployment_plan.py",
+        "scripts/validate_rendezvous_deployment_plan.py",
+        "src/surface-push/composition.ts",
+        "src/surface-push/enrollment.ts",
+        "test/surface-enrollment.spec.ts"
+      ],
+      "head_sha": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+      "main_changed_files": [
+        "docs/push/CLOSED_ENROLLMENT_SERVICE_JOIN_V1.md",
+        "docs/push/closed-enrollment-service-observations-v1.json",
+        "docs/push/closed-enrollment-service-observations-v2.json",
+        "docs/rendezvous/closed-enrollment-service-product-observations-v1.json",
+        "docs/rendezvous/closed-enrollment-service-product-observations-v2.json",
+        "docs/rendezvous/closed-enrollment-service-source-delta-v1.json",
+        "docs/rendezvous/closed-enrollment-service-source-delta-v2.json",
+        "docs/rendezvous/deployment-preparation-v1.json",
+        "qualification/rendezvous/local-native-runtime.mjs",
+        "scripts/test_rendezvous_deployment_plan.py",
+        "scripts/validate_rendezvous_deployment_plan.py",
+        "src/surface-push/composition.ts",
+        "src/surface-push/enrollment.ts",
+        "test/surface-enrollment.spec.ts"
+      ],
+      "merge_actor": "pcvantol",
+      "merge_commit_sha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "merge_strategy": "SQUASH",
+      "merged_at": "2026-10-27T00:21:46Z",
+      "number": 155,
+      "state": "MERGED"
+    },
+    "post_merge": {
+      "build_validation": "PASS",
+      "ci": "PASS",
+      "coverage": "PASS",
+      "coverage_artifact_sha": "sha256:1a6f3b00559f212322b9caa0f7520ab8f2fba310e4f3e28134b323356832ddb8",
+      "coverage_report_sha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "governance": "PASS",
+      "lint": "PASS",
+      "sha": "1f0659ee38efc786901aaf5925f797547317b83e",
+      "static_analysis": "PASS",
+      "tests": "PASS",
+      "workflow_run_ids": [
+        "40425908633"
+      ]
+    },
+    "pre_merge": {
+      "candidate_sha": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+      "owner_authorization": "PASS",
+      "required_checks": "PASS",
+      "risk_classification": "NORMAL_RISK",
+      "software_assurance": "PASS",
+      "trusted_delivery": "PASS",
+      "verification": "PASS",
+      "workflow_integrity": "PASS"
+    },
+    "provenance_result": "PASS",
+    "repository": "pcvantol/djconnect-api",
+    "repository_role": "active_source",
+    "schema_version": 1,
+    "source_qualified_pr_sha": "8f79f983f5a61e37dac3ba161ef2b26d61c157a2",
+    "timestamp": "2026-10-27T00:23:26.746Z"
+  },
+  "durable_original_file_sha256": "55c4542d7d08d8d64b736bb48ed1944f3057dadaba9be4f28fdd0847397a8cff",
+  "durable_original": {
+    "commit_sha": "1f0659ee38efc786901aaf5925f797547317b83e",
+    "integrity": {
+      "algorithm": "sha256-canonical-json",
+      "digest": "fbb0df7d9b850a15ca74a344781b3035f9211a2661a80a1f1c87c4a5c34d1af9"
+    },
+    "kind": "durable_qualification_evidence",
+    "published_at": "2026-10-27T00:23:26Z",
+    "qualification": {
+      "outcome": "POST_MERGE_RELEASE_EVIDENCE_QUALIFIED",
+      "profile": "post_merge_release_evidence",
+      "required_checks": {
+        "post_merge_build_validation": "PASS",
+        "post_merge_ci": "PASS",
+        "post_merge_coverage": "PASS",
+        "post_merge_governance": "PASS",
+        "post_merge_lint": "PASS",
+        "post_merge_static_analysis": "PASS",
+        "post_merge_tests": "PASS",
+        "required_checks": "PASS",
+        "software_assurance": "PASS",
+        "trusted_delivery": "PASS",
+        "verification": "PASS",
+        "workflow_integrity": "PASS"
+      }
+    },
+    "record_id": "pcvantol/djconnect-api@1f0659ee38efc786901aaf5925f797547317b83e:post-merge-release-evidence",
+    "redaction": {
+      "included_data": "formal allowlisted decision fields only",
+      "policy_version": 1,
+      "status": "REDACTED"
+    },
+    "release_identifier": "internal-api-1f0659ee38efc786901aaf5925f797547317b83e",
+    "repository": "pcvantol/djconnect-api",
+    "repository_role": "active_source",
+    "retention_class": "LONG_TERM",
+    "revision": 1,
+    "schema_version": 1,
+    "source_evidence_digest": "a5949d35252d85abe78e9fdd84bc0492bd908fc2bb5cc098fb12ef5e5c74dfd6",
+    "source_revision": "733ecc2836d40611b2b7472308a7175a6130c91a",
+    "supplemental_evidence": [
+      {
+        "kind": "coverage_artifact_digest",
+        "sha256": "1a6f3b00559f212322b9caa0f7520ab8f2fba310e4f3e28134b323356832ddb8"
+      }
+    ],
+    "workflow_references": {
+      "post_merge_run_ids": [
+        "40425908633"
+      ],
+      "producer_run_id": "40426070956"
+    }
+  },
+  "historical_failure": {
+    "head": "6fc6284ae8c8cce217cec697c6101b97a048d013",
+    "finding": "SERVICE-OUTER-ABORT-1",
+    "decision": "HOLD preserved; successor closure only",
+    "controlled_original": "3FAIL68SKIP; positive Response after captured signal aborted",
+    "minimal_successor_same_cases": "3PASS68SKIP; committed SQL state retained",
+    "current_full_suite": "309PASS, including all71 enrollment cases; no skipped cases",
+    "no_false_rollback": true
+  },
+  "closed_defaults": {
+    "public_surface_dispatch": "COMPILED_OFF/503",
+    "issuer_admitted_profiles": [],
+    "activity_profiles": [],
+    "rendezvous_full_service_gates": "22 OPEN"
+  },
+  "remaining": [
+    "Actual independent pre-enrollment operator bridge and original Core/API clock-witness admission",
+    "Complete accepted status-bootstrap/native-proof canonical schemas, counter/CAS/lifecycle and cryptographic conformance",
+    "Genuine owner/operator/custody/provisioned native target/token acquisition and separate B-read authority",
+    "Provider/APNs/native reception and user acceptance under separate genuine authorization"
+  ],
+  "not_granted": [
+    "Production deployment or remote migration",
+    "Key generation/access/rotation, native SDK calls or provider traffic",
+    "Actual owner/enrollment/target admission, HA changes or credential export"
+  ],
+  "translations": "No product UI or translation resources changed in en/nl/de/fr/es; this Final adds only two delivery documents.",
+  "separate_Final_status": "Requires fresh exact independent document review, protected source delivery and its own original main qualification; not self-qualified"
+}

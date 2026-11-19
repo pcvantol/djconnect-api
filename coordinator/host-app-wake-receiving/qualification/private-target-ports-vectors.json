@@ -1,0 +1,232 @@
+{
+  "classification": "INDEPENDENT_PYTHON_SYNTHETIC_DATA_ONLY_NOT_ROLE_NATIVE_KEY_CAPABILITY_OR_PROVIDER_AUTHORITY",
+  "original": {
+    "version": "djc-host-app-wake-native/1",
+    "core_purpose_id": "fixture-original-display",
+    "operation_id": "11111111-1111-4111-8111-111111111111",
+    "generation": "fixture-original-generation",
+    "revision": 1,
+    "token_role": "host_app_wake",
+    "target": {
+      "host_bundle_id": "example.fixture.host",
+      "installation_id": "fixture-native-install"
+    },
+    "platform": "ipados",
+    "apns_environment": "sandbox",
+    "native_key_id_b64": "c3ludGhldGljLXNkay1rZXktaWQtbm90LWFuLWVucm9sbGVkLWtleQ==",
+    "native_token_sha256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+    "original_wake_issued_at_ms": 1800000000000,
+    "original_wake_expires_at_ms": 1800003600000,
+    "original_display_expires_at_ms": 1800007200000,
+    "paired_subject_binding_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "owner_binding": "2222222222222222222222222222222222222222222222222222222222222222",
+    "device_binding": "3333333333333333333333333333333333333333333333333333333333333333",
+    "source_binding": "4444444444444444444444444444444444444444444444444444444444444444",
+    "selected_ha_origin_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "identity_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "deployment_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+  },
+  "private_purpose_id": "fixture-api-private-purpose",
+  "cases": [
+    {
+      "kind": "register",
+      "path": "/v1/push/host-app-wake/register",
+      "request": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "11111111-1111-4111-8111-111111111111",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "token_role": "host_app_wake",
+        "target": {
+          "host_bundle_id": "example.fixture.host",
+          "installation_id": "fixture-native-install"
+        },
+        "apns_environment": "sandbox",
+        "apns_token": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+      },
+      "request_headers": {
+        "Authorization": "Bearer djci_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "Content-Type": "application/json",
+        "X-DJConnect-Host-Wake-Authorization-ID": "fixture-existing-authorization",
+        "X-DJConnect-Host-Wake-Core-Purpose-ID": "fixture-original-display",
+        "X-DJConnect-Host-Wake-Issuer-Operation-ID": "fixture-original-issuer",
+        "X-DJConnect-Host-Wake-Capability": "djchw_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "X-DJConnect-Host-Wake-Operation-ID": "11111111-1111-4111-8111-111111111111"
+      },
+      "reply": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "11111111-1111-4111-8111-111111111111",
+        "state": "registered",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "expires_at_ms": 1800003600000,
+        "transport_expires_at_ms": null,
+        "operation_state": "registered",
+        "provider_status": null
+      },
+      "reply_headers": {
+        "X-DJConnect-Host-Wake-Request-SHA256": "4eac7753b41ffa02a0e03bfb15c0c9e6454da977b68fbba5fce07163d2da8005"
+      },
+      "status": 200,
+      "request_sha256": "4eac7753b41ffa02a0e03bfb15c0c9e6454da977b68fbba5fce07163d2da8005"
+    },
+    {
+      "kind": "wake",
+      "path": "/v1/push/host-app-wake/wake",
+      "request": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "fixture-original-wake-event",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "event": "direct_rich_refresh"
+      },
+      "request_headers": {
+        "Authorization": "Bearer djci_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "Content-Type": "application/json",
+        "X-DJConnect-Host-Wake-Authorization-ID": "fixture-existing-authorization",
+        "X-DJConnect-Host-Wake-Core-Purpose-ID": "fixture-original-display",
+        "X-DJConnect-Host-Wake-Issuer-Operation-ID": "fixture-original-issuer",
+        "X-DJConnect-Host-Wake-Capability": "djchw_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "X-DJConnect-Host-Wake-Operation-ID": "fixture-original-wake-event"
+      },
+      "reply": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "fixture-original-wake-event",
+        "state": "registered",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "expires_at_ms": 1800003600000,
+        "transport_expires_at_ms": 1800000030000,
+        "operation_state": "provider_accepted",
+        "provider_status": 200
+      },
+      "reply_headers": {
+        "X-DJConnect-Host-Wake-Request-SHA256": "27fbbe276a60ecd43ed4b72fb9530ee956eb3ae60b8978462280e79dfd4fdb6a"
+      },
+      "status": 200,
+      "request_sha256": "27fbbe276a60ecd43ed4b72fb9530ee956eb3ae60b8978462280e79dfd4fdb6a"
+    },
+    {
+      "kind": "status",
+      "path": "/v1/push/host-app-wake/status",
+      "request": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "11111111-1111-4111-8111-111111111111"
+      },
+      "request_headers": {
+        "Authorization": "Bearer djci_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "Content-Type": "application/json",
+        "X-DJConnect-Host-Wake-Authorization-ID": "fixture-existing-authorization",
+        "X-DJConnect-Host-Wake-Core-Purpose-ID": "fixture-original-display",
+        "X-DJConnect-Host-Wake-Issuer-Operation-ID": "fixture-original-issuer",
+        "X-DJConnect-Host-Wake-Capability": "djchw_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      },
+      "reply": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "11111111-1111-4111-8111-111111111111",
+        "state": "registered",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "expires_at_ms": 1800003600000,
+        "transport_expires_at_ms": null,
+        "operation_state": "registered",
+        "provider_status": null
+      },
+      "reply_headers": {
+        "X-DJConnect-Host-Wake-Request-SHA256": "42ef955187c15a3ef92d71c197e85dac93c2fa3a559a96cdaf6aed6b3e7be2c8"
+      },
+      "status": 200,
+      "request_sha256": "42ef955187c15a3ef92d71c197e85dac93c2fa3a559a96cdaf6aed6b3e7be2c8"
+    },
+    {
+      "kind": "revoke",
+      "path": "/v1/push/host-app-wake/revoke",
+      "request": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "11111111-1111-4111-8111-111111111111"
+      },
+      "request_headers": {
+        "Authorization": "Bearer djci_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "Content-Type": "application/json",
+        "X-DJConnect-Host-Wake-Authorization-ID": "fixture-existing-authorization",
+        "X-DJConnect-Host-Wake-Core-Purpose-ID": "fixture-original-display",
+        "X-DJConnect-Host-Wake-Issuer-Operation-ID": "fixture-original-issuer",
+        "X-DJConnect-Host-Wake-Capability": "djchw_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      },
+      "reply": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "11111111-1111-4111-8111-111111111111",
+        "state": "withdrawn",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "expires_at_ms": 1800003600000,
+        "transport_expires_at_ms": null,
+        "operation_state": "registered",
+        "provider_status": null
+      },
+      "reply_headers": {
+        "X-DJConnect-Host-Wake-Request-SHA256": "4d67f7cf2fa240a9b97a7a55a11273764927bd34312672b2fd6a52e5db2822ba"
+      },
+      "status": 200,
+      "request_sha256": "4d67f7cf2fa240a9b97a7a55a11273764927bd34312672b2fd6a52e5db2822ba"
+    },
+    {
+      "kind": "wake",
+      "path": "/v1/push/host-app-wake/wake",
+      "request": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "fixture-original-wake-event",
+        "generation": "fixture-original-generation",
+        "revision": 1,
+        "event": "direct_rich_refresh"
+      },
+      "request_headers": {
+        "Authorization": "Bearer djci_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "Content-Type": "application/json",
+        "X-DJConnect-Host-Wake-Authorization-ID": "fixture-existing-authorization",
+        "X-DJConnect-Host-Wake-Core-Purpose-ID": "fixture-original-display",
+        "X-DJConnect-Host-Wake-Issuer-Operation-ID": "fixture-original-issuer",
+        "X-DJConnect-Host-Wake-Capability": "djchw_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "X-DJConnect-Host-Wake-Operation-ID": "fixture-original-wake-event"
+      },
+      "reply": {
+        "version": "djc-host-app-wake/1",
+        "purpose_id": "fixture-api-private-purpose",
+        "operation_id": "fixture-original-wake-event",
+        "operation_state": "unknown"
+      },
+      "reply_headers": {
+        "X-DJConnect-Host-Wake-Request-SHA256": "27fbbe276a60ecd43ed4b72fb9530ee956eb3ae60b8978462280e79dfd4fdb6a"
+      },
+      "status": 202,
+      "request_sha256": "27fbbe276a60ecd43ed4b72fb9530ee956eb3ae60b8978462280e79dfd4fdb6a"
+    }
+  ],
+  "errors": [
+    {
+      "status": 401,
+      "body": {
+        "version": "djc-host-app-wake-receiving/1",
+        "success": false,
+        "error": "host_wake_core_auth"
+      }
+    },
+    {
+      "status": 409,
+      "body": {
+        "version": "djc-host-app-wake-receiving/1",
+        "success": false,
+        "error": "host_wake_intent_consumed"
+      }
+    }
+  ]
+}

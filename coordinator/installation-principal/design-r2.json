@@ -1,0 +1,304 @@
+{
+  "at": "2026-10-29T15:04:35.994979+00:00",
+  "classification": "PRIVATE_S1_S2_VERSIONED_CLOSED_DATA_CODEC_DESIGN_CANDIDATE_NO_IMPLEMENTATION_OR_AUTHORITY",
+  "contract_id_candidate": "DJC-INSTALLATION-PRINCIPAL-DATA-CANDIDATE-2",
+  "parents": {
+    "custody_design_sha256": "9b99f8a7eea9ea60da6cd1719e502bee2e3bcc7a5d0ad707ef1de1b4d068b196",
+    "Core_bounded_closure_sha256": "f042528500441bd2f58c42fa3021bdd0fde503abedb4dd48a368a92a4aaaf176",
+    "setup_plan_sha256": "74d3113b032c9f0486e38a014bc60f442b72833b51f13e7eddfd6749abeea23b",
+    "crypto168_candidate": "b6e5360f05ffff3107c7c5f4256f9e1898ee329d",
+    "crypto_R1_sha256": "69801f4dc741ed1f18289ebce9e380778bbefa005cd443c6aebcc32a103392e5"
+  },
+  "compatibility": "New distinct installation-subject2 and per-device join2 only. No reinterpretation, migration, wildcard or relaxed accepted_pair_binding in existing RegistryData1. af201/090b/Source153 and frozen crypto168/R1 remain unchanged. This is private review material, not accepted normative wire or a proposed live tuple.",
+  "codec": {
+    "input": "Only canonical primitive UTF8 JSON strings, exact closed keys per record below; unknown/missing/null/array/type coercion rejected. No parsed caller object retained across await.",
+    "canonical": "Strict duplicate-key parser followed by recursively lexicographic ASCII compact canonical JSON equality; no BOM, trailing LF, escape/number/Unicode aliases.",
+    "limits": "32768 UTF8 bytes per outer record before expensive parse; expected_transcript additionally4096bytes under exactR1. No unbounded nested arrays or maps.",
+    "types": {
+      "uuid4": "canonical lowercase UUIDv4, /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/",
+      "opaque": "ASCII /^[A-Za-z0-9._:-]{1,128}$/",
+      "sha256": "64lowercasehex",
+      "counter": "canonical safe decimal integer0..9007199254740990",
+      "positive_counter": "canonical safe decimal integer1..9007199254740990",
+      "utc_ms": "canonical safe decimal integer1..9007199254740991; DATA syntax only, no clock validation",
+      "public_P256_point": "Exact nested crv=P-256,kty=EC,x,y, each coordinate43canonical unpaddedbase64url/32bytes; actual point import separate crypto check. No private/extra members.",
+      "exact_R1_canonical_body_string": "Primitive canonical body from unchanged crypto16818field schema; not a reconstructed or normalized presentation"
+    },
+    "record_digest": "Candidate SHA256(ASCII(DJC-PRIVATE-INSTALLATION-RECORD-CANDIDATE-V1) ||0a|| canonical record UTF8). kind/version are included; no trailingLF. Not a signature and no trust granted.",
+    "JWK_pin": "Keep unchanged R1 SHA256(compact canonical exact four-member publicJWK), no extra record domain.",
+    "result": "Frozen privately-owned DATA scalars/closed records; no boolean admitted, signer, secret, factory, challenge issuer or authority object returned",
+    "predecode_numeric_bounds": {
+      "outer_utf8_bytes": 32768,
+      "expected_transcript_utf8_bytes": 4096,
+      "maximum_nesting_depth": 4,
+      "maximum_tokens_per_outer_document": 256,
+      "maximum_tokens_per_separately_scanned_R1_document": 128,
+      "scanner": "Before any generic JSON parse, perform a bounded nonallocating lexical scan with a fixed depth counter. Root object depth1; nested object/array adds1 even if later schema rejects it. Count each object/array opening and each primitive key/string/number/boolean/null as one token; closing brackets/punctuation are not tokens. Escaped quote/backslash handled lexically; string contents are not structural tokens. Invalid escapes/UTF8/control chars or unterminated constructs reject. No arbitrary-object parsing first.",
+      "nested_transcript": "Outer expected_transcript is one stringtoken, separately capped/unescaped into a bounded4096byte buffer then scanned with the same depth4/128token cap and unchanged R1 schema. Never recursively interpret arbitrary string fields as JSON.",
+      "followup": "Then strict duplicate-key parse, exact closed schema and canonical equality. Limits are candidate codec maxima, not a selected operational resource quota or parser implementation claim."
+    }
+  },
+  "records": {
+    "custody_generation_preparation": {
+      "version": "literal1",
+      "kind": "literal custody-generation-preparation/1",
+      "custody_operation_id": "uuid4",
+      "core_instance_id": "opaque",
+      "installation_id": "opaque",
+      "core_installation_binding_sha256": "sha256",
+      "operator_admission_binding_sha256": "sha256",
+      "custody_policy_sha256": "sha256",
+      "custody_restore_policy_sha256": "sha256",
+      "custody_epoch": "positive_counter",
+      "expected_local_revision": "counter",
+      "original_generation_deadline_unix_ms": "utc_ms",
+      "attempt_limit": "literal1"
+    },
+    "custody_public_receipt": {
+      "version": "literal1",
+      "kind": "literal custody-public-receipt/1",
+      "custody_operation_id": "uuid4",
+      "generation_preparation_sha256": "sha256",
+      "core_instance_id": "opaque",
+      "installation_id": "opaque",
+      "custody_epoch": "positive_counter",
+      "public_key_jwk": "public_P256_point",
+      "public_key_pin_sha256": "sha256",
+      "custody_policy_sha256": "sha256",
+      "local_committed_revision": "positive_counter"
+    },
+    "installation_principal_subject": {
+      "version": "literal2",
+      "kind": "literal installation-principal-subject/2",
+      "principal_id": "opaque",
+      "principal_epoch": "positive_counter",
+      "core_instance_id": "opaque",
+      "installation_id": "opaque",
+      "core_installation_binding_sha256": "sha256",
+      "custody_public_receipt_sha256": "sha256",
+      "custody_operation_id": "uuid4",
+      "custody_epoch": "positive_counter",
+      "public_key_pin_sha256": "sha256",
+      "policy_sha256": "sha256"
+    },
+    "bootstrap_admission_context": {
+      "version": "literal1",
+      "kind": "literal bootstrap-admission-context/1",
+      "subject_sha256": "sha256",
+      "custody_public_receipt_sha256": "sha256",
+      "custody_operation_id": "uuid4",
+      "generation_preparation_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "challenge_id": "uuid4",
+      "challenge_nonce_sha256": "sha256",
+      "operator_authority_record_sha256": "sha256",
+      "independent_installation_association_sha256": "sha256",
+      "core_installation_binding_sha256": "sha256",
+      "clock_policy_sha256": "sha256",
+      "registry_identity_sha256": "sha256",
+      "registry_restore_policy_sha256": "sha256",
+      "expected_registry_revision": "counter",
+      "policy_sha256": "sha256",
+      "original_authorization_deadline_unix_ms": "utc_ms"
+    },
+    "bootstrap_proof_preparation": {
+      "version": "literal1",
+      "kind": "literal bootstrap-proof-preparation/1",
+      "registration_operation_id": "uuid4",
+      "custody_operation_id": "uuid4",
+      "custody_public_receipt_sha256": "sha256",
+      "subject_sha256": "sha256",
+      "admission_context_sha256": "sha256",
+      "expected_transcript": "exact_R1_canonical_body_string",
+      "original_signing_deadline_unix_ms": "utc_ms",
+      "signing_attempt_limit": "literal1"
+    },
+    "installation_principal_record": {
+      "version": "literal2",
+      "kind": "literal installation-principal-record/2",
+      "subject_sha256": "sha256",
+      "bootstrap_preparation_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "challenge_id": "uuid4",
+      "crypto_possession_body_sha256": "sha256",
+      "crypto_signing_input_sha256": "sha256",
+      "public_key_pin_sha256": "sha256",
+      "original_authorization_deadline_unix_ms": "utc_ms",
+      "registry_committed_revision": "positive_counter",
+      "accepted_independent_authority_bundle_sha256": "sha256"
+    },
+    "device_pair_join": {
+      "version": "literal2",
+      "kind": "literal installation-device-pair-join/2",
+      "subject_sha256": "sha256",
+      "principal_record_sha256": "sha256",
+      "original_pair_binding_sha256": "sha256",
+      "original_pair_authority_record_sha256": "sha256",
+      "purpose_policy_sha256": "sha256",
+      "original_pair_operation_id": "uuid4",
+      "original_pair_expires_at_unix_ms": "utc_ms",
+      "join_revision": "positive_counter"
+    },
+    "withdrawal_preparation": {
+      "version": "literal2",
+      "kind": "literal installation-principal-withdrawal/2",
+      "withdrawal_operation_id": "uuid4",
+      "subject_sha256": "sha256",
+      "principal_record_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "withdrawal_authority_record_sha256": "sha256",
+      "registry_identity_sha256": "sha256",
+      "registry_restore_policy_sha256": "sha256",
+      "expected_registry_revision": "counter",
+      "original_withdrawal_deadline_unix_ms": "utc_ms",
+      "challenge_id": "uuid4",
+      "challenge_nonce_sha256": "sha256",
+      "withdrawal_policy_sha256": "sha256"
+    },
+    "original_admission_intent": {
+      "version": "literal2",
+      "kind": "literal original-admission-intent/2",
+      "subject_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "challenge_id": "uuid4",
+      "challenge_nonce_sha256": "sha256",
+      "bootstrap_preparation_sha256": "sha256",
+      "admission_context_sha256": "sha256",
+      "expected_registry_revision": "counter",
+      "original_authorization_deadline_unix_ms": "utc_ms",
+      "withdrawal_policy_sha256": "sha256"
+    },
+    "original_operation_withdrawal_preparation": {
+      "version": "literal2",
+      "kind": "literal original-operation-withdrawal/2",
+      "withdrawal_operation_id": "uuid4",
+      "subject_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "registration_challenge_id": "uuid4",
+      "registration_challenge_nonce_sha256": "sha256",
+      "original_admission_intent_sha256": "sha256",
+      "withdrawal_authority_record_sha256": "sha256",
+      "withdrawal_policy_sha256": "sha256",
+      "registry_identity_sha256": "sha256",
+      "registry_restore_policy_sha256": "sha256",
+      "withdrawal_challenge_id": "uuid4",
+      "withdrawal_challenge_nonce_sha256": "sha256",
+      "original_withdrawal_deadline_unix_ms": "utc_ms"
+    },
+    "original_admission_retirement_tombstone": {
+      "version": "literal2",
+      "kind": "literal original-admission-retirement/2",
+      "original_admission_intent_sha256": "sha256",
+      "subject_sha256": "sha256",
+      "registration_operation_id": "uuid4",
+      "registration_challenge_id": "uuid4",
+      "registration_challenge_nonce_sha256": "sha256",
+      "withdrawal_preparation_sha256": "sha256",
+      "withdrawal_operation_id": "uuid4",
+      "registry_committed_revision": "positive_counter"
+    }
+  },
+  "dependency_DAG": [
+    "Generation preparation precedes key effect; contains no registry challenge, proposed registry principal or reference to later result. Its custody_epoch is LOCAL, never registry principal_epoch.",
+    "Public receipt hashes exactly that preparation and its original local operation. It has no reverse reference to later principal/proof records.",
+    "Subject2 names exactly one original public receipt and local custody epoch plus separately proposed registry principal/epoch. No automatic equality or conversion between custody_epoch,principal_epoch,localrevision,registryrevision or sourceorigin.",
+    "Admission context hashes subject and receipt plus original operation/challenge and independently accepted authority references. It deliberately contains NO transcript hash, signature, its own digest or future principal record, avoiding circular hashes.",
+    "R1 transcript.operator_admission_binding_sha256 equals exact admission-context digest. This context is a CANDIDATE concrete encoding of that existing R1 binding, not a new R1 field. Its hash alone cannot make operator admission.",
+    "Proof preparation hashes original subject/receipt/context and contains exact unchanged R1 body. All registration/challenge/subject/JWK/install/policy/registry/revision/deadline fields must equal their original context/subject/receipt values. Signature thus binds the receipt through the immutable context digest, not only the public key.",
+    "Principal record2 references exact proof preparation and original cryptoDATA body/input digests only after independent original admission+once/CAS truth. Devicepairjoin2 is separate and does not mutate the install subject. No signed transcript includes later result hashes.",
+    "Local generation deadline and later original signing/admission deadlines are independently fixed and never copied/renewed from one another. original_signing_deadline cannot exceed the original registration authorization deadline or later be extended; the two proof operations are not authorized by the earlier generation grant."
+  ],
+  "authority_inputs_not_supplied": {
+    "operator": "Independently admitted original management principal/action and policy, not GitHubactor/deploypermission or pairedHAcredential",
+    "installation": "Original trusted management association of exact managed Core installation and public custodyreceipt, independent of same unsignedresponse",
+    "custody": "Actual selected host/runtime/privatepath/provider/backup/loss/rotation; bounded proposal9b99 is not an actual selected provider",
+    "clock": "Qualified original continuous/UTC deadline/currentness witnesses; numeric UTC, Date.now, SQLtimestamp or localrevision are insufficient",
+    "restore": "Independent accepted registry and custody restore/currentness/withdrawal policy; restored hashes cannot establish freshness",
+    "withdrawal": "Independent admitted emergency channel capable of retirement without the lost Core key"
+  },
+  "two_once_domains": {
+    "local_custody": "Own original custody_operation_id and generationpreparationdigest, localrevision, exactly1attempt, pre-effect durable consumed/unknown and reserved terminalcapacity. Never add a registry challenge or replace receipt after failure.",
+    "registry_proof": "Different registration_operation_id+challenge_id+noncehash, exact proofpreparation/context/receipt relation, expectedregistryrevision, original1signattempt and immutabledeadline. Original-sign once is owned by Core; registryadmission once is owned by API. They are distinct ledgers, not one atomic transaction.",
+    "atomicity": "Only API admission transaction atomically joins original registration/challenge once, expected revision CAS, principal record and withdrawal reserve. Core generation/signing files, management association and remote service are separate domains; no cross-store rollback claim.",
+    "identity": "Signature high/lowS aliases and repeated cryptoDATA do not create operation identities. Global operation identity namespaces must reject cross-kind reuse inside their own admitted transaction domain. Unknown outcomes never free an operation/nonce or capacity."
+  },
+  "status_closed_union": {
+    "envelope_exact_fields": {
+      "version": "literal1",
+      "kind": "literal operation-status/1",
+      "operation_kind": "enum custody_generation|bootstrap_signing|registry_admission|withdrawal",
+      "operation_id": "uuid4",
+      "preparation_sha256": "sha256",
+      "ledger_revision": "counter",
+      "outcome": "closed_variant"
+    },
+    "outcome_exact_variants": {
+      "NOT_FOUND_DATA": {
+        "tag": "literal NOT_FOUND_DATA"
+      },
+      "RESERVED": {
+        "tag": "literal RESERVED"
+      },
+      "UNKNOWN": {
+        "tag": "literal UNKNOWN",
+        "cause_class": "enum LOST_ACK|INTERRUPTED_EFFECT|UNCERTAIN_PERSISTENCE"
+      },
+      "COMMITTED": {
+        "tag": "literal COMMITTED",
+        "result_sha256": "sha256",
+        "committed_revision": "positive_counter"
+      },
+      "REJECTED_NO_EFFECT": {
+        "tag": "literal REJECTED_NO_EFFECT",
+        "reason": "enum INVALID_INPUT|UNTRUSTED_AUTHORITY|STALE_CONTEXT|CAPACITY|DEADLINE|CONFLICT"
+      },
+      "RETIRED": {
+        "tag": "literal RETIRED",
+        "withdrawal_operation_id": "uuid4",
+        "committed_revision": "positive_counter"
+      }
+    },
+    "semantics": [
+      "Status is observational DATA only. NOT_FOUND_DATA after absent/stale read is NOT permission to retry or recreate; original executor reconciles its admitted ledger.",
+      "UNKNOWN may settle to original COMMITTED/RETIRED only via explicit independently authenticated original reconciliation, never inferred from hash/file scan or fresh time. No UNKNOWN→REJECTED_NO_EFFECT shortcut.",
+      "REJECTED_NO_EFFECT requires proof no reservation/effect/commit occurred, not an exception code. Original consumed reservation is retained if it happened.",
+      "COMMITTED localgeneration means original local receipt; COMMITTED bootstrap_signing means original signatureeffect settled, not registryadmission. COMMITTED registryadmission still requires live original currentness for any later operational use.",
+      "Retirement closes local positive use synchronously before remote awaits; remote UNKNOWNwithdrawal never rolls it back. No GET/status allocates IDs, time, keys, challenge, scope or active authority."
+    ]
+  },
+  "epoch_and_withdrawal": [
+    "Principal epoch is proposed via independent original preparation and becomes genuinely admitted only after registryCAS; no localcounter/freshUUID auto-adoption.",
+    "Same principal/epoch with another install/key/receipt is conflict, never overwrite. Identical repeat of the same original operation returns only its original result, never renews expiry.",
+    "Successor epoch requires explicit independent policy/previousretirement/restorecurrentness and its own bounded operation; no automatic keyloss/restart rotation or implicit overlap.",
+    "Admission reserves withdrawal/terminalbudget before commit. Matched original withdrawal needs no ordinaryregistration slot or lostCore signature. Childdevicejoins retire with original principalepoch, and late proofs cannot revive it.",
+    "Adevicejoin requires original pairing+purpose authority; Bchild additionally original realSession/source/settings/nativeownership. Installationprincipal or Source1382DATA alone grants neither.",
+    "Withdrawal has its own originally admitted challenge_id/noncehash and withdrawalpolicy; never reuse bootstrapchallenge or require the lost signer. Authenticate and consume it within the selected independent withdrawalcontrolplane, with originaldeadline/revision and currentness checks."
+  ],
+  "acceptance_gate": "Before/after external awaits and final no-await transaction/CAS: exact original authorities+installation+custodyreceipt+operation/deadline+registryidentity/revision/restore+retirement/withdrawal. Any uncertainty keeps positive effects unavailable. Actual implementations and runtime proof still missing.",
+  "actual_values": "None supplied. No IDs/principals/keys/nonces generated, no storageprovider selected. Fields/types above are schema declarations, not actual trust attestations.",
+  "review_status": "R2_REQUEST_PERSONAL_BOUNDED_REVIEW_WITHDRAWAL_ORIGINAL_OPERATION_AND_PREDECODE_BOUNDS",
+  "effects": false,
+  "revision": "private draft R2",
+  "prior_candidate_sha256": "fea4cbf42f994919f61bf4d396cd3be6b9fd238ef25fc6149b18ca4c17a91b19",
+  "Core_P2_review_sha256": "4cb65c8b1fd838f929aeab1bd51fccee057354b24ce68e982d26f2aa98cd954b",
+  "withdrawal_original_operation_R2": {
+    "variants": "Existing withdrawal_preparation remains the distinct known-committed-record variant with required principal_record_sha256. New original_operation_withdrawal_preparation is a separate exact closed kind, with no principal_record_sha256 field at all; null/guessedhash/wildcards or variant fallback reject.",
+    "original_anchor_before_effect": "After the immutable proof preparation is accepted, the owning API must durably commit original_admission_intent plus unique registrationoperation/challenge/nonce reservation and sufficient admission/withdrawal/terminal slots in its registry transaction domain BEFORE releasing that preparation/challenge for Core bootstrap signing. No new live challenge is issued by this design. Its exact original intent bytes/digest go to the independently admitted withdrawal operator as part of the original management preparation, not by requiring a later principal-result/status GET.",
+    "no_hash_cycle": "Intent hashes proof preparation, which hashes earlier context/subject/receipt. Neither proof preparation nor context hashes the later intent or retirement tombstone. Withdrawal hashes the already accepted intent. A tombstone hashes withdrawal; neither withdrawal nor intent includes future result/tombstonehash.",
+    "two_once_clarification": "Custody generation remains local operation1. Registry preparation/signing/admission remains linked operation2; its sign-attempt, API intent/admission and independent withdrawal once domains are distinct. This intent is retained preparation DATA for operation2, not a third keygeneration or an already active principal.",
+    "revision_semantics": "Original expected_registry_revision is the registry principal/state revision pinned by original proof preparation. Reserving original once/intent/capacity entries may advance their own ledger/status revision but must not silently rewrite that immutable expected principal/state revision. ADMIT still requires its exact original expected registry revision and no retirement fence. Conservative invalidation by another actual principal mutation does not renew the original proof. The new original-operation withdrawal deliberately has no caller supplied expected-current registry revision: the server atomically resolves/CASes the exact stored original intent and its own current row state. Requiring the stale pre-ADMIT revision for withdrawal would obstruct committed/lostreply recovery.",
+    "target_resolution": "Independently authenticate the new withdrawal preparation and check original withdrawal clock/restore/currentness/policy. Resolve the exact already-persisted intent by original registrationoperation, then byte-compare every original subject/challenge/nonce/preparation binding. Its subject resolves exact independently prepared principal_id/epoch/install, never arbitrary caller discovery. Do not require the lost Core signer, a result digest, a successful status lookup, or proof that the caller knows whether ADMIT committed.",
+    "atomic_transaction": [
+      "Within one API-owned transaction/serialization boundary, recheck current withdrawal authority/context and resolve the retained exact intent, reserved capacities, original registration/challenge/nonce and any principal record whose original registration operation and subject exactly match.",
+      "Commit consumption of this original withdrawaloperation/challenge nonce, permanent original_admission_retirement_tombstone, terminal retirement of the pending admission/registrationnonce and exact any already committed matching principal epoch plus its exact children. Child rejection can use that parent terminal fence atomically; do not require unbounded child enumeration or extra capacity to enforce closure.",
+      "Any principal row found with a different operation/subject/keyepoch is never wildcard-retired or relabelled by this request. The exact old intent/nonce tombstone remains fenced; successor admission has its own policy/retirement gate.",
+      "ADMIT final-CAS must require the exact live original intent and unretired original nonce/subject and absence of this tombstone in the SAME transaction domain. It cannot rely on a successful pre-await retirement read.",
+      "If withdrawal serializes first, ADMIT cannot win later. If ADMIT commits first (even with lost reply), withdrawal resolves its exact original record internally and retires it. No future result hash is guessed or provided by caller.",
+      "If transaction aborts before commit, no partial remote retirement/once/nonce/revision truth is claimed. Local Core retirement still stays closed. Commit/lostreply preserves consumed original withdrawal and exact terminal truth; reconcile only that original operation."
+    ],
+    "reserved_capacity": "Before releasing original intent/preparation, reserve the permanent intent/nonce, one retirement tombstone and matched terminal/withdrawal once outcome slots under the selected capacity model. Pending-intent withdrawal and committed-result withdrawal must consume a common per-original-intent terminal budget so both variants cannot double-spend or starve the same reserve. Alternative freshwithdrawalIDs do not allocate unbounded slots; only the preallocated independently admitted terminaloperation scope can settle it. No eviction/TTL/freeing UNKNOWN state; actual numeric quotas still unselected.",
+    "unknown_absence": "An unavailable/stale lookup or missing restored intent is NOT proof of absent operation or permission to reissue. Positive use stays closed. Proven absence may be reported as NOT_FOUND_DATA by a qualified original read, but does not grant keygeneration/admission/retry or permit an unknown intent to bypass retirement. This withdrawal variant targets an originally acknowledged accepted intent, not a guessed uncreated future operation. Independent external install retirement/restore fences remain required when the original registry itself is unavailable.",
+    "status_outcome": "New original-operation withdrawal returns only the existing COMMITTED status with result_sha256 of the exact retirement tombstone and its committed revision; that digest can be unknown to caller after lost reply. No principal result hash or nullable target is added. Duplicate exact withdrawal may read original committed truth but cannot repeat external effects, mint identities or revive anything. UNKNOWN remains unknown without original reconciliation.",
+    "lasting_fence": "Tombstone is immutable retained original terminal truth; no prune/restart/restore/lateproof/newstatus can convert it to live intent or reopen nonce. Internal-consistency of restored tombstone or absence is not independent freshness. Actual S4 currentness/restore qualification is still required."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "scope": "SYNTHETIC_CORE_CANONICAL_RETIRE_V1",
+  "path": "/v1/push/native/key/retire",
+  "request": "{\"api_audience\":\"djc-native-push-ha-dev/1\",\"contract_version\":1,\"core_key_thumbprint\":\"4444444444444444444444444444444444444444444444444444444444444444\",\"device_binding\":\"3333333333333333333333333333333333333333333333333333333333333333\",\"event_id\":\"11111111-2222-4333-8444-555555555555\",\"install_credential_id\":\"synthetic-install-credential\",\"operation_id\":\"11111111-2222-4333-8444-555555555555\",\"owner_binding\":\"2222222222222222222222222222222222222222222222222222222222222222\",\"pair_binding\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"pairing_generation\":\"synthetic-pairing-generation\",\"request_expires_at_ms\":1}",
+  "ack": "{\"api_audience\":\"djc-native-push-ha-dev/1\",\"contract_version\":1,\"event_id\":\"11111111-2222-4333-8444-555555555555\",\"event_sha256\":\"f1531fbdd34dfbd22c911499ace63078c62d67a7473290e6072fb79c0ecbaacb\",\"pair_binding\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"state\":\"retired\"}"
+}

@@ -1,0 +1,21 @@
+{
+  "guard": {
+    "after": "6b127d78cfdfbcc65669ab43d2ab1967371cb9e136c691d882bf102adf68149c",
+    "before": "dd4f8093413999259d55bf950c2237f72d3e459bea0c43fae380b6774b8834b5",
+    "path": "scripts/check_reusable_workflow_refs.sh"
+  },
+  "manifest_changes": {
+    "coordinator/installation-principal/source-manifest.json": {
+      "after": "aeba64121c9cb38e8a2fc90d35e76f10e2af76224aac0525397727afc89a22db",
+      "before": "b574996d09cc03389fc1395f61a5f634da23c00f0ded85c7f02a4eccf65fb962"
+    },
+    "coordinator/principal-possession/source-manifest.json": {
+      "after": "801de22c5dd017996d1824758aeb18f4c1b74bdfaf2597a3ad90d056c5b86ebd",
+      "before": "8c3af7d1d0b971471fc388697fde9d9d34d1771771fcab2518f210b65a6eaae9"
+    }
+  },
+  "production_effect_authorized": false,
+  "public_activation_allowed": false,
+  "schema_version": 1,
+  "scope": "EXACT_API_GUARD_REFERENCE_SOURCE_ONLY_NOT_ACTIVATION"
+}

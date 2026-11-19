@@ -1,0 +1,73 @@
+{
+  "scope": "DATED_COMMON_CERTIFICATE_STATUS_ONLY_NO_DEVICE_ENROLLMENT_OR_LIVE_CLAIM",
+  "ocsp": [
+    {
+      "role": "signer",
+      "response_success": true,
+      "cert_id_matches_request": true,
+      "reported_good": true,
+      "signed_times_satisfy_candidate": true,
+      "this_update": "2026-10-17T20:40:15+00:00",
+      "next_update": "2026-10-18T08:40:14+00:00",
+      "produced_at": "2026-10-17T20:40:15+00:00",
+      "scope": "COMMON_RECEIPT_CERTIFICATES_ONLY_NOT_DEVICE_OR_RUNTIME_GO"
+    },
+    {
+      "role": "intermediate",
+      "response_success": true,
+      "cert_id_matches_request": true,
+      "reported_good": true,
+      "signed_times_satisfy_candidate": true,
+      "this_update": "2026-10-17T20:40:16+00:00",
+      "next_update": "2026-10-18T08:40:15+00:00",
+      "produced_at": "2026-10-17T20:40:16+00:00",
+      "scope": "COMMON_RECEIPT_CERTIFICATES_ONLY_NOT_DEVICE_OR_RUNTIME_GO"
+    }
+  ],
+  "offline_openssl_pinned": [
+    {
+      "role": "signer",
+      "exit_code": 0,
+      "response_verify_ok": true,
+      "system_ca_paths_disabled": true,
+      "no_nonce_for_common_cached_status": true
+    },
+    {
+      "role": "intermediate",
+      "exit_code": 0,
+      "response_verify_ok": true,
+      "system_ca_paths_disabled": true,
+      "no_nonce_for_common_cached_status": true
+    }
+  ],
+  "synthetic_fixture_independent_checks": {
+    "wrong-ca-delegation": {
+      "valid_response_signature": true,
+      "responder_has_ocsp_signing_eku": true,
+      "responder_has_digital_signature": true,
+      "responder_root_signed_not_receipt_issuer": true,
+      "receipt_issuer_signature_on_responder_fails": true,
+      "cert_id_sha256": true
+    },
+    "crl-critical-entry": {
+      "valid_root_signature": true,
+      "entry_serial_different_from_target": true,
+      "entry_extension_present": true,
+      "critical": true
+    },
+    "crl-noncritical-entry": {
+      "valid_root_signature": true,
+      "entry_serial_different_from_target": true,
+      "entry_extension_present": true,
+      "critical": false
+    }
+  },
+  "transport": "Fixed advertised Apple HTTP endpoints; signed body and exact CertID/time verified; no redirects/private device proof/credentials/fraud refresh",
+  "not_claimed": [
+    "device attestation certificate live revocation",
+    "current status beyond signed nextUpdate",
+    "fresh receipt enrollment",
+    "production egress/cache/propagation",
+    "complete verifier or runtime admission"
+  ]
+}

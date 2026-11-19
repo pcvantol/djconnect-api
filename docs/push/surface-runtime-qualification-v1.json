@@ -1,0 +1,46 @@
+{
+  "scope": "LOCAL_CLOSED_SURFACE_RUNTIME_COMPOSITION_NOT_PROVIDER_NATIVE_OR_ACTIVATION",
+  "result": "LOCAL_QUALIFIED_PENDING_INDEPENDENT_REVIEW_AND_CI",
+  "base": "fd1be286485b322ef37dbfc32f8348c9db0ef353",
+  "source_hashes": {
+    "src/index.ts": "172fffb5e9d015f7ad17af205fef82bf0cb247bb35e685b8b57b7ba93f055f94",
+    "src/surface-push/dispatch.ts": "1bfbb6f8003970a4cdfd4e0bd21a739d6dccbf6e10ee1411df13dada13ef3ce7",
+    "src/surface-push/composition.ts": "e03a67ef6f4759bb52207c8c690b34877c183eecdb072619a6d077df438a8600",
+    "test/surface-composition.spec.ts": "9d91ed6a4cd93c8451b80c56fd6e34f5c275c8c71c97bc087c478493fbdca652",
+    "test/surface-issuer-dispatch.spec.ts": "69405b37c11ac6f0279a89f826b0d6af4bf68db3dc8e9900ddbbbba11023b2c5",
+    "tsconfig.surface-push.json": "701c3a393d18b9e627abadac799784df613f3c1cf0e16a3dbf2b275d2282ec5a"
+  },
+  "root_worker_cases": 229,
+  "new_cases": 27,
+  "new_service_compositions": 5,
+  "new_closed_namespace_cases": 22,
+  "strict_types": "PASS",
+  "rendezvous_module_cases": 49,
+  "product_checks": 128,
+  "forbidden_rpc_rejections": 100,
+  "root_proof": "docs/push/surface-runtime-product-observations-v1.json",
+  "module_proof": "docs/push/surface-runtime-rendezvous-module-observations-v1.json",
+  "delta_proof": "docs/push/surface-runtime-source-delta-v1.json",
+  "historical_shared1570": "RETAINED66INPUTS_BYTE_EQUAL_NOT_RERUN",
+  "source_package_count": 116,
+  "root_input_count": 95,
+  "unchanged_installed_hashes": 32,
+  "logs": {
+    "surface-runtime-strict-types-20261023.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "surface-runtime-product-20261023.log": "e513dab094af9ecc6f294f0ba96cf3fbf32aa9e21692b34e251787bc30a53179",
+    "surface-runtime-rendezvous-composition-20261023.log": "4e5e440f944f8f8966e69d3f1c009c3ab69d09e6fb38585316ee104db5354dbf",
+    "surface-runtime-root-tests-final-20261023.log": "82df90fa9834a5487cd935f91acaa8318ad20ea02016c21afe49362361048156",
+    "surface-runtime-preparation-controls-20261023.log": "29cdad2f0ea98d1fc1ebe5ca41888ce4825529897bbdb5c4f18fc5c420797307"
+  },
+  "preliminary_failures_not_PASS": [
+    "newtestmissingexplicitJWK/PKCS8unionnarrowing",
+    "staleprior49moduleindexpinrejected; freshactual49proofbound"
+  ],
+  "public_activation": false,
+  "real_key_or_operator_actions": false,
+  "provider_requests": "INTERCEPTED_SYNTHETIC_ONLY",
+  "native_effects": false,
+  "production": "UNCHANGEDc048",
+  "legacy_gates": "22OPEN",
+  "offline_preparation_controls": 44
+}

@@ -1,0 +1,26 @@
+{
+  "scope": "same12newselectedtests; oldmain812 runtime versus newprivatecapacity runtime; no native/public effect",
+  "before": {
+    "passed": 1,
+    "failed": 11,
+    "unrelated_tests_not_selected": true,
+    "runtime_sources_restored": [
+      "request-admission.ts",
+      "allocation-budget.ts"
+    ],
+    "results_sha256": "3d98f4b2b830d07a73462a25eb8ba257e92710d34a88bd1cf1218d2239a5679f"
+  },
+  "after": {
+    "passed": 12,
+    "failed": 0,
+    "from_actual_full_shared_tests": 1570,
+    "summary_sha256": "a2c78c39382a18d08f2d87b0e51641f201b5773af64eb5fc2bc0ae3844c8e345"
+  },
+  "preliminary_failures_not_counted": [
+    "incomplete historicalJOSEtemporarypackage failedprepare",
+    "diagnosticcopywrongsourcepath failedprepare",
+    "counterproofwrongcwd missingconfig0tests",
+    "counterproofmismatchedVitest runner0tests"
+  ],
+  "test_dependency": "JOSE6.2.12 npmarchiveSHA512+all80trackedfilehashes verified; no scripts"
+}

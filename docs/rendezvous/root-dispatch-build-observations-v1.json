@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "scope": "ACTUAL_PRODUCT_BUILD_PRIVATE_RPC_ONLY",
+  "result": "PASS",
+  "checks": 128,
+  "forbidden_rpc_calls_rejected": 100,
+  "source_hashes": {
+    "src/index.ts": "a94d2a7cc34c9cf09c722789aa838964ff49c23fdbdf5a04636a92d24856bd55",
+    "src/rendezvous/perimeter.ts": "4dadedd8e4f9de9ad1b63ab384a53f59b6959e2fd9d9724e3b7faba0d7f54454",
+    "src/rendezvous/coordinators.ts": "642a8811d53dd14de5f640b965b2bf38d5a64bf4e5292f21f6900f0dd2843d83",
+    "src/rendezvous/trust.ts": "976b08f018dff384e2d9390afce98c46e8c84e9d1ab7a099f2345c00b2c0cd95",
+    "package.json": "7ea809d8f6fde96882d7897c4dbc0b9f26e2b0d54b5a5e9297a28d7fae59dfce",
+    "package-lock.json": "7b3088c7a885e1c02b03a6080540a70b97b3635fa70ce45497791c861caf0059",
+    "wrangler.jsonc": "6734d13848e98921e32409fbdf155ecee299d33696d17eb20dc54971e5f40536",
+    "tsconfig.json": "b9af33bf62df4bb042dac95a67505f2500c3588bdea9286d6627d0cf68a47d40",
+    "vitest.config.mts": "b3a8f1f6beacdfd71836e56f5cfd632cfdef05e70bbbb164d26300e95958fb1e",
+    "rendezvous-build-inputs.json": "c0dff3c47cf35122813b2a728df1759c14cc20e3b28f76118f1572f61d644d79",
+    "scripts/qualify_rendezvous_product_build.mjs": "2cb22861a190855ddc75331e09f992c6845bba5f2cc8547a01f1b341397d9af5",
+    "src/crypto.ts": "ecb59bf91bca14266dfe6636d1da2970d12e7fa06da80abfc1fe0d51cb91f881",
+    "src/messages.ts": "980ab421315143a27ca1e3605310fd043779fe0e175ef0e0d9f7844f5eeadb79",
+    "src/http.ts": "3828f75c474dd5dcab4d5804cbcb48b129bfda684a32ff5261123e50914cbc5f",
+    "src/repositories/apiDiagnostics.ts": "cbc357a51c1b140b32de601fb66a9bf5bcaed39369daa84cbdb0fc7f117c950f",
+    "src/repositories/adminDiagnostics.ts": "9ad3c5cde355216fcf448fc108ae4ddd6d859bcbfd8c882cadb4f569d439165d",
+    "src/repositories/hash.ts": "0a7b2f226c25542aca57f7e9a0de33cd63aa228eabc61d46d20fbc84dd85eba2",
+    "src/repositories/adminRegistrations.ts": "e1c4b6aa3876acd8db081dab5454fcec346aac8a5922498bd04dfde40a465643",
+    "src/repositories/auditEvents.ts": "6e06cf7849c44a60fd23bdf3b3188f398cd9142a236f56b8e9a436101d8e0493",
+    "src/repositories/bootstrapProofs.ts": "0c9213f536be88af4437007bd437acece7aad28880ec065ac36b95e7d95c3dc0",
+    "src/repositories/installTokens.ts": "c21ef52d84cd833cef7fbd2bca8edfb2f5da2f6d527ce5ce1fa115f4c87f8c2b",
+    "src/repositories/rateLimits.ts": "bf239f2c35749fba741df098e6bf18e5b8a36324c386968076ef0d8386911d10",
+    "src/repositories/registrations.ts": "3731530859d9ebc274d64cd0483e6f555c15ebc91a36dc2d06777b949f181e95",
+    "src/repository.ts": "ac4cd2df495f993c50bc4c873234bb13b7c40bcb484255630886f2d4bc9a1d2c",
+    "src/auth.ts": "3ea011df8bdc5bad6796047b15566b459a5cc4f7fc3effda6eb2f2deab22dbd0",
+    "src/validation.ts": "2fad4e70fb69b073f838b5233497efca4774f718ae930b9d29a1e270367d275b",
+    "src/handlers/admin.ts": "713ec573444a1d94120a4d7eb20ed1c7c85d6ca087f7d71cff7f35041b36abc4",
+    "src/handlers/install.ts": "f290aabf68aad588399912a268df40675dce5565a9f5da1a48d186e1beb04d8b",
+    "src/apns.ts": "8a6d3c3fa5400dc16b8b81e95e4536b2e2acdfe75829061c61741d791ae45948",
+    "src/services/pushDelivery.ts": "d83fd7a13494fbd899a50b1f221ff6adda395ccd18fc29f3577678280a54fe53",
+    "src/handlers/push.ts": "2129513a9c3e3c2d1075ad786370bdbbe655bdfcd0d33e4a6c16d2095dd726fd",
+    "src/releaseMetadata.ts": "f3a5f8129c0acf4ab41a463b326e412e6b2da8b73edcb7dbea6cd0c9ee1cca69",
+    "qualification/rendezvous/retry-hint.ts": "422b97fb81c63c52129f36d6d6c5948e8987e3f7797d3cdda35b2992a8f13f33",
+    "docs/rendezvous/wire-request-schemas-v1.json": "c00d495222a5bc719e5ef22280e4bbacbb7496f03740cb9c6ccf8b464f4d8a0d",
+    "qualification/rendezvous/http-ingress.ts": "d01adf7731975bbb846aec3d4980d88d7b7f3c2f7e59b801b3124ed4cd068554",
+    "qualification/rendezvous/allocation-budget.ts": "c5cb28a0178f1b7e97d9303b66248f3d735fafb813ce122dc184cb2c13ecda4e",
+    "qualification/rendezvous/jwe-framing.ts": "8dd212cbc1dedc48d9b5333e46ff2a3b24f95f3ff2e8ce5c6f9504298a16d6d8",
+    "qualification/rendezvous/transaction-state.ts": "40d84abd12043f00da12b50a14bd178e85228662815b894aea6618227ea4423b",
+    "qualification/rendezvous/allocation-index.ts": "980a2bf7ccc3a28c95794ca2a1148b26a36ef94ab384ba817e5bee9147e11557",
+    "qualification/rendezvous/key-routing.ts": "8ce1268598a5c12c448510f81691c185f0a0d5688ccc163e01d0bfd5fe3a97af",
+    "qualification/rendezvous/composed-http.ts": "21fad11bb8c0317084950f68bb3462fb737d31fdcbfbd82e054ab3a74eebde02",
+    "qualification/rendezvous/request-admission.ts": "13d0589ffe744c0b99ce58898c91e7235404309f442a60372572d632f1ebd609",
+    "qualification/rendezvous/receipt-key-store.ts": "0d20cb54412c4c117260ff750608d73a12e9b1ca7371c0645754b619939d5875",
+    "src/rendezvous/composition.ts": "d78fdc0a92794dd0399f3ca618babbf011d3a186a4f6d83f780775c23e2e8325",
+    "src/rendezvous/dispatch.ts": "95be2fc7434592fa22738ec57ef27fb7a1eeb302b1c5904c750975162ba56ce9",
+    "node_modules/nofilter/lib/index.js": "b87629040413cb877c60278a7de6a2ec45abfc4ab3120f012b5dc6d5148242db",
+    "node_modules/cbor/lib/constants.js": "977ed5a0934467a170835eef1244bf3e359b9852b0eb2a542a7a33161bc8b17a",
+    "node_modules/cbor/lib/utils.js": "7889f6fb8464e301fcc5c4b7b869ff339ef5825726000e7aad4627b126d367c6",
+    "node_modules/cbor/vendor/binary-parse-stream/index.js": "b617006213b1399f700ec9e49c835aa62b6cff4489669caf24b03a17c348eb5f",
+    "node_modules/cbor/lib/tagged.js": "a7122e7c5621b7230f1832635cf8f60c3d0eac65f7f417bb1635320f34d56f68",
+    "node_modules/cbor/lib/simple.js": "aad14f0e7ffc3fcc66f65117e67d27560ab583817983bd349e60de1b226901fc",
+    "node_modules/cbor/lib/decoder.js": "b350702fc6ea1ba057a0a737e71b923e2a4a66574958adb4a3f2918c3253d0a1",
+    "node_modules/cbor/lib/commented.js": "d292235a1b011a33059a970113954c18e3f3312413bf916ac6293ff70ebed186",
+    "node_modules/cbor/lib/diagnose.js": "1c52fb77376297c74e412fa503f13cd744d3064a1987eb40c1703268d366c5d3",
+    "node_modules/cbor/lib/encoder.js": "6c63bf7b6c6c62a9e30f96acf31d5eae91bd9818fed309ed8000391a251c2881",
+    "node_modules/cbor/lib/map.js": "5aef1d670e7516a12ce7ef4957c59342e3b7302f2d801741b9c3268a0c89b0d7",
+    "node_modules/cbor/lib/objectRecorder.js": "f3814ea1870b77cbeca34dbda6d23df83f81c9b02f97d8e47bd7990968a7c29d",
+    "node_modules/cbor/lib/sharedValueEncoder.js": "b2866badea8d9fb8266b331e82ebc72e51e31d0be1094c045ecf40190f17f163",
+    "node_modules/cbor/lib/cbor.js": "d4709dbdb1ad29cabc4a70fc912a89d81c18aa247033ad5e000f2ad903d31539",
+    "node_modules/pvtsutils/build/index.js": "8cf4300225298c7811fd72840f84ebd12dda5359f29fffdba09cb67a63a5943f",
+    "node_modules/pvutils/build/utils.es.js": "e1a942c322462a4a2b1a2311b2b40bd9ab1779273d98fca085e074532f96db98",
+    "node_modules/asn1js/build/index.es.js": "ee1dbac2b2f8bc0edd15f56932d847f5a8565b20d0b2b22d6c978360279899e4",
+    "node_modules/bytestreamjs/build/mjs/byte_stream.js": "d265091e6b5209c1839b2c3f4d91df681a37bb1d3e3834891619d422277b634c",
+    "node_modules/bytestreamjs/build/mjs/seq_stream.js": "bfa20e5092a8b5387091c9b00133a0fcaedf8bff090840cbb3872045346c1dc4",
+    "node_modules/bytestreamjs/build/mjs/helpers.js": "9fe919254ac3db6db045e008cce021c5223146d8d9fbb2b3c5aa45a9ec1b2abf",
+    "node_modules/bytestreamjs/build/mjs/bit.js": "948aa3449ba484a4b33b8d251714a655ec67544e991902cd1773cab0c8cc1bfe",
+    "node_modules/bytestreamjs/build/mjs/bit_stream.js": "109291e1cfc9e95db75748154cffd39163145d66fd85a6240d28eb5d8335c2f8",
+    "node_modules/bytestreamjs/build/mjs/seq_bit_stream.js": "01b075ad7bc1c49fa2854cbe3c82407c29f12d01a926e0e77c68fe266159e5f8",
+    "node_modules/bytestreamjs/build/mjs/index.js": "3139b1bdc36c99c155d14ff24e46ae5f3ecf78900f56de49bd466da2ed022de1",
+    "node_modules/@noble/hashes/esm/crypto.js": "9211d026c5d21e60e0126dd6f01150d87da5ba7261b8f468215c1264372ff5a5",
+    "node_modules/@noble/hashes/esm/utils.js": "4cf4c1e05affedcb4fd584a43d76ae1a3711e34a36e2251b90c27e33ecc74fad",
+    "node_modules/@noble/hashes/esm/_md.js": "cefb1557e7715cb2117c83f82ef3e3175c7e0391c80bd5795b2d4effc45fc582",
+    "node_modules/@noble/hashes/esm/legacy.js": "4906186a82438392443e3ac2a59d0acbbec2bee2595d048c8d8c0dd6584d4bdb",
+    "node_modules/@noble/hashes/esm/sha1.js": "cd708647a4aad36d820253fc75e3a821efe842652b2c9134903c5aec33a2926a",
+    "node_modules/@noble/hashes/esm/_u64.js": "e48c0cfc10810439a4807b46db136ce603a3fa09b62584f513ef2f3ca496af54",
+    "node_modules/@noble/hashes/esm/sha2.js": "e729088b82e5450bff54c3a0013582aa42e1fe8f58dd31f5967f6ebe34c52299",
+    "node_modules/pkijs/build/index.es.js": "5f5c08540929f01ee75373b9f317753aeb6a7239241658473bb37826e2f85a50",
+    "qualification/rendezvous/worker-path-candidate.mjs": "2ea6e9e1048e81304948b2189dee250269d30c7a18bc35738dfab7a6f8375773",
+    "qualification/rendezvous/app-attest-core-candidate.mjs": "8d49e0a6e0b0b639e27a2ea503bc6673bad997be1fe08d24603193dee5016655",
+    "qualification/rendezvous/assertion-key-state.ts": "52576fc65fd2e5f685a885c7888a444f77f9789d1ad285fdf5b746cca1ae2d3b",
+    "qualification/rendezvous/receipt-cms-candidate.mjs": "0dadf10ef3055862ef952dd551907d15f6aedc66f19400d8ed268e3c9daf5dd0",
+    "qualification/rendezvous/receipt-status-candidate.mjs": "7f2b1aa7d4307e36a8edddea7d89a1ada327ead8c9350e82866c6eee9449d434",
+    "qualification/rendezvous/receipt-status-client.mjs": "df34ffdfba387a0715e67e4977addf9e9fd1ee0cd452b750fc643f3269b6cc95",
+    "qualification/rendezvous/enrollment-evidence-candidate.mjs": "0001a9197ee3c10833b1b2053e227841f56cf788d40a30d12d82ec28295ccf05",
+    "qualification/rendezvous/enrollment-key-state.ts": "d460174a50c9b755aa1d850af4a82642e4bba894f1aef3f2ab9b5b05056df463"
+  },
+  "toolchain": {
+    "node": "v26.12.0",
+    "wrangler": "4.151.0",
+    "miniflare": "5.20261012.0-beta"
+  },
+  "bundle_sha256": "688e09a2ef61e8d82487943c7e428b6da79469347da7856b2d28bd24cdbf6ea7",
+  "bundle_bytes": 1254759,
+  "virtual_platform_inputs": {
+    "node-built-in-modules:stream": {
+      "bytes": 61,
+      "imports": [
+        {
+          "path": "stream",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "cjs"
+    },
+    "node-built-in-modules:buffer": {
+      "bytes": 61,
+      "imports": [
+        {
+          "path": "buffer",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "cjs"
+    }
+  },
+  "exports": [
+    "AllocationBudget",
+    "AllocationIndex",
+    "BudgetedTransactionCoordinator",
+    "EnrollmentCoordinator",
+    "RequestAdmission",
+    "default",
+    "tokenHashForTest"
+  ],
+  "rpc_allowlists": {
+    "RequestAdmission": [
+      "admit",
+      "alarm"
+    ],
+    "AllocationBudget": [
+      "admit",
+      "admitKeyCall",
+      "alarm"
+    ],
+    "AllocationIndex": [
+      "alarm",
+      "allocate",
+      "lookup"
+    ],
+    "EnrollmentCoordinator": [
+      "alarm",
+      "authorize",
+      "enroll",
+      "issueAction",
+      "issueEnrollment"
+    ],
+    "BudgetedTransactionCoordinator": [
+      "alarm",
+      "cancel",
+      "consume",
+      "create",
+      "inspect",
+      "poll",
+      "reserveSubmitChallenge",
+      "submit"
+    ]
+  },
+  "default_no_config": "FAIL_CLOSED",
+  "configured_malformed_default_genuine_enrollment": "REJECTED_ORIGINAL_CHALLENGE_PRESERVED",
+  "configured_unknown_key_management_proof": "REJECTED",
+  "unauthorized_key_rows": 0,
+  "outbound_calls": 0,
+  "compiled_public_disabled_with_or_without_private_test_configuration": true,
+  "root_binding_migration_mutations": false,
+  "native_positive_accepted": false,
+  "production_profile_accepted": false,
+  "service_activated": false,
+  "cloudflare_mutations": false
+}

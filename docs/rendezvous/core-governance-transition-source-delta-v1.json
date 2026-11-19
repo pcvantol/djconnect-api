@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "scope": "EXACT_CORE_GOVERNANCE_WORKFLOW_TRANSITION_NOT_ACTIVATION",
+  "baseline_source_map_sha256": "74558e3841d3fe579079a5af7c58b66bd6ff58982bedd99ee03346eaf291ad57",
+  "effective_source_map_sha256": "3cb7dabebff8c23d69772f17593fed2192da0aeceb1890e1a3d8a44b52410177",
+  "workflow_changes": {
+    ".github/workflows/ci-cd.yml": {
+      "before": "4f1c42ec920abae197c76fd8e2d4c09c0741875adaac361994be3a2a2329ac07",
+      "after": "ee359ef939016ffc84896d2f8a847ba2a80bf6eb9b8066cc4ee1d48b2de73036"
+    },
+    ".github/workflows/host-app-wake-receiving.yml": {
+      "before": "0d2de9c7114c17f67e6bb4e643fd36eac563f01e32a4cab815137a56d9616838",
+      "after": "c3040db896752a9b5949a009eb93ef6ae34719b10fe68759e89872a29c14030a"
+    },
+    ".github/workflows/host-app-wake-source.yml": {
+      "before": "80b51642680c067cac59bd5f28dec7208960dcaa2f75a44d099c446e19a7a6ae",
+      "after": "e1084e27ff0c6c24ea277bf2ff4f439a41c8f4127c774245223eb0061b50cb2c"
+    },
+    ".github/workflows/installation-principal-data.yml": {
+      "before": "14fc2a386d546456ea3ab7c9726411468fbeb224358c0872f8d3449ef7356d3f",
+      "after": "8149b54f50e82a3a87b1a514d4bbc09a82cd2f7fc196d9d4b6b816e064b07f2b"
+    },
+    ".github/workflows/installation-registry-transactions.yml": {
+      "before": "b794bb4fcf481c1b4c0f984f042be18f897930b5013acbfa8244435d7eeb08d3",
+      "after": "f0d70b52f00c06b0890fc9ff2e5185845923f8342548376b6bffe7f388081304"
+    },
+    ".github/workflows/native-proof-data-journal.yml": {
+      "before": "fd77fed7f1591904db829ce4a3997d8b22f3b9df5719b04cef54ddcad689a117",
+      "after": "1ddac2c1fbe14265a485ff9eb0f660aab4384b37f56f1d778f0f6ca8cfe7ab7a"
+    },
+    ".github/workflows/native-proof-transcript.yml": {
+      "before": "d28e347a5b5f9bcd0612b143a1781f1db85925d0923dd2b66229220e52e48bcc",
+      "after": "3ff138d4346616ffa1272505f00018527e11f9d5f54283f09b7827ecaad5db13"
+    },
+    ".github/workflows/principal-possession-data.yml": {
+      "before": "1ca1959c2782b6bdf83ad656e836e6f85bc5e48d6469102666515842d7713476",
+      "after": "6c773c53599b5d3cc8cba2fdfd8d271815d0fc70a09c29b45a2d6f46487a556a"
+    },
+    ".github/workflows/push-coordinator-source.yml": {
+      "before": "bace8728edf13680151fa7df54562762cbf19978e6df0132f283e143015d555c",
+      "after": "db106e6a910d2ab9554d78e12b3fc4a1c8c1c6c0b646b6b3d5e93c3ae007ecc1"
+    },
+    ".github/workflows/reusable-workflow-guard.yml": {
+      "before": "b05e46ed641b272c95edd82b36c1cd57c5d927b3ac21ba38f8927a5f44055660",
+      "after": "4f20a8a6ffd0ced8ebb3b1c297ef490d0c866f6d8d50164db54154ff2fc88654"
+    },
+    ".github/workflows/rich-delivery-adapter.yml": {
+      "before": "c03152933257785b001f1783049a7426a07531fd9bc17d879c3c5e0944390015",
+      "after": "38af0ca245d26d0df54957bc08c8cf5ba98537d89347618a06649e65de70177d"
+    },
+    ".github/workflows/rich-session-data-profile.yml": {
+      "before": "ecba5449667f272dad5665821a56454dac55ffc1f692fbbbe54fbb8b0a08885e",
+      "after": "46120347160c055f393590db151ac9b94638ad4413aa797a4d5de4cca21bcf8d"
+    },
+    ".github/workflows/surface-enrollment-source.yml": {
+      "before": "3cf90dd32cba9172daf080e776d7dd5bc7dcd98ddb9bfbeeb123cbdf9dfffa68",
+      "after": "b5fe274e9401188e123f3e65ff5ed5741dd3cd598d32a1d7fecea94c49b34018"
+    },
+    ".github/workflows/watch-moment-alert-source.yml": {
+      "before": "b3f14149949893621dccc0dbd715a30dfb3b16ebb73384562559b5d077d5c8a8",
+      "after": "8000de7369dd85d675b29d09082d8e3a6e93ced787de145e546a8651b68695ee"
+    },
+    ".github/workflows/worker-do-registry-source.yml": {
+      "before": "44393482bda4585fa128c1047771a879dd8312d8cce9e6d1e85784967519ef74",
+      "after": "711a703ddf763f94f508e9b660adfd8158c750a14f19133f0e4053781e69e1d1"
+    }
+  },
+  "source_changes": {
+    ".github/workflows/ci-cd.yml": {
+      "before": "4f1c42ec920abae197c76fd8e2d4c09c0741875adaac361994be3a2a2329ac07",
+      "after": "ee359ef939016ffc84896d2f8a847ba2a80bf6eb9b8066cc4ee1d48b2de73036"
+    }
+  },
+  "reference_changes": {
+    "coordinator/host-app-wake-receiving/runtime/source-inputs.json": {
+      "before": "36852869c3b3f0fc7fa9fea6732c8cde45073818ab3ff568189c1167ad56b131",
+      "after": "5d063c8a2602a3603080276148029c3561f78e5651e82cd47b150b7f45aa324a"
+    },
+    "coordinator/host-app-wake/source-manifest.json": {
+      "before": "7ee22ec03eeab2d34cbd531d3777438d40700278152f4c7b2138cd8bc678d8d8",
+      "after": "9005bbeaad6bb773d7aec3ef30d42048a1f89317c1e62fd3600de7815c2c652d"
+    },
+    "coordinator/installation-principal/source-manifest.json": {
+      "before": "92641db5091cea2e4165df901f8d09ab92d6eef2ffad670214cdea62956479f3",
+      "after": "a2136f256db2704c76cccf12f6b451c0d63afd81e187a17776b324be145d0552"
+    },
+    "coordinator/installation-registry/source-manifest.json": {
+      "before": "49b70c14465af9313b49e05e5e4eb6229c398321562ad07145623061bedfa6be",
+      "after": "9a348cc4abca3b3cf6e513987c8a86b13581fe7e78e9d3d62cd9d82f0d510fed"
+    },
+    "coordinator/principal-possession/source-manifest.json": {
+      "before": "c82948ca91f8546fea784cffb35d3f470bed019a167fb3b6d23d8fac5577e8ca",
+      "after": "d20baf7a7ab7bc28df5f88767a7b407275cb23ef4c9a6fed3f7bfe4c58db4555"
+    },
+    "coordinator/rich-delivery/source-manifest.json": {
+      "before": "79176fee93b57c268d1d15b172bef0eb2fe3d50782ec6c611a56931030d20662",
+      "after": "1d176b9559d428bc01dc3727d418150338294b2ebfa599ba17ef9dc7b0f417c4"
+    },
+    "coordinator/rich-session/source-manifest.json": {
+      "before": "a45e4c8e6f30a668e56dc96e0689693d3cfea35bc753350a950dd282d8cf0de9",
+      "after": "f2de5b8a7cf6a1c2026cc28eab0d6b3391102d6b2c4ce7da50c71fc092f29078"
+    },
+    "coordinator/worker-do/source-manifest.json": {
+      "before": "583bf80b3ca7f2e584ad377c346c4451fcba35f70444437d679725a5416bf65d",
+      "after": "f4e641f494a788c90766af128908324d48c562b29d01eb2c456679eb2d951350"
+    },
+    "qualification/watch-moment/source-manifest.json": {
+      "before": "37d9d9d059b342ee5e44af7dc0ce511d8785fdac82912c75f7b1f46ebd7a10be",
+      "after": "cbebce9f59f2257f2945a00ed472df209b007ce43f61def56529d40bc1956248"
+    },
+    ".github/workflows/reusable-workflow-guard.yml": {
+      "before": "b05e46ed641b272c95edd82b36c1cd57c5d927b3ac21ba38f8927a5f44055660",
+      "after": "4f20a8a6ffd0ced8ebb3b1c297ef490d0c866f6d8d50164db54154ff2fc88654"
+    }
+  },
+  "auxiliary_changes": {
+    "coordinator/source-manifest.json": {
+      "before": "337fb04826efca4f764ff5c46ff3648d3b4c6a80b4656145e8be1f64f2decd4a",
+      "after": "950926dc798f0d18fa499c36f45b5d4772162610134b874585c94bfc04fc02f1"
+    }
+  },
+  "public_activation_allowed": false,
+  "production_effect_authorized": false
+}

@@ -1,0 +1,118 @@
+{
+  "scope": "NARROW_OFFLINE_APPLE_LEAF_AKI_POLICY_NOT_FULL_VERIFIER",
+  "count": 16,
+  "cases": [
+    {
+      "name": "active:strict-baseline",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": 85,
+      "error_depth": 0
+    },
+    {
+      "name": "active:narrow-leaf-aki",
+      "verified": true,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 0,
+      "error_depth": 0
+    },
+    {
+      "name": "active:damaged-signature",
+      "verified": false,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 7,
+      "error_depth": 0
+    },
+    {
+      "name": "active:wrong-root",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": -1,
+      "error_depth": -1
+    },
+    {
+      "name": "active:reversed",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": -1,
+      "error_depth": -1
+    },
+    {
+      "name": "active:wrong-intermediate",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": 20,
+      "error_depth": 0
+    },
+    {
+      "name": "active:not-yet-valid",
+      "verified": false,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 9,
+      "error_depth": 0
+    },
+    {
+      "name": "active:expired",
+      "verified": false,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 10,
+      "error_depth": 0
+    },
+    {
+      "name": "replacement:strict-baseline",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": 85,
+      "error_depth": 0
+    },
+    {
+      "name": "replacement:narrow-leaf-aki",
+      "verified": true,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 0,
+      "error_depth": 0
+    },
+    {
+      "name": "replacement:damaged-signature",
+      "verified": false,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 7,
+      "error_depth": 0
+    },
+    {
+      "name": "replacement:wrong-root",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": -1,
+      "error_depth": -1
+    },
+    {
+      "name": "replacement:reversed",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": -1,
+      "error_depth": -1
+    },
+    {
+      "name": "replacement:wrong-intermediate",
+      "verified": false,
+      "allowed_missing_leaf_aki": false,
+      "error_code": 20,
+      "error_depth": 0
+    },
+    {
+      "name": "replacement:not-yet-valid",
+      "verified": false,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 9,
+      "error_depth": 0
+    },
+    {
+      "name": "replacement:expired",
+      "verified": false,
+      "allowed_missing_leaf_aki": true,
+      "error_code": 10,
+      "error_depth": 0
+    }
+  ]
+}

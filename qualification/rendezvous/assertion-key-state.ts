@@ -1,0 +1,104 @@
+// SHARED CANDIDATE INTERNAL: compiled product auth remains disabled; no native/production acceptance.
+import {ReceiptKeyStore,StoreRejected,type StoreEnv,type StoreMaterial} from './receipt-key-store';
+import {qualifyAssertionCore} from 'djc-qualified-assertion';
+import {base64Decode,base64Url} from 'djc-existing-crypto';
+import { rendezvousKeyAddress } from './key-address';
+import { assertionPolicyDeadline, TESTFLIGHT_POLICY, testflightRelease, testflightReleaseRevision, type PublicTrialWindow, type TestFlightReleaseEnv } from './testflight-release.mjs';
+export interface CoordinatorEnv extends StoreEnv, TestFlightReleaseEnv, PublicTrialWindow {}
+type Action='recover-key'|'delete-key'|'submit';
+export interface SubmitBinding {transactionId:string;generation:number;browserThumbprint:string;envelopeDigest:string;expiresAt:number}
+export interface IssueInput {action:Action;keyId:string;binding?:SubmitBinding}
+export interface ProofInput {operationId:string;action:Action;clientData:string;assertion:string}
+interface Operation {id:string;action:Action;keyAddress:string;createdAt:number;expiresAt:number;status:'challenge'|'authorized';clientData?:string;nonce?:string;binding?:SubmitBinding;requestDigest?:string;counter?:number;admittedAt?:number;authorizationExpiresAt?:number;releaseRevision?:string;keyExpiresAt?:number}
+class ProofRejected extends Error {}
+class AssertionConfigUnavailable extends Error {}
+type RecordWindow=(...bounds:ReadonlyArray<readonly[number|undefined,number|undefined]>)=>void;
+function proofFailureContext(){
+ let lower:number|undefined,upper:number|undefined;
+ const recordWindow:RecordWindow=(...bounds)=>{for(const [from,until] of bounds){if(typeof from==='number'&&typeof until==='number'&&Number.isSafeInteger(from)&&Number.isSafeInteger(until)&&from>=0&&until>from){lower=Math.max(lower??from,from);upper=Math.min(upper??until,until);}}};
+ return {recordWindow,failure:(error:unknown)=>({ok:false as const,error:error instanceof ProofRejected||error instanceof StoreRejected||(lower!==undefined&&upper!==undefined&&(Date.now()<lower||Date.now()>=upper))?'proof_rejected' as const:'service_unavailable' as const})};
+}
+const POLICY='ios-dev-qualification/1',ORIGIN='https://api.djconnect.dev',VERSION='djc-rendezvous/1';
+const need:(v:unknown)=>asserts v=v=>{if(!v)throw new ProofRejected();};
+const closed=(v:object,names:string[])=>need(v!==null&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===names.sort().join(','));
+const integer=(v:number)=>Number.isSafeInteger(v)&&v>=0;
+function b64url(s:string,max:number,exact?:number){need(typeof s==='string'&&s.length>0&&s.length<=Math.ceil(max*4/3));let bytes:Uint8Array<ArrayBuffer>;try{bytes=Uint8Array.from(atob(s.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));}catch{throw new ProofRejected();}need(bytes.length<=max&&(exact===undefined||bytes.length===exact)&&base64Url(bytes.buffer)===s);return bytes;}
+const opaque=(s:string)=>b64url(s,32,32);
+const random=()=>base64Url(crypto.getRandomValues(new Uint8Array(32)).buffer);
+async function digest(value:unknown){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(value)))),v=>v.toString(16).padStart(2,'0')).join('');}
+export class AssertionKeyState extends ReceiptKeyStore {
+ private verifying=false;
+ constructor(ctx:DurableObjectState,env:CoordinatorEnv){super(ctx,env);ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS proof_operations (id TEXT PRIMARY KEY, expires_at INTEGER NOT NULL, value TEXT NOT NULL)');}
+ protected override removingKeyEvidence(){this.ctx.storage.sql.exec('DELETE FROM proof_operations');}
+ protected override nextCleanupAt(){return this.ctx.storage.sql.exec<{at:number|null}>('SELECT MIN(expires_at) AS at FROM proof_operations').toArray()[0]?.at??undefined;}
+ private cleanup(now:number){this.ctx.storage.sql.exec('DELETE FROM proof_operations WHERE expires_at<=?',now);return this.expire(now);}
+ protected appPolicy():typeof POLICY|typeof TESTFLIGHT_POLICY{return (this.env as CoordinatorEnv).ASSERTION_POLICY_ENABLED===TESTFLIGHT_POLICY?TESTFLIGHT_POLICY:POLICY;}
+ protected appAttestEnvironment(){return this.appPolicy()===TESTFLIGHT_POLICY?'production' as const:'development' as const;}
+ protected release(){return this.appPolicy()===TESTFLIGHT_POLICY?testflightRelease(this.env as CoordinatorEnv):undefined;}
+ private policy(now:number){const e=this.env as CoordinatorEnv,until=assertionPolicyDeadline(e);if(!(e.ASSERTION_POLICY_ENABLED===this.appPolicy()&&integer(until)&&now<until&&(this.appPolicy()!==TESTFLIGHT_POLICY||this.release())))throw new AssertionConfigUnavailable();return until;}
+ private active(now:number){this.policy(now);const r=this.cleanup(now);need(r?.status==='active'&&r.objectId===this.ctx.id.toString()&&r.appPolicy===this.appPolicy()&&r.environment===this.appAttestEnvironment()&&now>=r.createdAt&&now<r.expiresAt);return r;}
+ private operation(id:string){return this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations WHERE id=?',id).toArray().map(r=>JSON.parse(r.value) as Operation)[0];}
+ private saveOperation(op:Operation){this.ctx.storage.sql.exec('INSERT INTO proof_operations(id,expires_at,value) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,value=excluded.value',op.id,op.expiresAt,JSON.stringify(op));}
+ private response(op:Operation){need(op.status==='challenge'&&op.clientData&&op.nonce);return {v:VERSION,challenge_id:op.id,challenge:op.nonce,expires_at:op.expiresAt,client_data:op.clientData};}
+ private async issueInternal(input:IssueInput){
+  need(input&&typeof input==='object'&&!Array.isArray(input));if(input.binding!==undefined&&input.binding!==null)need(typeof input.binding==='object'&&!Array.isArray(input.binding));
+  input={...input,...(input.binding?{binding:{...input.binding}}:{})};closed(input,input.action==='submit'?['action','keyId','binding']:['action','keyId']);need(['recover-key','delete-key','submit'].includes(input.action));
+  need(typeof input.keyId==='string'&&input.keyId.length===44);let keyBytes:Uint8Array;try{keyBytes=base64Decode(input.keyId);}catch{throw new ProofRejected();}need(keyBytes.length===32&&btoa(String.fromCharCode(...keyBytes))===input.keyId);
+  const appPolicy=this.appPolicy(),keyAddress=await rendezvousKeyAddress(input.keyId,this.appAttestEnvironment(),appPolicy);let binding:SubmitBinding|undefined;
+  if(input.action==='submit'){
+   need(input.binding);closed(input.binding,['transactionId','generation','browserThumbprint','envelopeDigest','expiresAt']);binding={...input.binding};
+   need(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(binding.transactionId));need(Number.isInteger(binding.generation)&&binding.generation>=1&&binding.generation<=2147483647);opaque(binding.browserThumbprint);opaque(binding.envelopeDigest);
+  }
+  const now=Date.now();this.policy(now);const releaseRevision=testflightReleaseRevision(this.release()),expiresAt=binding?.expiresAt??now+120000;need(integer(expiresAt)&&expiresAt>now&&expiresAt-now<=120000);
+  const id=random(),nonce=random(),body=binding?{v:VERSION,action:input.action,service_origin:ORIGIN,transaction_id:binding.transactionId,generation:binding.generation,browser_key_thumbprint:binding.browserThumbprint,expires_at:expiresAt,key_id:input.keyId,challenge_id:id,challenge:nonce,envelope_digest:binding.envelopeDigest}:{v:VERSION,action:input.action,service_origin:ORIGIN,key_id:input.keyId,challenge_id:id,challenge:nonce,expires_at:expiresAt};
+  const op:Operation={id,nonce,action:input.action,keyAddress,createdAt:now,expiresAt,status:'challenge',releaseRevision,clientData:base64Url(JSON.stringify(body)),...(binding?{binding}:{})};
+  try{return await this.locked(async()=>{
+   const alarm=await this.ctx.storage.getAlarm();await this.ctx.storage.setAlarm(Math.min(alarm??expiresAt,expiresAt));
+   return this.ctx.storage.transactionSync(()=>{
+    const at=Date.now();this.policy(at);need(this.appPolicy()===appPolicy&&testflightReleaseRevision(this.release())===releaseRevision);const row=this.cleanup(at);need(at>=now&&at<expiresAt);if(row)need(row.keyAddress===keyAddress);
+    const ops=this.ctx.storage.sql.exec<{value:string}>('SELECT value FROM proof_operations').toArray().map(r=>JSON.parse(r.value) as Operation).filter(previous=>{
+     if(previous.releaseRevision===releaseRevision)return true;
+     this.ctx.storage.sql.exec('DELETE FROM proof_operations WHERE id=?',previous.id);
+     return false;
+    });
+    if(input.action!=='submit'){const existing=ops.find(v=>v.status==='challenge'&&v.action===input.action&&v.keyAddress===keyAddress);if(existing)return {ok:true as const,...this.response(existing)};}
+    need(ops.length<32&&ops.filter(v=>v.action===input.action).length<(input.action==='submit'?28:2)&&!this.operation(op.id));this.saveOperation(op);return {ok:true as const,...this.response(op)};
+   });
+  });}catch(error){need(Date.now()>=now&&Date.now()<expiresAt);throw error;}
+ }
+ private disposition(op:Operation,requestDigest:string,now:number,recordWindow:RecordWindow){
+  const row=this.active(now),policyUntil=this.policy(now);need(op.status==='authorized'&&op.releaseRevision===testflightReleaseRevision(this.release())&&op.requestDigest===requestDigest&&op.keyAddress===row.keyAddress&&now>=op.admittedAt!&&now<op.expiresAt);
+  if(op.action==='submit'){need(op.authorizationExpiresAt!==undefined&&now<op.authorizationExpiresAt&&op.authorizationExpiresAt<=policyUntil);recordWindow([op.createdAt,op.expiresAt],[row.createdAt,row.expiresAt],[op.admittedAt,op.authorizationExpiresAt]);return {kind:'submit-authorization' as const,operationId:op.id,requestDigest,admittedAt:op.admittedAt!,keyExpiresAt:op.keyExpiresAt!,authorizationExpiresAt:op.authorizationExpiresAt,counter:op.counter!,binding:op.binding!};}
+  need(op.action==='recover-key');recordWindow([op.createdAt,op.expiresAt],[row.createdAt,row.expiresAt],[op.admittedAt,op.expiresAt]);return {kind:'recovery-receipt' as const,keyExpiresAt:op.keyExpiresAt!,counter:op.counter!};
+ }
+ private async authorizeInternal(input:ProofInput,recordWindow:RecordWindow){
+  input={...input};closed(input,['operationId','action','clientData','assertion']);opaque(input.operationId);need(['recover-key','delete-key','submit'].includes(input.action));
+  const client=b64url(input.clientData,2048),proof=b64url(input.assertion,4096),now=Date.now();
+  const snapshot=this.ctx.storage.transactionSync(()=>{const row=this.active(now),op=this.operation(input.operationId);need(op&&op.action===input.action&&op.keyAddress===row.keyAddress&&now>=op.createdAt&&now<op.expiresAt);const release=this.release();need(op.releaseRevision===testflightReleaseRevision(release));return {row,op,release};});
+  const requestDigest=await digest([input.action,input.operationId,snapshot.row.keyAddress,input.clientData,input.assertion]);
+  if(snapshot.op.status==='authorized')return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now(),recordWindow);});
+  need(snapshot.op.clientData===input.clientData);recordWindow([snapshot.op.createdAt,snapshot.op.expiresAt],[snapshot.row.createdAt,snapshot.row.expiresAt]);
+  const verified=await qualifyAssertionCore(proof,client,base64Decode(snapshot.row.publicPoint),snapshot.row.counter,snapshot.row.appPolicy,snapshot.release);need(verified);
+  let committedBounds:ReadonlyArray<readonly[number|undefined,number|undefined]>=[];
+  const result=this.ctx.storage.transactionSync(()=>{
+   const at=Date.now(),row=this.active(at),op=this.operation(input.operationId);need(op&&op.status==='challenge'&&op.releaseRevision===snapshot.op.releaseRevision&&op.action===input.action&&op.keyAddress===row.keyAddress&&op.clientData===input.clientData&&at>=op.createdAt&&at<op.expiresAt);
+   need(testflightReleaseRevision(this.release())===testflightReleaseRevision(snapshot.release)&&row.appPolicy===snapshot.row.appPolicy&&row.environment===snapshot.row.environment&&row.publicPoint===snapshot.row.publicPoint&&row.createdAt===snapshot.row.createdAt&&row.expiresAt===snapshot.row.expiresAt&&verified.counter>row.counter&&verified.counter<=0xffffffff);
+   if(input.action==='delete-key'){const tombstone=this.tombstone(row);this.save(tombstone);return {kind:'deleted' as const,purgeAt:tombstone.purgeAt};}
+   row.counter=verified.counter;row.revision++;this.save(row);
+   const receipt:Operation={id:op.id,action:op.action,keyAddress:op.keyAddress,createdAt:op.createdAt,expiresAt:Math.min(op.expiresAt,row.expiresAt),status:'authorized',requestDigest,releaseRevision:op.releaseRevision,counter:verified.counter,admittedAt:at,keyExpiresAt:row.expiresAt,...(op.binding?{binding:op.binding,authorizationExpiresAt:Math.min(at+5000,op.expiresAt,row.expiresAt,this.policy(at))}:{})};
+   this.saveOperation(receipt);return this.disposition(receipt,requestDigest,at,(...bounds)=>{committedBounds=bounds;});
+  });
+  recordWindow(...committedBounds);
+  await this.arm();if(result.kind==='deleted')return result;
+  return this.ctx.storage.transactionSync(()=>{const op=this.operation(input.operationId);need(op);return this.disposition(op,requestDigest,Date.now(),recordWindow);});
+ }
+ // Single active verification per key. No queue of unbounded crypto requests.
+ async authorize(input:ProofInput){if(this.verifying)return {ok:false as const,error:'proof_rejected' as const};const {recordWindow,failure}=proofFailureContext();this.verifying=true;try{return {ok:true as const,...await this.authorizeInternal(input,recordWindow)};}catch(error){return failure(error);}finally{this.verifying=false;}}
+ async issue(input:IssueInput){try{return await this.issueInternal(input);}catch(error){return {ok:false as const,error:error instanceof ProofRejected||error instanceof StoreRejected?'proof_rejected' as const:'service_unavailable' as const};}}
+ async lookupSubmit(operationId:string,requestDigest:string){const {recordWindow,failure}=proofFailureContext();try{opaque(operationId);need(/^[a-f0-9]{64}$/.test(requestDigest));const result=this.ctx.storage.transactionSync(()=>{const op=this.operation(operationId);need(op?.action==='submit');return this.disposition(op,requestDigest,Date.now(),recordWindow);});return {ok:true as const,...result};}catch(error){return failure(error);}}
+ // Direct fixture APIs disabled. Inherited QA helpers/protected hooks are NOT a hardened untrusted RPC boundary.
+ override async install(_m:StoreMaterial){return {ok:false as const,error:'store_rejected' as const};}
+ override async advance(_counter:number){return {ok:false as const,error:'store_rejected' as const};}
+ override async evidence(){return {ok:false as const,error:'store_rejected' as const};}
+ override async alarm(){try{this.ctx.storage.transactionSync(()=>{this.cleanup(Date.now());});await super.alarm();}catch{throw new Error('qualification_cleanup_failed');}}
+}

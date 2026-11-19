@@ -1,0 +1,10 @@
+{
+ "$schema":"../../../node_modules/wrangler/config-schema.json",
+ "name":"djc-installation-registry-qualification-only",
+ "main":"./worker.ts",
+ "compatibility_date":"2026-08-22",
+ "compatibility_flags":["nodejs_compat"],
+ "workers_dev":false,"send_metrics":false,
+ "durable_objects":{"bindings":[{"name":"INSTALLATION_REGISTRY_TEST","class_name":"QualificationRegistry"}]},
+ "exports":{"QualificationRegistry":{"type":"durable-object","storage":"sqlite"}}
+}

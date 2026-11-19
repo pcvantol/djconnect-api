@@ -1,0 +1,16 @@
+{
+  "production_effect_authorized": false,
+  "public_activation_allowed": false,
+  "reference_changes": {
+    ".github/workflows/api-worker-post-deployment-smoke.yml": {
+      "after": "dbec38063e587731f059715552ea65805f254a2486fa0c4c4c813066145346d4",
+      "before": "0960471fdd231e070fe5e638ec25efe85c6932dad0a7d90ceb2411af73e6b32f"
+    },
+    ".github/workflows/deploy-api-worker.yml": {
+      "after": "e5f6444939541fe3917ab48512019abcae934c24d43afa2f2ec7078e8d561feb",
+      "before": "d208afa168b5dde7684d1d752a8ca3e1d8cf3f813d4d215be041ec4d18e98a45"
+    }
+  },
+  "schema_version": 1,
+  "scope": "EXACT_API_ORG_ONLY_RELEASE_SOURCE_NOT_ACTIVATION"
+}

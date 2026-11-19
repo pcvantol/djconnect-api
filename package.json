@@ -1,0 +1,48 @@
+{
+  "name": "djconnect-api",
+  "version": "4.1.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "deps:report": "node scripts/deps_report.mjs",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage.enabled true --coverage.provider istanbul --coverage.reporter cobertura --coverage.reportsDirectory coverage",
+    "test:e2e": "vitest run test/index.spec.ts -t \"privacy-safe E2E contract smoke flow\"",
+    "test:rendezvous-product": "node scripts/qualify_rendezvous_product_build.mjs",
+    "test:rendezvous-composition": "tsc --noEmit --project qualification/rendezvous/tsconfig.product-composition.json && vitest run --config qualification/rendezvous/vitest.product-composition.config.mts",
+    "test:smoke": "scripts/smoke_e2e.sh",
+    "cf-typegen": "wrangler types",
+    "postman:test": "npx --yes newman run postman/djconnect-api.postman_collection.json --env-var baseUrl=https://api.djconnect.dev --bail",
+    "smoke:e2e": "scripts/smoke_e2e.sh",
+    "provision:cloudflare": "scripts/provision_cloudflare.sh"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.23.0",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-istanbul": "~4.1.12",
+    "typescript": "^7.0.2",
+    "vitest": "~4.1.12",
+    "wrangler": "^4.160.0"
+  },
+  "overrides": {
+    "sharp": "0.35.5",
+    "undici": "7.30.2",
+    "zod": "4.6.7"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "esbuild@0.28.2": true,
+    "sharp@0.35.5": true,
+    "workerd@1.20260815.1": true,
+    "workerd@1.20260921.1": true,
+    "workerd@1.20261110.1": true,
+    "fsevents": false
+  },
+  "dependencies": {
+    "asn1js": "4.0.0",
+    "cbor": "10.0.12",
+    "pkijs": "4.0.1"
+  }
+}

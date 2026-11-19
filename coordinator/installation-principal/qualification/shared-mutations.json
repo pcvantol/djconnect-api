@@ -1,0 +1,86 @@
+[
+  {
+    "id": "missing",
+    "text": "{\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "unknown",
+    "text": "{\"attempt_limit\":1,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"extra\":true,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "family",
+    "text": "{\"attempt_limit\":1,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"other/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "null",
+    "text": "{\"attempt_limit\":null,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "bool",
+    "text": "{\"attempt_limit\":true,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "float",
+    "text": "{\"attempt_limit\":1.0,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "duplicate",
+    "text": "{\"attempt_limit\":1,\"attempt_limit\":1,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "negativezero",
+    "text": "{\"attempt_limit\":1,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":-0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "exponent",
+    "text": "{\"attempt_limit\":1e0,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "unsafe",
+    "text": "{\"attempt_limit\":1,\"core_installation_binding_sha256\":\"9141577bea7bb949339a2cc9058e4487a024e252ab9d0776824bfa274f03d6f8\",\"core_instance_id\":\"fixture-core\",\"custody_epoch\":9007199254740992,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"custody_restore_policy_sha256\":\"9ce6f9fbe7c30fc921ac1f71324bdd4eaaf6cf15e411352da87749d980b19156\",\"expected_local_revision\":0,\"installation_id\":\"fixture-installation\",\"kind\":\"custody-generation-preparation/1\",\"operator_admission_binding_sha256\":\"10a39cc293906a471b8187bd19490fad511ccc331244fcbeb4751326015f5c4c\",\"original_generation_deadline_unix_ms\":1712345678000,\"version\":1}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "depth5",
+    "text": "{\"a\":{\"a\":{\"a\":{\"a\":{\"a\":0}}}}}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "token257",
+    "text": "{\"k0\":0,\"k1\":0,\"k2\":0,\"k3\":0,\"k4\":0,\"k5\":0,\"k6\":0,\"k7\":0,\"k8\":0,\"k9\":0,\"k10\":0,\"k11\":0,\"k12\":0,\"k13\":0,\"k14\":0,\"k15\":0,\"k16\":0,\"k17\":0,\"k18\":0,\"k19\":0,\"k20\":0,\"k21\":0,\"k22\":0,\"k23\":0,\"k24\":0,\"k25\":0,\"k26\":0,\"k27\":0,\"k28\":0,\"k29\":0,\"k30\":0,\"k31\":0,\"k32\":0,\"k33\":0,\"k34\":0,\"k35\":0,\"k36\":0,\"k37\":0,\"k38\":0,\"k39\":0,\"k40\":0,\"k41\":0,\"k42\":0,\"k43\":0,\"k44\":0,\"k45\":0,\"k46\":0,\"k47\":0,\"k48\":0,\"k49\":0,\"k50\":0,\"k51\":0,\"k52\":0,\"k53\":0,\"k54\":0,\"k55\":0,\"k56\":0,\"k57\":0,\"k58\":0,\"k59\":0,\"k60\":0,\"k61\":0,\"k62\":0,\"k63\":0,\"k64\":0,\"k65\":0,\"k66\":0,\"k67\":0,\"k68\":0,\"k69\":0,\"k70\":0,\"k71\":0,\"k72\":0,\"k73\":0,\"k74\":0,\"k75\":0,\"k76\":0,\"k77\":0,\"k78\":0,\"k79\":0,\"k80\":0,\"k81\":0,\"k82\":0,\"k83\":0,\"k84\":0,\"k85\":0,\"k86\":0,\"k87\":0,\"k88\":0,\"k89\":0,\"k90\":0,\"k91\":0,\"k92\":0,\"k93\":0,\"k94\":0,\"k95\":0,\"k96\":0,\"k97\":0,\"k98\":0,\"k99\":0,\"k100\":0,\"k101\":0,\"k102\":0,\"k103\":0,\"k104\":0,\"k105\":0,\"k106\":0,\"k107\":0,\"k108\":0,\"k109\":0,\"k110\":0,\"k111\":0,\"k112\":0,\"k113\":0,\"k114\":0,\"k115\":0,\"k116\":0,\"k117\":0,\"k118\":0,\"k119\":0,\"k120\":0,\"k121\":0,\"k122\":0,\"k123\":0,\"k124\":0,\"k125\":0,\"k126\":0,\"k127\":0}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "escape",
+    "text": "{\"a\":\"\\q\"}",
+    "kind": "custody_generation_preparation",
+    "expected": "reject"
+  },
+  {
+    "id": "pin",
+    "text": "{\"core_instance_id\":\"fixture-core\",\"custody_epoch\":3,\"custody_operation_id\":\"00000000-0000-4000-8000-000000000001\",\"custody_policy_sha256\":\"e186573584e01a1d3cd5ada052ccd73cd97cda9bdd5d83a570595cbd483bc068\",\"generation_preparation_sha256\":\"81dacfef77a5e13e00c9ef1e784201dd12d0ffbf98d035c7b2c7ff9b7edc54f1\",\"installation_id\":\"fixture-installation\",\"kind\":\"custody-public-receipt/1\",\"local_committed_revision\":2,\"public_key_jwk\":{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY\",\"y\":\"T-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU\"},\"public_key_pin_sha256\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"version\":1}",
+    "kind": "custody_public_receipt",
+    "expected": "reject"
+  }
+]
